@@ -25,14 +25,25 @@ public:
                          const Size& size);
   virtual void deliverService();
   virtual int getVisitorsNumber() const;
+
+  virtual unsigned int getWalkerDistance() const;
+
+  virtual float evaluateTrainee(const WalkerType traineeType);
+
+protected:
+  int _getTraineeLevel();
 };
 
 class Theater : public EntertainmentBuilding
 {
 public:
-   Theater();
+  Theater();
 
-   virtual int getVisitorsNumber() const;
+  virtual void build(CityPtr city, const TilePos &pos);
+
+  virtual void timeStep(const unsigned long time);
+
+  virtual int getVisitorsNumber() const;
 };
 
 class Amphitheater : public EntertainmentBuilding
@@ -46,7 +57,6 @@ class Collosseum : public EntertainmentBuilding
 public:
    Collosseum();
 };
-
 
 class Hippodrome : public EntertainmentBuilding
 {

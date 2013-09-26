@@ -24,12 +24,12 @@
 #include "oc3_enums_helper.hpp"
 #include "oc3_foreach.hpp"
 
-BuildingData BuildingData::invalid = BuildingData( B_NONE, "unknown", 0 );
+BuildingData BuildingData::invalid = BuildingData( notBuilding, "unknown", 0 );
 
 class BuildingTypeHelper : public EnumsHelper<BuildingType>
 {
 public:
-  BuildingTypeHelper() : EnumsHelper<BuildingType>( B_NONE )
+  BuildingTypeHelper() : EnumsHelper<BuildingType>( notBuilding )
   {
     append( B_AMPHITHEATER,   "amphitheater");
     append( B_THEATER,        "theater" );
@@ -117,7 +117,7 @@ public:
     append( B_SENATE_2, "senate_2" );
     append( B_TOWER, "tower" );
     append( B_WALL, "wall"  );
-    append( B_NONE, "" );
+    append( notBuilding, "" );
  }
 };
 
@@ -211,11 +211,6 @@ int BuildingData::getCost() const
   return _cost;
 }
 
-int BuildingData::getEmployers() const
-{
-  return _employers;
-}
-
 const Picture &BuildingData::getBasePicture() const
 {
   return _basePicture;
@@ -245,7 +240,6 @@ BuildingData &BuildingData::operator=(const BuildingData &a)
   _basePicture = a._basePicture;
   _buildingClass = a._buildingClass;
   _d->desirability = a._d->desirability;
-  _employers = a._employers;
   _cost = a._cost;
 
   _d->options = a._d->options;
@@ -282,7 +276,7 @@ BuildingDataHolder& BuildingDataHolder::instance()
 
 BuildingType BuildingDataHolder::getConsumerType(const Good::Type inGoodType) const
 {
-  BuildingType res = B_NONE;
+  BuildingType res = notBuilding;
 
   Impl::FactoryInMap::iterator mapIt;
   mapIt = _d->mapBuildingByInGood.find(inGoodType);
@@ -351,7 +345,7 @@ void BuildingDataHolder::initialize( const io::FilePath& filename )
     VariantMap options = mapItem.second.toMap();
 
     const BuildingType btype = getType( mapItem.first );
-    if( btype == B_NONE )
+    if( btype == notBuilding )
     {
       StringHelper::debug( 0xff, "!!!Warning: can't associate type with %s", mapItem.first.c_str() );
       continue;
@@ -376,7 +370,6 @@ void BuildingDataHolder::initialize( const io::FilePath& filename )
     bData._d->desirability.base = (int)desMap[ "base" ];
     bData._d->desirability.range = (int)desMap[ "range" ];
     bData._d->desirability.step  = (int)desMap[ "step" ];
-    bData._employers = (int)options[ "employers" ];
 
     Variant prettyName = options[ "prettyName" ];
     if( prettyName.isValid() )

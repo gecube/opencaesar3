@@ -167,9 +167,15 @@ void InfoBoxSimple::_drawWorkers(const Point &pos, int picId, int need, int have
 }
 
 InfoBoxWorkingBuilding::InfoBoxWorkingBuilding( Widget* parent, WorkingBuildingPtr building)
-  : InfoBoxSimple( parent, Rect( 0, 0, 510, 256 ), Rect( 16, 136, 510 - 16, 136 + 62 ) )
+  : InfoBoxSimple( parent, Rect( 0, 0, 510, 256 ) )
 {
-  setTitle( BuildingDataHolder::instance().getData( building->getType() ).getPrettyName() );
+  setTitle( BuildingDataHolder::instance().getData( building->getType() ).getPrettyName() );  
+
+  if( building.isValid() && building->getMaxWorkers() > 0 )
+  {
+    Rect r( 16, 136, 510 - 16, 136 + 62 );
+    PictureDecorator::draw( *_d->bgPicture, r, PictureDecorator::blackFrame );
+  }
 
   _drawWorkers( Point( 32, 150 ), 542, building->getMaxWorkers(), building->getWorkers() );
 
@@ -233,6 +239,10 @@ InfoBoxHouse::InfoBoxHouse( Widget* parent, const Tile& tile )
   if( house->getLevelSpec().getHouseLevel() > 2 )
   {
     drawGood( house, Good::wheat, 0, 0, startY );
+    drawGood( house, Good::fish, 1, 0, startY );
+    drawGood( house, Good::meat, 2, 0, startY );
+    drawGood( house, Good::fruit, 3, 0, startY );
+    drawGood( house, Good::vegetable, 4, 0, startY );
   }
   else
   {
@@ -308,7 +318,7 @@ GuiInfoFactory::GuiInfoFactory( Widget* parent, const Tile& tile)
 
   // paint progress
   std::string text = StringHelper::format( 0xff, _("Le travail est a %d%% termine."), building->getProgress() );
-  new Label( this, Rect( _d->lbTitle->getLeftdownCorner(), Size( getWidth() - 32, 30 ) ), text );
+  new Label( this, Rect( _d->lbTitle->getLeftdownCorner() + Point( 10, 0 ), Size( getWidth() - 32, 25 ) ), text );
 
   if( building->getOutGoodType() != Good::none )
   {
@@ -318,15 +328,15 @@ GuiInfoFactory::GuiInfoFactory( Widget* parent, const Tile& tile)
   // paint picture of in good
   if( building->getInGood().type() != Good::none )
   {
-    getBgPicture().draw( GoodHelper::getPicture( building->getInGood().type() ), Point( 32, 20 ) );
+    getBgPicture().draw( GoodHelper::getPicture( building->getInGood().type() ), Point( 32, 45 ) );
     std::string text = StringHelper::format( 0xff, _("%s stock: %d units"),
                                              GoodHelper::getName( building->getInGood().type() ).c_str(),
                                              building->getInGood()._currentQty / 100 );
 
-    new Label( this, Rect( _d->lbTitle->getLeftdownCorner(), Size( getWidth() - 32, 30 ) ), text );
+    new Label( this, Rect( _d->lbTitle->getLeftdownCorner() + Point( 0, 25 ), Size( getWidth() - 32, 25 ) ), text );
   }
 
-  _drawWorkers( Point( 16, 157 ), 542, building->getMaxWorkers(), building->getWorkers() );
+  _drawWorkers( Point( 32, 157 ), 542, building->getMaxWorkers(), building->getWorkers() );
 }
 
 std::string GuiInfoFactory::getInfoText()

@@ -322,6 +322,8 @@ public:
   /** \param r The absolute position to set */
   void setGeometry(const Rect& r, GeometryType mode=RelativeGeometry );
 
+  void setGeometry(const RectF& r, GeometryType mode=ProportionalGeometry);
+
   //! 
   void setLeft( int newLeft );
 
@@ -425,7 +427,7 @@ protected:
   /*!
    * This event handler can be reimplemented in a subclass to receive
    * widget resize events which are passed in the \a event parameter.
-   * When resizeEvent_() is called, the widget already has its new
+   * When _resizeEvent() is called, the widget already has its new
    * geometry.
    */
   virtual void _resizeEvent();
@@ -441,9 +443,6 @@ protected:
 
   class Impl;
   ScopedPtr< Impl > _d;
-
-  //! is visible?
-  bool _isVisible;
 
   //! is enabled?
   bool _isEnabled;

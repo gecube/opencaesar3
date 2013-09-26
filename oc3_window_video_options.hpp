@@ -13,31 +13,30 @@
 // You should have received a copy of the GNU General Public License
 // along with openCaesar3.  If not, see <http://www.gnu.org/licenses/>.
 
-
-#ifndef __OPENCAESAR3_MESSAGE_STACK_WIDGET_H_INCLUDED__ 
-#define __OPENCAESAR3_MESSAGE_STACK_WIDGET_H_INCLUDED__ 
+#ifndef _OPENCAESAR3_WINDOW_VIDEO_OPTIONS_H_INCLUDE_
+#define _OPENCAESAR3_WINDOW_VIDEO_OPTIONS_H_INCLUDE_
 
 #include "oc3_gui_widget.hpp"
-#include "oc3_scopedptr.hpp"
+#include "oc3_signals.hpp"
 
-class WindowMessageStack : public Widget
+#define ANIMATOR_UNUSE_VALUE -9999
+
+class VideoOptionsWindow : public Widget
 {
 public:
-  static const int defaultID;
-  static WindowMessageStack* create( Widget* parent );
+  VideoOptionsWindow( Widget* parent );
 
-  // draw on screen
-  virtual void draw( GfxEngine& engine );
+  //! Деструктор
+  virtual ~VideoOptionsWindow(void);
 
-  bool onEvent(const NEvent& event);
+  virtual bool onEvent(const NEvent &event);
 
-  void addMessage( std::string );
- 
+public oc3_signals:
+  Signal1<Size>& onSreenSizeChange();
+
 private:
-  WindowMessageStack( Widget* parent, int id, const Rect& rectangle );
-
   class Impl;
   ScopedPtr< Impl > _d;
 };
 
-#endif
+#endif //_OPENCAESAR3_WINDOW_VIDEO_OPTIONS_H_INCLUDE_

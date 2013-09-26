@@ -15,9 +15,7 @@
 //
 // Copyright 2012-2013 Gregoire Athanase, gathanase@gmail.com
 
-#include "oc3_training_building.hpp"
-
-#include <iostream>
+#include "oc3_building_training.hpp"
 
 #include "oc3_walker_trainee.hpp"
 #include "oc3_exception.hpp"
@@ -30,17 +28,20 @@
 TrainingBuilding::TrainingBuilding( const BuildingType type, const Size& size )
   : WorkingBuilding( type, size )
 {
-   setMaxWorkers(5);
-   setWorkers(0);
    _trainingTimer = 0;
    _trainingDelay = 80;
 }
 
 void TrainingBuilding::timeStep(const unsigned long time)
 {
-   Building::timeStep(time);
+   WorkingBuilding::timeStep(time);
 
-   if (_trainingTimer == 0)
+   if( getWorkers() <= 0 )
+   {
+     return;
+   }
+
+   if( _trainingTimer == 0 )
    {
       deliverTrainee();
       _trainingTimer = _trainingDelay;
@@ -59,14 +60,6 @@ void TrainingBuilding::timeStep(const unsigned long time)
    }
 }
 
-// void TrainingBuilding::deliverTrainee()
-// {
-//    // make a service walker and send him to his wandering
-//    ServiceWalker *walker = new ServiceWalker(_service);
-//    walker->setServiceBuilding(*this);
-//    walker->start();
-// }
-
 void TrainingBuilding::save( VariantMap& stream) const
 {
   WorkingBuilding::save( stream );
@@ -76,23 +69,13 @@ void TrainingBuilding::save( VariantMap& stream) const
 
 void TrainingBuilding::load( const VariantMap& stream )
 {
-//    WorkingBuilding::unserialize(stream);
-//    _trainingTimer = stream.read_int(2, 0, 1000);
-//    _trainingDelay = stream.read_int(2, 0, 1000);
+  WorkingBuilding::load( stream );
+  _trainingTimer = (int)stream.get( "trainingTimer" );
+  _trainingDelay = (int)stream.get( "trainingDelay" );
 }
-
-
-//GuiInfoBox* TrainingBuilding::makeInfoBox()
-//{
-//   GuiInfoService* box = new GuiInfoService(*this);
-//   return box;
-//}
-
 
 ActorColony::ActorColony() : TrainingBuilding( B_ACTOR_COLONY, Size(3) )
 {
-  setPicture( Picture::load( ResourceGroup::entertaiment, 81));
-
   _getAnimation().load( ResourceGroup::entertaiment, 82, 9);
   _getAnimation().setOffset( Point( 68, -6 ) );
   _fgPictures.resize(1);
@@ -100,10 +83,19 @@ ActorColony::ActorColony() : TrainingBuilding( B_ACTOR_COLONY, Size(3) )
 
 void ActorColony::deliverTrainee()
 {
-   // std::cout << "Deliver trainee!" << std::endl;
-  TraineeWalkerPtr trainee = TraineeWalker::create( _getCity(), WT_ACTOR);
+  if( !getWalkerList().empty() )
+  {
+    return;
+  }
+
+  TraineeWalkerPtr trainee = TraineeWalker::create( _getCity(), WT_ACTOR );
   trainee->setOriginBuilding(*this);
   trainee->send2City();
+
+  if( !trainee->isDeleted() )
+  {
+    addWalker( trainee.as<Walker>() );
+  }
 }
 
 GladiatorSchool::GladiatorSchool() : TrainingBuilding( B_GLADIATOR_SCHOOL, Size(3))
