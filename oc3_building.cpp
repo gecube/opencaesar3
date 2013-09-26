@@ -247,7 +247,7 @@ float Building::evaluateService(ServiceWalkerPtr walker)
 
    switch(service)
    {
-   case Service::S_ENGINEER:
+   case Service::engineer:
       res = _damageLevel;
    break;
 
@@ -281,7 +281,7 @@ void Building::applyService( ServiceWalkerPtr walker)
 
    switch( service )
    {
-   case Service::S_ENGINEER:
+   case Service::engineer:
      {
        _damageLevel = 0;
      }
@@ -300,13 +300,13 @@ float Building::evaluateTrainee(const WalkerType traineeType)
 {
    float res = 0.0;
 
-   if (_reservedTrainees.count(traineeType) == 1)
+   if( _reservedTrainees.count(traineeType) == 1 )
    {
       // don't allow two reservations of the same type
       return 0.0;
    }
 
-   if (_traineeMap.count(traineeType) == 1)
+   if( _traineeMap.count(traineeType) == 1 )
    {
       int currentLevel = _traineeMap[traineeType];
       res = (float)( 101 - currentLevel );

@@ -81,6 +81,7 @@
 	cost : 50,
 	desirability : { base : -2, range : 3, step : 1 }
 	employers : 5
+  image : [ "entertainment", 81 ]
 	class : "entertainment"
   },
 
@@ -182,7 +183,7 @@
 	desirability : { base :4,	range : 4,	step : -1 }
 	employers : 10
 	class : "health"
-  image : [ "security", 21 ]
+  image : [ "security", 32 ]
   animation : { start : 22, count : 10, offset : [ 23, 25 ] }
   service : "srvc_baths" 
   }, 
@@ -341,6 +342,7 @@
 	desirability : { base : -2, 	range : 2, 	step : 1 }
 	employers : 5
 	class : "food"
+  image : [ "commerce", 1 ]
   }, 
 
   granery :
@@ -499,7 +501,7 @@
   {
     cost : 5,
     desirability : { base : -1,    range : 1,    step : 1 }
-    employers : 1,
+    employers : 0,
     pretty : "Well",
     image : [ "utilitya", 1 ]
     class : "water"
@@ -648,6 +650,8 @@
   description : "##clay_pit_help##"
 	desirability : { base : -3,	range : 3,	step : 1 }
 	employers : 10
+  image : [ "commerce", 61 ]
+  productRate : 9.6
 	class : "rawmaterial"
   },
   
@@ -689,5 +693,6 @@
 	desirability : { base : -4,	range : 2,	step : 2 }
 	employers : 10
 	class : "industry"
+  image : [ "commerce", 132 ]
   }
 }

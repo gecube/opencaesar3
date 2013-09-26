@@ -40,6 +40,8 @@ public:
   const std::string& getLevelName() const;
   const std::string& getInternalName() const;
 
+  int getRequiredGoodLevel(Good::Type type) const;
+
   // returns True if patrician villa
   bool isPatrician() const;
 
@@ -47,19 +49,19 @@ public:
 
   HouseLevelSpec next() const;
 
-  int computeEntertainmentLevel(HousePtr house);
+  int computeEntertainmentLevel(HousePtr house) const;
   int computeEducationLevel(HousePtr house, std::string &oMissingRequirement);
   int computeHealthLevel(HousePtr house, std::string &oMissingRequirement);
   int computeReligionLevel(HousePtr house);
   int computeWaterLevel(HousePtr house, std::string &oMissingRequirement);
   int computeFoodLevel(HousePtr house);
-  int computeMonthlyConsumption(House &house, const Good::Type goodType);
+  int computeMonthlyConsumption(House &house, const Good::Type goodType, bool real);
 
-  float evaluateServiceNeed(House &house, const Service::Type service);
-  float evaluateEntertainmentNeed(House &house, const Service::Type service);
-  float evaluateEducationNeed(House &house, const Service::Type service);
-  float evaluateHealthNeed(House &house, const Service::Type service);
-  float evaluateReligionNeed(House &house, const Service::Type service);
+  float evaluateServiceNeed(HousePtr house, const Service::Type service);
+  float evaluateEntertainmentNeed(HousePtr house, const Service::Type service);
+  float evaluateEducationNeed(HousePtr house, const Service::Type service);
+  float evaluateHealthNeed(HousePtr house, const Service::Type service);
+  float evaluateReligionNeed(HousePtr house, const Service::Type service);
   // float evaluateFoodNeed(House &house, const ServiceType service);
 
 

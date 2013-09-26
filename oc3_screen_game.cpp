@@ -49,6 +49,7 @@
 #include "oc3_gettext.hpp"
 #include "oc3_window_minimap.hpp"
 #include "oc3_game_event_mgr.hpp"
+#include "oc3_window_video_options.hpp"
 
 class ScreenGame::Impl
 {
@@ -60,7 +61,6 @@ public:
   ExtentMenu* extMenu;
   InfoBoxManagerPtr infoBoxMgr;
   CityRenderer renderer;
-  WindowMessageStack* wndStackMsgs;
   Game* game; // current game scenario
   AlarmEventHolder alarmsHolder;
 
@@ -77,6 +77,8 @@ public:
   void resolveRemoveTool();
   void showTileInfo( const Tile& tile );
   void makeScreenShot();
+  void showScreenOptionsDialog();
+  void resolveWarningMessage( std::string );
 };
 
 ScreenGame::ScreenGame(Game& game , GfxEngine& engine ) : _d( new Impl )
@@ -123,10 +125,8 @@ void ScreenGame::initialize()
                                city->getTilemap(),
                                city->getClimate() );
 
-  _d->wndStackMsgs = WindowMessageStack::create( gui.getRootWidget(), -1 );
-  _d->wndStackMsgs->setPosition( Point( gui.getRootWidget()->getWidth() / 4, 33 ) );
-  _d->wndStackMsgs->sendToBack();
-    
+  WindowMessageStack::create( gui.getRootWidget() );
+
   _d->rightPanel->bringToFront();
 
   // 8*30: used for high buildings (granary...), visible even when not in tilemap_area.
@@ -139,6 +139,7 @@ void ScreenGame::initialize()
   CONNECT( _d->topMenu, onExit(), this, ScreenGame::resolveExitGame );
   CONNECT( _d->topMenu, onEnd(), this, ScreenGame::resolveEndGame );
   CONNECT( _d->topMenu, onRequestAdvisor(), _d.data(), Impl::showAdvisorsWindow );
+  CONNECT( _d->topMenu, onShowVideoOptions(), _d.data(), Impl::showScreenOptionsDialog );
 
   CONNECT( _d->menu, onCreateConstruction(), _d.data(), Impl::resolveCreateConstruction );
   CONNECT( _d->menu, onRemoveTool(), _d.data(), Impl::resolveRemoveTool );
@@ -152,8 +153,8 @@ void ScreenGame::initialize()
 
   CONNECT( &_d->renderer, onShowTileInfo(), _d.data(), Impl::showTileInfo );
 
-  CONNECT( city, onWarningMessage(), _d->wndStackMsgs, WindowMessageStack::addMessage );
-  CONNECT( &_d->renderer, onWarningMessage(), _d->wndStackMsgs, WindowMessageStack::addMessage );
+  CONNECT( city, onWarningMessage(), _d.data(), Impl::resolveWarningMessage );
+  CONNECT( &_d->renderer, onWarningMessage(), _d.data(), Impl::resolveWarningMessage );
   CONNECT( _d->extMenu, onSelectOverlayType(), _d.data(), Impl::resolveSelectOverlayView );
   CONNECT( _d->extMenu, onEmpireMapShow(), _d.data(), Impl::showEmpireMapWindow );
   CONNECT( _d->extMenu, onAdvisorsWindowShow(), _d.data(), Impl::showAdvisorsWindow );
@@ -173,6 +174,17 @@ void ScreenGame::Impl::showSaveDialog()
 {
   SaveDialog* dialog = new SaveDialog( game->getGui()->getRootWidget(), "saves", ".oc3save", -1 );
   CONNECT( dialog, onFileSelected(), game, Game::save );
+}
+
+void ScreenGame::Impl::showScreenOptionsDialog()
+{
+  VideoOptionsWindow* dialog = new VideoOptionsWindow( game->getGui()->getRootWidget() );
+  CONNECT( dialog, onSreenSizeChange(), engine, GfxEngine::setScreenSize );
+}
+
+void ScreenGame::Impl::resolveWarningMessage(std::string text )
+{
+  GameEventMgr::append( WarningMessageEvent::create( text ) );
 }
 
 void ScreenGame::Impl::showEmpireMapWindow()
