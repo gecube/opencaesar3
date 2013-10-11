@@ -14,7 +14,7 @@
 // along with openCaesar3.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "oc3_gettext.hpp"
-#include "oc3_topmenu.hpp"
+#include "oc3_gui_topmenu.hpp"
 #include "oc3_gui_label.hpp"
 #include "oc3_resourcegroup.hpp"
 #include "oc3_contextmenuitem.hpp"
@@ -39,6 +39,7 @@ public:
   Label* lbPopulation;
   Label* lbFunds;
   Label* lbDate;
+  ContextMenu* langSelect;
   PictureRef bgPicture;
 
   void resolveSave();
@@ -78,7 +79,8 @@ void TopMenu::setPopulation( int value )
 
 void TopMenu::setFunds( int value )
 {
-  _d->lbFunds->setText( StringHelper::format( 0xff, "%.2s %d", _("##denarii_short##"), value) );
+  if( _d->lbFunds )
+    _d->lbFunds->setText( StringHelper::format( 0xff, "%.2s %d", _("##denarii_short##"), value) );
 }
 
 void TopMenu::Impl::updateDate()
@@ -136,8 +138,8 @@ TopMenu::TopMenu( Widget* parent, const int height )
   ContextMenuItem* tmp = addItem( _("##gmenu_file##"), -1, true, true, false, false );
   ContextMenu* file = tmp->addSubMenu();
 
-  ContextMenuItem* newGame = file->addItem( _("##gmenu_file_new##"), -1, true, false, false, false );
-  ContextMenuItem* restart = file->addItem( _("##gmenu_file_restart##"), -1, true, false, false, false );
+  /*ContextMenuItem* newGame = */file->addItem( _("##gmenu_file_new##"), -1, true, false, false, false );
+  /*ContextMenuItem* restart = */ file->addItem( _("##gmenu_file_restart##"), -1, true, false, false, false );
   ContextMenuItem* load = file->addItem( _("##gmenu_file_load##"), -1, true, false, false, false );
   ContextMenuItem* save = file->addItem( _("##gmenu_file_save##"), -1, true, false, false, false );
   ContextMenuItem* mainMenu = file->addItem( _("##gmenu_file_mainmenu##"), -1, true, false, false, false );
@@ -151,11 +153,17 @@ TopMenu::TopMenu( Widget* parent, const int height )
   tmp = addItem( _("##gmenu_options##"), -1, true, true, false, false );
   ContextMenu* options = tmp->addSubMenu();
   ContextMenuItem* screen = options->addItem( _("##screen_options##"), -1, true, false, false, false );  
-  ContextMenuItem* sound = options->addItem( _("##sound_options##"), -1, true, false, false, false );
-  ContextMenuItem* speed = options->addItem( _("##speed_options##"), -1, true, false, false, false );
+  /*ContextMenuItem* sound = */options->addItem( _("##sound_options##"), -1, true, false, false, false );
+  /*ContextMenuItem* speed = */options->addItem( _("##speed_options##"), -1, true, false, false, false );
+  ContextMenuItem* language = options->addItem( _("##select_language##"), -1, true, true, false, false );
+  _d->langSelect = language->addSubMenu();
+  ContextMenuItem* russianLng = _d->langSelect->addItem( _("##russian_lang##"), 0xf001, true, false, false, false );
+  ContextMenuItem* englishLng = _d->langSelect->addItem( _("##english_lang##"), 0xf002, true, false, false, false );
+
+  CONNECT( russianLng, onClicked(), this, TopMenu::resolveSelectLanguage );
+  CONNECT( englishLng, onClicked(), this, TopMenu::resolveSelectLanguage );
 
   CONNECT( screen, onClicked(), &_d->onShowVideoOptionsSignal, Signal0<>::emit );
-
 
   tmp = addItem( _("##gmenu_help##"), -1, true, true, false, false );
   tmp = addItem( _("##gmenu_advisors##"), -1, true, true, false, false );
@@ -193,6 +201,22 @@ Signal0<>& TopMenu::onEnd()
 Signal1<int>& TopMenu::onRequestAdvisor()
 {
   return _d->onRequestAdvisorSignal;
+}
+
+void TopMenu::resolveSelectLanguage()
+{
+  if( ContextMenuItem* current = _d->langSelect->getSelectedItem() )
+  {
+    switch( current->getCommandId() )
+    {
+    case 0xf001: putenv( "LC_ALL=ru_RU" ); break;
+
+    case 0xf002:
+    default:
+        putenv( "LC_ALL=en_US" );
+    break;
+    }
+  }
 }
 
 Signal0<>& TopMenu::onLoad()

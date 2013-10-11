@@ -54,10 +54,10 @@ public:
   }
 };
 
-Market::Market() : ServiceBuilding(Service::S_MARKET, B_MARKET, Size(2) ),
+Market::Market() : ServiceBuilding(Service::market, B_MARKET, Size(2) ),
   _d( new Impl )
 {
-  _fgPictures.resize(1);  // animation
+  _getForegroundPictures().resize(1);  // animation
 
   _d->initStore();
 

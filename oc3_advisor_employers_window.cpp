@@ -25,6 +25,9 @@
 #include "oc3_enums.hpp"
 #include "oc3_foreach.hpp"
 #include "oc3_city.hpp"
+#include "oc3_cityfunds.hpp"
+#include "oc3_game_settings.hpp"
+#include "oc3_empire.hpp"
 
 static const Point employerButtonOffset = Point( 0, 25 );
 static const Size  employerButtonSize = Size( 560, 22 );
@@ -40,7 +43,7 @@ public:
     _haveWorkers = have;
   }
 
-  void _updateTexture( ElementState state )
+  virtual void _updateTexture( ElementState state )
   {
     PushButton::_updateTexture( state );
 
@@ -82,10 +85,19 @@ public:
     prCount
   };
 
-  PictureRef background;
+  Label* lbSalary;
+  Label* lbYearlyWages;
+  Label* lbWorkersState;
+
   CityPtr city;
 
   void showPriorityWindow( int id );
+  void increaseSalary();
+  void decreaseSalary();
+  void updateSalaryLabel();
+  void updateWorkersState();
+  void updateYearlyWages();
+  void changeSalary( int relative );
 
   struct EmployersInfo { 
     unsigned int needWorkers;
@@ -100,6 +112,64 @@ public:
 void AdvisorEmployerWindow::Impl::showPriorityWindow( int id )
 {
 
+}
+
+void AdvisorEmployerWindow::Impl::increaseSalary()
+{
+  changeSalary( +1 );
+}
+
+void AdvisorEmployerWindow::Impl::decreaseSalary()
+{
+  changeSalary( -1 );
+}
+
+void AdvisorEmployerWindow::Impl::updateWorkersState()
+{
+  int workers = CityStatistic::getCurrentWorkersNumber( city );
+  int allWorkers = CityStatistic::getAvailableWorkersNumber( city );
+  int withoutWork = CityStatistic::getWorklessNumber( city );
+  std::string strWorkerState = StringHelper::format( 0xff, "%d %s     %d %s  ( %d%% )",
+                                                     workers, _("##advemployer_panel_workers##"),
+                                                     withoutWork, _("##advemployer_panel_workless##"),
+                                                     (withoutWork * 100/ (allWorkers+1)) );
+
+  if( lbWorkersState )
+  {
+    lbWorkersState->setText( strWorkerState );
+  }
+}
+
+void AdvisorEmployerWindow::Impl::updateYearlyWages()
+{
+  if( lbYearlyWages )
+  {
+    int wages = CityStatistic::getMontlyWorkersWages( city ) * DateTime::monthInYear;
+    std::string wagesStr = StringHelper::format( 0xff, "%s %d", _("##workers_yearly_wages_is##"), wages );
+
+    lbYearlyWages->setText( wagesStr );
+  }
+}
+
+void AdvisorEmployerWindow::Impl::changeSalary(int relative)
+{
+  int currentSalary = city->getFunds().getWorkerSalary();
+  city->getFunds().setWorkerSalary( currentSalary+relative );
+  updateSalaryLabel();
+}
+
+void AdvisorEmployerWindow::Impl::updateSalaryLabel()
+{
+  int pay = 30;
+  int romePay = city->getEmpire()->getWorkersSalary();
+  std::string salaryString = StringHelper::format( 0xff, "%s %d (%s %d)",
+                                                   _("##advemployer_panel_denaries##"), pay,
+                                                   _("##advemployer_panel_romepay##"), romePay );
+
+  if( lbSalary )
+  {
+    lbSalary->setText( salaryString );
+  }
 }
 
 AdvisorEmployerWindow::Impl::EmployersInfo AdvisorEmployerWindow::Impl::getEmployersInfo( PriorityIndex type )
@@ -142,72 +212,45 @@ EmployerButton* AdvisorEmployerWindow::Impl::addButton( Widget* parent, const Po
 {
   EmployersInfo info = getEmployersInfo( priority );
 
-  return new EmployerButton( parent, startPos, priority, title, info.needWorkers, info.currentWorkers );
+  EmployerButton* btn = new EmployerButton( parent, startPos, priority, title, info.needWorkers, info.currentWorkers );
+  btn->setText( "" );
+
+  return btn;
 }
 
 AdvisorEmployerWindow::AdvisorEmployerWindow( CityPtr city, Widget* parent, int id ) 
 : Widget( parent, id, Rect( 0, 0, 1, 1 ) ), _d( new Impl )
 {
-  setGeometry( Rect( Point( (parent->getWidth() - 640 )/2, parent->getHeight() / 2 - 242 ), Size( 640, 416 ) ) );
+  setupUI( GameSettings::rcpath( "/gui/employersadv.gui" ) );
+  setPosition( Point( (parent->getWidth() - getWidth()) / 2, parent->getHeight() / 2 - 242 ) );
 
   _d->city = city;
-  _d->background.reset( Picture::create( getSize() ) );
-  //main _d->_d->background
-  PictureDecorator::draw( *_d->background, Rect( Point( 0, 0 ), getSize() ), PictureDecorator::whiteFrame );
 
   //buttons _d->_d->background
-  Point startPos( 32, 70 );
-  PictureDecorator::draw( *_d->background, Rect( startPos, Size( 576, 238 ) ), PictureDecorator::blackFrame );
+  Point startPos = Point( 32, 70 ) + Point( 8, 8 );
+  _d->addButton( this, startPos, Impl::prIndustryAndTrade, _("##adve_industry_and_trade##") );
+  _d->addButton( this, startPos, Impl::prFood, _("##adve_food##") );
+  _d->addButton( this, startPos, Impl::prEngineers, _("##adve_engineers##" ) );
+  _d->addButton( this, startPos, Impl::prWater, _("##adve_water##") );
+  _d->addButton( this, startPos, Impl::prPrefectures, _("##adve_prefectures##") );
+  _d->addButton( this, startPos, Impl::prMilitary, _("##adve_military##") );
+  _d->addButton( this, startPos, Impl::prEntertainment, _("##adve_entertainment##") );
+  _d->addButton( this, startPos, Impl::prHealthAndEducation, _("##adve_health_education##") );
+  _d->addButton( this, startPos, Impl::prAdministrationAndReligion, _("##adve_administration_religion##") );
 
-  //salary _d->_d->background
-  Rect salaryBgRect( Point( 64, 352 ), Size( 510, 32 ) );
-  PictureDecorator::draw( *_d->background, salaryBgRect, PictureDecorator::blackFrame );
+  _d->lbSalary = findChild<Label*>( "lbSalaries", true );
+  _d->lbWorkersState = findChild<Label*>( "lbWorkersState", true );
+  _d->lbYearlyWages = findChild<Label*>( "lbYearlyWages", true );
 
-  Font font = Font::create( FONT_1 );
-  font.draw( *_d->background, _("##advemployer_panel_priority##"), 56, 54, false );
-  font.draw( *_d->background, _("##advemployer_panel_sector##"), 164, 54, false );
-  font.draw( *_d->background, _("##advemployer_panel_needworkers##"), 400, 54, false );
-  font.draw( *_d->background, _("##advemployer_panel_haveworkers##"), 500, 54, false );
-
-  startPos += Point( 8, 8 );
-  _d->addButton( this, startPos, Impl::prIndustryAndTrade, "industry&trade" );
-  _d->addButton( this, startPos, Impl::prFood, "food" );
-  _d->addButton( this, startPos, Impl::prEngineers, "engineers" );
-  _d->addButton( this, startPos, Impl::prWater, "water" );
-  _d->addButton( this, startPos, Impl::prPrefectures, "prefectures" );
-  _d->addButton( this, startPos, Impl::prMilitary, "military" );
-  _d->addButton( this, startPos, Impl::prEntertainment, "entertainment" );
-  _d->addButton( this, startPos, Impl::prHealthAndEducation, "health&education" );
-  _d->addButton( this, startPos, Impl::prAdministrationAndReligion, "administration&religion" );
-
-  new TexturedButton( this, Point( 160, 356 ), Size( 24 ), -1, 601 );
-  new TexturedButton( this, Point( 160+24, 356 ), Size( 24 ), -1, 605 );
-
-  Font font2 = Font::create( FONT_2 );
-  font2.draw( *_d->background, _("##advemployer_panel_salary##"), salaryBgRect.UpperLeftCorner + Point( 4, 4), false );
-
-  int pay = 30, romePay = 30;
-  std::string salaryString = StringHelper::format( 0xff, "%d %s (%s %d)", pay, _("##advemployer_panel_denaries##"),
-    _("##advemployer_panel_romepay##"), romePay );
-  new Label( this, Rect( salaryBgRect.UpperLeftCorner + Point( 168, 4), Size( 340, 26 )), salaryString );
-
-  int workers = 0, withoutWork = 0;
-  std::string strWorkerState = StringHelper::format( 0xff, "%d %s     %d %s  ( %d%% )", workers, _("##advemployer_panel_workers##"),
-    withoutWork, _("##advemployer_panel_workless##"), (withoutWork * 100/ (workers+1)) );
-  new Label( this, Rect( Point( 32, 310 ), Size( 550, 28) ), strWorkerState );
-
-  Label* title = new Label( this, Rect( 10, 10, getWidth() - 10, 10 + 40) );
-  title->setText( _("##advemployer_panel_title##") );
-  title->setFont( Font::create( FONT_3 ) );
-  title->setTextAlignment( alignCenter, alignCenter );
+  _d->updateSalaryLabel();
+  _d->updateWorkersState();
+  _d->updateYearlyWages();
 }
 
 void AdvisorEmployerWindow::draw( GfxEngine& painter )
 {
   if( !isVisible() )
     return;
-
-  painter.drawPicture( *_d->background, getScreenLeft(), getScreenTop() );
 
   Widget::draw( painter );
 }

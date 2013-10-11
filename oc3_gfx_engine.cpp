@@ -60,6 +60,16 @@ int GfxEngine::getScreenHeight() const
   return _srcSize.getHeight();
 }
 
+bool GfxEngine::isFullscreen() const
+{
+  return getFlag( fullscreen ) > 0;
+}
+
+void GfxEngine::setFullscreen(bool enabled)
+{
+  setFlag( fullscreen, enabled ? 1 : 0 );
+}
+
 Size GfxEngine::getScreenSize() const
 {
   return _srcSize;
@@ -67,4 +77,11 @@ Size GfxEngine::getScreenSize() const
 
 void GfxEngine::setFlag( int flag, int value )
 {
+  _flags[ flag ] = value;
+}
+
+int GfxEngine::getFlag(int flag) const
+{
+  std::map< int, int >::const_iterator it = _flags.find( flag );
+  return it != _flags.end() ? it->second : 0;
 }

@@ -32,6 +32,14 @@ public:
   virtual bool isWalkable() const;
   virtual bool isNeedRoadAccess() const;
   virtual void destroy();
+  virtual void appendPaved( int value );
+  int getPavedValue() const;
+
+  virtual void save(VariantMap &stream) const;
+  virtual void load(const VariantMap &stream);
+
+private:
+  int _paved;
 };
 
 class Plaza : public Road
@@ -41,6 +49,7 @@ public:
   virtual void initTerrain(Tile& terrain);
   virtual bool canBuild( CityPtr city, const TilePos& pos ) const;
   virtual Picture computePicture();
+  virtual void appendPaved(int value);
 };
 
 

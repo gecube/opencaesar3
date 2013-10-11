@@ -24,7 +24,7 @@
 #include "oc3_gui_rightpanel.hpp"
 #include "oc3_resourcegroup.hpp"
 #include "oc3_guienv.hpp"
-#include "oc3_topmenu.hpp"
+#include "oc3_gui_topmenu.hpp"
 #include "oc3_gui_menu.hpp"
 #include "oc3_event.hpp"
 #include "oc3_infoboxmanager.hpp"
@@ -178,8 +178,11 @@ void ScreenGame::Impl::showSaveDialog()
 
 void ScreenGame::Impl::showScreenOptionsDialog()
 {
-  VideoOptionsWindow* dialog = new VideoOptionsWindow( game->getGui()->getRootWidget() );
+  VideoOptionsWindow* dialog = new VideoOptionsWindow( game->getGui()->getRootWidget(),
+                                                       engine->getAvailableModes(),
+                                                       engine->isFullscreen() );
   CONNECT( dialog, onSreenSizeChange(), engine, GfxEngine::setScreenSize );
+  CONNECT( dialog, onFullScreenChange(), engine, GfxEngine::setFullscreen );
 }
 
 void ScreenGame::Impl::resolveWarningMessage(std::string text )
@@ -365,7 +368,7 @@ void ScreenGame::Impl::showAdvisorsWindow( const int advType )
   }
   else
   {
-    AdvisorsWindow* advWnd = AdvisorsWindow::create( game->getGui()->getRootWidget(), -1,
+    /*AdvisorsWindow* advWnd = */AdvisorsWindow::create( game->getGui()->getRootWidget(), -1,
                                                      (AdvisorType)advType, game->getCity() );
   }
 }

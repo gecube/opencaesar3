@@ -162,7 +162,7 @@ void InfoBoxSimple::_drawWorkers(const Point &pos, int picId, int need, int have
   _d->bgPicture->draw( Picture::load( ResourceGroup::panelBackground, picId ), pos );
 
   // number of workers
-  std::string text = StringHelper::format( 0xff, "%d %s (%d %s)", have, _("employers"), need, _("requierd") );
+  std::string text = StringHelper::format( 0xff, "%d %s (%d %s)", have, _("##employers##"), need, _("##requierd##") );
   Font::create( FONT_2 ).draw( *_d->bgPicture, text, pos + Point( 20, 5), false );
 }
 
@@ -219,18 +219,24 @@ InfoBoxHouse::InfoBoxHouse( Widget* parent, const Tile& tile )
   : InfoBoxSimple( parent, Rect( 0, 0, 510, 360 ), Rect( 16, 150, 510 - 16, 360 - 50 ) )
 {
   HousePtr house = tile.getOverlay().as<House>();
-  setTitle( house->getName() );
+  setTitle( house->getLevelSpec().getLevelName() );
 
-  new Label( this, Rect( 30, 40, getWidth() - 30, 40 + 100 ), house->getUpCondition() );
+  Label* houseInfo = new Label( this, Rect( 30, 40, getWidth() - 30, 40 + 100 ), house->getUpCondition() );
+  houseInfo->setWordWrap( true );
+
+  std::string workerState = StringHelper::format( 0xff, "habtns=%d avWrk=%d",
+                                                  house->getNbHabitants(),
+                                                  house->getServiceValue( Service::workersRecruter ) );
+  new Label( this, Rect( 16, 125, getWidth() - 16, 150 ), workerState );
 
   drawHabitants( house );
 
-  int taxes = -1;
-  std::string taxesStr = taxes > 0
+  int taxes = house->getLevelSpec().getTaxRate();
+  std::string taxesStr = taxes <= 0
                            ? StringHelper::format( 0xff, _("##house_not_taxation##") )
-                           : StringHelper::format( 0xff, _("%d %s"), taxes, _("##house_pay_tax##") );
+                           : StringHelper::format( 0xff, "%d %s", taxes, _("##house_pay_tax##") );
 
-  Label* taxesLb = new Label( this, Rect( 16 + 15, 177, getWidth() - 16, 177 + 20 ), taxesStr );
+  Label* taxesLb = new Label( this, Rect( 16 + 35, 177, getWidth() - 16, 177 + 20 ), taxesStr );
 
   std::string aboutCrimes = _("##house_not_report_about_crimes##");
   Label* lbCrime = new Label( this, taxesLb->getRelativeRect() + Point( 0, 22 ), aboutCrimes );
@@ -280,17 +286,17 @@ void InfoBoxHouse::drawHabitants( HousePtr house )
   if( freeRoom > 0 )
   {
     // there is some room for new habitants!
-    freeRoomText = StringHelper::format( 0xff, _("%d citizens, additional rooms for %d"), house->getNbHabitants(), freeRoom);
+    freeRoomText = StringHelper::format( 0xff, "%d %s %d", house->getNbHabitants(), _("##citizens_additional_rooms_for##"), freeRoom);
   }
   else if (freeRoom == 0)
   {
     // full house!
-    freeRoomText = StringHelper::format( 0xff, _("%d citizens"), house->getNbHabitants());
+    freeRoomText = StringHelper::format( 0xff, "%d %s", house->getNbHabitants(), _("##citizens##"));
   }
   else if (freeRoom < 0)
   {
     // too many habitants!
-    freeRoomText = StringHelper::format( 0xff, _("%d citizens, %d habitants en trop"), house->getNbHabitants(), -freeRoom);
+    freeRoomText = StringHelper::format( 0xff, "%d %s %d", house->getNbHabitants(), _("##no_room_for_citizens##"),-freeRoom);
     lbHabitants->setFont( Font::create( FONT_2_RED ) );
   }
 
@@ -317,7 +323,7 @@ GuiInfoFactory::GuiInfoFactory( Widget* parent, const Tile& tile)
   setTitle( BuildingDataHolder::getPrettyName( building->getType() ) );
 
   // paint progress
-  std::string text = StringHelper::format( 0xff, _("Le travail est a %d%% termine."), building->getProgress() );
+  std::string text = StringHelper::format( 0xff, "%s %d%%", _("##production_ready_at##"), building->getProgress() );
   new Label( this, Rect( _d->lbTitle->getLeftdownCorner() + Point( 10, 0 ), Size( getWidth() - 32, 25 ) ), text );
 
   if( building->getOutGoodType() != Good::none )
@@ -329,9 +335,11 @@ GuiInfoFactory::GuiInfoFactory( Widget* parent, const Tile& tile)
   if( building->getInGood().type() != Good::none )
   {
     getBgPicture().draw( GoodHelper::getPicture( building->getInGood().type() ), Point( 32, 45 ) );
-    std::string text = StringHelper::format( 0xff, _("%s stock: %d units"),
+    std::string text = StringHelper::format( 0xff, "%s %s: %d %s",
                                              GoodHelper::getName( building->getInGood().type() ).c_str(),
-                                             building->getInGood()._currentQty / 100 );
+                                             _("##factory_stock##"),
+                                             building->getInGood()._currentQty / 100,
+                                             _("##factory_units##") );
 
     new Label( this, Rect( _d->lbTitle->getLeftdownCorner() + Point( 0, 25 ), Size( getWidth() - 32, 25 ) ), text );
   }
@@ -395,9 +403,10 @@ InfoBoxGranary::InfoBoxGranary( Widget* parent, const Tile& tile )
   setTitle( BuildingDataHolder::getPrettyName( _granary->getType() ) );
 
   // summary: total stock, free capacity
-  std::string desc = StringHelper::format( 0xff, _("%d unites en stock. Espace pour %d unites."),
-                                                  _granary->getGoodStore().getCurrentQty(),
-                                                  _granary->getGoodStore().getFreeQty() );
+  std::string desc = StringHelper::format( 0xff, "%d %s %d",
+                                           _granary->getGoodStore().getCurrentQty(),
+                                           _("##units_in_stock_freespace_for##"),
+                                           _granary->getGoodStore().getFreeQty() );
 
   Label* lbUnits = new Label( this, Rect( _d->lbTitle->getLeftdownCorner(), Size( getWidth() - 16, 40 )), desc );
 
@@ -544,8 +553,6 @@ InfoBoxMarket::InfoBoxMarket( Widget* parent, const Tile& tile )
 
    Label* lbAbout = new Label( this, _d->lbTitle->getRelativeRect() + Point( 0, 30 ) );
 
-   setTitle( _("building_market") );
-
    if( market->getWorkers() > 0 )
    {
      GoodStore& goods = market->getGoodStore();
@@ -626,36 +633,36 @@ InfoBoxLand::InfoBoxLand( Widget* parent, const Tile& tile )
 
   if( tile.getFlag( Tile::tlTree ) )
   {
-    setTitle( _("##trees_and_forest_caption") );
-    lbText->setText( _("##trees_and_forest_text"));
+    setTitle( _("##trees_and_forest_caption##") );
+    lbText->setText( _("##trees_and_forest_text##"));
   } 
   else if( tile.getFlag( Tile::tlWater ) )
   {
-    setTitle( _("##water_caption") );
-    lbText->setText( _("##water_text"));
+    setTitle( _("##water_caption##") );
+    lbText->setText( _("##water_text##"));
   }
   else if( tile.getFlag( Tile::tlRock ) )
   {
-    setTitle( _("##rock_caption") );
-    lbText->setText( _("##rock_text"));
+    setTitle( _("##rock_caption##") );
+    lbText->setText( _("##rock_text##"));
   }
   else if( tile.getFlag( Tile::tlRoad ) )
   {
     if( tile.getOverlay()->getType() == B_PLAZA )
     {
-      setTitle( _("##plaza_caption") );
-      lbText->setText( _("##plaza_text"));
+      setTitle( _("##plaza_caption##") );
+      lbText->setText( _("##plaza_text##"));
     }
     else 
     {
-     setTitle( _("##road_caption") );
-      lbText->setText( _("##road_text"));
+     setTitle( _("##road_caption##") );
+      lbText->setText( _("##road_text##"));
     }
   }
   else 
   {
-    setTitle( _("##clear_land_caption") );
-    lbText->setText( _("##clear_land_text"));
+    setTitle( _("##clear_land_caption##") );
+    lbText->setText( _("##clear_land_text##"));
   }
   
   //int index = (size - tile.getJ() - 1 + border_size) * 162 + tile.getI() + border_size;
@@ -705,7 +712,7 @@ InfoBoxRawMaterial::InfoBoxRawMaterial( Widget* parent, const Tile& tile )
                                           (int)rawmb->getDamageLevel(), (int)rawmb->getFireLevel());
   new Label( this, Rect( 50, getHeight() - 50, getWidth() - 50, getHeight() - 16 ), text );
 
-  text = StringHelper::format( 0xff, _("Production %d%% complete."), rawmb->getProgress() );
+  text = StringHelper::format( 0xff, "%s %d", _("##rawm_production_complete##"), rawmb->getProgress() );
   Label* lbProgress = new Label( this, Rect( 32, 50, getWidth() - 16, 50 + 32 ), text );
   Label* lbAbout = new Label( this, Rect( 32, lbProgress->getBottom() + 6, getWidth() - 16, 130 ) );
 

@@ -13,36 +13,25 @@
 // You should have received a copy of the GNU General Public License
 // along with openCaesar3.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef __OPENCAESAR3_TOPMENU_H_INCLUDE_
-#define __OPENCAESAR3_TOPMENU_H_INCLUDE_
+#ifndef __OPENCAESAR3_CITYSERVICE_ROADS_H_INCLUDED__
+#define __OPENCAESAR3_CITYSERVICE_ROADS_H_INCLUDED__
 
-#include "oc3_gui_mainmenu.hpp"
+#include "oc3_cityservice.hpp"
 #include "oc3_scopedptr.hpp"
+#include "oc3_predefinitions.hpp"
 
-class DateTime;
-
-class TopMenu : public MainMenu
+class CityServiceRoads : public CityService
 {
 public:
-  TopMenu( Widget* parent, const int height );
+  static CityServicePtr create( CityPtr city );
 
-  // draw on screen
-  void draw( GfxEngine& engine );
-
-  void setFunds( int value );
-  void setPopulation( int value );
-
-oc3_signals public:
-  Signal0<>& onExit();
-  Signal0<>& onSave();
-  Signal0<>& onEnd();
-  Signal0<>& onLoad();
-  Signal0<>& onShowVideoOptions();
-  Signal1<int>& onRequestAdvisor();
-
+  void update( const unsigned int time );
+  ~CityServiceRoads();
 private:
+  CityServiceRoads( CityPtr city );
+
   class Impl;
   ScopedPtr< Impl > _d;
 };
 
-#endif //__OPENCAESAR3_TOPMENU_H_INCLUDE_
+#endif //__OPENCAESAR3_CITYSERVICE_ROADS_H_INCLUDED__

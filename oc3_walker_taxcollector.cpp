@@ -15,6 +15,7 @@
 
 #include "oc3_walker_taxcollector.hpp"
 #include "oc3_city.hpp"
+#include "oc3_cityfunds.hpp"
 #include "oc3_building_house.hpp"
 #include "oc3_name_generator.hpp"
 
@@ -29,13 +30,15 @@ void TaxCollector::onMidTile()
 {
   ServiceWalker::onMidTile();
 
+  float taxRate = _getCity()->getFunds().getTaxRate() / 100.f;
+
   ReachedBuildings buildings = getReachedBuildings( getIJ() );
   foreach( BuildingPtr building, buildings )
   {
     HousePtr house = building.as<House>();
     if( house.isValid() )
     {
-      int money = house->collectTaxes();
+      int money = (int)(house->collectTaxes() * taxRate);
       _d->money += money;
       _d->peoplesReached += money > 0 ? house->getNbHabitants() : 0;
     }
@@ -50,7 +53,7 @@ TaxCollectorPtr TaxCollector::create( CityPtr city )
   return tc;
 }
 
-TaxCollector::TaxCollector( CityPtr city ) : ServiceWalker( city, Service::S_FORUM ), _d( new Impl )
+TaxCollector::TaxCollector( CityPtr city ) : ServiceWalker( city, Service::forum ), _d( new Impl )
 {
   _d->money = 0;
   _setType( WT_TAXCOLLECTOR );

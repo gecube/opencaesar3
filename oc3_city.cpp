@@ -59,6 +59,7 @@
 #include "oc3_game_event.hpp"
 #include "oc3_cityservice_festival.hpp"
 #include "oc3_win_targets.hpp"
+#include "oc3_cityservice_roads.hpp"
 
 #include <set>
 
@@ -72,20 +73,16 @@ public:
   CityFunds funds;  // amount of money
   std::string name;
   EmpirePtr empire;
-  Player* player;
+  PlayerPtr player;
 
   LandOverlayList overlayList;
   WalkerList walkerList;
-  TilePos roadEntry; //coordinates can't be negative!
   CityServices services;
   bool needRecomputeAllRoads;
-  int taxRate;
   int lastMonthTax;
   int lastMonthTaxpayer;
-  TilePos roadExit;
+  BorderInfo borderInfo;
   Tilemap tilemap;
-  TilePos boatEntry;
-  TilePos boatExit;
   TilePos cameraStart;
   Point location;
   CityBuildOptions buildOptions;
@@ -97,7 +94,11 @@ public:
 
   // collect taxes from all houses
   void collectTaxes( CityPtr city);
+  void payWages( CityPtr city );
   void calculatePopulation( CityPtr city );
+  void beforeOverlayDestroyed(CityPtr city, LandOverlayPtr overlay );
+  void returnFiredWorkers( WorkingBuildingPtr building );
+  void fireWorkers(HousePtr house );
 
 oc3_signals public:
   Signal1<int> onPopulationChangedSignal;
@@ -107,14 +108,14 @@ oc3_signals public:
 
 City::City() : _d( new Impl )
 {
-  _d->roadEntry = TilePos( 0, 0 );
-  _d->roadExit = TilePos( 0, 0 );
-  _d->boatEntry = TilePos( 0, 0 );
-  _d->boatExit = TilePos( 0, 0 );
+  _d->borderInfo.roadEntry = TilePos( 0, 0 );
+  _d->borderInfo.roadExit = TilePos( 0, 0 );
+  _d->borderInfo.boatEntry = TilePos( 0, 0 );
+  _d->borderInfo.boatExit = TilePos( 0, 0 );
   _d->funds.resolveIssue( FundIssue( CityFunds::donation, 1000 ) );
   _d->population = 0;
   _d->needRecomputeAllRoads = false;
-  _d->taxRate = 7;
+  _d->funds.setTaxRate( 7 );
   _d->walkerIdCount = 0;
   _d->climate = C_CENTRAL;
   _d->lastMonthCount = GameDate::current().getMonth();
@@ -129,6 +130,7 @@ City::City() : _d( new Impl )
   addService( CityServiceAnimals::create( this ) );
   addService( CityServiceReligion::create( this ) );
   addService( CityServiceFestival::create( this ) );
+  addService( CityServiceRoads::create( this ) );
 }
 
 void City::timeStep( unsigned int time )
@@ -159,8 +161,6 @@ void City::timeStep( unsigned int time )
     }
     catch(...)
     {
-      //int o=0;
-      //volatile error here... WTF
     }
   }
 
@@ -173,11 +173,10 @@ void City::timeStep( unsigned int time )
 
       if( (*overlayIt)->isDeleted() )
       {
-         // remove the overlay from the overlay list
-          (*overlayIt)->destroy();
-          //delete (*overlayIt);
-
-          overlayIt = _d->overlayList.erase(overlayIt);
+        _d->beforeOverlayDestroyed( this, *overlayIt );
+        // remove the overlay from the overlay list
+        (*overlayIt)->destroy();
+        overlayIt = _d->overlayList.erase(overlayIt);
       }
       else
       {
@@ -231,6 +230,7 @@ void City::monthStep( const DateTime& time )
 {
   _d->collectTaxes( this );
   _d->calculatePopulation( this );
+  _d->payWages( this );
 
   _d->funds.resolveIssue( FundIssue( CityFunds::playerSalary, -_d->player->getSalary() ) );
   _d->player->appendMoney( _d->player->getSalary() );
@@ -262,51 +262,32 @@ LandOverlayList& City::getOverlayList()
   return _d->overlayList;
 }
 
+void City::setBorderInfo(const BorderInfo& info)
+{
+  int size = getTilemap().getSize();
+  TilePos start( 0, 0 );
+  TilePos stop( size-1, size-1 );
+  _d->borderInfo.roadEntry = info.roadEntry.fit( start, stop );
+  _d->borderInfo.roadExit = info.roadExit.fit( start, stop );
+  _d->borderInfo.boatEntry = info.boatEntry.fit( start, stop );
+  _d->borderInfo.boatExit = info.boatExit.fit( start, stop );
+}
+
+const BorderInfo&City::getBorderInfo() const
+{
+  return _d->borderInfo;
+}
+
 Tilemap& City::getTilemap()
 {
    return _d->tilemap;
 }
 
-TilePos City::getBoatEntry() const { return _d->boatEntry; }
-TilePos City::getBoatExit() const  { return _d->boatExit;  }
-
 ClimateType City::getClimate() const     { return _d->climate;    }
 
 void City::setClimate(const ClimateType climate) { _d->climate = climate; }
 
-// paste here protection from bad values
-void City::setRoadEntry( const TilePos& pos )
-{
-  int size = getTilemap().getSize();
-  _d->roadEntry = TilePos( math::clamp<unsigned int>( pos.getI(), 0, size - 1 ),
-                           math::clamp<unsigned int>( pos.getJ(), 0, size - 1 ) );
-}
-
-void City::setRoadExit( const TilePos& pos )
-{
-  int size = getTilemap().getSize();
-  _d->roadExit.setI( math::clamp<unsigned int>( pos.getI(), 0, size - 1 ) );
-  _d->roadExit.setJ( math::clamp<unsigned int>( pos.getJ(), 0, size - 1 ) );
-}
-
-void City::setBoatEntry(const TilePos& pos )
-{
-  int size = getTilemap().getSize();
-  _d->boatEntry.setI( math::clamp<unsigned int>( pos.getI(), 0, size - 1 ) );
-  _d->boatEntry.setJ( math::clamp<unsigned int>( pos.getJ(), 0, size - 1 ) );
-}
-
-void City::setBoatExit( const TilePos& pos )
-{
-  int size = getTilemap().getSize();
-  _d->boatExit.setI( math::clamp<unsigned int>( pos.getI(), 0, size - 1 ) );
-  _d->boatExit.setJ( math::clamp<unsigned int>( pos.getJ(), 0, size - 1 ) );
-}
-
-int City::getTaxRate() const                 {  return _d->taxRate;    }
-void City::setTaxRate(const int taxRate)     {  _d->taxRate = taxRate; }
 CityFunds& City::getFunds() const                  {  return _d->funds;   }
-
 
 int City::getPopulation() const
 {
@@ -339,6 +320,12 @@ void City::Impl::collectTaxes( CityPtr city )
   funds.resolveIssue( FundIssue( CityFunds::taxIncome, lastMonthTax ) );
 }
 
+void City::Impl::payWages(CityPtr city)
+{
+  int wages = CityStatistic::getMontlyWorkersWages( city );
+  funds.resolveIssue( FundIssue( CityFunds::workersWages, -wages ) );
+}
+
 void City::Impl::calculatePopulation( CityPtr city )
 {
   long pop = 0; /* population can't be negative - should be unsigned long long*/
@@ -355,17 +342,88 @@ void City::Impl::calculatePopulation( CityPtr city )
   onPopulationChangedSignal.emit( pop );
 }
 
+void City::Impl::beforeOverlayDestroyed( CityPtr city, LandOverlayPtr overlay)
+{
+  if( overlay.is<Construction>() )
+  {
+    CityHelper helper( city );
+    helper.updateDesirability( overlay.as<Construction>(), false );
+  }
+
+  if( overlay.is<WorkingBuilding>() )
+  {
+    returnFiredWorkers( overlay.as<WorkingBuilding>() );
+  }
+  else if( overlay.is<House>() )
+  {
+    fireWorkers( overlay.as<House>() );
+  }
+}
+
+void City::Impl::fireWorkers( HousePtr house )
+{
+  int leftWorkers = house->getWorkersCount();
+  const int defaultFireWorkersDistance = 40;
+
+  for( int curRange=1; curRange < defaultFireWorkersDistance; curRange++ )
+  {
+    TilemapArea perimetr = tilemap.getRectangle( house->getTilePos() - TilePos( curRange, curRange ),
+                                                 house->getSize() + Size( 2 * curRange ) );
+    foreach( Tile* tile, perimetr )
+    {
+      WorkingBuildingPtr wrkBuilding = tile->getOverlay().as<WorkingBuilding>();
+      if( wrkBuilding.isValid() )
+      {
+        int bldWorkersCount = wrkBuilding->getWorkers();
+        wrkBuilding->removeWorkers( leftWorkers );
+        leftWorkers -= math::clamp( bldWorkersCount, 0, leftWorkers );
+      }
+
+      if( !leftWorkers )
+        return;
+    }
+  }
+}
+
+
+void City::Impl::returnFiredWorkers(WorkingBuildingPtr building )
+{
+  int workersCount = building->getWorkers();
+  const int defaultFireWorkersDistance = 40;
+  for( int curRange=1; curRange < defaultFireWorkersDistance; curRange++ )
+  {
+    TilemapArea perimetr = tilemap.getRectangle( building->getTilePos() - TilePos( curRange, curRange ),
+                                                 building->getSize() + Size( 2 * curRange ) );
+    foreach( Tile* tile, perimetr )
+    {
+      HousePtr house = tile->getOverlay().as<House>();     
+      if( house.isValid() )
+      {
+        int lastWorkersCount = house->getServiceValue( Service::workersRecruter );
+        house->appendServiceValue( Service::workersRecruter, workersCount );
+        int currentWorkers = house->getServiceValue( Service::workersRecruter );
+
+        int mayAppend = math::clamp( workersCount, 0, currentWorkers - lastWorkersCount );
+        workersCount -= mayAppend;
+      }
+
+      if( !workersCount )
+        return;
+    }
+  }
+}
+
 void City::save( VariantMap& stream) const
 {
   VariantMap vm_tilemap;
   _d->tilemap.save( vm_tilemap );
 
   stream[ "tilemap" ] = vm_tilemap;
-  stream[ "roadEntry" ] = _d->roadEntry;
-  stream[ "roadExit" ]  = _d->roadExit;
+  stream[ "roadEntry" ] = _d->borderInfo.roadEntry;
+  stream[ "roadExit" ]  = _d->borderInfo.roadExit;
   stream[ "cameraStart" ] = _d->cameraStart;
-  stream[ "boatEntry" ] = _d->boatEntry;
-  stream[ "boatExit" ] = _d->boatExit;
+  stream[ "boatEntry" ] = _d->borderInfo.boatEntry;
+  stream[ "boatExit" ] = _d->borderInfo.boatExit;
   stream[ "climate" ] = _d->climate;
   stream[ "funds" ] = _d->funds.save();
   stream[ "population" ] = _d->population;
@@ -401,13 +459,14 @@ void City::load( const VariantMap& stream )
 {
   _d->tilemap.load( stream.get( "tilemap" ).toMap() );
 
-  _d->roadEntry = TilePos( stream.get( "roadEntry" ).toTilePos() );
-  _d->roadExit = TilePos( stream.get( "roadExit" ).toTilePos() );
-  _d->boatEntry = TilePos( stream.get( "boatEntry" ).toTilePos() );
-  _d->boatExit = TilePos( stream.get( "boatExit" ).toTilePos() );
+  _d->borderInfo.roadEntry = TilePos( stream.get( "roadEntry" ).toTilePos() );
+  _d->borderInfo.roadExit = TilePos( stream.get( "roadExit" ).toTilePos() );
+  _d->borderInfo.boatEntry = TilePos( stream.get( "boatEntry" ).toTilePos() );
+  _d->borderInfo.boatExit = TilePos( stream.get( "boatExit" ).toTilePos() );
+
   _d->climate = (ClimateType)stream.get( "climate" ).toInt(); 
   _d->funds.load( stream.get( "funds" ).toMap() );
-  _d->population = stream.get( "population" ).toInt();
+  _d->population = (int)stream.get( "population", 0 );
   _d->cameraStart = TilePos( stream.get( "cameraStart" ).toTilePos() );
   _d->name = stream.get( "name" ).toString();
   _d->lastMonthCount = GameDate::current().getMonth();
@@ -417,7 +476,7 @@ void City::load( const VariantMap& stream )
   {
     VariantMap overlay = item.second.toMap();
     TilePos buildPos( overlay.get( "pos" ).toTilePos() );
-    int buildingType = overlay.get( "buildingType" ).toInt();
+    int buildingType = (int)overlay.get( "buildingType", 0 );
 
     ConstructionPtr construction = ConstructionManager::getInstance().create( BuildingType( buildingType ) );
     if( construction.isValid() )
@@ -432,7 +491,7 @@ void City::load( const VariantMap& stream )
   foreach( VariantMap::value_type& item, walkers )
   {
     VariantMap walkerInfo = item.second.toMap();
-    int walkerType = walkerInfo.get( "type" ).toInt();
+    int walkerType = (int)walkerInfo.get( "type", 0 );
 
     WalkerPtr walker = WalkerManager::getInstance().create( WalkerType( walkerType ), this );
     if( walker.isValid() )
@@ -446,16 +505,6 @@ void City::load( const VariantMap& stream )
 void City::addOverlay( LandOverlayPtr overlay )
 {
   _d->overlayList.push_back( overlay );
-}
-
-TilePos City::getRoadEntry() const
-{
-  return _d->roadEntry;
-}
-
-TilePos City::getRoadExit() const
-{
-  return _d->roadExit;
 }
 
 City::~City()
@@ -538,7 +587,7 @@ int City::getProsperity() const
   return csPrsp.isValid() ? csPrsp.as<CityServiceProsperity>()->getValue() : 0;
 }
 
-CityPtr City::create( EmpirePtr empire, Player* player )
+CityPtr City::create( EmpirePtr empire, PlayerPtr player )
 {
   CityPtr ret( new City );
   ret->_d->empire = empire;
@@ -563,7 +612,7 @@ int City::getLastMonthTaxpayer() const
   return _d->lastMonthTaxpayer;
 }
 
-Player*City::getPlayer() const
+PlayerPtr City::getPlayer() const
 {
   return _d->player;
 }
@@ -627,5 +676,35 @@ void City::updateRoads()
 
 TilemapArea CityHelper::getArea(BuildingPtr building)
 {
-  return _city->getTilemap().getFilledRectangle( building->getTilePos(), building->getSize() );
+  return _city->getTilemap().getArea( building->getTilePos(), building->getSize() );
+}
+
+
+void CityHelper::updateDesirability( ConstructionPtr construction, bool onBuild )
+{
+  Tilemap& tilemap = _city->getTilemap();
+
+  const BuildingData::Desirability dsrbl = construction->getDesirabilityInfo();
+  int mul = ( onBuild ? 1 : -1);
+
+  //change desirability in selfarea
+  TilemapArea area = tilemap.getArea( construction->getTilePos(), construction->getSize() );
+  foreach( Tile* tile, area )
+  {
+    tile->appendDesirability( mul * dsrbl.base );
+  }
+
+  //change deisirability around
+  int current = mul * dsrbl.base;
+  for( int curRange=1; curRange <= dsrbl.range; curRange++ )
+  {
+    TilemapArea perimetr = tilemap.getRectangle( construction->getTilePos() - TilePos( curRange, curRange ),
+                                                 construction->getSize() + Size( 2 * curRange ) );
+    foreach( Tile* tile, perimetr )
+    {
+      tile->appendDesirability( current );
+    }
+
+    current += mul * dsrbl.step;
+  }
 }

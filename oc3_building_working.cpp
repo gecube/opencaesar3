@@ -45,9 +45,9 @@ int WorkingBuilding::getMaxWorkers() const
   return _d->maxWorkers;
 }
 
-void WorkingBuilding::setWorkers(const int currentWorkers)
+void WorkingBuilding::setWorkers(const unsigned int currentWorkers)
 {
-  _d->currentWorkers = currentWorkers;
+  _d->currentWorkers = math::clamp<int>( currentWorkers, 0, _d->maxWorkers );
 }
 
 int WorkingBuilding::getWorkers() const
@@ -74,12 +74,17 @@ void WorkingBuilding::save( VariantMap& stream ) const
 void WorkingBuilding::load( const VariantMap& stream)
 {
   Building::load( stream );
-  _d->currentWorkers = stream.get( "currentWorkers" ).toInt();
+  _d->currentWorkers = (int)stream.get( "currentWorkers", 0 );
 }
 
-void WorkingBuilding::addWorkers( const int workers )
+void WorkingBuilding::addWorkers(const unsigned int workers )
 {
-  _d->currentWorkers += workers;
+  setWorkers( getWorkers() + workers );
+}
+
+void WorkingBuilding::removeWorkers(const unsigned int workers)
+{
+  setWorkers( getWorkers() - workers );
 }
 
 WorkingBuilding::~WorkingBuilding()

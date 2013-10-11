@@ -53,6 +53,12 @@ public:
 
   int getIssueValue( IssueType type, int age=thisYear ) const;
 
+  int getTaxRate() const;
+  void setTaxRate( const unsigned int value );
+
+  int getWorkerSalary() const;
+  void setWorkerSalary( const unsigned int value );
+
   int getValue() const;
 
   VariantMap save() const;
@@ -64,6 +70,16 @@ oc3_signals public:
 private:
   class Impl;
   ScopedPtr< Impl > _d;
+};
+
+class CityStatistic
+{
+public:
+  static unsigned int getCurrentWorkersNumber( CityPtr city );
+  static unsigned int getAvailableWorkersNumber( CityPtr city );
+  static unsigned int getVacantionsNumber( CityPtr city );
+  static unsigned int getMontlyWorkersWages( CityPtr city );
+  static unsigned int getWorklessNumber( CityPtr city );
 };
 
 #endif //__OPENCAESAR3_CITYFUNDS_H_INCLUDED__
