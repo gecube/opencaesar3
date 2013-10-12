@@ -41,7 +41,7 @@ bool Construction::canBuild( CityPtr city, const TilePos& pos ) const
   bool is_constructible = true;
 
   //return area for available tiles
-  TilemapArea area = tilemap.getFilledRectangle( pos, getSize() );
+  TilemapArea area = tilemap.getArea( pos, getSize() );
 
   //on over map size
   if( (int)area.size() != getSize().getArea() )
@@ -60,39 +60,7 @@ void Construction::build( CityPtr city, const TilePos& pos )
   LandOverlay::build( city, pos );
 
   computeAccessRoads();
-  _updateDesirabilityInfluence( duPositive );
 }
-
-void Construction::_updateDesirabilityInfluence( const DsbrlUpdate type )
-{
-  Tilemap& tilemap = _getCity()->getTilemap();
-
-  int dsrblRange = getDesirabilityRange();
-  int step = getDesirabilityStep();
-  int desInfluence = getDesirabilityInfluence();
-  int mul = ( type == duPositive ? 1 : -1);
-
-  //change desirability in selfarea
-  TilemapArea area = tilemap.getFilledRectangle( getTilePos(), getSize() );
-  foreach( Tile* tile, area )
-  {
-    tile->appendDesirability( mul * desInfluence );
-  }
-
-  //change deisirability around
-  for( int curRange=1; curRange <= dsrblRange; curRange++ )
-  {
-    TilemapArea perimetr = tilemap.getRectangle( getTilePos() - TilePos( curRange, curRange ), 
-                                                  getSize() + Size( 2 * curRange - 1 ) );
-    foreach( Tile* tile, perimetr )
-    {
-      tile->appendDesirability( mul * desInfluence );
-    }
-
-    desInfluence += step;
-  }
-}
-
 
 const TilemapTiles& Construction::getAccessRoads() const
 {
@@ -141,30 +109,19 @@ void Construction::collapse()
   GameEventMgr::append( DisasterEvent::create( getTile().getIJ(), DisasterEvent::collapse ) );
 }
 
-char Construction::getDesirabilityInfluence() const
+const BuildingData::Desirability& Construction::getDesirabilityInfo() const
 {
-  return BuildingDataHolder::instance().getData( getType() ).getDesirbilityInfluence();
-}
-
-unsigned char Construction::getDesirabilityRange() const
-{
-  return BuildingDataHolder::instance().getData( getType() ).getDesirbilityRange();
+  return BuildingDataHolder::instance().getData( getType() ).getDesirbilityInfo();
 }
 
 void Construction::destroy()
 {
   LandOverlay::destroy();
-  _updateDesirabilityInfluence( duNegative );
 }
 
 bool Construction::isNeedRoadAccess() const
 {
   return true;
-}
-
-char Construction::getDesirabilityStep() const
-{
-  return BuildingDataHolder::instance().getData( getType() ).getDesirabilityStep();
 }
 
 Building::Building(const BuildingType type, const Size& size )
@@ -251,7 +208,7 @@ float Building::evaluateService(ServiceWalkerPtr walker)
       res = _damageLevel;
    break;
 
-   case Service::S_PREFECT:
+   case Service::prefect:
       res = _fireLevel;
    break;
 
@@ -286,7 +243,7 @@ void Building::applyService( ServiceWalkerPtr walker)
        _damageLevel = 0;
      }
    break;
-   case Service::S_PREFECT:
+   case Service::prefect:
     {
       _fireLevel = 0;
     }
@@ -357,8 +314,8 @@ void Building::save( VariantMap& stream) const
 void Building::load( const VariantMap& stream )
 {
   Construction::load( stream );
-  _damageLevel = stream.get( Serializable::damageLevel ).toFloat();
-  _fireLevel = stream.get( Serializable::fireLevel ).toFloat();
+  _damageLevel = (float)stream.get( Serializable::damageLevel, 0.f );
+  _fireLevel = (float)stream.get( Serializable::fireLevel, 0.f );
 //    Construction::unserialize(stream);
 //    _damageLevel = (float)stream.read_int(1, 0, 100);
 //    _fireLevel = (float)stream.read_int(1, 0, 100);
@@ -439,14 +396,14 @@ Shipyard::Shipyard() : Building( B_SHIPYARD, Size(2) )
 
 Dock::Dock() : Building( B_DOCK, Size(2) )
 {
-  setPicture( Picture::load( ResourceGroup::transport, 5));  
+  setPicture( ResourceGroup::transport, 5);
 
   _getAnimation().load( ResourceGroup::transport, 6, 11);
   // now fill in reverse order
   _getAnimation().load( ResourceGroup::transport, 15, 10, Animation::reverse );
   
   _getAnimation().setOffset( Point( 107, 61 ) );
-  _fgPictures.resize(1);  
+  _getForegroundPictures().resize(1);
 }
 
 void Dock::timeStep(const unsigned long time)
@@ -454,16 +411,16 @@ void Dock::timeStep(const unsigned long time)
   _getAnimation().update( time );
   
   // takes current animation frame and put it into foreground
-  _fgPictures[ 0 ] = _getAnimation().getCurrentPicture();
+  _getForegroundPictures().at(0) = _getAnimation().getCurrentPicture();
 }
 
 // second arch pictures is land3a 45 + 46	
 
 TriumphalArch::TriumphalArch() : Building( B_TRIUMPHAL_ARCH, Size(3) )
 {
-  setPicture( Picture::load( "land3a", 43 ) );
+  setPicture( ResourceGroup::land3a, 43 );
   _getAnimation().load("land3a", 44, 1);
   _getAnimation().setOffset( Point( 63, 97 ) );
-  _fgPictures.resize(1);
-  _fgPictures.at(0) = _getAnimation().getCurrentPicture();
+  _getForegroundPictures().resize(1);
+  _getForegroundPictures().at(0) = _getAnimation().getCurrentPicture();
 }

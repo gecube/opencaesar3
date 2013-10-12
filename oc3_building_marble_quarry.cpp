@@ -21,12 +21,9 @@
 
 MarbleQuarry::MarbleQuarry() : Factory(Good::none, Good::marble, B_MARBLE_QUARRY, Size(2) )
 {
-  setProductRate( 9.6f );
-  setPicture( Picture::load( ResourceGroup::commerce, 43 ) );
-
   _getAnimation().load( ResourceGroup::commerce, 44, 10);
   _getAnimation().setFrameDelay( 4 );
-  _fgPictures.resize(2);
+  _getForegroundPictures().resize(2);
 }
 
 void MarbleQuarry::timeStep( const unsigned long time )

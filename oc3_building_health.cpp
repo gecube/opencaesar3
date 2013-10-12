@@ -35,14 +35,14 @@ void Doctor::deliverService()
   }
 }
 
-Hospital::Hospital() : ServiceBuilding(Service::S_HOSPITAL, B_HOSPITAL, Size(3 ) )
+Hospital::Hospital() : ServiceBuilding(Service::hospital, B_HOSPITAL, Size(3 ) )
 {
 }
 
 Baths::Baths() : ServiceBuilding(Service::baths, B_BATHS, Size(2) )
 {
   _haveReservorWater = false;
-  _fgPictures.resize(2);
+  _getForegroundPictures().resize(2);
 
   _initAnimation();
 }
@@ -65,7 +65,7 @@ void Baths::timeStep(const unsigned long time)
     {
       _getAnimation().stop();
       _haveReservorWater = false;
-      _fgPictures[ 0 ] = Picture::getInvalid();
+      _getForegroundPictures().at(0) = Picture::getInvalid();
     }
   }
 
@@ -88,7 +88,7 @@ void Baths::_initAnimation()
   _getAnimation().stop();
 }
 
-Barber::Barber() : ServiceBuilding(Service::S_BARBER, B_BARBER, Size(1))
+Barber::Barber() : ServiceBuilding(Service::barber, B_BARBER, Size(1))
 {
 }
 

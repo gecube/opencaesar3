@@ -16,12 +16,15 @@
 #include "oc3_cityfunds.hpp"
 #include "oc3_city.hpp"
 #include "oc3_city_trade_options.hpp"
+#include "oc3_building_house.hpp"
 
 #include <map>
 
 class CityFunds::Impl
 {
 public:
+  int taxRate;
+  int workerSalary;
   int money;
   int lastYeapUpdate;
 
@@ -36,6 +39,7 @@ oc3_signals public:
 CityFunds::CityFunds() : _d( new Impl )
 {
   _d->money = 0;
+  _d->workerSalary = 30;
   _d->lastYeapUpdate = 0;
   _d->history.push_back( Impl::IssuesValue() );
 }
@@ -94,11 +98,33 @@ int CityFunds::getIssueValue( IssueType type, int age ) const
   return ( it == step.end() ) ? 0 : it->second;
 }
 
+int CityFunds::getTaxRate() const
+{
+  return _d->taxRate;
+}
+
+void CityFunds::setTaxRate(const unsigned int value)
+{
+  _d->taxRate = value;
+}
+
+int CityFunds::getWorkerSalary() const
+{
+  return _d->workerSalary;
+}
+
+void CityFunds::setWorkerSalary(const unsigned int value)
+{
+  _d->workerSalary = value;
+}
+
 VariantMap CityFunds::save() const
 {
   VariantMap ret;
 
   ret[ "money" ] = _d->money;
+  ret[ "taxRate" ] = _d->taxRate;
+  ret[ "workerSalary" ] = _d->workerSalary;
   
   VariantList history;
   for( Impl::IssuesHistory::iterator stepIt=_d->history.begin(); stepIt != _d->history.end(); stepIt++ )
@@ -120,7 +146,9 @@ VariantMap CityFunds::save() const
 
 void CityFunds::load( const VariantMap& stream )
 {
-  _d->money = stream.get( "money" ).toInt();
+  _d->money = (int)stream.get( "money", 0 );
+  _d->taxRate = (int)stream.get( "taxRate", 7 );
+  _d->workerSalary = (int)stream.get( "workerSalary", 30 );
 
   VariantList history = stream.get( "history" ).toList();
   for( VariantList::iterator it = history.begin(); it != history.end(); it++ )
@@ -147,4 +175,81 @@ CityFunds::~CityFunds()
 Signal1<int>& CityFunds::onChange()
 {
   return _d->onChangeSignal;
+}
+
+
+unsigned int CityStatistic::getCurrentWorkersNumber(CityPtr city)
+{
+  CityHelper helper( city );
+
+  WorkingBuildingList buildings = helper.getBuildings<WorkingBuilding>( B_MAX );
+
+  int workersNumber = 0;
+  foreach( WorkingBuildingPtr bld, buildings )
+  {
+    workersNumber += bld->getWorkers();
+  }
+
+  return workersNumber;
+}
+
+unsigned int CityStatistic::getAvailableWorkersNumber(CityPtr city)
+{
+  CityHelper helper( city );
+
+  HouseList houses = helper.getBuildings<House>( B_HOUSE );
+
+  int avWrksNumber = 0;
+  foreach( HousePtr house, houses )
+  {
+    avWrksNumber += house->getServiceValue( Service::workersRecruter );
+  }
+
+  return avWrksNumber;
+}
+
+unsigned int CityStatistic::getVacantionsNumber(CityPtr city)
+{
+  CityHelper helper( city );
+
+  WorkingBuildingList buildings = helper.getBuildings<WorkingBuilding>( B_MAX );
+
+  int workersNumber = 0;
+  foreach( WorkingBuildingPtr bld, buildings )
+  {
+    workersNumber += bld->getMaxWorkers();
+  }
+
+  return workersNumber;
+}
+
+unsigned int CityStatistic::getMontlyWorkersWages(CityPtr city)
+{
+  int workersNumber = getCurrentWorkersNumber( city );
+
+  if( workersNumber == 0 )
+    return 0;
+
+  //wages all worker in year
+  //workers take salary in sestertius 1/100 part of dinarius
+  int wages = workersNumber * city->getFunds().getWorkerSalary() / 100;
+
+  wages = std::max<int>( wages, 1 );
+
+  return wages;
+}
+
+unsigned int CityStatistic::getWorklessNumber(CityPtr city)
+{
+  CityHelper helper( city );
+
+  HouseList houses = helper.getBuildings<House>( B_HOUSE );
+
+  int worklessNumber = 0;
+  foreach( HousePtr house, houses )
+  {
+    worklessNumber += house->getServiceValue( Service::workersRecruter );
+  }
+
+  return worklessNumber;
 }

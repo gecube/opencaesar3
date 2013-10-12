@@ -35,6 +35,8 @@
 #include "oc3_building_watersupply.hpp"
 #include "oc3_foreach.hpp"
 #include "oc3_game_event_mgr.hpp"
+#include "oc3_font.hpp"
+#include "oc3_gfx_sdl_engine.hpp"
 
 namespace WalkersVisibility
 {
@@ -49,7 +51,11 @@ namespace WalkersVisibility
   static const WalkerType actorsOnly[] = { WT_ACTOR, WT_NONE };
   static const WalkerType gladiatorsOnly[] = { WT_GLADIATOR, WT_NONE };
   static const WalkerType tamersOnly[] = { WT_TAMER, WT_NONE };
-  static const WalkerType chariotdOnly[] = { WT_CHARIOT, WT_NONE };
+  static const WalkerType chariotsOnly[] = { WT_CHARIOT, WT_NONE };
+  static const WalkerType doctorsOnly[] = { WT_DOCTOR, WT_NONE };
+  static const WalkerType hospitalOnly[] = { WT_SURGEON, WT_NONE };
+  static const WalkerType barberOnly[] = { WT_BARBER, WT_NONE };
+  static const WalkerType bathsOnly[] = { WT_BATHLADY, WT_NONE };
 }
 
 class CityRenderer::Impl
@@ -66,7 +72,7 @@ public:
   Tilemap* tilemap;
   GfxEngine* engine;
   TilemapCamera camera;  // visible map area
-  std::set<int> entertainmentRendeFlags;
+  std::set<int> overlayRendeFlags;
 
   TilePos lastTilePos;
   TilemapChangeCommandPtr changeCommand;
@@ -74,9 +80,12 @@ public:
   typedef Delegate1< Tile& > DrawTileSignature;
   DrawTileSignature drawTileFunction;
 
+  Font debugFont;
+
   Impl()
   {
     visibleWalkers.push_back(WT_ALL);
+    debugFont = Font::create( FONT_2_WHITE );
   }
 
   void getSelectedArea( TilePos& outStartPos, TilePos& outStopPos );
@@ -91,6 +100,7 @@ public:
   void drawTileFire( Tile& tile );
   void drawTileEntertainment( Tile& tile );
   void drawTileDamage( Tile& tile );
+  void drawTileHealth( Tile& tile );
   void drawTileReligion( Tile& tile );
   void drawTileInSelArea( Tile& tile, Tile* master );
   void drawTileFood( Tile& tile );
@@ -186,13 +196,13 @@ void CityRenderer::Impl::drawTile( Tile& tile )
 void CityRenderer::Impl::drawAnimations( LandOverlayPtr overlay, const Point& screenPos )
 {
   // building foregrounds and animations
-  PicturesArray& fgPictures = overlay->getForegroundPictures();
-  foreach( Picture& picRef, fgPictures )
+  const PicturesArray& fgPictures = overlay->getForegroundPictures();
+  for( PicturesArray::const_iterator it=fgPictures.begin(); it != fgPictures.end(); it++ )
   {
     // skip void picture
-    if( picRef.isValid() )
+    if( it->isValid() )
     {
-      engine->drawPicture( picRef, screenPos);
+      engine->drawPicture( *it, screenPos);
     }
   }
 }
@@ -208,8 +218,11 @@ void CityRenderer::Impl::drawTileDesirability( Tile& tile )
     //draw background
     if( tile.getFlag( Tile::isConstructible ) && tile.getDesirability() != 0 )
     {
-      int picOffset = math::clamp( tile.getDesirability() / 16, -5, 6 );
+      int picOffset = tile.getDesirability() < 0
+                          ? math::clamp( tile.getDesirability() / 25, -3, 0 )
+                          : math::clamp( tile.getDesirability() / 15, 0, 6 );
       Picture& pic = Picture::load( ResourceGroup::land2a, 37 + picOffset );
+
       engine->drawPicture( pic, screenPos );
     }
     else
@@ -232,9 +245,11 @@ void CityRenderer::Impl::drawTileDesirability( Tile& tile )
     //other buildings
     default:      
       {
-        int picOffset = math::clamp( tile.getDesirability() / 16, -5, 6 );
+        int picOffset = tile.getDesirability() < 0
+                          ? math::clamp( tile.getDesirability() / 25, -3, 0 )
+                          : math::clamp( tile.getDesirability() / 15, 0, 6 );
         Picture& pic = Picture::load( ResourceGroup::land2a, 37 + picOffset );
-        TilemapTiles tiles4clear = tilemap->getFilledRectangle( tile.getIJ(), overlay->getSize() );
+        TilemapTiles tiles4clear = tilemap->getArea( tile.getIJ(), overlay->getSize() );
         foreach( Tile* tile, tiles4clear )
         {
           engine->drawPicture( pic, tile->getXY() + mapOffset );
@@ -242,6 +257,12 @@ void CityRenderer::Impl::drawTileDesirability( Tile& tile )
       }
     break;
     } 
+  }
+
+  if( tile.getDesirability() != 0 )
+  {
+    GfxSdlEngine* painter = static_cast< GfxSdlEngine* >( engine );
+    debugFont.draw( painter->getScreen(), StringHelper::format( 0xff, "%d", tile.getDesirability() ), screenPos + Point( 20, -15 ), false );
   }
 }
 
@@ -405,7 +426,7 @@ void CityRenderer::Impl::drawTileEntertainment( Tile& tile )
     case B_LION_HOUSE:
     case B_ACTOR_COLONY:
     case B_GLADIATOR_SCHOOL:
-      needDrawAnimations = entertainmentRendeFlags.find( overlay->getType() ) != entertainmentRendeFlags.end();
+      needDrawAnimations = overlayRendeFlags.count( overlay->getType() );
       if( needDrawAnimations )
       {
         engine->drawPicture( tile.getPicture(), screenPos );
@@ -420,9 +441,13 @@ void CityRenderer::Impl::drawTileEntertainment( Tile& tile )
     case B_HOUSE:
       {
         HousePtr house = overlay.as< House >();
-        entertainmentLevel = house->getLevelSpec().computeEntertainmentLevel( house );
-        needDrawAnimations = (house->getLevelSpec().getHouseLevel() == 1) && (house->getNbHabitants() == 0);
+        if( overlayRendeFlags.count( B_MAX ) ) { entertainmentLevel = house->getLevelSpec().computeEntertainmentLevel( house ); }
+        else if( overlayRendeFlags.count( B_THEATER ) ) { entertainmentLevel = house->getServiceValue( Service::theater ); }
+        else if( overlayRendeFlags.count( B_AMPHITHEATER ) ) { entertainmentLevel = house->getServiceValue( Service::amphitheater ); }
+        else if( overlayRendeFlags.count( B_COLLOSSEUM ) ) { entertainmentLevel = house->getServiceValue( Service::colloseum ); }
+        else if( overlayRendeFlags.count( B_HIPPODROME ) ) { entertainmentLevel = house->getServiceValue( Service::hippodrome ); }
 
+        needDrawAnimations = (house->getLevelSpec().getHouseLevel() == 1) && (house->getNbHabitants() == 0);
         drawBuildingAreaTiles( overlay->getTile(), overlay, ResourceGroup::foodOverlay, OverlayPic::inHouseBase );
       }
     break;
@@ -445,6 +470,83 @@ void CityRenderer::Impl::drawTileEntertainment( Tile& tile )
     }
   }
 }
+
+void CityRenderer::Impl::drawTileHealth( Tile& tile )
+{
+  Point screenPos = tile.getXY() + mapOffset;
+
+  tile.setWasDrawn();
+
+  bool needDrawAnimations = false;
+  if( tile.getOverlay().isNull() )
+  {
+    //draw background
+    engine->drawPicture( tile.getPicture(), screenPos );
+  }
+  else
+  {
+    LandOverlayPtr overlay = tile.getOverlay();
+
+    int healthLevel = -1;
+    switch( overlay->getType() )
+    {
+      //fire buildings and roads
+    case B_ROAD:
+    case B_PLAZA:
+      needDrawAnimations = true;
+      engine->drawPicture( tile.getPicture(), screenPos );
+    break;
+
+    case B_DOCTOR:
+    case B_HOSPITAL:
+    case B_BARBER:
+    case B_BATHS:
+      needDrawAnimations = overlayRendeFlags.count( overlay->getType() );
+      if( needDrawAnimations )
+      {
+        engine->drawPicture( tile.getPicture(), screenPos );
+      }
+      else
+      {
+        drawBuildingAreaTiles( overlay->getTile(), overlay, ResourceGroup::foodOverlay, OverlayPic::base );
+      }
+    break;
+
+      //houses
+    case B_HOUSE:
+      {
+        HousePtr house = overlay.as< House >();
+
+        if( overlayRendeFlags.count( B_DOCTOR ) ) { healthLevel = house->getHealthLevel(); }
+        else if( overlayRendeFlags.count( B_HOSPITAL ) ) { healthLevel = house->getServiceValue( Service::hospital ); }
+        else if( overlayRendeFlags.count( B_BARBER ) ) { healthLevel = house->getServiceValue( Service::barber ); }
+        else if( overlayRendeFlags.count( B_BATHS ) ) { healthLevel = house->getServiceValue( Service::baths ); }
+
+        needDrawAnimations = (house->getLevelSpec().getHouseLevel() == 1) && (house->getNbHabitants() == 0);
+
+        drawBuildingAreaTiles( overlay->getTile(), overlay, ResourceGroup::foodOverlay, OverlayPic::inHouseBase );
+      }
+    break;
+
+      //other buildings
+    default:
+      {
+        drawBuildingAreaTiles( overlay->getTile(), overlay, ResourceGroup::foodOverlay, OverlayPic::base );
+      }
+    break;
+    }
+
+    if( needDrawAnimations )
+    {
+      drawAnimations( overlay, screenPos );
+    }
+    else if( healthLevel > 0 )
+    {
+      drawColumn( screenPos, 9, healthLevel );
+    }
+  }
+}
+
 
 void CityRenderer::Impl::drawTileReligion( Tile& tile )
 {
@@ -479,11 +581,11 @@ void CityRenderer::Impl::drawTileReligion( Tile& tile )
     case B_HOUSE:
       {
         HousePtr house = overlay.as< House >();
-        religionLevel = house->getServiceAccess(Service::S_TEMPLE_MERCURE);
-        religionLevel += house->getServiceAccess(Service::S_TEMPLE_VENUS);
-        religionLevel += house->getServiceAccess(Service::S_TEMPLE_MARS);
-        religionLevel += house->getServiceAccess(Service::S_TEMPLE_NEPTUNE);
-        religionLevel += house->getServiceAccess(Service::S_TEMPLE_CERES);
+        religionLevel = house->getServiceValue(Service::religionMercury);
+        religionLevel += house->getServiceValue(Service::religionVenus);
+        religionLevel += house->getServiceValue(Service::religionMars);
+        religionLevel += house->getServiceValue(Service::religionNeptune);
+        religionLevel += house->getServiceValue(Service::religionCeres);
         religionLevel = math::clamp( religionLevel / (house->getLevelSpec().getMinReligionLevel()+1), 0, 100 );
         needDrawAnimations = (house->getLevelSpec().getHouseLevel() == 1) && (house->getNbHabitants() ==0);
 
@@ -612,7 +714,7 @@ void CityRenderer::Impl::drawTileWater( Tile& tile )
       {
         HousePtr h = overlay.as<House>();
         tileNumber = OverlayPic::inHouse;
-        haveWater = haveWater || h->hasServiceAccess(Service::S_FOUNTAIN) || h->hasServiceAccess(Service::well);
+        haveWater = haveWater || h->hasServiceAccess(Service::fontain) || h->hasServiceAccess(Service::well);
       }
       tileNumber += (haveWater ? OverlayPic::haveWater : 0);
       tileNumber += tile.getWaterService( WTR_RESERVOIR ) > 0 ? OverlayPic::reservoirRange : 0;
@@ -639,7 +741,7 @@ void CityRenderer::Impl::drawTileWater( Tile& tile )
 
   if( !needDrawAnimations && ( tile.isWalkable(true) || tile.getFlag( Tile::tlBuilding ) ) )
   {
-    TilemapArea area = tilemap->getFilledRectangle( tile.getIJ(), areaSize );
+    TilemapArea area = tilemap->getArea( tile.getIJ(), areaSize );
 
     foreach( Tile* rtile, area )
     {
@@ -681,7 +783,7 @@ void CityRenderer::Impl::drawTileBase( Tile& tile )
       if( isAqueducts )
       {
         tile.setWasDrawn();
-        Picture& pic = overlay.as<Aqueduct>()->computePicture(&postTiles, tile.getIJ());
+        Picture& pic = overlay.as<Aqueduct>()->computePicture( city, &postTiles, tile.getIJ());
         engine->drawPicture( pic, screenPos );
       }
     }
@@ -741,7 +843,7 @@ void CityRenderer::Impl::drawTilemapWithRemoveTools()
   getSelectedArea( startPos, stopPos );
  
   std::set<int> hashDestroyArea;
-  TilemapArea destroyArea = tilemap->getFilledRectangle( startPos, stopPos );
+  TilemapArea destroyArea = tilemap->getArea( startPos, stopPos );
   
   //create list of destroy tiles add full area building if some of it tile constain in destroy area
   foreach( Tile* tile, destroyArea)
@@ -751,7 +853,7 @@ void CityRenderer::Impl::drawTilemapWithRemoveTools()
     LandOverlayPtr overlay = tile->getOverlay();
     if( overlay.isValid() )
     {
-      TilemapArea overlayArea = tilemap->getFilledRectangle( overlay->getTilePos(), overlay->getSize() );
+      TilemapArea overlayArea = tilemap->getArea( overlay->getTilePos(), overlay->getSize() );
       foreach( Tile* ovelayTile, overlayArea )
       {
         hashDestroyArea.insert( ovelayTile->getJ() * 1000 + ovelayTile->getI() );
@@ -897,7 +999,7 @@ void CityRenderer::draw()
           // aqueducts must be shown in correct form
           AqueductPtr aqueduct = ptr_construction.as<Aqueduct>();
           if (aqueduct != NULL)
-            aqueduct->setPicture(aqueduct->computePicture(&_d->postTiles, postTile->getIJ()));
+            aqueduct->setPicture(aqueduct->computePicture( _d->city, &_d->postTiles, postTile->getIJ()));
         }
       }
 
@@ -1013,7 +1115,7 @@ void CityRenderer::Impl::clearAll()
   TilePos startPos, stopPos;
   getSelectedArea( startPos, stopPos );
 
-  TilemapTiles tiles4clear = tilemap->getFilledRectangle( startPos, stopPos );
+  TilemapTiles tiles4clear = tilemap->getArea( startPos, stopPos );
   foreach( Tile* tile, tiles4clear )
   {
     GameEventMgr::append( ClearLandEvent::create( tile->getIJ() ) );
@@ -1092,7 +1194,7 @@ void CityRenderer::Impl::drawWalkersBetweenZ(WalkerList walkerList, int minZ, in
 
 void CityRenderer::Impl::drawBuildingAreaTiles(Tile& baseTile, LandOverlayPtr overlay, std::string resourceGroup, int tileId)
 {
-  TilemapArea area = tilemap->getFilledRectangle( baseTile.getIJ(), overlay->getSize() );
+  TilemapArea area = tilemap->getArea( baseTile.getIJ(), overlay->getSize() );
 
   Picture *pic = NULL;
   int leftBorderAtI = baseTile.getI();
@@ -1230,6 +1332,11 @@ void CityRenderer::discardPreview()
 {
   foreach( Tile* tile, _d->postTiles )
   {
+    if( tile->getOverlay().isValid() )
+    {
+      tile->getOverlay()->deleteLater();
+    }
+
     delete tile;
   }
 
@@ -1339,42 +1446,63 @@ void CityRenderer::setMode( const TilemapChangeCommandPtr command )
     case OV_RELIGION: _d->setDrawFunction( _d.data(), &Impl::drawTileReligion ); break;
     case OV_ENTERTAINMENT_ALL:
       _d->setDrawFunction( _d.data(), &Impl::drawTileEntertainment );
-      _d->entertainmentRendeFlags.clear();
-      _d->entertainmentRendeFlags.insert( B_THEATER );
-      _d->entertainmentRendeFlags.insert( B_AMPHITHEATER );
-      _d->entertainmentRendeFlags.insert( B_COLLOSSEUM );
-      _d->entertainmentRendeFlags.insert( B_HIPPODROME );
-      _d->entertainmentRendeFlags.insert( B_ACTOR_COLONY );
-      _d->entertainmentRendeFlags.insert( B_GLADIATOR_SCHOOL );
+      _d->overlayRendeFlags.clear();
+      _d->overlayRendeFlags.insert( B_MAX );
+      _d->overlayRendeFlags.insert( B_THEATER );
+      _d->overlayRendeFlags.insert( B_AMPHITHEATER );
+      _d->overlayRendeFlags.insert( B_COLLOSSEUM );
+      _d->overlayRendeFlags.insert( B_HIPPODROME );
+      _d->overlayRendeFlags.insert( B_ACTOR_COLONY );
+      _d->overlayRendeFlags.insert( B_GLADIATOR_SCHOOL );
+    break;
+
+    case OV_HEALTH_DOCTOR:
+      _d->setDrawFunction( _d.data(), &Impl::drawTileHealth );
+      _d->overlayRendeFlags.insert( B_DOCTOR );
+    break;
+
+    case OV_HEALTH_HOSPITAL:
+      _d->setDrawFunction( _d.data(), &Impl::drawTileHealth );
+      _d->overlayRendeFlags.insert( B_HOSPITAL );
+    break;
+
+    case OV_HEALTH_BARBER:
+      _d->setDrawFunction( _d.data(), &Impl::drawTileHealth );
+      _d->overlayRendeFlags.insert( B_BARBER );
+    break;
+
+    case OV_HEALTH_BATHS:
+      _d->setDrawFunction( _d.data(), &Impl::drawTileHealth );
+      _d->overlayRendeFlags.insert( B_BATHS );
     break;
 
     case OV_ENTERTAINMENT_THEATRES:
       _d->setDrawFunction( _d.data(), &Impl::drawTileEntertainment );
-      _d->entertainmentRendeFlags.clear();
-      _d->entertainmentRendeFlags.insert( B_THEATER );
-      _d->entertainmentRendeFlags.insert( B_ACTOR_COLONY );
+      _d->overlayRendeFlags.clear();
+      _d->overlayRendeFlags.insert( B_THEATER );
+      _d->overlayRendeFlags.insert( B_ACTOR_COLONY );
     break;
 
     case OV_ENTERTAINMENT_AMPHITHEATRES:
       _d->setDrawFunction( _d.data(), &Impl::drawTileEntertainment );
-      _d->entertainmentRendeFlags.clear();
-      _d->entertainmentRendeFlags.insert( B_AMPHITHEATER );
-      _d->entertainmentRendeFlags.insert( B_ACTOR_COLONY );
-      _d->entertainmentRendeFlags.insert( B_GLADIATOR_SCHOOL );
+      _d->overlayRendeFlags.clear();
+      _d->overlayRendeFlags.insert( B_AMPHITHEATER );
+      _d->overlayRendeFlags.insert( B_ACTOR_COLONY );
+      _d->overlayRendeFlags.insert( B_GLADIATOR_SCHOOL );
     break;
 
     case OV_ENTERTAINMENT_COLLISEUM:
       _d->setDrawFunction( _d.data(), &Impl::drawTileEntertainment );
-      _d->entertainmentRendeFlags.clear();
-      _d->entertainmentRendeFlags.insert( B_COLLOSSEUM );
-      _d->entertainmentRendeFlags.insert( B_GLADIATOR_SCHOOL );
+      _d->overlayRendeFlags.clear();
+      _d->overlayRendeFlags.insert( B_COLLOSSEUM );
+      _d->overlayRendeFlags.insert( B_GLADIATOR_SCHOOL );
     break;
 
     case OV_ENTERTAINMENT_HIPPODROME:
       _d->setDrawFunction( _d.data(), &Impl::drawTileEntertainment );
-      _d->entertainmentRendeFlags.clear();
-      _d->entertainmentRendeFlags.insert( B_HIPPODROME );
-      _d->entertainmentRendeFlags.insert( B_CHARIOT_MAKER );
+      _d->overlayRendeFlags.clear();
+      _d->overlayRendeFlags.insert( B_HIPPODROME );
+      _d->overlayRendeFlags.insert( B_CHARIOT_MAKER );
     break;
 
     default:_d->setDrawFunction( _d.data(), &Impl::drawTileBase ); break;
@@ -1392,7 +1520,11 @@ void CityRenderer::setMode( const TilemapChangeCommandPtr command )
     case OV_ENTERTAINMENT_THEATRES: _d->setVisibleWalkers(WalkersVisibility::actorsOnly); break;
     case OV_ENTERTAINMENT_AMPHITHEATRES: _d->setVisibleWalkers(WalkersVisibility::gladiatorsOnly); break;
     case OV_ENTERTAINMENT_COLLISEUM: _d->setVisibleWalkers(WalkersVisibility::tamersOnly); break;
-    case OV_ENTERTAINMENT_HIPPODROME: _d->setVisibleWalkers(WalkersVisibility::chariotdOnly); break;
+    case OV_ENTERTAINMENT_HIPPODROME: _d->setVisibleWalkers(WalkersVisibility::chariotsOnly); break;
+    case OV_HEALTH_DOCTOR: _d->setVisibleWalkers( WalkersVisibility::doctorsOnly ); break;
+    case OV_HEALTH_HOSPITAL: _d->setVisibleWalkers( WalkersVisibility::hospitalOnly ); break;
+    case OV_HEALTH_BARBER: _d->setVisibleWalkers( WalkersVisibility::barberOnly ); break;
+    case OV_HEALTH_BATHS: _d->setVisibleWalkers( WalkersVisibility::bathsOnly ); break;
     default:
       _d->setVisibleWalkers(WalkersVisibility::all);
       break;

@@ -81,7 +81,10 @@ void GfxSdlEngine::init()
   rc = TTF_Init();
   if (rc != 0) THROW("Unable to initialize SDL: " << SDL_GetError());
 
-  SDL_Surface* scr = SDL_SetVideoMode(_srcSize.getWidth(), _srcSize.getHeight(), 32, SDL_DOUBLEBUF | SDL_SWSURFACE);  // 32bpp
+  unsigned int flags = SDL_DOUBLEBUF | SDL_SWSURFACE;
+  flags |= (getFlag( GfxEngine::fullscreen ) > 0 ? SDL_FULLSCREEN : 0);
+
+  SDL_Surface* scr = SDL_SetVideoMode(_srcSize.getWidth(), _srcSize.getHeight(), 32, flags );  // 32bpp
   _d->screen.init( scr, Point( 0, 0 ) );
   
   if( !_d->screen.isValid() ) 
@@ -219,6 +222,21 @@ void GfxSdlEngine::createScreenshot( const std::string& filename )
   IMG_SavePNG( filename.c_str(), _d->screen.getSurface(), -1 );
 }
 
+std::vector<Size> GfxSdlEngine::getAvailableModes() const
+{
+  std::vector<Size> ret;
+
+  /* Get available fullscreen/hardware modes */
+  SDL_Rect** modes = SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
+
+  for(int i=0; modes[i]; ++i)
+  {
+    ret.push_back( Size( modes[i]->w, modes[i]->h) );
+  }
+
+  return ret;
+}
+
 unsigned int GfxSdlEngine::getFps() const
 {
   return _d->fps;
@@ -226,8 +244,13 @@ unsigned int GfxSdlEngine::getFps() const
 
 void GfxSdlEngine::setFlag( int flag, int value )
 {
-  _d->showDebugInfo = value > 0;
-  _d->debugFont = Font::create( FONT_2 );
+  GfxEngine::setFlag( flag, value );
+
+  if( flag == debugInfo )
+  {
+    _d->showDebugInfo = value > 0;
+    _d->debugFont = Font::create( FONT_2 );
+  }
 }
 
 void GfxSdlEngine::delay( const unsigned int msec )

@@ -59,7 +59,8 @@ public:
   Rect textRect;
   Rect iconRect;
   int clickTime;
-  BackgroundStyle bgStyle;
+  Point textOffset;
+  PushButton::BackgroundStyle bgStyle;
   
   ElementState currentButtonState, lastButtonState;
   ButtonState buttonStates[ StateCount ];
@@ -126,7 +127,7 @@ PushButton::PushButton( Widget* parent,
   _d->bgStyle = bgStyle;
   setTextAlignment( alignCenter, alignCenter );
 
-  _text = caption;
+  setText( caption );
   setNotClipped(noclip);
 }
 
@@ -206,7 +207,7 @@ void PushButton::_updateTexture( ElementState state )
     Rect textRect = stFont.calculateTextRect( getText(), Rect( 0, 0, getWidth(), getHeight() ),
                                               getHorizontalTextAlign(), getVerticalTextAlign() );
     textTxs->fill( 0x00ffffff, Rect( 0, 0, 0, 0 ) );
-    stFont.draw( *textTxs, getText(), textRect.getLeft(), textRect.getTop() );
+    stFont.draw( *textTxs, getText(), textRect.UpperLeftCorner + _d->textOffset );
   }
 }
 
@@ -231,6 +232,25 @@ void PushButton::setupUI(const VariantMap &ui)
     BackgroundStyleHelper helper;
     setBackgroundStyle( helper.findType( tmp.toString() ) );
   }
+
+  _d->textOffset = ui.get( "textOffset" ).toPoint();
+
+  VariantList vlist = ui.get( "normal" ).toList();
+  if( !vlist.empty() ) setPicture( vlist.get( 0 ).toString(), vlist.get( 1 ).toInt(), stNormal );
+
+  vlist = ui.get( "hovered" ).toList();
+  if( !vlist.empty() ) setPicture( vlist.get( 0 ).toString(), vlist.get( 1 ).toInt(), stHovered  );
+
+  vlist = ui.get( "pressed" ).toList();
+  if( !vlist.empty() ) setPicture( vlist.get( 0 ).toString(), vlist.get( 1 ).toInt(), stPressed );
+
+  vlist = ui.get( "disabled" ).toList();
+  if( !vlist.empty() ) setPicture( vlist.get( 0 ).toString(), vlist.get( 1 ).toInt(), stDisabled );
+}
+
+void PushButton::setTextOffset(const Point& offset)
+{
+  _d->textOffset = offset;
 }
 
 bool PushButton::isPushButton() const
@@ -245,6 +265,11 @@ void PushButton::setPicture( const Picture& picture, ElementState state )
   _d->buttonStates[ state ].bgTexture = picture;
   _d->buttonStates[ state ].rectangle = rectangle;
   _updateTexture( state );
+}
+
+void PushButton::setPicture(const std::string& rcname, int index, ElementState state)
+{
+  setPicture( Picture::load( rcname, index ), state );
 }
 
 void PushButton::setPressed( bool pressed )

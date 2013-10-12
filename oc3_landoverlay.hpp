@@ -50,8 +50,10 @@ public:
   void setPicture(const Picture &picture);
   void setPicture(const char* resource, const int index);
 
+  void setAnimation( const Animation& animation );
+
   const Picture& getPicture() const;
-  PicturesArray& getForegroundPictures();
+  const PicturesArray& getForegroundPictures() const;
 
   std::string getName();  // landoverlay debug name
   void setName( const std::string& name );
@@ -64,11 +66,10 @@ public:
   virtual void load( const VariantMap& stream );
 
 protected:
-  std::vector<Picture> _fgPictures;
-
   Animation& _getAnimation();
   Tile* _getMasterTile();
   CityPtr _getCity() const;
+  PicturesArray& _getForegroundPictures();
 
 private:
   class Impl;

@@ -17,26 +17,42 @@
 #define __OPENCAESAR3_SERVICE_H_INCLUDED__
 
 #include "oc3_enums_helper.hpp"
+#include "oc3_math.hpp"
 
 class Service
 {
 public:
   typedef enum
   {
-    well, S_FOUNTAIN,
-    S_MARKET,
+    well, fontain,
+    market,
     engineer,
-    S_SENATE, S_FORUM,
-    S_PREFECT,
-    S_TEMPLE_NEPTUNE, S_TEMPLE_CERES, S_TEMPLE_VENUS,  S_TEMPLE_MARS, S_TEMPLE_MERCURE, S_TEMPLE_ORACLE,
-    doctor, S_BARBER, baths, S_HOSPITAL,
-    S_SCHOOL, S_LIBRARY, S_COLLEGE,
+    senate, forum,
+    prefect,
+    religionNeptune, religionCeres, religionVenus,  religionMars, religionMercury, oracle,
+    doctor, barber, baths, hospital,
+    school, library, college,
     theater, amphitheater, colloseum,
     hippodrome,
-    S_BURNING_RUINS,
-    S_WORKERS_HUNTER,
-    S_MAX
+    burningRuins,
+    workersRecruter,
+    srvCount
   } Type;
+
+  Service() : _value( 0 ), _min( 0 ), _max( 100 ) {}
+
+  void set( int i ) { _value = math::clamp<int>( i, _min, _max); }
+  int value() const { return _value; }
+
+  int getMax() const { return _max; }
+  void setMax( int value ) { _max = value; set( _value ); }
+
+  operator int() const { return _value; }
+  Service& operator=(  int i) { set( i ); return *this; }
+  Service& operator-=(int i) { set( _value - i ); return *this; }
+  Service& operator+=(int i) { set( _value + i ); return *this; }
+private:
+  int _value, _min, _max;
 };
 
 class ServiceHelper : public EnumsHelper<Service::Type>

@@ -49,8 +49,8 @@ void ServiceWalker::init(const Service::Type service)
   switch (_d->service)
   {
   case Service::well:
-  case Service::S_FOUNTAIN:
-  case Service::S_TEMPLE_ORACLE:
+  case Service::fontain:
+  case Service::oracle:
     _setGraphic( WG_NONE );
   break;
   
@@ -59,22 +59,26 @@ void ServiceWalker::init(const Service::Type service)
      _setType( WT_ENGINEER );
   break;
 
-  case Service::S_TEMPLE_NEPTUNE:
-  case Service::S_TEMPLE_CERES:
-  case Service::S_TEMPLE_VENUS:
-  case Service::S_TEMPLE_MARS:
-  case Service::S_TEMPLE_MERCURE:
+  case Service::religionNeptune:
+  case Service::religionCeres:
+  case Service::religionVenus:
+  case Service::religionMars:
+  case Service::religionMercury:
     _setGraphic( WG_PRIEST );
   break;
   
   case Service::doctor:
-  case Service::S_HOSPITAL:
     _setGraphic( WG_DOCTOR );
     _setType( WT_DOCTOR );
   break;
+
+  case Service::hospital:
+    _setGraphic( WG_DOCTOR );
+    _setType( WT_SURGEON );
   
-  case Service::S_BARBER:
+  case Service::barber:
     _setGraphic( WG_BARBER );
+    _setType( WT_BARBER );
   break;
   
   case Service::baths:
@@ -82,12 +86,12 @@ void ServiceWalker::init(const Service::Type service)
     _setType( WT_BATHLADY );
   break;
   
-  case Service::S_SCHOOL:
+  case Service::school:
     _setGraphic( WG_CHILD );
   break;
   
-  case Service::S_LIBRARY:
-  case Service::S_COLLEGE:
+  case Service::library:
+  case Service::college:
     _setGraphic( WG_LIBRARIAN );
   break;
   
@@ -111,13 +115,13 @@ void ServiceWalker::init(const Service::Type service)
     _setGraphic( WG_ACTOR );
   break;
   
-  case Service::S_MARKET:
+  case Service::market:
     _setGraphic( WG_MARKETLADY );
     nameType = NameGenerator::female;
   break;
 
-  case Service::S_FORUM:
-  case Service::S_SENATE:
+  case Service::forum:
+  case Service::senate:
     _setGraphic( WG_TAX );
   break;
 
@@ -192,7 +196,7 @@ ServiceWalker::ReachedBuildings ServiceWalker::getReachedBuildings(const TilePos
   int reachDistance = getReachDistance();
   TilePos start = pos - TilePos( reachDistance, reachDistance );
   TilePos stop = pos + TilePos( reachDistance, reachDistance );
-  TilemapArea reachedTiles = _getCity()->getTilemap().getFilledRectangle( start, stop );
+  TilemapArea reachedTiles = _getCity()->getTilemap().getArea( start, stop );
   foreach( Tile* tile, reachedTiles )
   {
     BuildingPtr building = tile->getOverlay().as<Building>();

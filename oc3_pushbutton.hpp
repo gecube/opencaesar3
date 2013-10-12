@@ -64,6 +64,7 @@ public:
   virtual void drawIcon( GfxEngine& painter );
 
   virtual void setPicture( const Picture& picture, ElementState state );
+  virtual void setPicture( const std::string& rcname, int index, ElementState state );
 
   virtual void setBackgroundStyle( const BackgroundStyle style );
 
@@ -76,6 +77,8 @@ public:
   virtual void setIsPushButton( bool value );
 
   virtual void setupUI(const VariantMap &ui);
+
+  virtual void setTextOffset( const Point& offset );
 
 oc3_signals public:
   virtual Signal0<>& onClicked(); 

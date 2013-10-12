@@ -17,10 +17,12 @@
 #include "oc3_building_data.hpp"
 #include "oc3_city.hpp"
 #include "oc3_tilemap.hpp"
+#include "oc3_stringhelper.hpp"
 
 class LandOverlay::Impl
 {
 public:
+  PicturesArray fgPictures;
   BuildingType buildingType;
   BuildingClass buildingClass;
   Tile* masterTile;  // left-most tile if multi-tile, or "this" if single-tile
@@ -91,6 +93,11 @@ void LandOverlay::setPicture(const char* resource, const int index)
   setPicture( Picture::load( resource, index ) );
 }
 
+void LandOverlay::setAnimation(const Animation& animation)
+{
+  _d->animation = animation;
+}
+
 void LandOverlay::build( CityPtr city, const TilePos& pos )
 {
   Tilemap &tilemap = city->getTilemap();
@@ -128,7 +135,12 @@ void LandOverlay::destroy()
 
 Tile& LandOverlay::getTile() const
 {
-  _OC3_DEBUG_BREAK_IF( !_d->masterTile && "master tile must be exists" );
+  if( !_d->masterTile )
+  {
+    StringHelper::debug( 0xff, "master tile must be exists" );
+    static Tile invalid( TilePos( -1, -1 ));
+    return invalid;
+  }
   return *_d->masterTile;
 }
 
@@ -147,9 +159,9 @@ const Picture &LandOverlay::getPicture() const
   return _d->picture;
 }
 
-std::vector<Picture>& LandOverlay::getForegroundPictures()
+const PicturesArray& LandOverlay::getForegroundPictures() const
 {
-  return _fgPictures;
+  return _d->fgPictures;
 }
 
 std::string LandOverlay::getName()
@@ -172,11 +184,11 @@ void LandOverlay::save( VariantMap& stream ) const
 void LandOverlay::load( const VariantMap& stream )
 {
   _d->name = stream.get( "name" ).toString();
+  _d->size = stream.get( "size", Size(1) ).toSize();
   _d->buildingType = (BuildingType)stream.get( "buildingType" ).toInt();
   _d->picture = Picture::load( stream.get( "picture" ).toString() + ".png" );
   _d->picture.setOffset( stream.get( "pictureOffset" ).toPoint() );
-  _d->size = stream.get( "size" ).toSize();
-  _d->isDeleted = stream.get( "isDeleted" ).toBool();
+  _d->isDeleted = stream.get( "isDeleted", false ).toBool();  
 }
 
 bool LandOverlay::isWalkable() const
@@ -186,8 +198,12 @@ bool LandOverlay::isWalkable() const
 
 TilePos LandOverlay::getTilePos() const
 {
-  _OC3_DEBUG_BREAK_IF( !_d->masterTile && "master tile can't be null" );
-  return _d->masterTile ? _d->masterTile->getIJ() : TilePos( -1, -1 );
+  if( !_d->masterTile )
+  {
+    StringHelper::debug( 0xff,  "master tile can't be null" );
+    return TilePos( -1, -1 );
+  }
+  return _d->masterTile->getIJ();
 }
 
 void LandOverlay::setName( const std::string& name )
@@ -218,6 +234,11 @@ Tile* LandOverlay::_getMasterTile()
 CityPtr LandOverlay::_getCity() const
 {
   return _d->city;
+}
+
+PicturesArray& LandOverlay::_getForegroundPictures()
+{
+  return _d->fgPictures;
 }
 
 BuildingClass LandOverlay::getClass() const

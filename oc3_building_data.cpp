@@ -156,16 +156,9 @@ public:
 class BuildingData::Impl
 {
 public:
-  struct DeisrabilityInfo
-  {
-    int base;
-    int range;
-    int step;
-  };
-
+  BuildingData::Desirability desirability;
   BuildingType buildingType;
   VariantMap options;
-  DeisrabilityInfo desirability;
 };
 
 BuildingData::BuildingData(const BuildingType buildingType, const std::string &name, const int cost)
@@ -174,7 +167,7 @@ BuildingData::BuildingData(const BuildingType buildingType, const std::string &n
   _d->buildingType = buildingType;
   _buildingClass = BC_NONE;
   _name = name;
-  _prettyName = "##" + name + "##";  // i18n translation
+  _prettyName = _( ("##" + name + "##").c_str() );  // i18n translation
   _cost = cost;
   _d->desirability.base = 0;
   _d->desirability.range = 0;
@@ -216,20 +209,15 @@ const Picture &BuildingData::getBasePicture() const
   return _basePicture;
 }
 
-char BuildingData::getDesirbilityInfluence() const
+const BuildingData::Desirability& BuildingData::getDesirbilityInfo() const
 {
-  return _d->desirability.base;
+  return _d->desirability;
 }
 
-char BuildingData::getDesirbilityRange() const
-{
-  return _d->desirability.range;
-}
-
-Variant BuildingData::getOption(const std::string &name) const
+Variant BuildingData::getOption(const std::string &name, Variant defaultVal ) const
 {
   VariantMap::iterator it = _d->options.find( name );
-  return it != _d->options.end() ? it->second : Variant();
+  return it != _d->options.end() ? it->second : defaultVal;
 }
 
 BuildingData &BuildingData::operator=(const BuildingData &a)
@@ -243,11 +231,8 @@ BuildingData &BuildingData::operator=(const BuildingData &a)
   _cost = a._cost;
 
   _d->options = a._d->options;
-}
 
-char BuildingData::getDesirabilityStep() const
-{
-  return _d->desirability.step;
+  return *this;
 }
 
 BuildingClass BuildingData::getClass() const
@@ -380,18 +365,13 @@ void BuildingDataHolder::initialize( const io::FilePath& filename )
     bData._buildingClass = getClass( options[ "class" ].toString() );
 
     VariantList basePic = options[ "image" ].toList();
-    if( basePic.size() == 2 && basePic.back().toInt() > 0 )
+    if( !basePic.empty() )
     {
-      std::string resourceGroup = basePic.front().toString();
-      int rcIndex = basePic.back().toInt();
-      if( rcIndex > 0 )
-      {
-        bData._basePicture = Picture::load( resourceGroup, rcIndex );
-      }
+      bData._basePicture = Picture::load( basePic.get( 0 ).toString(), basePic.get( 1 ).toInt() );
     }
 
     addData( bData );
-    }
+  }
 }
 
 BuildingType BuildingDataHolder::getType( const std::string& name )

@@ -33,42 +33,45 @@
 #include "oc3_goodstore_simple.hpp"
 #include "oc3_city.hpp"
 #include "oc3_foreach.hpp"
+#include "oc3_game_event_mgr.hpp"
+
+namespace {
+  static const int workingHbKoeff = 2;
+}
 
 class House::Impl
 {
 public:
-  typedef std::map<Service::Type, int> ServiceAccessMap;
+  typedef std::map< Service::Type, Service > Services;
   int picIdOffset;
   int houseId;  // pictureId
   int houseLevel;
   float healthLevel;
-  HouseLevelSpec houseLevelSpec;  // characteristics of the current house level
-  HouseLevelSpec nextHouseLevelSpec;  // characteristics of the house level+1
-  char desirability;
+  HouseLevelSpec levelSpec;  // characteristics of the current house level
+  BuildingData::Desirability desirability;
   SimpleGoodStore goodStore;
-  ServiceAccessMap serviceAccess;  // value=access to the service (0=no access, 100=good access)
+  Services services;  // value=access to the service (0=no access, 100=good access)
   int currentHabitants;
   int maxHabitants;
-  int freeWorkersCount;
   DateTime lastPayDate;
   std::string condition4Up;  
 
   bool mayPayTax()
   {
-    return lastPayDate.getMonthToDate( GameDate::current() ) > 0;
+    return lastPayDate.getMonthToDate( GameDate::current() ) > 2;
   }
 
   int getAvailableTax()
   {
-    return houseLevelSpec.getTaxRate() * currentHabitants; 
+    return levelSpec.getTaxRate() * currentHabitants;
   }
 
   void updateHealthLevel()
   {
-    float delim = 1 + (((serviceAccess[Service::well]>0 || serviceAccess[Service::S_FOUNTAIN]>0) ? 1 : 0))
-                + ((serviceAccess[Service::doctor]>0 || serviceAccess[Service::S_HOSPITAL]) ? 1 : 0)
-                + (serviceAccess[Service::baths] ? 0.7 : 0)
-                + (serviceAccess[Service::S_BARBER] ? 0.3 : 0);
+    float delim = 1 + (((services[Service::well] > 0 || services[Service::fontain] > 0) ? 1 : 0))
+                + ((services[Service::doctor] > 0 || services[Service::hospital] > 0) ? 1 : 0)
+                + (services[Service::baths] > 0 ? 0.7 : 0)
+                + (services[Service::barber] > 0 ? 0.3 : 0);
 
     float decrease = 0.3f / delim;
 
@@ -96,26 +99,27 @@ House::House(const int houseId) : Building( B_HOUSE ), _d( new Impl )
   _d->houseId = houseId;
   _d->lastPayDate = DateTime( -400, 1, 1 );
   _d->picIdOffset = ( rand() % 10 > 6 ? 1 : 0 );
-  _d->freeWorkersCount = 0;
   _d->healthLevel = 100;
   HouseSpecHelper& helper = HouseSpecHelper::getInstance();
   _d->houseLevel = helper.getHouseLevel( houseId );
-  _d->houseLevelSpec = helper.getHouseLevelSpec( _d->houseLevel);
-  _d->nextHouseLevelSpec = _d->houseLevelSpec.next();
-  setName( _d->houseLevelSpec.getLevelName() );
+  _d->levelSpec = helper.getHouseLevelSpec( _d->houseLevel );
+  setName( _d->levelSpec.getLevelName() );
   _d->currentHabitants = 0;
-  _d->desirability = -3;
+  _d->desirability.base = -3;
+  _d->desirability.range = 3;
+  _d->desirability.step = 1;
   _fireLevel = 0;
 
   _d->initGoodStore( 1 );
 
   // init the service access
-  for (int i = 0; i<Service::S_MAX; ++i)
+  for( int i = 0; i<Service::srvCount; ++i )
   {
     // for every service type
     Service::Type service = Service::Type(i);
-    _d->serviceAccess[service] = 0;
+    _d->services[service] = Service();
   }
+  _d->services[ Service::workersRecruter ].setMax( 0 );
 
   _update();
 }
@@ -126,15 +130,18 @@ void House::timeStep(const unsigned long time)
   {
     if( time % 16 == 0 )
     {
-       // consume services
-       for( int i = 0; i < Service::S_MAX; ++i)
-       {
-          Service::Type service = (Service::Type) i;
-          _d->serviceAccess[service] = std::max(_d->serviceAccess[service] - 1, 0);
-       }
+      //save available workers number
+      int currentWorkersPower = _d->services[ Service::workersRecruter ];
 
-       cancelService( Service::S_WORKERS_HUNTER );
-       _d->updateHealthLevel();
+      //consume services
+      foreach( Impl::Services::value_type& srvc, _d->services )
+      {
+        srvc.second -= 1;
+      }
+
+      _d->services[ Service::workersRecruter ] = currentWorkersPower;
+      //restore available workers number
+      _d->updateHealthLevel();
     }
 
     if( time % 64 == 0 )
@@ -143,19 +150,19 @@ void House::timeStep(const unsigned long time)
       for( int i = 0; i < Good::goodCount; ++i)
       {
          Good::Type goodType = (Good::Type) i;
-         int montlyGoodsQty = _d->houseLevelSpec.computeMonthlyConsumption( *this, goodType, true );
+         int montlyGoodsQty = _d->levelSpec.computeMonthlyConsumption( *this, goodType, true );
          _d->goodStore.setCurrentQty( goodType, std::max( _d->goodStore.getCurrentQty(goodType) - montlyGoodsQty, 0) );
       }
 
-      bool validate = _d->houseLevelSpec.checkHouse( this );
-      if (!validate)
+      bool validate = _d->levelSpec.checkHouse( this );
+      if( !validate )
       {
         levelDown();
       }
       else
       {
         _d->condition4Up = "";
-        validate = _d->nextHouseLevelSpec.checkHouse( this, &_d->condition4Up );
+        validate = _d->levelSpec.next().checkHouse( this, &_d->condition4Up );
         if( validate && _d->currentHabitants > 0 )
         {
            levelUp();
@@ -168,9 +175,7 @@ void House::timeStep(const unsigned long time)
       {
         _d->currentHabitants = math::clamp( _d->currentHabitants, 0, _d->maxHabitants );
 
-        ImmigrantPtr im = Immigrant::create( _getCity() );
-        im->setCapacity( homeless );
-        im->send2City( getTile() );
+        Immigrant::send2City( _getCity(), homeless, getTile() );
       }
     }
 
@@ -186,15 +191,17 @@ GoodStore& House::getGoodStore()
 
 const HouseLevelSpec& House::getLevelSpec() const
 {
-   return _d->houseLevelSpec;
+   return _d->levelSpec;
 }
 
 void House::_tryUpdate_1_to_11_lvl( int level4grow, int startSmallPic, int startBigPic, const char desirability )
-{       
+{
+  CityHelper helper( _getCity() );
+
   if( getSize() == 1 )
   {
     Tilemap& tmap = _getCity()->getTilemap();
-    TilemapTiles area = tmap.getFilledRectangle( getTile().getIJ(), Size(2) );
+    TilemapTiles area = tmap.getArea( getTile().getIJ(), Size(2) );
     bool mayGrow = true;
 
     foreach( Tile* tile, area )
@@ -224,7 +231,7 @@ void House::_tryUpdate_1_to_11_lvl( int level4grow, int startSmallPic, int start
     if( mayGrow )
     {
       int sumHabitants = getNbHabitants();
-      int sumFreeWorkers = _d->freeWorkersCount;
+      int sumFreeWorkers = getServiceValue( Service::workersRecruter );
       TilemapTiles::iterator delIt=area.begin();
       HousePtr selfHouse = (*delIt)->getOverlay().as<House>();
 
@@ -238,27 +245,33 @@ void House::_tryUpdate_1_to_11_lvl( int level4grow, int startSmallPic, int start
           house->_d->currentHabitants = 0;
 
           sumHabitants += house->getNbHabitants();
-          sumFreeWorkers += house->_d->freeWorkersCount;
+          sumFreeWorkers += house->getServiceValue( Service::workersRecruter );
 
           selfHouse->getGoodStore().storeAll( house->getGoodStore() );
         }
       }
 
       _d->currentHabitants = sumHabitants;
-      _d->freeWorkersCount = sumFreeWorkers;
-      _d->houseLevelSpec = HouseSpecHelper::getInstance().getHouseLevelSpec(_d->houseLevel);
-      _d->nextHouseLevelSpec = _d->houseLevelSpec.next();
+      setServiceValue( Service::workersRecruter, sumFreeWorkers );
+
+      //reset desirability level with old house size
+      helper.updateDesirability( this, false );
 
       _update();
-      _updateDesirabilityInfluence( Construction::duNegative );
-      setSize( getSize() + Size(1) );
+      setSize( getSize() + Size(1) );      
       build( _getCity(), getTile().getIJ() );
+      //set new desirability level
+      helper.updateDesirability( this, true );
     }
   }
 
-  _updateDesirabilityInfluence( Construction::duNegative );
-  _d->desirability = desirability;       
-  _updateDesirabilityInfluence( Construction::duPositive );
+  //that this house will be upgrade, we need decrease current desirability level
+  helper.updateDesirability( this, false );
+
+  _d->desirability.base = desirability;
+  _d->desirability.step = desirability < 0 ? 1 : -1;
+  //now upgrade groud area to new desirability
+  helper.updateDesirability( this, true );
 
   bool bigSize = getSize().getWidth() > 1;
   _d->houseId = bigSize ? startBigPic : startSmallPic; 
@@ -275,7 +288,8 @@ void House::levelUp()
   {
   case 1:
     _d->houseId = 1;
-    _d->desirability = -3;
+    _d->desirability.base = -3;
+    _d->desirability.step = 1;
   break;
 
   case 2: _tryUpdate_1_to_11_lvl( 1, 1, 5, -3);
@@ -309,8 +323,7 @@ void House::levelUp()
   break;
   }
 
-  _d->houseLevelSpec = HouseSpecHelper::getInstance().getHouseLevelSpec(_d->houseLevel);
-  _d->nextHouseLevelSpec = _d->houseLevelSpec.next();
+  _d->levelSpec = HouseSpecHelper::getInstance().getHouseLevelSpec(_d->houseLevel);
 
   _update();
 }
@@ -321,16 +334,20 @@ void House::_tryDegrage_11_to_2_lvl( int smallPic, int bigPic, const char desira
   _d->houseId = bigSize ? bigPic : smallPic;
   _d->picIdOffset = bigSize ? 0 : ( rand() % 10 > 6 ? 1 : 0 );
 
-  _updateDesirabilityInfluence( Construction::duNegative );
-  _d->desirability = desirability;
-  _updateDesirabilityInfluence( Construction::duPositive );
+  CityHelper helper( _getCity() );
+  //clear current desirability influence
+  helper.updateDesirability( this, false );
+
+  _d->desirability.base = desirability;
+  _d->desirability.step = desirability < 0 ? 1 : -1;
+  //set new desirability level
+  helper.updateDesirability( this, true );
 }
 
 void House::levelDown()
 {
    _d->houseLevel--;
-   _d->houseLevelSpec = HouseSpecHelper::getInstance().getHouseLevelSpec(_d->houseLevel);
-   _d->nextHouseLevelSpec = _d->houseLevelSpec.next();
+   _d->levelSpec = HouseSpecHelper::getInstance().getHouseLevelSpec(_d->houseLevel);
 
    switch (_d->houseLevel)
    {
@@ -341,25 +358,22 @@ void House::levelDown()
 
      Tilemap& tmap = _getCity()->getTilemap();
 
-     if( getSize().getWidth() > 1 )
+     if( getSize().getArea() > 1 )
      {
-       _updateDesirabilityInfluence( Construction::duNegative );
-
-       TilemapTiles perimetr = tmap.getFilledRectangle( getTile().getIJ(), Size(2) );
-       TilemapTiles::iterator it=perimetr.begin();
+       TilemapTiles perimetr = tmap.getArea( getTilePos(), Size(2) );
        int peoplesPerHouse = getNbHabitants() / 4;
        _d->currentHabitants = peoplesPerHouse;
-       it++; //no destroy himself
-       for( ; it != perimetr.end(); it++ )
+       foreach( Tile* tile, perimetr )
        {
          HousePtr house = ConstructionManager::getInstance().create( B_HOUSE ).as<House>();
-         house->build( _getCity(), (*it)->getIJ() );
          house->_d->currentHabitants = peoplesPerHouse;
+         house->_d->houseId = smallHovel;
          house->_update();
+
+         GameEventMgr::append( BuildEvent::create( tile->getIJ(), house.as<Construction>() ));
        }
 
-       setSize( Size( 1 ) );
-       _updateDesirabilityInfluence( Construction::duPositive );
+       deleteLater();
      }
    }
    break;
@@ -409,8 +423,8 @@ void House::buyMarket( ServiceWalkerPtr walker )
   {
     Good::Type goodType = (Good::Type) i;
     int houseQty = houseStore.getCurrentQty(goodType) / 10;
-    int houseSafeQty = _d->houseLevelSpec.computeMonthlyConsumption(*this, goodType, false )
-                       + _d->nextHouseLevelSpec.computeMonthlyConsumption(*this, goodType, false );
+    int houseSafeQty = _d->levelSpec.computeMonthlyConsumption(*this, goodType, false )
+                       + _d->levelSpec.next().computeMonthlyConsumption(*this, goodType, false );
     int marketQty = marketStore.getCurrentQty(goodType);
     if( houseQty < houseSafeQty && marketQty > 0  )
     {
@@ -430,6 +444,11 @@ void House::buyMarket( ServiceWalkerPtr walker )
   }
 }
 
+void House::appendServiceValue( Service::Type srvc, const int value)
+{
+  setServiceValue( srvc, getServiceValue( srvc ) + value );
+}
+
 void House::applyService( ServiceWalkerPtr walker )
 {
   Building::applyService(walker);  // handles basic services, and remove service reservation
@@ -438,55 +457,56 @@ void House::applyService( ServiceWalkerPtr walker )
   switch (service)
   {
   case Service::well:
-  case Service::S_FOUNTAIN:
-  case Service::S_TEMPLE_NEPTUNE:
-  case Service::S_TEMPLE_CERES:
-  case Service::S_TEMPLE_VENUS:
-  case Service::S_TEMPLE_MARS:
-  case Service::S_TEMPLE_MERCURE:
-  case Service::S_BARBER:
+  case Service::fontain:
+  case Service::religionNeptune:
+  case Service::religionCeres:
+  case Service::religionVenus:
+  case Service::religionMars:
+  case Service::religionMercury:
+  case Service::barber:
   case Service::baths:
-  case Service::S_SCHOOL:
-  case Service::S_LIBRARY:
-  case Service::S_COLLEGE:
+  case Service::school:
+  case Service::library:
+  case Service::college:
   case Service::theater:
   case Service::amphitheater:
   case Service::colloseum:
   case Service::hippodrome:
-    setServiceAccess(service, 100);
+    setServiceValue(service, 100);
   break;
 
-  case Service::S_HOSPITAL:
+  case Service::hospital:
   case Service::doctor:
     _d->healthLevel += 10;
-    setServiceAccess(service, 100);
+    setServiceValue(service, 100);
   break;
   
-  case Service::S_MARKET:
+  case Service::market:
     buyMarket(walker);
   break;
  
-  case Service::S_SENATE:
-  case Service::S_FORUM:
-    setServiceAccess(service, 100);
+  case Service::senate:
+  case Service::forum:
+    setServiceValue(service, 100);
   break;
 
-  case Service::S_TEMPLE_ORACLE:
+  case Service::oracle:
   case Service::engineer:
-  case Service::S_PREFECT:
-  case Service::S_MAX:
+  case Service::prefect:
+  case Service::srvCount:
   break;
 
-  case Service::S_WORKERS_HUNTER:
+  case Service::workersRecruter:
   {
-    if( !_d->freeWorkersCount )
+    int svalue = getServiceValue( service );
+    if( !svalue )
       break;
 
     WorkersHunterPtr hunter = walker.as<WorkersHunter>();
     if( hunter.isValid() )
     {
-      int hiredWorkers = math::clamp( _d->freeWorkersCount, 0, hunter->getWorkersNeeded() );
-      _d->freeWorkersCount -= hiredWorkers;
+      int hiredWorkers = math::clamp( svalue, 0, hunter->getWorkersNeeded() );
+      appendServiceValue( service, -hiredWorkers );
       hunter->hireWorkers( hiredWorkers );
     }
   }
@@ -510,15 +530,15 @@ float House::evaluateService(ServiceWalkerPtr walker)
   switch(service)
   {
   case Service::engineer: res = _damageLevel; break;
-  case Service::S_PREFECT: res = _fireLevel; break;
+  case Service::prefect: res = _fireLevel; break;
 
   // this house pays taxes
-  case Service::S_FORUM:
-  case Service::S_SENATE:
+  case Service::forum:
+  case Service::senate:
     res = _d->mayPayTax() ? (float)_d->getAvailableTax() : 0.f;
   break;
 
-  case Service::S_MARKET:
+  case Service::market:
   {
     MarketPtr market = walker->getBase().as<Market>();
     GoodStore &marketStore = market->getGoodStore();
@@ -527,8 +547,8 @@ float House::evaluateService(ServiceWalkerPtr walker)
     {
       Good::Type goodType = (Good::Type) i;
       int houseQty = houseStore.getCurrentQty(goodType) / 10;
-      int houseSafeQty = _d->houseLevelSpec.computeMonthlyConsumption(*this, goodType, false)
-                         + _d->nextHouseLevelSpec.computeMonthlyConsumption(*this, goodType, false );
+      int houseSafeQty = _d->levelSpec.computeMonthlyConsumption(*this, goodType, false)
+                         + _d->levelSpec.next().computeMonthlyConsumption(*this, goodType, false );
       int marketQty = marketStore.getCurrentQty(goodType);
       if( houseQty < houseSafeQty && marketQty > 0)
       {
@@ -538,15 +558,15 @@ float House::evaluateService(ServiceWalkerPtr walker)
   }
   break;
 
-  case Service::S_WORKERS_HUNTER:
+  case Service::workersRecruter:
   {
-    res = (float)_d->freeWorkersCount;        
+    res = (float)getServiceValue( service );
   }
-  break;
+  break;   
 
   default:
   {
-    return _d->houseLevelSpec.evaluateServiceNeed( this, service);
+    return _d->levelSpec.evaluateServiceNeed( this, service);
   }
   break;
   }
@@ -556,19 +576,19 @@ float House::evaluateService(ServiceWalkerPtr walker)
   return res;
 }
 
-bool House::hasServiceAccess(const Service::Type service)
+bool House::hasServiceAccess( Service::Type service)
 {
-  return (_d->serviceAccess[service] > 0);
+  return (_d->services[service] > 0);
 }
 
-int House::getServiceAccess(const Service::Type service)
+int House::getServiceValue( Service::Type service)
 {
-  return _d->serviceAccess[service];
+  return _d->services[service];
 }
 
-void House::setServiceAccess(const Service::Type service, const int access)
+void House::setServiceValue( Service::Type service, const int access)
 {
-  _d->serviceAccess[service] = access;
+  _d->services[service] = access;
 }
 
 int House::getNbHabitants()
@@ -586,7 +606,8 @@ void House::_update()
   int picId = ( _d->houseId == smallHovel && _d->currentHabitants == 0 ) ? 45 : (_d->houseId + _d->picIdOffset);
   setPicture( ResourceGroup::housing, picId );
   setSize( Size( (getPicture().getWidth() + 2 ) / 60 ) );
-  _d->maxHabitants = _d->houseLevelSpec.getMaxHabitantsByTile() * getSize().getArea();
+  _d->maxHabitants = _d->levelSpec.getMaxHabitantsByTile() * getSize().getArea();
+  _d->initGoodStore( getSize().getArea() );
 }
 
 int House::getMaxDistance2Road() const
@@ -597,8 +618,9 @@ int House::getMaxDistance2Road() const
 void House::addHabitants( const int newHabitCount )
 {
   int peoplesCount = (std::min)( _d->currentHabitants + newHabitCount, _d->maxHabitants );
+  _d->services[ Service::workersRecruter ].setMax( _d->maxHabitants / workingHbKoeff );
+  _d->services[ Service::workersRecruter ] += (peoplesCount - _d->currentHabitants)/workingHbKoeff;
   _d->currentHabitants = peoplesCount;
-  _d->freeWorkersCount += peoplesCount / 2;
   _update();
 }
 
@@ -607,12 +629,7 @@ void House::destroy()
   int homeless = _d->currentHabitants;
   _d->currentHabitants = _d->maxHabitants;
 
-  if( homeless > 0 )
-  {
-    ImmigrantPtr im = Immigrant::create( _getCity() );
-    im->setCapacity( homeless );
-    im->send2City( getTile() );
-  }
+  Immigrant::send2City( _getCity(), homeless, getTile() );
 
   Building::destroy();
 }
@@ -622,7 +639,7 @@ bool House::isWalkable() const
   return (_d->houseId == smallHovel && _d->currentHabitants == 0) ? true : false;
 }
 
-char House::getDesirabilityInfluence() const
+const BuildingData::Desirability& House::getDesirabilityInfo() const
 {
   return _d->desirability;
 }
@@ -634,15 +651,14 @@ void House::save( VariantMap& stream ) const
   stream[ "picIdOffset" ] = _d->picIdOffset;
   stream[ "houseId" ] = _d->houseId;
   stream[ "houseLevel" ] = _d->houseLevel;
-  stream[ "desirability" ] = _d->desirability;
+  stream[ "desirability" ] = _d->desirability.base;
   stream[ "currentHubitants" ] = _d->currentHabitants;
   stream[ "maxHubitants" ] = _d->maxHabitants;
-  stream[ "freeWorkersCount" ] = _d->freeWorkersCount;
   stream[ "goodstore" ] = _d->goodStore.save();
   stream[ "healthLevel" ] = _d->healthLevel;
 
   VariantList vl_services;
-  foreach( Impl::ServiceAccessMap::value_type& mapItem, _d->serviceAccess )
+  foreach( Impl::Services::value_type& mapItem, _d->services )
   {
     vl_services.push_back( Variant( (int)mapItem.first) );
     vl_services.push_back( Variant( mapItem.second ) );
@@ -655,22 +671,23 @@ void House::load( const VariantMap& stream )
 {
   Building::load( stream );
 
-  _d->picIdOffset = (int)stream.get( "picIdOffset" );
-  _d->houseId = (int)stream.get( "houseId" );
-  _d->houseLevel = (int)stream.get( "houseLevel" );
-  _d->healthLevel = (float)stream.get( "healthLevel" );
-  _d->houseLevelSpec = HouseSpecHelper::getInstance().getHouseLevelSpec(_d->houseLevel);
-  _d->nextHouseLevelSpec = _d->houseLevelSpec.next();
+  _d->picIdOffset = (int)stream.get( "picIdOffset", 0 );
+  _d->houseId = (int)stream.get( "houseId", 0 );
+  _d->houseLevel = (int)stream.get( "houseLevel", 0 );
+  _d->healthLevel = (float)stream.get( "healthLevel", 0 );
+  _d->levelSpec = HouseSpecHelper::getInstance().getHouseLevelSpec(_d->houseLevel);
 
-  _d->desirability = (int)stream.get( "desirability" );
-  _d->currentHabitants = (int)stream.get( "currentHubitants" );
-  _d->maxHabitants = (int)stream.get( "maxHubitants" );
-  _d->freeWorkersCount = (int)stream.get( "freeWorkersCount" );
+  _d->desirability.base = (int)stream.get( "desirability", 0 );
+  _d->desirability.step = _d->desirability.base < 0 ? 1 : -1;
+
+  _d->currentHabitants = (int)stream.get( "currentHubitants", 0 );
+  _d->maxHabitants = (int)stream.get( "maxHubitants", 0 );
 
   _d->goodStore.load( stream.get( "goodstore" ).toMap() );
 
   _d->initGoodStore( getSize().getArea() );
 
+  _d->services[ Service::workersRecruter ].setMax( _d->currentHabitants / workingHbKoeff );
   VariantList vl_services = stream.get( "services" ).toList();
   for( VariantList::iterator it = vl_services.begin(); it != vl_services.end(); it++ )
   {
@@ -678,26 +695,16 @@ void House::load( const VariantMap& stream )
     it++;
     int serviceValue = (*it).toInt();
 
-    _d->serviceAccess[ type ] = serviceValue;
+    _d->services[ type ] = serviceValue;
   }
 
   Building::build( _getCity(), getTilePos() );
   _update();
 }
 
-unsigned char House::getDesirabilityRange() const
-{
-  return abs( _d->desirability );
-}
-
-char House::getDesirabilityStep() const
-{
-  return _d->desirability > 0 ? -1 : 1;
-}
-
 int House::getFoodLevel() const
 {
-  switch( _d->houseLevelSpec.getHouseLevel() )
+  switch( _d->levelSpec.getHouseLevel() )
   {
   case smallHovel:
   case bigTent:
@@ -718,6 +725,12 @@ int House::getFoodLevel() const
 int House::getHealthLevel() const
 {
   return _d->healthLevel;
+}
+
+int House::getWorkersCount() const
+{
+  const Service& srvc = _d->services[ Service::workersRecruter ];
+  return srvc.getMax() - srvc.value();
 }
 
 int House::getScholars() const

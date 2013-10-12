@@ -78,8 +78,8 @@ void ServiceBuilding::timeStep(const unsigned long time)
    const Picture& pic = _getAnimation().getCurrentPicture();
    if( pic.isValid() )
    {
-      int level = _fgPictures.size()-1;
-      _fgPictures[level] = _getAnimation().getCurrentPicture();
+      int level = getForegroundPictures().size()-1;
+      _getForegroundPictures().at( level ) = _getAnimation().getCurrentPicture();
    }
 }
 
@@ -117,9 +117,9 @@ void ServiceBuilding::save( VariantMap& stream ) const
 void ServiceBuilding::load( const VariantMap& stream )
 {
   WorkingBuilding::load( stream );
-  _d->serviceTimer = (int)stream.get( "timer" );
-  _d->serviceDelay = (int)stream.get( "delay" );
-  _d->serviceRange = (int)stream.get( "range" );
+  _d->serviceTimer = (int)stream.get( "timer", 0 );
+  _d->serviceDelay = (int)stream.get( "delay", 80 );
+  _d->serviceRange = (int)stream.get( "range", 30 );
 }
 
 int ServiceBuilding::getServiceDelay() const
