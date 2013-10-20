@@ -25,6 +25,7 @@
 #include "oc3_walker_service.hpp"
 #include "oc3_city.hpp"
 #include "oc3_foreach.hpp"
+#include "oc3_gettext.hpp"
 #include "oc3_tilemap.hpp"
 
 class WaterSource::Impl
@@ -38,6 +39,7 @@ public:
   bool lastWaterState;
   bool isRoad;
   bool alsoResolved;
+  std::string errorStr;
 };
 
 Aqueduct::Aqueduct() : WaterSource( B_AQUEDUCT, Size(1) ) 
@@ -69,7 +71,7 @@ void Aqueduct::build( CityPtr city, const TilePos& pos )
   Construction::build( city, pos );
 
   CityHelper helper( city );
-  AqueductList aqueducts = helper.getBuildings<Aqueduct>( B_AQUEDUCT );
+  AqueductList aqueducts = helper.find<Aqueduct>( B_AQUEDUCT );
   foreach( AqueductPtr aqueduct, aqueducts )
   {
     aqueduct->updatePicture( city );
@@ -87,7 +89,7 @@ void Aqueduct::destroy()
     TilemapArea area = _getCity()->getTilemap().getArea( getTilePos() - TilePos( 2, 2), Size( 5 ) );
     foreach( Tile* tile, area )
     {
-      LandOverlayPtr overlay = tile->getOverlay();
+      TileOverlayPtr overlay = tile->getOverlay();
       if( overlay.isValid() && overlay->getType() == B_AQUEDUCT )
       {
         overlay.as<Aqueduct>()->updatePicture( _getCity() );
@@ -218,7 +220,7 @@ Picture& Aqueduct::computePicture(CityPtr city , const TilemapTiles * tmp, const
   }
 
   // get overlays for all directions
-  LandOverlayPtr overlay_d[D_MAX];
+  TileOverlayPtr overlay_d[D_MAX];
   overlay_d[D_NORTH] = tmap.at( tile_pos_d[D_NORTH] ).getOverlay();
   overlay_d[D_EAST] = tmap.at( tile_pos_d[D_EAST]  ).getOverlay();
   overlay_d[D_SOUTH] = tmap.at( tile_pos_d[D_SOUTH] ).getOverlay();
@@ -460,6 +462,8 @@ bool Reservoir::canBuild( CityPtr city, const TilePos& pos ) const
   bool nearWater = _isNearWater( city, pos );
   const_cast< Reservoir* >( this )->setPicture( ResourceGroup::waterbuildings, nearWater ? 2 : 1  );
 
+  const_cast< Reservoir* >( this )->_setError( nearWater ? "" : _("##need_connect_to_other_reservoir##"));
+
   return ret;
 }
 
@@ -468,7 +472,7 @@ bool Reservoir::isNeedRoadAccess() const
   return false;
 }
 
-WaterSource::WaterSource( const BuildingType type, const Size& size )
+WaterSource::WaterSource( const TileOverlayType type, const Size& size )
   : Construction( type, size ), _d( new Impl )
 
 {
@@ -537,13 +541,23 @@ int WaterSource::getId() const
   return getTilePos().getJ() * 10000 + getTilePos().getI();
 }
 
+std::string WaterSource::getError() const
+{
+  return _d->errorStr;
+}
+
+void WaterSource::_setError(const std::string& error)
+{
+  _d->errorStr = error;
+}
+
 typedef enum { fontainEmpty = 3, fontainFull = 4, fontainStartAnim = 11, fontainSizeAnim = 7 } FontainConstant;
 
 Fountain::Fountain() : ServiceBuilding(Service::fontain, B_FOUNTAIN, Size(1))
 {  
-  std::srand( DateTime::getElapsedTime() );
+  //std::srand( DateTime::getElapsedTime() );
 
-  setPicture( ResourceGroup::utilitya, 10 );
+  //setPicture( ResourceGroup::utilitya, 10 );
 
   _initAnimation();
   _getForegroundPictures().resize(1);
@@ -589,7 +603,7 @@ void Fountain::timeStep(const unsigned long time)
       _getAnimation().stop();
     }
 
-    if( !_haveReservoirWater )
+    if( !isActive() )
     {
       _getForegroundPictures().at( 0 ) = Picture::getInvalid();
       return;
@@ -627,6 +641,26 @@ void Fountain::build( CityPtr city, const TilePos& pos )
 
 bool Fountain::isNeedRoadAccess() const
 {
+  return false;
+}
+
+bool Fountain::isActive() const
+{
+  return ServiceBuilding::isActive() && _haveReservoirWater;
+}
+
+bool Fountain::haveReservoirAccess() const
+{
+  TilemapArea reachedTiles = _getCity()->getTilemap().getArea( getTilePos() - TilePos( 10, 10 ), Size( 10, 10 ) + getSize() );
+  foreach( Tile* tile, reachedTiles )
+  {
+    TileOverlayPtr overlay = tile->getOverlay();
+    if( overlay != 0 && (B_RESERVOIR == overlay->getType()) )
+    {
+      return true;
+    }
+  }
+
   return false;
 }
 

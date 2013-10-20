@@ -80,9 +80,10 @@ public:
 void Game::Impl::initLocale(const std::string & localePath)
 {
   // init the internationalization library (gettext)
-  std::string localeStr = StringHelper::format( 0xff, "LC_ALL=%s", GameSettings::get( GameSettings::localeName ).toString().c_str() );
+  ByteArray localeData;
+  localeData = StringHelper::format( 0xff, "LC_ALL=%s", GameSettings::get( GameSettings::localeName ).toString().c_str() );
 
-  putenv( localeStr.c_str() );
+  putenv( localeData.data() );
   //setlocale(LC_ALL, "English");
   bindtextdomain( "caesar", localePath.data() );
   bind_textdomain_codeset( "caesar", "UTF-8" );
@@ -296,7 +297,17 @@ Game::Game() : _d( new Impl )
 
 void Game::changeTimeMultiplier(int percent)
 {
-  _d->timeMultiplier = math::clamp<int>( _d->timeMultiplier + percent, 10, 300 );
+  setTimeMultiplier( _d->timeMultiplier + percent );
+}
+
+void Game::setTimeMultiplier(int percent)
+{
+  _d->timeMultiplier = math::clamp<int>( percent, 10, 300 );
+}
+
+int Game::getTimeMultiplier() const
+{
+  return _d->timeMultiplier;
 }
 
 void Game::resolveEvent(GameEventPtr event)
@@ -336,8 +347,8 @@ void Game::load(std::string filename)
 
   _d->empire->initPlayerCity( _d->city.as<EmpireCity>() );
 
-  LandOverlayList& llo = _d->city->getOverlayList();
-  foreach( LandOverlayPtr overlay, llo )
+  TileOverlayList& llo = _d->city->getOverlayList();
+  foreach( TileOverlayPtr overlay, llo )
   {
     ConstructionPtr construction = overlay.as<Construction>();
     if( construction.isValid() )

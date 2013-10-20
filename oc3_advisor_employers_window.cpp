@@ -70,7 +70,7 @@ private:
 class AdvisorEmployerWindow::Impl
 {
 public:
-  typedef std::vector< BuildingType > BldTypes;
+  typedef std::vector< TileOverlayType > BldTypes;
   enum PriorityIndex
   {
     prIndustryAndTrade=0,
@@ -127,12 +127,12 @@ void AdvisorEmployerWindow::Impl::decreaseSalary()
 void AdvisorEmployerWindow::Impl::updateWorkersState()
 {
   int workers = CityStatistic::getCurrentWorkersNumber( city );
-  int allWorkers = CityStatistic::getAvailableWorkersNumber( city );
+  int worklessPercent = CityStatistic::getWorklessPercent( city );
   int withoutWork = CityStatistic::getWorklessNumber( city );
   std::string strWorkerState = StringHelper::format( 0xff, "%d %s     %d %s  ( %d%% )",
                                                      workers, _("##advemployer_panel_workers##"),
                                                      withoutWork, _("##advemployer_panel_workless##"),
-                                                     (withoutWork * 100/ (allWorkers+1)) );
+                                                     worklessPercent );
 
   if( lbWorkersState )
   {
@@ -174,7 +174,7 @@ void AdvisorEmployerWindow::Impl::updateSalaryLabel()
 
 AdvisorEmployerWindow::Impl::EmployersInfo AdvisorEmployerWindow::Impl::getEmployersInfo( PriorityIndex type )
 {
-  std::vector< BuildingClass > bldClasses;
+  std::vector< TileOverlayGroup > bldClasses;
   switch( type )
   {
   case prIndustryAndTrade: bldClasses.push_back( BC_INDUSTRY ); bldClasses.push_back( BC_TRADE ); break;
@@ -191,9 +191,9 @@ AdvisorEmployerWindow::Impl::EmployersInfo AdvisorEmployerWindow::Impl::getEmplo
 
   WorkingBuildingList buildings;
   CityHelper helper( city );
-  foreach( BuildingClass cl, bldClasses )
+  foreach( TileOverlayGroup cl, bldClasses )
   {
-    WorkingBuildingList sectorBuildings = helper.getBuildings<WorkingBuilding>( cl );
+    WorkingBuildingList sectorBuildings = helper.find<WorkingBuilding>( cl );
     buildings.insert( buildings.begin(), sectorBuildings.begin(), sectorBuildings.end() );
   }
 

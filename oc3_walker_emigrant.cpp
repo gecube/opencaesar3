@@ -21,7 +21,10 @@
 
 Emigrant::Emigrant( CityPtr city ) : Immigrant( city )
 {
-  setCapacity( defaultPeoples );
+  CitizenGroup peoples;
+  peoples[ CitizenGroup::matureMin ] = 2;
+  peoples[ CitizenGroup::childMin ] = 2;
+  setPeoples( peoples );
 
   _setType( WT_EMIGRANT );
   _setGraphic( WG_PUSHER2 );

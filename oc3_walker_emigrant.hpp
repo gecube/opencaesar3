@@ -27,7 +27,6 @@ class Emigrant : public Immigrant
 {
 public:
   typedef enum { G_EMIGRANT_CART1 = Good::goodCount, G_EMIGRANT_CART2, CT_MAX } CartType;
-  static const unsigned int defaultPeoples=4;
 
   static EmigrantPtr create( CityPtr city);
 

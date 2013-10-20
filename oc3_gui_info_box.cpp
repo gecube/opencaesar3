@@ -45,6 +45,7 @@
 #include "oc3_goodstore.hpp"
 #include "oc3_gui_groupbox.hpp"
 #include "oc3_walker.hpp"
+#include "oc3_building_watersupply.hpp"
 #include "oc3_building_senate.hpp"
 
 class InfoBoxSimple::Impl
@@ -224,9 +225,15 @@ InfoBoxHouse::InfoBoxHouse( Widget* parent, const Tile& tile )
   Label* houseInfo = new Label( this, Rect( 30, 40, getWidth() - 30, 40 + 100 ), house->getUpCondition() );
   houseInfo->setWordWrap( true );
 
-  std::string workerState = StringHelper::format( 0xff, "habtns=%d avWrk=%d",
-                                                  house->getNbHabitants(),
-                                                  house->getServiceValue( Service::workersRecruter ) );
+  std::string workerState = StringHelper::format( 0xff, "hb=%d hr=%d nb=%d ch=%d sch=%d st=%d mt=%d old=%d",
+                                                  house->getHabitants().count(),
+                                                  house->getServiceValue( Service::workersRecruter ),
+                                                  house->getHabitants().count( CitizenGroup::newborn ),
+                                                  house->getHabitants().count( CitizenGroup::child ),
+                                                  house->getHabitants().count( CitizenGroup::scholar ),
+                                                  house->getHabitants().count( CitizenGroup::student ),
+                                                  house->getHabitants().count( CitizenGroup::mature ),
+                                                  house->getHabitants().count( CitizenGroup::aged ) );
   new Label( this, Rect( 16, 125, getWidth() - 16, 150 ), workerState );
 
   drawHabitants( house );
@@ -282,21 +289,22 @@ void InfoBoxHouse::drawHabitants( HousePtr house )
   Label* lbHabitants = new Label( this, Rect( 60, 157, getWidth() - 16, 157 + citPic.getHeight() ) );
 
   std::string freeRoomText;
-  int freeRoom = house->getMaxHabitants() - house->getNbHabitants();
+  int current = house->getHabitants().count();
+  int freeRoom = house->getMaxHabitants() - current;
   if( freeRoom > 0 )
   {
     // there is some room for new habitants!
-    freeRoomText = StringHelper::format( 0xff, "%d %s %d", house->getNbHabitants(), _("##citizens_additional_rooms_for##"), freeRoom);
+    freeRoomText = StringHelper::format( 0xff, "%d %s %d", current, _("##citizens_additional_rooms_for##"), freeRoom);
   }
   else if (freeRoom == 0)
   {
     // full house!
-    freeRoomText = StringHelper::format( 0xff, "%d %s", house->getNbHabitants(), _("##citizens##"));
+    freeRoomText = StringHelper::format( 0xff, "%d %s", current, _("##citizens##"));
   }
   else if (freeRoom < 0)
   {
     // too many habitants!
-    freeRoomText = StringHelper::format( 0xff, "%d %s %d", house->getNbHabitants(), _("##no_room_for_citizens##"),-freeRoom);
+    freeRoomText = StringHelper::format( 0xff, "%d %s %d", current, _("##no_room_for_citizens##"),-freeRoom);
     lbHabitants->setFont( Font::create( FONT_2_RED ) );
   }
 
@@ -837,6 +845,39 @@ InfoBoxText::InfoBoxText(Widget* parent, const std::string& title, const std::st
 }
 
 InfoBoxText::~InfoBoxText()
+{
+
+}
+
+
+InfoBoxFontain::InfoBoxFontain(Widget* parent, const Tile& tile)
+  : InfoBoxSimple( parent, Rect( 0, 0, 480, 320 ), Rect( 0, 0, 1, 1 ) )
+{
+  setTitle( "##fontaun_title##" );
+
+  _d->lbText->setGeometry( Rect( 25, 45, getWidth() - 25, getHeight() - 55 ) );
+  _d->lbText->setWordWrap( true );
+
+  FountainPtr fountain = tile.getOverlay().as<Fountain>();
+  std::string text;
+  if( fountain != 0 )
+  {
+    if( fountain->isActive() )
+    {
+      text = _("##fountain_text##");
+    }
+    else
+    {
+      text = fountain->haveReservoirAccess()
+               ? _("##need_full_reservoir_for_work##")
+               : _("##need_reservoir_for_work##");
+    }
+  }
+
+  _d->lbText->setText( text );
+}
+
+InfoBoxFontain::~InfoBoxFontain()
 {
 
 }

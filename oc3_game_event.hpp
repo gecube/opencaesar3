@@ -53,13 +53,13 @@ private:
 class BuildEvent : public GameEvent
 {
 public:
-  static GameEventPtr create( const TilePos&, BuildingType type );
-  static GameEventPtr create( const TilePos& pos, ConstructionPtr building );
+  static GameEventPtr create( const TilePos&, TileOverlayType type );
+  static GameEventPtr create(const TilePos&, TileOverlayPtr overlay );
 
   virtual void exec( Game& game );
 private:
   TilePos _pos;
-  ConstructionPtr _construction;
+  TileOverlayPtr _overlay;
 };
 
 class ClearLandEvent : public GameEvent

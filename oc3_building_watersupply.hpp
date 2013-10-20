@@ -26,15 +26,18 @@ class Reservoir;
 class WaterSource : public Construction
 {
 public:
-  WaterSource( const BuildingType type, const Size& size );
+  WaterSource( const TileOverlayType type, const Size& size );
   
   virtual void addWater( const WaterSource& source );
   virtual bool haveWater() const;
   virtual void timeStep(const unsigned long time);
   int getId() const;
 
+  virtual std::string getError() const;
+
 protected:
-  virtual void _waterStateChanged() {};
+  void _setError( const std::string& error );
+  virtual void _waterStateChanged() {}
   virtual void _produceWater( const TilePos* points, const int size );
   
   class Impl;
@@ -82,7 +85,6 @@ public:
 private:
   bool _isWaterSource;
   bool _isNearWater( CityPtr city, const TilePos& pos ) const;
-
 };
 
 class Fountain : public ServiceBuilding
@@ -95,6 +97,9 @@ public:
   virtual void deliverService();
   virtual void timeStep(const unsigned long time);
   virtual bool isNeedRoadAccess() const;
+
+  virtual bool isActive() const;
+  virtual bool haveReservoirAccess() const;
 
   virtual void load( const VariantMap& stream);
 private:

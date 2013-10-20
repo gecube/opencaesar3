@@ -134,7 +134,10 @@ void ServiceWalker::init(const Service::Type service)
 
 BuildingPtr ServiceWalker::getBase() const
 {
-  _OC3_DEBUG_BREAK_IF( _d->base.isNull() && "ServiceBuilding is not initialized" );
+  if( _d->base.isNull() )
+  {
+    StringHelper::debug( 0xff, "ServiceBuilding is not initialized" );
+  }
 
   return _d->base;
 }
@@ -316,7 +319,7 @@ void ServiceWalker::load( const VariantMap& stream )
   _d->maxDistance = stream.get( "maxDistance" ).toInt();
 
   TilePos basePos = stream.get( "base" ).toTilePos();
-  LandOverlayPtr overlay = _getCity()->getTilemap().at( basePos ).getOverlay();
+  TileOverlayPtr overlay = _getCity()->getTilemap().at( basePos ).getOverlay();
 
   _d->base = overlay.as<Building>();
   if( _d->base.isNull() )

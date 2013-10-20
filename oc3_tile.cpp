@@ -16,7 +16,7 @@
 #include "oc3_tile.hpp"
 #include "oc3_exception.hpp"
 #include "oc3_building.hpp"
-#include "oc3_landoverlay.hpp"
+#include "oc3_tileoverlay.hpp"
 #include "oc3_resourcegroup.hpp"
 #include "oc3_stringhelper.hpp"
 
@@ -127,7 +127,7 @@ void Tile::setAnimation(const Animation& animation)
   _animation = animation;
 }
 
-bool Tile::isWalkable(bool alllands ) const
+bool Tile::isWalkable( bool alllands ) const
 {
   // TODO: test building to allow garden, gatehouse, granary, ...
   bool walkable = (_terrain.road || (alllands && !_terrain.water && !_terrain.tree && !_terrain.rock));
@@ -200,12 +200,12 @@ int Tile::getDesirability() const
   return _terrain.desirability;
 }
 
-LandOverlayPtr Tile::getOverlay() const
+TileOverlayPtr Tile::getOverlay() const
 {
   return _overlay;
 }
 
-void Tile::setOverlay(LandOverlayPtr overlay)
+void Tile::setOverlay(TileOverlayPtr overlay)
 {
   _overlay = overlay;
 }

@@ -19,8 +19,6 @@
 #include "oc3_gui_widget.hpp"
 #include "oc3_signals.hpp"
 
-#define ANIMATOR_UNUSE_VALUE -9999
-
 class VideoOptionsWindow : public Widget
 {
 public:

@@ -13,18 +13,18 @@
 // You should have received a copy of the GNU General Public License
 // along with openCaesar3.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "oc3_landoverlay.hpp"
+#include "oc3_tileoverlay.hpp"
 #include "oc3_building_data.hpp"
 #include "oc3_city.hpp"
 #include "oc3_tilemap.hpp"
 #include "oc3_stringhelper.hpp"
 
-class LandOverlay::Impl
+class TileOverlay::Impl
 {
 public:
   PicturesArray fgPictures;
-  BuildingType buildingType;
-  BuildingClass buildingClass;
+  TileOverlayType overlayType;
+  TileOverlayGroup overlayClass;
   Tile* masterTile;  // left-most tile if multi-tile, or "this" if single-tile
   std::string name;
   Picture picture;
@@ -34,7 +34,7 @@ public:
   CityPtr city;
 };
 
-LandOverlay::LandOverlay(const BuildingType type, const Size& size)
+TileOverlay::TileOverlay(const TileOverlayType type, const Size& size)
 : _d( new Impl )
 {
   _d->masterTile = 0;
@@ -45,29 +45,29 @@ LandOverlay::LandOverlay(const BuildingType type, const Size& size)
   setType( type );
 }
 
-LandOverlay::~LandOverlay()
+TileOverlay::~TileOverlay()
 {
   // what we shall to do here?
 }
 
 
-BuildingType LandOverlay::getType() const
+TileOverlayType TileOverlay::getType() const
 {
-   return _d->buildingType;
+   return _d->overlayType;
 }
 
-void LandOverlay::setType(const BuildingType buildingType)
+void TileOverlay::setType(const TileOverlayType type)
 {
-  const BuildingData& bd = BuildingDataHolder::instance().getData( buildingType );
+  const BuildingData& bd = BuildingDataHolder::instance().getData( type );
 
-   _d->buildingType = buildingType;
-   _d->buildingClass = bd.getClass();
+   _d->overlayType = type;
+   _d->overlayClass = bd.getClass();
    _d->name = bd.getName();
 }
 
-void LandOverlay::timeStep(const unsigned long time) { }
+void TileOverlay::timeStep(const unsigned long time) { }
 
-void LandOverlay::setPicture(const Picture &picture)
+void TileOverlay::setPicture(const Picture &picture)
 {
   _d->picture = picture;
 
@@ -88,17 +88,17 @@ void LandOverlay::setPicture(const Picture &picture)
   }
 }
 
-void LandOverlay::setPicture(const char* resource, const int index)
+void TileOverlay::setPicture(const char* resource, const int index)
 {
   setPicture( Picture::load( resource, index ) );
 }
 
-void LandOverlay::setAnimation(const Animation& animation)
+void TileOverlay::setAnimation(const Animation& animation)
 {
   _d->animation = animation;
 }
 
-void LandOverlay::build( CityPtr city, const TilePos& pos )
+void TileOverlay::build( CityPtr city, const TilePos& pos )
 {
   Tilemap &tilemap = city->getTilemap();
 
@@ -124,16 +124,16 @@ void LandOverlay::build( CityPtr city, const TilePos& pos )
   }
 }
 
-void LandOverlay::deleteLater()
+void TileOverlay::deleteLater()
 {
   _d->isDeleted  = true;
 }
 
-void LandOverlay::destroy()
+void TileOverlay::destroy()
 {
 }
 
-Tile& LandOverlay::getTile() const
+Tile& TileOverlay::getTile() const
 {
   if( !_d->masterTile )
   {
@@ -144,36 +144,39 @@ Tile& LandOverlay::getTile() const
   return *_d->masterTile;
 }
 
-Size LandOverlay::getSize() const
+Size TileOverlay::getSize() const
 {
   return _d->size;
 }
 
-bool LandOverlay::isDeleted() const
+bool TileOverlay::isDeleted() const
 {
   return _d->isDeleted;
 }
 
-const Picture &LandOverlay::getPicture() const
+const Picture &TileOverlay::getPicture() const
 {
   return _d->picture;
 }
 
-const PicturesArray& LandOverlay::getForegroundPictures() const
+const PicturesArray& TileOverlay::getForegroundPictures() const
 {
   return _d->fgPictures;
 }
 
-std::string LandOverlay::getName()
+std::string TileOverlay::getName()
 {
   return _d->name;
 }
 
-void LandOverlay::save( VariantMap& stream ) const
+void TileOverlay::save( VariantMap& stream ) const
 {
-  stream[ "pos" ] = getTile().getIJ();
-  stream[ "buildingTypeName" ] = Variant( BuildingDataHolder::instance().getData( _d->buildingType ).getName() );
-  stream[ "buildingType" ] = (int)_d->buildingType;
+  VariantList config;
+  config.push_back( (int)_d->overlayType );
+  config.push_back( Variant( BuildingDataHolder::instance().getData( _d->overlayType ).getName() ) );
+  config.push_back( getTile().getIJ() );
+
+  stream[ "config" ] = config;
   stream[ "picture" ] = Variant( _d->picture.getName() );
   stream[ "pictureOffset" ] = _d->picture.getOffset();
   stream[ "size" ] = _d->size;
@@ -181,22 +184,22 @@ void LandOverlay::save( VariantMap& stream ) const
   stream[ "name" ] = Variant( _d->name );
 }
 
-void LandOverlay::load( const VariantMap& stream )
+void TileOverlay::load( const VariantMap& stream )
 {
   _d->name = stream.get( "name" ).toString();
   _d->size = stream.get( "size", Size(1) ).toSize();
-  _d->buildingType = (BuildingType)stream.get( "buildingType" ).toInt();
+  //_d->overlayType = (LandOverlayType)stream.get( "overlayType" ).toInt();
   _d->picture = Picture::load( stream.get( "picture" ).toString() + ".png" );
   _d->picture.setOffset( stream.get( "pictureOffset" ).toPoint() );
   _d->isDeleted = stream.get( "isDeleted", false ).toBool();  
 }
 
-bool LandOverlay::isWalkable() const
+bool TileOverlay::isWalkable() const
 {
   return false;
 }
 
-TilePos LandOverlay::getTilePos() const
+TilePos TileOverlay::getTilePos() const
 {
   if( !_d->masterTile )
   {
@@ -206,42 +209,42 @@ TilePos LandOverlay::getTilePos() const
   return _d->masterTile->getIJ();
 }
 
-void LandOverlay::setName( const std::string& name )
+void TileOverlay::setName( const std::string& name )
 {
   _d->name = name;
 }
 
-void LandOverlay::setSize( const Size& size )
+void TileOverlay::setSize( const Size& size )
 {
   _d->size = size;
 }
 
-Point LandOverlay::getOffset( const Point& subpos ) const
+Point TileOverlay::getOffset( const Point& subpos ) const
 {
   return Point( 0, 0 );
 }
 
-Animation& LandOverlay::_getAnimation()
+Animation& TileOverlay::_getAnimation()
 {
   return _d->animation;
 }
 
-Tile* LandOverlay::_getMasterTile()
+Tile* TileOverlay::_getMasterTile()
 {
   return _d->masterTile;
 }
 
-CityPtr LandOverlay::_getCity() const
+CityPtr TileOverlay::_getCity() const
 {
   return _d->city;
 }
 
-PicturesArray& LandOverlay::_getForegroundPictures()
+PicturesArray& TileOverlay::_getForegroundPictures()
 {
   return _d->fgPictures;
 }
 
-BuildingClass LandOverlay::getClass() const
+TileOverlayGroup TileOverlay::getClass() const
 {
-  return _d->buildingClass;
+  return _d->overlayClass;
 }

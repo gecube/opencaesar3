@@ -182,7 +182,7 @@ unsigned int CityStatistic::getCurrentWorkersNumber(CityPtr city)
 {
   CityHelper helper( city );
 
-  WorkingBuildingList buildings = helper.getBuildings<WorkingBuilding>( B_MAX );
+  WorkingBuildingList buildings = helper.find<WorkingBuilding>( B_MAX );
 
   int workersNumber = 0;
   foreach( WorkingBuildingPtr bld, buildings )
@@ -193,31 +193,31 @@ unsigned int CityStatistic::getCurrentWorkersNumber(CityPtr city)
   return workersNumber;
 }
 
-unsigned int CityStatistic::getAvailableWorkersNumber(CityPtr city)
-{
-  CityHelper helper( city );
-
-  HouseList houses = helper.getBuildings<House>( B_HOUSE );
-
-  int avWrksNumber = 0;
-  foreach( HousePtr house, houses )
-  {
-    avWrksNumber += house->getServiceValue( Service::workersRecruter );
-  }
-
-  return avWrksNumber;
-}
-
 unsigned int CityStatistic::getVacantionsNumber(CityPtr city)
 {
   CityHelper helper( city );
 
-  WorkingBuildingList buildings = helper.getBuildings<WorkingBuilding>( B_MAX );
+  WorkingBuildingList buildings = helper.find<WorkingBuilding>( B_MAX );
 
   int workersNumber = 0;
   foreach( WorkingBuildingPtr bld, buildings )
   {
     workersNumber += bld->getMaxWorkers();
+  }
+
+  return workersNumber;
+}
+
+unsigned int CityStatistic::getAvailableWorkersNumber(CityPtr city)
+{
+  CityHelper helper( city );
+
+  HouseList houses = helper.find<House>( B_HOUSE );
+
+  int workersNumber = 0;
+  foreach( HousePtr house, houses )
+  {
+    workersNumber += (house->getServiceValue( Service::workersRecruter ) + house->getWorkersCount());
   }
 
   return workersNumber;
@@ -243,7 +243,7 @@ unsigned int CityStatistic::getWorklessNumber(CityPtr city)
 {
   CityHelper helper( city );
 
-  HouseList houses = helper.getBuildings<House>( B_HOUSE );
+  HouseList houses = helper.find<House>( B_HOUSE );
 
   int worklessNumber = 0;
   foreach( HousePtr house, houses )
@@ -252,4 +252,9 @@ unsigned int CityStatistic::getWorklessNumber(CityPtr city)
   }
 
   return worklessNumber;
+}
+
+unsigned int CityStatistic::getWorklessPercent(CityPtr city)
+{
+  return getWorklessNumber( city ) * 100 / (getAvailableWorkersNumber( city )+1);
 }

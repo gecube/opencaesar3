@@ -31,7 +31,7 @@
 class EntertainmentInfoLabel : public Label
 {
 public:
-  EntertainmentInfoLabel( Widget* parent, const Rect& rect, const BuildingType service, 
+  EntertainmentInfoLabel( Widget* parent, const Rect& rect, const TileOverlayType service, 
                       int workBulding, int numberBuilding, int peoplesCount  )
     : Label( parent, rect )
   {
@@ -52,7 +52,7 @@ public:
     switch( _service )
     {
     case B_THEATER: buildingStr = _("##theaters##"); peoplesStr = _("##peoples##"); break;
-    case B_AMPHITHEATER: buildingStr = _("##amphitheatres##"); peoplesStr = _("##peoples##"); break;
+    case buildingAmphitheater: buildingStr = _("##amphitheatres##"); peoplesStr = _("##peoples##"); break;
     case B_COLLOSSEUM: buildingStr = _("##colloseum##"); peoplesStr = _("##peoples##"); break;
     case B_HIPPODROME: buildingStr = _("##hippodromes##"); peoplesStr = "-"; break;
     default:
@@ -68,7 +68,7 @@ public:
   }
 
 private:
-  BuildingType _service;
+  TileOverlayType _service;
   int _workingBuilding;
   int _numberBuilding;
   int _peoplesCount;
@@ -85,6 +85,7 @@ public:
   EntertainmentInfoLabel* lbAmphitheatresInfo;
   EntertainmentInfoLabel* lbColisseumInfo;
   EntertainmentInfoLabel* lbHippodromeInfo;
+  Label* lbInfo;
   TexturedButton* btnHelp;
 
   struct InfrastructureInfo
@@ -95,7 +96,7 @@ public:
     int peoplesStuding;
   };
 
-  InfrastructureInfo getInfo( CityPtr city, const BuildingType service )
+  InfrastructureInfo getInfo( CityPtr city, const TileOverlayType service )
   {
     CityHelper helper( city );
 
@@ -106,7 +107,7 @@ public:
     ret.buildingShow = 0;
     ret.buildingCount = 0;
 
-    ServiceBuildingList servBuildings = helper.getBuildings<ServiceBuilding>( service );
+    ServiceBuildingList servBuildings = helper.find<ServiceBuilding>( service );
     foreach( ServiceBuildingPtr building, servBuildings )
     {
       if( building->getWorkers() > 0 )
@@ -117,7 +118,7 @@ public:
         switch( service )
         {
         case B_THEATER: maxStuding = 500; break;
-        case B_AMPHITHEATER: maxStuding = 800; break;
+        case buildingAmphitheater: maxStuding = 800; break;
         case B_COLLOSSEUM: maxStuding = 1500; break;
         default:
         break;
@@ -135,6 +136,8 @@ public:
   {
 
   }
+
+  void updateInfo();
 };
 
 
@@ -147,7 +150,7 @@ AdvisorEntertainmentWindow::AdvisorEntertainmentWindow( CityPtr city, Widget* pa
                Size( 640, 384 ) ) );
 
   Label* title = new Label( this, Rect( 60, 10, getWidth() - 10, 10 + 40) );
-  title->setText( _("##Entertainment advisor##") );
+  title->setText( _("##entertainment_advisor_title##") );
   title->setFont( Font::create( FONT_3 ) );
   title->setTextAlignment( alignUpperLeft, alignCenter );
 
@@ -157,6 +160,9 @@ AdvisorEntertainmentWindow::AdvisorEntertainmentWindow( CityPtr city, Widget* pa
 
   //buttons _d->_d->background
   PictureDecorator::draw( *_d->background, Rect( 32, 60, getWidth() - 32, 60 + 86 ), PictureDecorator::blackFrame );
+  _d->lbInfo = new Label( this, Rect( 50, 145, getWidth() - 50, 145 + 75) );
+
+  _d->updateInfo();
 
   Picture& icon = Picture::load( ResourceGroup::panelBackground, 263 );
   _d->background->draw( icon, Point( 11, 11 ) );
@@ -173,8 +179,8 @@ AdvisorEntertainmentWindow::AdvisorEntertainmentWindow( CityPtr city, Widget* pa
   _d->lbTheatresInfo = new EntertainmentInfoLabel( this, Rect( startPoint, labelSize ), B_THEATER, 
                                              info.buildingWork, info.buildingCount, info.peoplesStuding );
 
-  info = _d->getInfo( city, B_AMPHITHEATER );
-  _d->lbAmphitheatresInfo = new EntertainmentInfoLabel( this, Rect( startPoint + Point( 0, 20), labelSize), B_AMPHITHEATER,
+  info = _d->getInfo( city, buildingAmphitheater );
+  _d->lbAmphitheatresInfo = new EntertainmentInfoLabel( this, Rect( startPoint + Point( 0, 20), labelSize), buildingAmphitheater,
                                               info.buildingWork, info.buildingCount, info.peoplesStuding );
 
   info = _d->getInfo( city, B_COLLOSSEUM );
@@ -189,10 +195,10 @@ AdvisorEntertainmentWindow::AdvisorEntertainmentWindow( CityPtr city, Widget* pa
 
   int sumScholars = 0;
   //int sumStudents = 0;
-  HouseList houses = helper.getBuildings<House>( B_HOUSE );
+  HouseList houses = helper.find<House>( B_HOUSE );
   foreach( HousePtr house, houses )
   {
-    sumScholars += house->getScholars();
+    sumScholars += house->getHabitants().count( CitizenGroup::scholar );
     //sumStudents += (*it)->getStudents();
   }
 
@@ -229,4 +235,10 @@ void AdvisorEntertainmentWindow::_showFestivalWindow()
 {
   FestivalPlaningWindow* wnd = FestivalPlaningWindow::create( this, _d->city, -1 );
   CONNECT( wnd, onFestivalAssign(), _d.data(), Impl::updateFestivalInfo );
+}
+
+
+void AdvisorEntertainmentWindow::Impl::updateInfo()
+{
+  lbInfo->setText( _( "##entrainment_not_need##") );
 }

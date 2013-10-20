@@ -43,10 +43,11 @@ public:
   Good::Type inGoodType;
   Good::Type outGoodType;
   bool produceGood;
+  std::string errorStr;
 };
 
 Factory::Factory(const Good::Type inType, const Good::Type outType,
-                  const BuildingType type, const Size& size )
+                  const TileOverlayType type, const Size& size )
 : WorkingBuilding( type, size ), _d( new Impl )
 {
    _d->productionRate = 2.f;
@@ -65,7 +66,6 @@ GoodStock& Factory::getInGood()
 {
    return _d->goodStore.getStock(_d->inGoodType);
 }
-
 
 GoodStock& Factory::getOutGood()
 {
@@ -232,9 +232,19 @@ bool Factory::_mayDeliverGood() const
   return ( getAccessRoads().size() > 0 ) && ( getWalkerList().size() == 0 );
 }
 
+void Factory::_setError(const std::string& err)
+{
+  _d->errorStr = err;
+}
+
 void Factory::setProductRate( const float rate )
 {
   _d->productionRate = rate;
+}
+
+std::string Factory::getError() const
+{
+  return _d->errorStr;
 }
 
 Good::Type Factory::getOutGoodType() const
@@ -276,8 +286,7 @@ bool Factory::standIdle() const
 
 TimberLogger::TimberLogger() : Factory(Good::none, Good::timber, B_TIMBER_YARD, Size(2) )
 {
-  setProductRate( 9.6f );
-  setPicture( Picture::load(ResourceGroup::commerce, 72) );
+  setPicture( ResourceGroup::commerce, 72 );
 
   _getAnimation().load( ResourceGroup::commerce, 73, 10);
   _getForegroundPictures().resize(2);
@@ -295,15 +304,15 @@ bool TimberLogger::canBuild( CityPtr city, const TilePos& pos ) const
       near_forest |= tile->getFlag( Tile::tlTree );
    }
 
+   const_cast< TimberLogger* >( this )->_setError( near_forest ? "" : _("##lumber_mill_need_forest_near##"));
+
    return (is_constructible && near_forest);
 }
 
 
 IronMine::IronMine() : Factory(Good::none, Good::iron, B_IRON_MINE, Size(2) )
 {
-  setProductRate( 9.6f );
-
-  setPicture( Picture::load(ResourceGroup::commerce, 54) );
+  setPicture( ResourceGroup::commerce, 54 );
 
   _getAnimation().load( ResourceGroup::commerce, 55, 6 );
   _getAnimation().setFrameDelay( 5 );
@@ -327,15 +336,38 @@ bool IronMine::canBuild( CityPtr city, const TilePos& pos ) const
 
 WeaponsWorkshop::WeaponsWorkshop() : Factory(Good::iron, Good::weapon, B_WEAPONS_WORKSHOP, Size(2) )
 {
-  setPicture( Picture::load(ResourceGroup::commerce, 108) );
+  setPicture( ResourceGroup::commerce, 108);
 
   _getAnimation().load( ResourceGroup::commerce, 109, 6);
   _getForegroundPictures().resize(2);
 }
 
+bool WeaponsWorkshop::canBuild(CityPtr city, const TilePos& pos) const
+{
+  bool ret = Factory::canBuild( city, pos );
+
+  CityHelper helper( city );
+  bool haveIronMine = !helper.find<Building>( B_IRON_MINE ).empty();
+
+  const_cast< WeaponsWorkshop* >( this )->_setError( haveIronMine ? "" : _("##need_iron_for_work##") );
+  return ret;
+}
+
+bool WorkshopFurniture::canBuild(CityPtr city, const TilePos& pos) const
+{
+  bool ret = Factory::canBuild( city, pos );
+
+  CityHelper helper( city );
+  bool haveTimberLogger = !helper.find<TimberLogger>( B_TIMBER_YARD ).empty();
+
+  const_cast< WorkshopFurniture* >( this )->_setError( haveTimberLogger ? "" : _("##need_timber_for_work##") );
+
+  return ret;
+}
+
 WorkshopFurniture::WorkshopFurniture() : Factory(Good::timber, Good::furniture, B_FURNITURE, Size(2) )
 {
-  setPicture( Picture::load(ResourceGroup::commerce, 117) );
+  setPicture( ResourceGroup::commerce, 117 );
 
   _getAnimation().load(ResourceGroup::commerce, 118, 14);
   _getForegroundPictures().resize(2);
@@ -349,6 +381,17 @@ Winery::Winery() : Factory(Good::grape, Good::wine, B_WINE_WORKSHOP, Size(2) )
   _getForegroundPictures().resize(2);
 }
 
+bool Winery::canBuild(CityPtr city, const TilePos& pos) const
+{
+  bool ret = Factory::canBuild( city, pos );
+
+  CityHelper helper( city );
+  bool haveVinegrad = !helper.find<Building>( B_GRAPE_FARM ).empty();
+
+  const_cast< Winery* >( this )->_setError( haveVinegrad ? "" : _("##need_vinegrad_for_work##") );
+  return ret;
+}
+
 Creamery::Creamery() : Factory(Good::olive, Good::oil, B_OIL_WORKSHOP, Size(2) )
 {
   setPicture( ResourceGroup::commerce, 99 );
@@ -357,62 +400,14 @@ Creamery::Creamery() : Factory(Good::olive, Good::oil, B_OIL_WORKSHOP, Size(2) )
   _getForegroundPictures().resize(2);
 }
 
-Wharf::Wharf() : Factory(Good::none, Good::fish, B_WHARF, Size(2))
+bool Creamery::canBuild(CityPtr city, const TilePos& pos) const
 {
-  // transport 52 53 54 55
-  setPicture( Picture::load( ResourceGroup::wharf, 52));
+  bool ret = Factory::canBuild( city, pos );
+
+  CityHelper helper( city );
+  bool haveOliveFarm = !helper.find<Building>( B_OLIVE_FARM ).empty();
+
+  const_cast< Creamery* >( this )->_setError( haveOliveFarm ? "" : _("##need_olive_for_work##") );
+
+  return ret;
 }
-
-/* INCORRECT! */
-bool Wharf::canBuild( CityPtr city, const TilePos& pos ) const
-{
-  bool is_constructible = Construction::canBuild( city, pos );
-
-  // We can build wharf only on straight border of water and land
-  //
-  //   ?WW? ???? ???? ????
-  //   ?XX? WXX? ?XXW ?XX?
-  //   ?XX? WXX? ?XXW ?XX?
-  //   ???? ???? ???? ?WW?
-  //
-
-  bool bNorth = true;
-  bool bSouth = true;
-  bool bWest  = true;
-  bool bEast  = true;
-   
-  Tilemap& tilemap = city->getTilemap();
-   
-  TilemapArea perimetr = tilemap.getRectangle( pos + TilePos( -1, -1 ), getSize() + Size( 2 ), false);
-  foreach( Tile* tile, perimetr )
-  {    
-    int size = getSize().getWidth();
-     if(tile->getJ() > (pos.getJ() + size -1) && !tile->getFlag( Tile::tlWater )) {  bNorth = false; }
-     if(tile->getJ() < pos.getJ() && !tile->getFlag( Tile::tlWater ))              {  bSouth = false; }
-     if(tile->getI() > (pos.getI() + size -1) && !tile->getFlag( Tile::tlWater )) {  bEast = false;  }
-     if(tile->getI() < pos.getI() && !tile->getFlag( Tile::tlWater ))              {  bWest = false;  }
-   }
-
-   return (is_constructible && (bNorth || bSouth || bEast || bWest));
-}
-
-/*
-bool Wharf::canBuild(const int i, const int j) const
-{
-  Tilemap& tilemap = Scenario::instance().getCity().getTilemap();
-  
-  int sum = 0;
-  
-  // 2 x 2 so sum will be max 1 + 2 + 4 + 8
-  for (int k = 0; k < _size; k++)
-    for (int l = 0; l < _size; l++)
-      sum += tilemap.at(i + k, j + l).get_terrain().isWater() << (k * _size + l);
-  
-  std::cout << sum << std::endl;
-    
-  if (sum==3 or sum==5 or 
-    //sum==9 or sum==6 or
-    sum==10 or sum==12) return true;
-  
-  return false;
-}*/

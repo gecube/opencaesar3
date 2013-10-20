@@ -22,6 +22,7 @@
 #include "oc3_city.hpp"
 #include "oc3_stringhelper.hpp"
 #include "oc3_tilemap.hpp"
+#include "oc3_gettext.hpp"
 
 class FarmTile
 {
@@ -84,7 +85,7 @@ public:
   Picture pictureBuilding;  // we need to change its offset
 };
 
-Farm::Farm(const Good::Type outGood, const BuildingType type )
+Farm::Farm(const Good::Type outGood, const TileOverlayType type )
   : Factory( Good::none, outGood, type, Size(3) ), _d( new Impl )
 {
   _d->pictureBuilding = Picture::load( ResourceGroup::commerce, 12);  // farm building
@@ -108,6 +109,8 @@ bool Farm::canBuild( CityPtr city, const TilePos& pos ) const
   {
     on_meadow |= tile->getFlag( Tile::tlMeadow );
   }
+
+  const_cast< Farm* >( this )->_setError( on_meadow ? _("##need_meadow_ground##") : "" );
 
   return (is_constructible && on_meadow);  
 }
