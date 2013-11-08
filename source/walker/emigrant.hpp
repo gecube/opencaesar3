@@ -30,8 +30,11 @@ public:
 
   static EmigrantPtr create( CityPtr city);
 
-  void getPictureList(std::vector<Picture> &oPics);
-  void onNewDirection();
+  virtual void getPictureList(std::vector<Picture> &oPics);
+  virtual void onNewDirection();
+  virtual void timeStep(const unsigned long time);
+
+  virtual void die();
 
   ~Emigrant();
 protected:

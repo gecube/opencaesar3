@@ -17,14 +17,19 @@
 #include "building/metadata.hpp"
 #include "game/city.hpp"
 #include "game/tilemap.hpp"
-#include "core/stringhelper.hpp"
+#include "core/logger.hpp"
+
+namespace {
+static Renderer::PassQueue defaultPassQueue=Renderer::PassQueue(1,Renderer::foreground);
+static PicturesArray invalidPictures;
+}
 
 class TileOverlay::Impl
 {
-public:
+public:  
   PicturesArray fgPictures;
-  TileOverlayType overlayType;
-  TileOverlayGroup overlayClass;
+  TileOverlay::Type overlayType;
+  TileOverlay::Group overlayClass;
   Tile* masterTile;  // left-most tile if multi-tile, or "this" if single-tile
   std::string name;
   Picture picture;
@@ -34,7 +39,7 @@ public:
   CityPtr city;
 };
 
-TileOverlay::TileOverlay(const TileOverlayType type, const Size& size)
+TileOverlay::TileOverlay(const Type type, const Size& size)
 : _d( new Impl )
 {
   _d->masterTile = 0;
@@ -51,23 +56,23 @@ TileOverlay::~TileOverlay()
 }
 
 
-TileOverlayType TileOverlay::getType() const
+TileOverlay::Type TileOverlay::getType() const
 {
    return _d->overlayType;
 }
 
-void TileOverlay::setType(const TileOverlayType type)
+void TileOverlay::setType(const Type type)
 {
-  const BuildingData& bd = BuildingDataHolder::instance().getData( type );
+  const MetaData& bd = MetaDataHolder::instance().getData( type );
 
    _d->overlayType = type;
    _d->overlayClass = bd.getClass();
    _d->name = bd.getName();
 }
 
-void TileOverlay::timeStep(const unsigned long time) { }
+void TileOverlay::timeStep(const unsigned long time) {}
 
-void TileOverlay::setPicture(const Picture &picture)
+void TileOverlay::setPicture(Picture picture)
 {
   _d->picture = picture;
 
@@ -91,6 +96,11 @@ void TileOverlay::setPicture(const Picture &picture)
 void TileOverlay::setPicture(const char* resource, const int index)
 {
   setPicture( Picture::load( resource, index ) );
+}
+
+const Picture& TileOverlay::getPicture() const
+{
+  return _d->picture;
 }
 
 void TileOverlay::setAnimation(const Animation& animation)
@@ -137,7 +147,7 @@ Tile& TileOverlay::getTile() const
 {
   if( !_d->masterTile )
   {
-    StringHelper::debug( 0xff, "master tile must be exists" );
+    Logger::warning( "master tile must be exists" );
     static Tile invalid( TilePos( -1, -1 ));
     return invalid;
   }
@@ -154,14 +164,20 @@ bool TileOverlay::isDeleted() const
   return _d->isDeleted;
 }
 
-const Picture &TileOverlay::getPicture() const
+const PicturesArray& TileOverlay::getPictures( Renderer::Pass pass ) const
 {
-  return _d->picture;
+  switch( pass )
+  {
+  case Renderer::foreground: return _d->fgPictures;
+  default: break;
+  }
+
+  return invalidPictures;
 }
 
-const PicturesArray& TileOverlay::getForegroundPictures() const
+Renderer::PassQueue TileOverlay::getPassQueue() const
 {
-  return _d->fgPictures;
+  return defaultPassQueue;
 }
 
 std::string TileOverlay::getName()
@@ -173,7 +189,7 @@ void TileOverlay::save( VariantMap& stream ) const
 {
   VariantList config;
   config.push_back( (int)_d->overlayType );
-  config.push_back( Variant( BuildingDataHolder::instance().getData( _d->overlayType ).getName() ) );
+  config.push_back( Variant( MetaDataHolder::instance().getData( _d->overlayType ).getName() ) );
   config.push_back( getTile().getIJ() );
 
   stream[ "config" ] = config;
@@ -203,7 +219,7 @@ TilePos TileOverlay::getTilePos() const
 {
   if( !_d->masterTile )
   {
-    StringHelper::debug( 0xff,  "master tile can't be null" );
+    Logger::warning(  "master tile can't be null" );
     return TilePos( -1, -1 );
   }
   return _d->masterTile->getIJ();
@@ -239,12 +255,17 @@ CityPtr TileOverlay::_getCity() const
   return _d->city;
 }
 
-PicturesArray& TileOverlay::_getForegroundPictures()
+PicturesArray& TileOverlay::_getFgPictures()
 {
   return _d->fgPictures;
 }
 
-TileOverlayGroup TileOverlay::getClass() const
+Picture&TileOverlay::_getPicture()
+{
+  return _d->picture;
+}
+
+TileOverlay::Group TileOverlay::getClass() const
 {
   return _d->overlayClass;
 }

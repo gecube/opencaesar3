@@ -39,7 +39,7 @@ public:
 };
 
 ServiceBuilding::ServiceBuilding(const Service::Type service,
-                                 const TileOverlayType type, const Size& size)
+                                 const Type type, const Size& size)
                                  : WorkingBuilding( type, size ), _d( new Impl )
 {
    _d->service = service;
@@ -75,11 +75,10 @@ void ServiceBuilding::timeStep(const unsigned long time)
    }
 
    _getAnimation().update( time );
-   const Picture& pic = _getAnimation().getCurrentPicture();
+   const Picture& pic = _getAnimation().getFrame();
    if( pic.isValid() )
    {
-      int level = getForegroundPictures().size()-1;
-      _getForegroundPictures().at( level ) = _getAnimation().getCurrentPicture();
+      _getFgPictures().back() = _getAnimation().getFrame();
    }
 }
 

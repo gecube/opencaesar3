@@ -22,13 +22,18 @@
 #include "walker/taxcollector.hpp"
 #include "city.hpp"
 #include "name_generator.hpp"
-#include "core/stringhelper.hpp"
+#include "core/logger.hpp"
 #include "walker/animals.hpp"
 #include "walker/fishing_boat.hpp"
+#include "walker/constants.hpp"
+#include "walker/corpse.hpp"
+#include "walker/protestor.hpp"
 #include <map>
 
+using namespace constants;
+
 template< class T >
-class WalkerCreator : public AbstractWalkerCreator
+class BaseWalkerCreator : public WalkerCreator
 {
 public:
   virtual WalkerPtr create( CityPtr city )
@@ -37,7 +42,7 @@ public:
   }
 };
 
-class ServiceWalkerCreator : public AbstractWalkerCreator
+class ServiceWalkerCreator : public WalkerCreator
 {
 public:
   WalkerPtr create( CityPtr city )
@@ -53,39 +58,41 @@ public:
   Service::Type serviceType;
 };
 
-class TraineeWalkerCreator : public AbstractWalkerCreator
+class TraineeWalkerCreator : public WalkerCreator
 {
 public:
   WalkerPtr create( CityPtr city )
   {
-    return TraineeWalker::create( city, WT_TRAINEE ).object();
+    return TraineeWalker::create( city, walker::trainee ).object();
   }
 };
 
 class WalkerManager::Impl
 {
 public:
-  typedef std::map< WalkerType, AbstractWalkerCreator* > WalkerCreators;
+  typedef std::map< walker::Type, WalkerCreator* > WalkerCreators;
   WalkerCreators constructors;
 };
 
 WalkerManager::WalkerManager() : _d( new Impl )
 {
-  addCreator( WT_EMIGRANT, new WalkerCreator<Emigrant>() );
-  addCreator( WT_IMMIGRANT, new WalkerCreator<Immigrant>() );
-  addCreator( WT_CART_PUSHER, new WalkerCreator<CartPusher>() );
-  addCreator( WT_PREFECT, new WalkerCreator<WalkerPrefect>() );
-  addCreator( WT_TAXCOLLECTOR, new WalkerCreator<TaxCollector>() );
-  addCreator( WT_ENGINEER, new ServiceWalkerCreator( Service::engineer ));
-  addCreator( WT_DOCTOR, new ServiceWalkerCreator( Service::doctor ) );
-  addCreator( WT_ANIMAL_SHEEP, new WalkerCreator< Sheep >() );
-  addCreator( WT_BATHLADY, new ServiceWalkerCreator( Service::baths ) );
-  addCreator( WT_ACTOR, new ServiceWalkerCreator( Service::theater ) );
-  addCreator( WT_GLADIATOR, new ServiceWalkerCreator( Service::amphitheater ) );
-  addCreator( WT_BARBER, new ServiceWalkerCreator( Service::barber ) );
-  addCreator( WT_SURGEON, new ServiceWalkerCreator( Service::hospital ) );
-  addCreator( WT_TRAINEE, new TraineeWalkerCreator() );
-  addCreator( WT_FISHING_BOAT, new WalkerCreator<FishingBoat>() );
+  addCreator( walker::emigrant, new BaseWalkerCreator<Emigrant>() );
+  addCreator( walker::immigrant, new BaseWalkerCreator<Immigrant>() );
+  addCreator( walker::cartPusher, new BaseWalkerCreator<CartPusher>() );
+  addCreator( walker::prefect, new BaseWalkerCreator<Prefect>() );
+  addCreator( walker::taxCollector, new BaseWalkerCreator<TaxCollector>() );
+  addCreator( walker::engineer, new ServiceWalkerCreator( Service::engineer ));
+  addCreator( walker::doctor, new ServiceWalkerCreator( Service::doctor ) );
+  addCreator( walker::sheep, new BaseWalkerCreator< Sheep >() );
+  addCreator( walker::bathlady, new ServiceWalkerCreator( Service::baths ) );
+  addCreator( walker::actor, new ServiceWalkerCreator( Service::theater ) );
+  addCreator( walker::gladiator, new ServiceWalkerCreator( Service::amphitheater ) );
+  addCreator( walker::barber, new ServiceWalkerCreator( Service::barber ) );
+  addCreator( walker::surgeon, new ServiceWalkerCreator( Service::hospital ) );
+  addCreator( walker::trainee, new TraineeWalkerCreator() );
+  addCreator( walker::fishingBoat, new BaseWalkerCreator<FishingBoat>() );
+  addCreator( walker::corpse, new BaseWalkerCreator<Corpse>() );
+  addCreator( walker::protestor, new BaseWalkerCreator<Protestor>() );
 }
 
 WalkerManager::~WalkerManager()
@@ -93,7 +100,7 @@ WalkerManager::~WalkerManager()
 
 }
 
-WalkerPtr WalkerManager::create(const WalkerType walkerType , CityPtr city)
+WalkerPtr WalkerManager::create(const walker::Type walkerType , CityPtr city)
 {
   Impl::WalkerCreators::iterator findConstructor = _d->constructors.find( walkerType );
 
@@ -102,7 +109,7 @@ WalkerPtr WalkerManager::create(const WalkerType walkerType , CityPtr city)
     return findConstructor->second->create( city ).as<Walker>();
   }
 
-  StringHelper::debug( 0xff, "Can't create walker from type %d", walkerType );
+  Logger::warning( "Can't create walker from type %d", walkerType );
   return WalkerPtr();
 }
 
@@ -112,14 +119,14 @@ WalkerManager& WalkerManager::getInstance()
   return inst;
 }
 
-void WalkerManager::addCreator( const WalkerType type, AbstractWalkerCreator* ctor )
+void WalkerManager::addCreator( const walker::Type type, WalkerCreator* ctor )
 {
   std::string typeName = WalkerHelper::getName( type );
 
   bool alreadyHaveConstructor = _d->constructors.find( type ) != _d->constructors.end();
   if( alreadyHaveConstructor )
   {
-    StringHelper::debug( 0xff, "Already have constructor for type %s", typeName.c_str() );
+    Logger::warning( "Already have constructor for type %s", typeName.c_str() );
     return;
   }
   else
@@ -128,7 +135,7 @@ void WalkerManager::addCreator( const WalkerType type, AbstractWalkerCreator* ct
   }
 }
 
-bool WalkerManager::canCreate( const WalkerType type ) const
+bool WalkerManager::canCreate( const walker::Type type ) const
 {
   return _d->constructors.find( type ) != _d->constructors.end();   
 }

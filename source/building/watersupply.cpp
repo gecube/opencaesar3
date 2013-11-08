@@ -27,6 +27,10 @@
 #include "core/foreach.hpp"
 #include "core/gettext.hpp"
 #include "game/tilemap.hpp"
+#include "core/logger.hpp"
+#include "constants.hpp"
+
+using namespace constants;
 
 class WaterSource::Impl
 {
@@ -42,7 +46,7 @@ public:
   std::string errorStr;
 };
 
-Aqueduct::Aqueduct() : WaterSource( B_AQUEDUCT, Size(1) ) 
+Aqueduct::Aqueduct() : WaterSource( building::B_AQUEDUCT, Size(1) )
 {
   setPicture( ResourceGroup::aqueduct, 133 ); // default picture for aqueduct
   _d->isRoad = false;
@@ -71,7 +75,7 @@ void Aqueduct::build( CityPtr city, const TilePos& pos )
   Construction::build( city, pos );
 
   CityHelper helper( city );
-  AqueductList aqueducts = helper.find<Aqueduct>( B_AQUEDUCT );
+  AqueductList aqueducts = helper.find<Aqueduct>( building::B_AQUEDUCT );
   foreach( AqueductPtr aqueduct, aqueducts )
   {
     aqueduct->updatePicture( city );
@@ -90,7 +94,7 @@ void Aqueduct::destroy()
     foreach( Tile* tile, area )
     {
       TileOverlayPtr overlay = tile->getOverlay();
-      if( overlay.isValid() && overlay->getType() == B_AQUEDUCT )
+      if( overlay.isValid() && overlay->getType() == building::B_AQUEDUCT )
       {
         overlay.as<Aqueduct>()->updatePicture( _getCity() );
       }
@@ -154,27 +158,27 @@ bool Aqueduct::canBuild( CityPtr city, const TilePos& pos ) const
   {
     int directionFlags = 0;  // bit field, N=1, E=2, S=4, W=8
 
-    TilePos tile_pos_d[D_MAX];
-    bool is_border[D_MAX];
+    TilePos tile_pos_d[countDirection];
+    bool is_border[countDirection];
 
-    tile_pos_d[D_NORTH] = pos + TilePos(  0,  1);
-    tile_pos_d[D_EAST]  = pos + TilePos(  1,  0);
-    tile_pos_d[D_SOUTH] = pos + TilePos(  0, -1);
-    tile_pos_d[D_WEST]  = pos + TilePos( -1,  0);
+    tile_pos_d[north] = pos + TilePos(  0,  1);
+    tile_pos_d[east]  = pos + TilePos(  1,  0);
+    tile_pos_d[south] = pos + TilePos(  0, -1);
+    tile_pos_d[west]  = pos + TilePos( -1,  0);
 
     // all tiles must be in map range
-    for (int i = 0; i < D_MAX; ++i) {
+    for (int i = 0; i < countDirection; ++i) {
       is_border[i] = !tilemap.isInside(tile_pos_d[i]);
       if (is_border[i])
         tile_pos_d[i] = pos;
     }
 
-    if (tilemap.at(tile_pos_d[D_NORTH]).getFlag( Tile::tlRoad )) { directionFlags += 1; } // road to the north
-    if (tilemap.at(tile_pos_d[D_EAST]).getFlag( Tile::tlRoad )) { directionFlags += 2; } // road to the east
-    if (tilemap.at(tile_pos_d[D_SOUTH]).getFlag( Tile::tlRoad )) { directionFlags += 4; } // road to the south
-    if (tilemap.at(tile_pos_d[D_WEST]).getFlag( Tile::tlRoad )) { directionFlags += 8; } // road to the west
+    if (tilemap.at(tile_pos_d[north]).getFlag( Tile::tlRoad )) { directionFlags += 1; } // road to the north
+    if (tilemap.at(tile_pos_d[east]).getFlag( Tile::tlRoad )) { directionFlags += 2; } // road to the east
+    if (tilemap.at(tile_pos_d[south]).getFlag( Tile::tlRoad )) { directionFlags += 4; } // road to the south
+    if (tilemap.at(tile_pos_d[west]).getFlag( Tile::tlRoad )) { directionFlags += 8; } // road to the west
 
-    StringHelper::debug( 0xff, "direction flags=%d", directionFlags );
+    Logger::warning( "direction flags=%d", directionFlags );
 
     switch (directionFlags)
     {
@@ -203,28 +207,28 @@ Picture& Aqueduct::computePicture(CityPtr city , const TilemapTiles * tmp, const
   if (!tmap.isInside(tile_pos))
     return Picture::load( ResourceGroup::aqueduct, 121 );
 
-  TilePos tile_pos_d[D_MAX];
-  bool is_border[D_MAX];
-  bool is_busy[D_MAX] = { false };
+  TilePos tile_pos_d[countDirection];
+  bool is_border[countDirection];
+  bool is_busy[countDirection] = { false };
 
-  tile_pos_d[D_NORTH] = tile_pos + TilePos(  0,  1);
-  tile_pos_d[D_EAST]  = tile_pos + TilePos(  1,  0);
-  tile_pos_d[D_SOUTH] = tile_pos + TilePos(  0, -1);
-  tile_pos_d[D_WEST]  = tile_pos + TilePos( -1,  0);
+  tile_pos_d[north] = tile_pos + TilePos(  0,  1);
+  tile_pos_d[east]  = tile_pos + TilePos(  1,  0);
+  tile_pos_d[south] = tile_pos + TilePos(  0, -1);
+  tile_pos_d[west]  = tile_pos + TilePos( -1,  0);
 
   // all tiles must be in map range
-  for (int i = 0; i < D_MAX; ++i) {
+  for (int i = 0; i < countDirection; ++i) {
     is_border[i] = !tmap.isInside(tile_pos_d[i]);
     if (is_border[i])
       tile_pos_d[i] = tile_pos;
   }
 
   // get overlays for all directions
-  TileOverlayPtr overlay_d[D_MAX];
-  overlay_d[D_NORTH] = tmap.at( tile_pos_d[D_NORTH] ).getOverlay();
-  overlay_d[D_EAST] = tmap.at( tile_pos_d[D_EAST]  ).getOverlay();
-  overlay_d[D_SOUTH] = tmap.at( tile_pos_d[D_SOUTH] ).getOverlay();
-  overlay_d[D_WEST] = tmap.at( tile_pos_d[D_WEST]  ).getOverlay();
+  TileOverlayPtr overlay_d[countDirection];
+  overlay_d[north] = tmap.at( tile_pos_d[north] ).getOverlay();
+  overlay_d[east] = tmap.at( tile_pos_d[east]  ).getOverlay();
+  overlay_d[south] = tmap.at( tile_pos_d[south] ).getOverlay();
+  overlay_d[west] = tmap.at( tile_pos_d[west]  ).getOverlay();
 
   // if we have a TMP array with aqueducts, calculate them
   if (tmp != NULL)
@@ -234,25 +238,21 @@ Picture& Aqueduct::computePicture(CityPtr city , const TilemapTiles * tmp, const
       int i = (*it)->getI();
       int j = (*it)->getJ();
 
-      if (i == pos.getI() && j == (pos.getJ() + 1))
-        is_busy[D_NORTH] = true;
-      else if (i == pos.getI() && j == (pos.getJ() - 1))
-        is_busy[D_SOUTH] = true;
-      else if (j == pos.getJ() && i == (pos.getI() + 1))
-        is_busy[D_EAST] = true;
-      else if (j == pos.getJ() && i == (pos.getI() - 1))
-        is_busy[D_WEST] = true;
+      if (i == pos.getI() && j == (pos.getJ() + 1)) is_busy[north] = true;
+      else if (i == pos.getI() && j == (pos.getJ() - 1))is_busy[south] = true;
+      else if (j == pos.getJ() && i == (pos.getI() + 1))is_busy[east] = true;
+      else if (j == pos.getJ() && i == (pos.getI() - 1))is_busy[west] = true;
     }
   }
 
   // calculate directions
-  for (int i = 0; i < D_MAX; ++i) {
+  for (int i = 0; i < countDirection; ++i) {
     if (!is_border[i] && (overlay_d[i].is<Aqueduct>() || overlay_d[i].is<Reservoir>() || is_busy[i]))
       switch (i) {
-      case D_NORTH: directionFlags += 1; break;
-      case D_EAST:  directionFlags += 2; break;
-      case D_SOUTH: directionFlags += 4; break;
-      case D_WEST:  directionFlags += 8; break;
+      case north: directionFlags += 1; break;
+      case east:  directionFlags += 2; break;
+      case south: directionFlags += 4; break;
+      case west:  directionFlags += 8; break;
       default: break;
       }
   }
@@ -362,19 +362,19 @@ void Reservoir::destroy()
   Construction::destroy();
 }
 
-Reservoir::Reservoir() : WaterSource( B_RESERVOIR, Size( 3 ) )
+Reservoir::Reservoir() : WaterSource( building::B_RESERVOIR, Size( 3 ) )
 {
-  setPicture( Picture::load( ResourceGroup::waterbuildings, 1 )  );
+  setPicture( ResourceGroup::waterbuildings, 1 );
   
   // utilitya 34      - empty reservoir
   // utilitya 35 ~ 42 - full reservoir animation
  
   _getAnimation().load( ResourceGroup::utilitya, 35, 8);
   _getAnimation().load( ResourceGroup::utilitya, 42, 7, Animation::reverse);
-  _getAnimation().setFrameDelay( 11 );
+  _getAnimation().setDelay( 11 );
   _getAnimation().setOffset( Point( 47, 63 ) );
 
-  _getForegroundPictures().resize(1);
+  _getFgPictures().resize(1);
   //_fgPictures[0]=;
 }
 
@@ -386,7 +386,7 @@ void Reservoir::build( CityPtr city, const TilePos& pos )
 {
   Construction::build( city, pos );
 
-  setPicture( Picture::load( ResourceGroup::waterbuildings, 1 ) );
+  setPicture( ResourceGroup::waterbuildings, 1 );
   _isWaterSource = _isNearWater( city, pos );
   
   //updateAqueducts();
@@ -427,7 +427,7 @@ void Reservoir::timeStep(const unsigned long time)
 
   if( !_d->water )
   {
-    _getForegroundPictures().at( 0 ) = Picture::getInvalid();
+    _getFgPictures().at( 0 ) = Picture::getInvalid();
     return;
   }
 
@@ -452,7 +452,7 @@ void Reservoir::timeStep(const unsigned long time)
   _getAnimation().update( time );
   
   // takes current animation frame and put it into foreground
-  _getForegroundPictures().at( 0 ) = _getAnimation().getCurrentPicture();
+  _getFgPictures().at( 0 ) = _getAnimation().getFrame();
 }
 
 bool Reservoir::canBuild( CityPtr city, const TilePos& pos ) const
@@ -472,7 +472,7 @@ bool Reservoir::isNeedRoadAccess() const
   return false;
 }
 
-WaterSource::WaterSource( const TileOverlayType type, const Size& size )
+WaterSource::WaterSource(const Type type, const Size& size )
   : Construction( type, size ), _d( new Impl )
 
 {
@@ -553,14 +553,14 @@ void WaterSource::_setError(const std::string& error)
 
 typedef enum { fontainEmpty = 3, fontainFull = 4, fontainStartAnim = 11, fontainSizeAnim = 7 } FontainConstant;
 
-Fountain::Fountain() : ServiceBuilding(Service::fontain, B_FOUNTAIN, Size(1))
+Fountain::Fountain() : ServiceBuilding(Service::fontain, building::B_FOUNTAIN, Size(1))
 {  
   //std::srand( DateTime::getElapsedTime() );
 
   //setPicture( ResourceGroup::utilitya, 10 );
 
   _initAnimation();
-  _getForegroundPictures().resize(1);
+  _getFgPictures().resize(1);
 
   _damageIncrement = 0;
   _fireIncrement = 0;
@@ -605,7 +605,7 @@ void Fountain::timeStep(const unsigned long time)
 
     if( !isActive() )
     {
-      _getForegroundPictures().at( 0 ) = Picture::getInvalid();
+      _getFgPictures().at( 0 ) = Picture::getInvalid();
       return;
     }
 
@@ -655,7 +655,7 @@ bool Fountain::haveReservoirAccess() const
   foreach( Tile* tile, reachedTiles )
   {
     TileOverlayPtr overlay = tile->getOverlay();
-    if( overlay != 0 && (B_RESERVOIR == overlay->getType()) )
+    if( overlay != 0 && (building::B_RESERVOIR == overlay->getType()) )
     {
       return true;
     }
@@ -677,6 +677,6 @@ void Fountain::_initAnimation()
   _getAnimation().load( ResourceGroup::utilitya, fontainStartAnim, fontainSizeAnim );
   //animLoader.fill_animation_reverse(_animation, "utilitya", 25, 7);
   _getAnimation().setOffset( Point( 12, 24 ) );
-  _getAnimation().setFrameDelay( 2 );
+  _getAnimation().setDelay( 2 );
   _getAnimation().stop();
 }

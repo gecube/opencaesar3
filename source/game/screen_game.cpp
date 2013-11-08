@@ -50,6 +50,7 @@
 #include "gui/minimap_window.hpp"
 #include "gui/window_gamespeed_options.hpp"
 #include "events/setvideooptions.hpp"
+#include "core/logger.hpp"
 
 using namespace gui;
 
@@ -65,6 +66,7 @@ public:
   CityRenderer renderer;
   Game* game; // current game
   AlarmEventHolder alarmsHolder;
+  bool isPaused;
 
   int result;
 
@@ -89,6 +91,7 @@ ScreenGame::ScreenGame(Game& game , GfxEngine& engine ) : _d( new Impl )
   _d->topMenu = NULL;
   _d->game = &game;
   _d->engine = &engine;
+  _d->isPaused = false;
 }
 
 ScreenGame::~ScreenGame() {}
@@ -213,7 +216,7 @@ void ScreenGame::Impl::showEmpireMapWindow()
 
 void ScreenGame::draw()
 {
-  _d->renderer.draw();
+  _d->renderer.render();
 
   _d->game->getGui()->beforeDraw();
   _d->game->getGui()->draw();
@@ -261,8 +264,12 @@ void ScreenGame::handleEvent( NEvent& event )
       if( event.KeyboardEvent.PressedDown )
         break;
 
-      events::GameEventPtr e = events::TogglePause::create();
-      e->dispatch();
+      _d->isPaused = !_d->isPaused;
+
+      events::GameEventPtr e = events::Pause::create( _d->isPaused
+                                                        ? events::Pause::pause
+                                                        : events::Pause::play );
+      e->dispatch();      
     }
     break;
 
@@ -332,7 +339,7 @@ void ScreenGame::Impl::makeScreenShot()
   std::string filename = StringHelper::format( 0xff, "oc3_[%04d_%02d_%02d_%02d_%02d_%02d].png", 
                                                time.getYear(), time.getMonth(), time.getDay(),
                                                time.getHour(), time.getMinutes(), time.getSeconds() );
-  StringHelper::debug( 0xff, "creating screenshot %s", filename.c_str() );
+  Logger::warning( "creating screenshot %s", filename.c_str() );
 
   GfxEngine::instance().createScreenshot( filename );
 }
@@ -344,7 +351,7 @@ int ScreenGame::getResult() const
 
 void ScreenGame::Impl::resolveCreateConstruction( int type )
 {
-  renderer.setMode( TilemapBuildCommand::create( TileOverlayType( type ) ) );
+  renderer.setMode( TilemapBuildCommand::create( TileOverlay::Type( type ) ) );
 }
 
 void ScreenGame::Impl::resolveRemoveTool()
@@ -371,7 +378,7 @@ void ScreenGame::resolveExitGame()
 
 void ScreenGame::Impl::resolveSelectOverlayView( int type )
 {
-  renderer.setMode( TilemapOverlayCommand::create( DrawingOverlayType( type ) ) );
+  renderer.setMode( TilemapOverlayCommand::create( type ) );
 }
 
 void ScreenGame::Impl::showAdvisorsWindow()

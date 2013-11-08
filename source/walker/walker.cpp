@@ -29,12 +29,16 @@
 #include "gfx/animation_bank.hpp"
 #include "core/gettext.hpp"
 #include "game/tilemap.hpp"
+#include "core/logger.hpp"
+#include "ability.hpp"
+
+using namespace constants;
 
 class Walker::Impl
 {
 public:
   CityPtr city;
-  WalkerType walkerType;
+  walker::Type walkerType;
   WalkerGraphicType walkerGraphic;
   bool isDeleted;
   float speed;
@@ -50,6 +54,7 @@ public:
   DirectedAction action;
   std::string name;
   int health;
+  AbilityList abilities;
 
   float getSpeed() const
   {
@@ -66,8 +71,8 @@ Walker::Walker( CityPtr city ) : _d( new Impl )
 {
   _d->city = city;
   _d->action.action = Walker::acMove;
-  _d->action.direction = D_NONE;
-  _d->walkerType = WT_NONE;
+  _d->action.direction = constants::noneDirection;
+  _d->walkerType = walker::unknown;
   _d->walkerGraphic = WG_NONE;
   _d->health = 100;
 
@@ -77,7 +82,7 @@ Walker::Walker( CityPtr city ) : _d( new Impl )
 
   _d->midTilePos = Point( 7, 7 );
   _d->remainMove = PointF( 0, 0 );
-};
+}
 
 Walker::~Walker()
 {
@@ -95,27 +100,30 @@ void Walker::timeStep(const unsigned long time)
   case Walker::acMove:
     walk();
 
-    if( _d->animation.getPicturesCount() > 0 && _d->getSpeed() > 0.f )
+    if( _d->speed > 0.f )
     {
-      _d->animation.update( time );
+      _updateAnimation( time );
     }
+  break;
+
+  case Walker::acFight:
+    _updateAnimation( time );
   break;
 
   default:
   break;
   }
 
-  if( ( time % 15 == 1 ) && _d->health <= 0 )
+  foreach( AbilityPtr ab, _d->abilities)
   {
-    _d->health--;
+    ab->run( this, time );
+  }
 
-    if( _d->health <= -100 )
-    {
-      deleteLater();
-    }
+  if( getHealth() <= 0 )
+  {
+    die();
   }
 }
-
 
 bool Walker::isDeleted() const
 {
@@ -221,7 +229,7 @@ void Walker::dec(int &ioSI, int &ioI, int &ioAmount, const int iMidPos, bool &oN
 
 void Walker::walk()
 {
-   if (D_NONE == _d->action.direction )
+   if( constants::noneDirection == _d->action.direction )
    {
       // nothing to do
       return;
@@ -231,26 +239,26 @@ void Walker::walk()
     
    switch (_d->action.direction)
    {
-   case D_NORTH:
-   case D_SOUTH:
-      _d->remainMove += PointF( 0, _d->getSpeed() );
+   case constants::north:
+   case constants::south:
+     _d->remainMove += PointF( 0, _d->getSpeed() );
    break;
 
-   case D_EAST:
-   case D_WEST:
-      _d->remainMove += PointF( _d->getSpeed(), 0 );
+   case constants::east:
+   case constants::west:
+     _d->remainMove += PointF( _d->getSpeed(), 0 );
    break;
 
-   case D_NORTH_EAST:
-   case D_SOUTH_WEST:
-   case D_SOUTH_EAST:
-   case D_NORTH_WEST:
+   case constants::northEast:
+   case constants::southWest:
+   case constants::southEast:
+   case constants::northWest:
       _d->remainMove += PointF( _d->getSpeed() * 0.7f, _d->getSpeed() * 0.7f );
    break;
 
    default:
-      StringHelper::debug( 0xff, "Invalid move direction: %d", _d->action.direction );
-      _d->action.direction = D_NONE;
+      Logger::warning( "Invalid move direction: %d", _d->action.direction );
+      _d->action.direction = constants::noneDirection;
    break;
    }
    
@@ -270,37 +278,45 @@ void Walker::walk()
    {
       switch (_d->action.direction)
       {
-      case D_NORTH:
+      case constants::north:
          inc(tmpY, tmpJ, amountJ, _d->midTilePos.getY(), newTile, midTile);
-         break;
-      case D_NORTH_EAST:
+      break;
+
+      case constants::northEast:
          inc(tmpY, tmpJ, amountJ, _d->midTilePos.getY(), newTile, midTile);
          inc(tmpX, tmpI, amountI, _d->midTilePos.getX(), newTile, midTile);
-         break;
-      case D_EAST:
+      break;
+
+      case constants::east:
          inc(tmpX, tmpI, amountI, _d->midTilePos.getX(), newTile, midTile);
-         break;
-      case D_SOUTH_EAST:
+      break;
+
+      case constants::southEast:
          dec(tmpY, tmpJ, amountJ, _d->midTilePos.getY(), newTile, midTile);
          inc(tmpX, tmpI, amountI, _d->midTilePos.getX(), newTile, midTile);
-         break;
-      case D_SOUTH:
+      break;
+
+      case constants::south:
          dec(tmpY, tmpJ, amountJ, _d->midTilePos.getY(), newTile, midTile);
-         break;
-      case D_SOUTH_WEST:
+      break;
+
+      case constants::southWest:
          dec(tmpY, tmpJ, amountJ, _d->midTilePos.getY(), newTile, midTile);
          dec(tmpX, tmpI, amountI, _d->midTilePos.getX(), newTile, midTile);
-         break;
-      case D_WEST:
+      break;
+
+      case constants::west:
          dec(tmpX, tmpI, amountI, _d->midTilePos.getX(), newTile, midTile);
-         break;
-      case D_NORTH_WEST:
+      break;
+
+      case constants::northWest:
          inc(tmpY, tmpJ, amountJ, _d->midTilePos.getY(), newTile, midTile);
          dec(tmpX, tmpI, amountI, _d->midTilePos.getX(), newTile, midTile);
-         break;
+      break;
+
       default:
-         StringHelper::debug( 0xff, "Invalid move direction: %d", _d->action.direction);
-         _d->action.direction = D_NONE;
+         Logger::warning( "Invalid move direction: %d", _d->action.direction);
+         _d->action.direction = constants::noneDirection;
       break;
       }
 
@@ -357,37 +373,46 @@ void Walker::onMidTile()
 
 void Walker::onDestination()
 {
-   // std::cout << "Walker arrived at destination! coord=" << _i << "," << _j << std::endl;
-   _d->action.action = acNone;  // stop moving
-   _d->animation = Animation();
+  _d->action.action = acNone;  // stop moving
+  _d->animation = Animation();
 }
 
 void Walker::onNewDirection()
 {
-   _d->animation = Animation();  // need to fetch the new animation
+  _d->animation = Animation();  // need to fetch the new animation
 }
 
 
 void Walker::computeDirection()
 {
-   DirectionType lastDirection = _d->action.direction;
-   _d->action.direction = _d->pathWay.getNextDirection();
+  Direction lastDirection = _d->action.direction;
+  _d->action.direction = _d->pathWay.getNextDirection();
 
-   if (lastDirection != _d->action.direction)
-   {
-      onNewDirection();
-   }
+  if( lastDirection != _d->action.direction )
+  {
+    onNewDirection();
+  }
 }
 
 
-DirectionType Walker::getDirection()
+Direction Walker::getDirection()
 {
   return _d->action.direction;
 }
 
-int Walker::getHealth() const
+Walker::Action Walker::getAction()
+{
+  return (Walker::Action)_d->action.action;
+}
+
+double Walker::getHealth() const
 {
   return _d->health;
+}
+
+void Walker::updateHealth(double value)
+{
+  _d->health = math::clamp( _d->health + value, -100.0, 100.0 );
 }
 
 void Walker::setName(const std::string &name)
@@ -417,13 +442,13 @@ const Picture& Walker::getMainPicture()
   {
     const AnimationBank::MovementAnimation& animMap = AnimationBank::getWalker( getWalkerGraphic() );
     std::map<DirectedAction, Animation>::const_iterator itAnimMap;
-    if (_d->action.action == acNone || _d->action.direction == D_NONE)
+    if (_d->action.action == acNone || _d->action.direction == constants::noneDirection )
     {
       DirectedAction action;
       action.action = acMove;       // default action
-      if (_d->action.direction == D_NONE)
+      if (_d->action.direction == constants::noneDirection)
       {
-         action.direction = D_NORTH;  // default direction
+         action.direction = constants::north;  // default direction
       }
       else
       {
@@ -444,11 +469,11 @@ const Picture& Walker::getMainPicture()
     else
     {
       _d->animation = animMap.begin()->second;
-      StringHelper::debug( 0xff, "Wrong walker direction detected" );
+      Logger::warning( "Wrong walker direction detected" );
     }
   }
 
-  return _d->animation.getCurrentPicture();
+  return _d->animation.getFrame();
 }
 
 void Walker::save( VariantMap& stream ) const
@@ -456,6 +481,7 @@ void Walker::save( VariantMap& stream ) const
   stream[ "name" ] = Variant( _d->name );
   stream[ "type" ] = (int)_d->walkerType;
   stream[ "pathway" ] =  _d->pathWay.save();
+  stream[ "health" ] = _d->health;
   stream[ "action" ] = (int)_d->action.action;
   stream[ "direction" ] = (int)_d->action.direction;
   stream[ "pos" ] = _d->pos;
@@ -475,7 +501,7 @@ void Walker::load( const VariantMap& stream)
   _d->pathWay.init( tmap, tmap.at( 0, 0 ) );
   _d->pathWay.load( stream.get( "pathway" ).toMap() );
   _d->action.action = (Walker::Action) stream.get( "action" ).toInt();
-  _d->action.direction = (DirectionType) stream.get( "direction" ).toInt();
+  _d->action.direction = (Direction) stream.get( "direction" ).toInt();
   _d->pos = stream.get( "pos" ).toTilePos();
   _d->tileOffset = stream.get( "tileoffset" ).toPoint();
   _d->posOnMap = stream.get( "mappos" ).toPoint();
@@ -492,6 +518,12 @@ void Walker::load( const VariantMap& stream)
   _d->speed = stream.get( "speed" ).toFloat();
   _d->midTilePos = stream.get( "midTile" ).toPoint();
   _d->remainMove = stream.get( "remainmove" ).toPointF();
+  _d->health = (double)stream.get( "health" );
+}
+
+void Walker::addAbility(AbilityPtr ability)
+{
+  _d->abilities.push_back( ability );
 }
 
 TilePos Walker::getIJ() const
@@ -529,7 +561,7 @@ void Walker::_setAction( Walker::Action action )
   _d->action.action = action;
 }
 
-void Walker::_setDirection( DirectionType direction )
+void Walker::_setDirection(constants::Direction direction )
 {
   _d->action.direction = direction;
 }
@@ -544,7 +576,7 @@ WalkerGraphicType Walker::_getGraphic() const
   return _d->walkerGraphic;
 }
 
-void Walker::_setType(WalkerType type)
+void Walker::_setType(walker::Type type)
 {
   _d->walkerType = type;
 }
@@ -552,6 +584,19 @@ void Walker::_setType(WalkerType type)
 CityPtr Walker::_getCity() const
 {
   return _d->city;
+}
+
+void Walker::_setHealth(double value)
+{
+  _d->health = value;
+}
+
+void Walker::_updateAnimation( const unsigned int time )
+{
+  if( _d->animation.size() > 0 )
+  {
+    _d->animation.update( time );
+  }
 }
 
 void Walker::go()
@@ -562,50 +607,51 @@ void Walker::go()
 void Walker::die()
 {
   _d->health = 0;
+  deleteLater();
 }
 
 Soldier::Soldier( CityPtr city ) : Walker( city )
 {
-  _setType( WT_SOLDIER );
+  _setType( walker::soldier );
   _setGraphic( WG_HORSEMAN );
 }
 
-class WalkerHelper::Impl : public EnumsHelper<WalkerType>
+class WalkerHelper::Impl : public EnumsHelper<walker::Type>
 {
 public:
-  typedef std::map< WalkerType, std::string > PrettyNames;
+  typedef std::map< walker::Type, std::string > PrettyNames;
   PrettyNames prettyTypenames;
 
-  void append( WalkerType type, const std::string& typeName, const std::string& prettyTypename )
+  void append( walker::Type type, const std::string& typeName, const std::string& prettyTypename )
   {
-    EnumsHelper<WalkerType>::append( type, typeName );
+    EnumsHelper<walker::Type>::append( type, typeName );
     prettyTypenames[ type ] = prettyTypename;
   }
 
-  Impl() : EnumsHelper<WalkerType>( WT_NONE )
+  Impl() : EnumsHelper<walker::Type>( walker::unknown )
   {
-    append( WT_NONE, "none", _("##wt_none##"));
-    append( WT_IMMIGRANT, "immigrant", _("##wt_immigrant##") );
-    append( WT_EMIGRANT, "emmigrant", _("##wt_emmigrant##") );
-    append( WT_SOLDIER, "soldier", _("##wt_soldier##") );
-    append( WT_CART_PUSHER, "cart_pusher", _("##wt_cart_pushher##") );
-    append( WT_MARKETLADY, "market_lady", _("##wt_market_lady##") );
-    append( WT_MARKETLADY_HELPER, "market_lady_helper", _("##wt_market_lady_helper##") );
-    append( WT_SERVICE, "serviceman", _("##wt_serviceman##") );
-    append( WT_TRAINEE, "trainee", _("##wt_trainee##") );
-    append( WT_WORKERS_HUNTER, "workers_hunter", _("##wt_workers_hunter##") );
-    append( WT_PREFECT, "prefect", _("##wt_prefect##") );
-    append( WT_TAXCOLLECTOR, "tax_collector", _("##wt_tax_collector##") );
-    append( WT_MERCHANT, "merchant", _("##wt_merchant##") );
-    append( WT_ENGINEER, "engineer", _("##wt_engineer##") );
-    append( WT_DOCTOR, "doctor", _("##wt_doctor##") );
-    append( WT_ANIMAL_SHEEP, "sheep", _("##wt_animal_sheep##") );
-    append( WT_BATHLADY, "bathlady", _("##wt_bathlady##") );
-    append( WT_ACTOR, "actor", _("##wt_actor##") );
-    append( WT_GLADIATOR, "gladiator", _("##wt_gladiator##") );
-    append( WT_BARBER, "barber", _("##wt_barber##" ) );
-    append( WT_SURGEON, "surgeon", _("##wt_surgeon##") );
-    append( WT_MAX, "unknown", _("##wt_unknown##") );
+    append( walker::unknown, "none", _("##wt_none##"));
+    append( walker::immigrant, "immigrant", _("##wt_immigrant##") );
+    append( walker::emigrant, "emmigrant", _("##wt_emmigrant##") );
+    append( walker::soldier, "soldier", _("##wt_soldier##") );
+    append( walker::cartPusher, "cart_pusher", _("##wt_cart_pushher##") );
+    append( walker::marketLady, "market_lady", _("##wt_market_lady##") );
+    append( walker::marketKid, "market_lady_helper", _("##wt_market_lady_helper##") );
+    append( walker::serviceman, "serviceman", _("##wt_serviceman##") );
+    append( walker::trainee, "trainee", _("##wt_trainee##") );
+    append( walker::recruter, "workers_hunter", _("##wt_workers_hunter##") );
+    append( walker::prefect, "prefect", _("##wt_prefect##") );
+    append( walker::taxCollector, "tax_collector", _("##wt_tax_collector##") );
+    append( walker::merchant, "merchant", _("##wt_merchant##") );
+    append( walker::engineer, "engineer", _("##wt_engineer##") );
+    append( walker::doctor, "doctor", _("##wt_doctor##") );
+    append( walker::sheep, "sheep", _("##wt_animal_sheep##") );
+    append( walker::bathlady, "bathlady", _("##wt_bathlady##") );
+    append( walker::actor, "actor", _("##wt_actor##") );
+    append( walker::gladiator, "gladiator", _("##wt_gladiator##") );
+    append( walker::barber, "barber", _("##wt_barber##" ) );
+    append( walker::surgeon, "surgeon", _("##wt_surgeon##") );
+    append( walker::all, "unknown", _("##wt_unknown##") );
   }
 };
 
@@ -615,55 +661,55 @@ WalkerHelper& WalkerHelper::instance()
   return inst;
 }
 
-std::string WalkerHelper::getName( WalkerType type )
+std::string WalkerHelper::getName( walker::Type type )
 {
   std::string name = instance()._d->findName( type );
 
   if( name.empty() )
   {
-    StringHelper::debug( 0xff, "Can't find walker typeName for %d", type );
+    Logger::warning( "Can't find walker typeName for %d", type );
     //_OC3_DEBUG_BREAK_IF( "Can't find walker typeName by WalkerType" );
   }
 
   return name;
 }
 
-WalkerType WalkerHelper::getType(const std::string &name)
+walker::Type WalkerHelper::getType(const std::string &name)
 {
-  WalkerType type = instance()._d->findType( name );
+  walker::Type type = instance()._d->findType( name );
 
   if( type == instance()._d->getInvalid() )
   {
-    StringHelper::debug( 0xff, "Can't find walker type for %s", name.c_str() );
+    Logger::warning( "Can't find walker type for %s", name.c_str() );
     //_OC3_DEBUG_BREAK_IF( "Can't find walker type by typeName" );
   }
 
   return type;
 }
 
-std::string WalkerHelper::getPrettyTypeName(WalkerType type)
+std::string WalkerHelper::getPrettyTypeName(walker::Type type)
 {
   Impl::PrettyNames::iterator it = instance()._d->prettyTypenames.find( type );
   return it != instance()._d->prettyTypenames.end() ? it->second : "";
 }
 
-Picture WalkerHelper::getBigPicture(WalkerType type)
+Picture WalkerHelper::getBigPicture(walker::Type type)
 {
   int index = -1;
   switch( type )
   {
-  case WT_IMMIGRANT: index=9; break;
-  case WT_EMIGRANT: index=13; break;
-  case WT_DOCTOR: index = 2; break;
-  case WT_CART_PUSHER: index=51; break;
-  case WT_MARKETLADY: index=12; break;
-  case WT_MARKETLADY_HELPER: index=38; break;
-  case WT_MERCHANT: index=25; break;
-  case WT_PREFECT: index=19; break;
-  case WT_ENGINEER: index=7; break;
-  case WT_TAXCOLLECTOR: index=6; break;
-  case WT_ANIMAL_SHEEP: index = 54; break;
-  case WT_WORKERS_HUNTER: index=13; break;
+  case walker::immigrant: index=9; break;
+  case walker::emigrant: index=13; break;
+  case walker::doctor: index = 2; break;
+  case walker::cartPusher: index=51; break;
+  case walker::marketLady: index=12; break;
+  case walker::marketKid: index=38; break;
+  case walker::merchant: index=25; break;
+  case walker::prefect: index=19; break;
+  case walker::engineer: index=7; break;
+  case walker::taxCollector: index=6; break;
+  case walker::sheep: index = 54; break;
+  case walker::recruter: index=13; break;
 
   default: index=8; break;
   break;

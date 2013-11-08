@@ -29,6 +29,10 @@
 #include "building/factory.hpp"
 #include "game/name_generator.hpp"
 #include "game/goodstore.hpp"
+#include "building/constants.hpp"
+#include "core/direction.hpp"
+
+using namespace constants;
 
 class CartSupplier::Impl
 {
@@ -47,7 +51,7 @@ CartSupplier::CartSupplier( CityPtr city )
   : Walker( city ), _d( new Impl )
 {
   _setGraphic( WG_PUSHER );
-  _setType( WT_CART_PUSHER );
+  _setType( walker::cartPusher );
 
   _d->storageBuildingPos = TilePos( -1, -1 );
   _d->baseBuildingPos = TilePos( -1, -1 );
@@ -142,34 +146,35 @@ void CartSupplier::getPictureList(std::vector<Picture> &oPics)
    // depending on the walker direction, the cart is ahead or behind
    switch (getDirection())
    {
-   case D_WEST:
-   case D_NORTH_WEST:
-   case D_NORTH:
-   case D_NORTH_EAST:
+   case constants::west:
+   case constants::northWest:
+   case constants::north:
+   case constants::northEast:
       oPics.push_back( getCartPicture() );
       oPics.push_back( getMainPicture() );
-      break;
-   case D_EAST:
-   case D_SOUTH_EAST:
-   case D_SOUTH:
-   case D_SOUTH_WEST:
+   break;
+
+   case constants::east:
+   case constants::southEast:
+   case constants::south:
+   case constants::southWest:
       oPics.push_back( getMainPicture() );
       oPics.push_back( getCartPicture() );
-      break;
+   break;
+
    default:
-      break;
+   break;
    }
 }
 
 template< class T >
-TilePos getSupplierDestination2( Propagator &pathPropagator, const TileOverlayType type, 
+TilePos getSupplierDestination2( Propagator &pathPropagator, const TileOverlay::Type type,
                                  const Good::Type what, const int needQty,
                                  PathWay &oPathWay, long& reservId )
 {
   SmartPtr< T > res;
 
-  Propagator::Routes pathWayList;
-  pathPropagator.getRoutes(type, pathWayList);
+  Propagator::Routes pathWayList = pathPropagator.getRoutes( type );
 
   int max_qty = 0;
 
@@ -178,7 +183,7 @@ TilePos getSupplierDestination2( Propagator &pathPropagator, const TileOverlayTy
        pathWayIt != pathWayList.end(); ++pathWayIt)
   {
     // for every warehouse within range
-    BuildingPtr building= pathWayIt->first;
+    BuildingPtr building= pathWayIt->first.as<Building>();
     PathWay& pathWay= pathWayIt->second;
 
     SmartPtr< T > destBuilding = building.as< T >();
@@ -219,13 +224,13 @@ void CartSupplier::computeWalkerDestination(BuildingPtr building, const Good::Ty
   pathPropagator.propagate( _d->maxDistance);
 
   // try get that good from a granary
-  _d->storageBuildingPos = getSupplierDestination2<Granary>( pathPropagator, B_GRANARY,
+  _d->storageBuildingPos = getSupplierDestination2<Granary>( pathPropagator, building::granary,
                                                              type, qty, pathWay, _d->reservationID );
 
   if( _d->storageBuildingPos.getI() < 0 )
   {
     // try get that good from a warehouse
-    _d->storageBuildingPos = getSupplierDestination2<Warehouse>( pathPropagator, B_WAREHOUSE,
+    _d->storageBuildingPos = getSupplierDestination2<Warehouse>( pathPropagator, building::B_WAREHOUSE,
                                                                  type, qty, pathWay, _d->reservationID );
   }
 

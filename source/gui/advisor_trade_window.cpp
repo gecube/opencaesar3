@@ -33,6 +33,10 @@
 #include "texturedbutton.hpp"
 #include "core/event.hpp"
 #include "core/foreach.hpp"
+#include "core/logger.hpp"
+#include "building/constants.hpp"
+
+using namespace constants;
 
 namespace gui
 {
@@ -496,7 +500,7 @@ int AdvisorTradeWindow::Impl::getStackedGoodsQty( Good::Type gtype )
   CityHelper helper( city );
 
   int goodsQty = 0;
-  WarehouseList warehouses = helper.find< Warehouse >( B_WAREHOUSE );
+  WarehouseList warehouses = helper.find< Warehouse >( building::B_WAREHOUSE );
   foreach( WarehousePtr warehouse, warehouses )
   {
     goodsQty += warehouse->getGoodStore().getCurrentQty( gtype );

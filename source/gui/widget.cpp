@@ -20,6 +20,7 @@
 #include "core/foreach.hpp"
 #include "core/saveadapter.hpp"
 #include "core/stringhelper.hpp"
+#include "core/logger.hpp"
 
 namespace gui
 {
@@ -41,7 +42,7 @@ void Widget::setTextAlignment( TypeAlign horizontal, TypeAlign vertical )
     if( !(horizontal >= alignUpperLeft && horizontal <= alignAuto)
         || !(vertical >= alignUpperLeft && vertical <= alignAuto) )
     {
-        StringHelper::debug( 0xff, "Unknown align in SetTextAlignment" );
+        Logger::warning( "Unknown align in SetTextAlignment" );
         return;
     }
 
@@ -584,7 +585,14 @@ void Widget::setupUI( const VariantMap& ui )
   tmp = ui.get( "geometryf" );
   if( tmp.isValid() )
   {
-    setGeometry( tmp.toRectf() );
+    RectF r = tmp.toRectf();
+    if( r.getWidth() > 1 && r.getHeight() > 1)
+    {
+      Logger::warning( "Incorrect geometryf values [%f, %f, %f, %f]",
+                       r.getLeft(), r.getTop(), r.getRight(), r.getBottom() );
+    }
+
+    setGeometry( r );
   }
 
   setNotClipped( ui.get( "noclipped", false ).toBool() );

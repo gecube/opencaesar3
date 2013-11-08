@@ -22,11 +22,17 @@
 #include "game/enums.hpp"
 #include "core/serializer.hpp"
 #include "core/scopedptr.hpp"
+#include "renderer.hpp"
 
 class TileOverlay : public Serializable, public ReferenceCounted
 {
 public:
-  TileOverlay( const TileOverlayType type, const Size& size=Size(1));
+  typedef int Type;
+  typedef int Group;
+
+  enum { any=0 };
+
+  TileOverlay( const Type type, const Size& size=Size(1));
   virtual ~TileOverlay();
 
   Tile& getTile() const;  // master tile, in case of multi-tile area
@@ -47,20 +53,21 @@ public:
   virtual void timeStep(const unsigned long time);  // perform one simulation step
 
   // graphic
-  void setPicture(const Picture &picture);
+  void setPicture(Picture picture);
   void setPicture(const char* resource, const int index);
+  const Picture& getPicture() const;
 
   void setAnimation( const Animation& animation );
 
-  const Picture& getPicture() const;
-  const PicturesArray& getForegroundPictures() const;
+  virtual const PicturesArray& getPictures( Renderer::Pass pass ) const;
+  virtual Renderer::PassQueue getPassQueue() const;
 
   std::string getName();  // landoverlay debug name
   void setName( const std::string& name );
 
-  TileOverlayType getType() const;
-  TileOverlayGroup getClass() const;
-  void setType(const TileOverlayType type);
+  Type getType() const;
+  Group getClass() const;
+  void setType(const Type type);
 
   virtual void save( VariantMap& stream) const;
   virtual void load( const VariantMap& stream );
@@ -69,7 +76,8 @@ protected:
   Animation& _getAnimation();
   Tile* _getMasterTile();
   CityPtr _getCity() const;
-  PicturesArray& _getForegroundPictures();
+  PicturesArray& _getFgPictures();
+  Picture& _getPicture();
 
 private:
   class Impl;

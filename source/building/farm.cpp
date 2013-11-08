@@ -23,6 +23,10 @@
 #include "core/stringhelper.hpp"
 #include "game/tilemap.hpp"
 #include "core/gettext.hpp"
+#include "core/logger.hpp"
+#include "constants.hpp"
+
+using namespace constants;
 
 class FarmTile
 {
@@ -52,7 +56,7 @@ FarmTile::FarmTile(const Good::Type outGood, const TilePos& pos )
   case Good::grape: picIdx = 33; break;
   case Good::meat: picIdx = 38; break;
   default:
-    StringHelper::debug( 0xff, "Unexpected farmType in farm %s", GoodHelper::getName( outGood ).c_str() );
+    Logger::warning( "Unexpected farmType in farm %s", GoodHelper::getName( outGood ).c_str() );
     _OC3_DEBUG_BREAK_IF( "Unexpected farmType in farm ");
   }
 
@@ -62,7 +66,7 @@ FarmTile::FarmTile(const Good::Type outGood, const TilePos& pos )
 
 void FarmTile::computePicture(const int percent)
 {
-  PicturesArray& pictures = _animation.getPictures();
+  PicturesArray& pictures = _animation.getFrames();
 
   int picIdx = (percent * (pictures.size()-1)) / 100;
   _picture = pictures[picIdx];
@@ -85,7 +89,7 @@ public:
   Picture pictureBuilding;  // we need to change its offset
 };
 
-Farm::Farm(const Good::Type outGood, const TileOverlayType type )
+Farm::Farm(const Good::Type outGood, const Type type )
   : Factory( Good::none, outGood, type, Size(3) ), _d( new Impl )
 {
   _d->pictureBuilding = Picture::load( ResourceGroup::commerce, 12);  // farm building
@@ -126,7 +130,7 @@ void Farm::init()
   _d->subTiles.push_back(FarmTile(farmType, TilePos( 2, 1 ) ));
   _d->subTiles.push_back(FarmTile(farmType, TilePos( 2, 0 ) ));
 
-  _getForegroundPictures().resize(5);
+  _getFgPictures().resize(5);
   computePictures();
 }
 
@@ -154,7 +158,7 @@ void Farm::computePictures()
 
   for (int n = 0; n<5; ++n)
   {
-    _getForegroundPictures().at(n) = _d->subTiles[n].getPicture();
+    _getFgPictures().at(n) = _d->subTiles[n].getPicture();
   }
 }
 
@@ -183,26 +187,26 @@ Farm::~Farm()
 
 }
 
-FarmWheat::FarmWheat() : Farm(Good::wheat, B_WHEAT_FARM)
+FarmWheat::FarmWheat() : Farm(Good::wheat, building::wheatFarm)
 {
 }
 
-FarmOlive::FarmOlive() : Farm(Good::olive, B_OLIVE_FARM)
+FarmOlive::FarmOlive() : Farm(Good::olive, building::B_OLIVE_FARM)
 {
 }
 
-FarmGrape::FarmGrape() : Farm(Good::grape, B_GRAPE_FARM)
+FarmGrape::FarmGrape() : Farm(Good::grape, building::grapeFarm)
 {
 }
 
-FarmMeat::FarmMeat() : Farm(Good::meat, B_PIG_FARM)
+FarmMeat::FarmMeat() : Farm(Good::meat, building::B_PIG_FARM)
 {
 }
 
-FarmFruit::FarmFruit() : Farm(Good::fruit, B_FRUIT_FARM)
+FarmFruit::FarmFruit() : Farm(Good::fruit, building::B_FRUIT_FARM)
 {
 }
 
-FarmVegetable::FarmVegetable() : Farm(Good::vegetable, B_VEGETABLE_FARM)
+FarmVegetable::FarmVegetable() : Farm(Good::vegetable, building::B_VEGETABLE_FARM)
 {
 }

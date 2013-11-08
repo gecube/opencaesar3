@@ -19,6 +19,7 @@
 #include "walker/taxcollector.hpp"
 #include "game/city.hpp"
 #include "core/foreach.hpp"
+#include "constants.hpp"
 
 class Forum::Impl
 {
@@ -27,11 +28,11 @@ public:
   int citizensReached;
 };
 
-Forum::Forum() : ServiceBuilding(Service::forum, B_FORUM, Size(2)), _d( new Impl )
+Forum::Forum() : ServiceBuilding(Service::forum, constants::building::forum, Size(2)), _d( new Impl )
 {
   _d->taxInThisMonth = 0;
   _d->citizensReached = 0;
-  setPicture( Picture::load( ResourceGroup::govt, 10));
+  setPicture( ResourceGroup::govt, 10 );
 }
 
 void Forum::deliverService()

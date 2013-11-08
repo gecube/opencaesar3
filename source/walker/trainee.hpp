@@ -24,9 +24,9 @@ class Propagator;
 class TraineeWalker : public Walker
 {
 public:
-  static TraineeWalkerPtr create( CityPtr city, const WalkerType traineeType );
+  static TraineeWalkerPtr create( CityPtr city, constants::walker::Type traineeType );
 
-  void checkDestination(const TileOverlayType buildingType, Propagator& pathPropagator);
+  void checkDestination(const TileOverlay::Type buildingType, Propagator& pathPropagator);
   void send2City();
   void setOriginBuilding(Building &building);
   void computeWalkerPath();
@@ -37,15 +37,15 @@ public:
   void load( const VariantMap& stream);
 
 protected:
-  TraineeWalker( CityPtr city, const WalkerType traineeType);
-  void init(const WalkerType traineeType);
+  TraineeWalker( CityPtr city, constants::walker::Type traineeType);
+  void init(constants::walker::Type traineeType);
 
 private:
   BuildingPtr _originBuilding;
   BuildingPtr _destinationBuilding;
   int _maxDistance;
 
-  std::list<TileOverlayType> _buildingNeed;  // list of buildings needing this trainee
+  std::list<TileOverlay::Type> _buildingNeed;  // list of buildings needing this trainee
   float _maxNeed;  // evaluates the need for that trainee
 };
 

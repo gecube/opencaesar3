@@ -33,6 +33,9 @@
 #include "game/trade_options.hpp"
 #include "gui/message_stack_widget.hpp"
 #include "game/settings.hpp"
+#include "building/constants.hpp"
+
+using namespace constants;
 
 namespace events
 {
@@ -74,7 +77,7 @@ void DisasterEvent::exec( Game& game )
     TilemapArea clearedTiles = tmap.getArea( rPos, size );
     foreach( Tile* tile, clearedTiles )
     {
-      TileOverlayType dstr2constr[] = { B_BURNING_RUINS, B_COLLAPSED_RUINS, B_PLAGUE_RUINS };
+      TileOverlay::Type dstr2constr[] = { building::B_BURNING_RUINS, building::B_COLLAPSED_RUINS, building::B_PLAGUE_RUINS };
       bool canCreate = TileOverlayFactory::getInstance().canCreate( dstr2constr[_type] );
       if( canCreate )
       {
@@ -88,7 +91,7 @@ void DisasterEvent::exec( Game& game )
   }
 }
 
-GameEventPtr BuildEvent::create( const TilePos& pos, const TileOverlayType type )
+GameEventPtr BuildEvent::create( const TilePos& pos, const TileOverlay::Type type )
 {
   return create( pos, TileOverlayFactory::getInstance().create( type ) );
 }
@@ -107,7 +110,7 @@ GameEventPtr BuildEvent::create(const TilePos& pos, TileOverlayPtr overlay)
 
 void BuildEvent::exec( Game& game )
 {
-  const BuildingData& buildingData = BuildingDataHolder::instance().getData( _overlay->getType() );
+  const MetaData& buildingData = MetaDataHolder::instance().getData( _overlay->getType() );
   if( _overlay.isValid() )
   {
     _overlay->build( game.getCity(), _pos );
@@ -119,7 +122,7 @@ void BuildEvent::exec( Game& game )
       helper.updateDesirability( construction, true );
 
       game.getCity()->addOverlay( _overlay );
-      game.getCity()->getFunds().resolveIssue( FundIssue( CityFunds::buildConstruction, -buildingData.getCost() ) );
+      game.getCity()->getFunds().resolveIssue( FundIssue( CityFunds::buildConstruction, -(int)buildingData.getOption( "cost" ) ) );
 
       if( construction->isNeedRoadAccess() && construction->getAccessRoads().empty() )
       {
@@ -228,35 +231,51 @@ void ShowInfoboxEvent::exec( Game& game )
 }
 
 
-GameEventPtr TogglePause::create()
+GameEventPtr Pause::create( Mode mode )
 {
-  GameEventPtr ret( new TogglePause() );
+  Pause* e = new Pause();
+  e->_mode = mode;
+
+  GameEventPtr ret( e );
   ret->drop();
   return ret;
 }
 
-void TogglePause::exec(Game& game)
+void Pause::exec(Game& game)
 {
   gui::Widget* rootWidget = game.getGui()->getRootWidget();
   gui::Label* wdg = safety_cast< gui::Label* >( rootWidget->findChild( windowGamePausedId ) );
-  game.setPaused( !game.isPaused() );
 
-  if( game.isPaused()  )
+  switch( _mode )
   {
-    if( !wdg )
+  case toggle:
+  case pause:
+  case play:
+    game.setPaused( _mode == toggle ? !game.isPaused() : (_mode == pause) );
+
+    if( game.isPaused()  )
     {
-      Size scrSize = rootWidget->getSize();
-      wdg = new gui::Label( rootWidget, Rect( Point( (scrSize.getWidth() - 450)/2, 40 ), Size( 450, 50 ) ),
-                            _("##game_is_paused##"), false, gui::Label::bgWhiteFrame, windowGamePausedId );
-      wdg->setTextAlignment( alignCenter, alignCenter );
+      if( !wdg )
+      {
+        Size scrSize = rootWidget->getSize();
+        wdg = new gui::Label( rootWidget, Rect( Point( (scrSize.getWidth() - 450)/2, 40 ), Size( 450, 50 ) ),
+                              _("##game_is_paused##"), false, gui::Label::bgWhiteFrame, windowGamePausedId );
+        wdg->setTextAlignment( alignCenter, alignCenter );
+      }
     }
-  }
-  else
-  {
-    if( wdg )
+    else
     {
-      wdg->deleteLater();
+      if( wdg )
+      {
+        wdg->deleteLater();
+      }
     }
+  break;
+
+  case hidepause:
+  case hideplay:
+    game.setPaused( _mode == hidepause );
+  break;
   }
 }
 

@@ -19,9 +19,11 @@
 #include "core/position.hpp"
 #include "game/resourcegroup.hpp"
 #include "gfx/picture.hpp"
-#include "core/stringhelper.hpp"
+#include "core/logger.hpp"
 #include "walker/emigrant.hpp"
 #include <vector>
+
+using namespace constants;
 
 namespace{
   static const Point frontCartOffsetSouth = Point( -33, 22 );
@@ -94,38 +96,42 @@ void AnimationBank::Impl::loadWalkers()
   animations.resize( WG_MAX );
 
   animations[WG_NONE              ] = AnimationBank::MovementAnimation();
-  animations[WG_POOR              ] = loadAnimation( "citizen01", 1, 12 );
-  animations[WG_BATH              ] = loadAnimation( "citizen01", 105, 12);
-  animations[WG_PRIEST            ] = loadAnimation( "citizen01", 209, 12);
-  animations[WG_ACTOR             ] = loadAnimation( "citizen01", 313, 12);
-  animations[WG_TAMER             ] = loadAnimation( "citizen01", 417, 12);
-  animations[WG_TAX               ] = loadAnimation( "citizen01", 617, 12);
-  animations[WG_CHILD             ] = loadAnimation( "citizen01", 721, 12);
-  animations[WG_MARKETLADY        ] = loadAnimation( "citizen01", 825, 12);
-  animations[WG_PUSHER            ] = loadAnimation( "citizen01", 929, 12);
-  animations[WG_PUSHER2           ] = loadAnimation( "citizen01", 1033, 12);
-  animations[WG_ENGINEER          ] = loadAnimation( "citizen01", 1137, 12);
-  animations[WG_GLADIATOR         ] = loadAnimation( "citizen02", 1, 12);
-  animations[WG_GLADIATOR2        ] = loadAnimation( "citizen02", 199, 12);
-  animations[WG_RIOTER            ] = loadAnimation( "citizen02", 351, 12);
-  animations[WG_BARBER            ] = loadAnimation( "citizen02", 463, 12);
-  animations[WG_PREFECT           ] = loadAnimation( "citizen02", 615, 12);
-  animations[WG_PREFECT_DRAG_WATER] = loadAnimation( "citizen02", 767, 12);
-  animations[WG_PREFECT_FIGHTS_FIRE]= loadAnimation( "citizen02", 863, 6);
-  animations[WG_HOMELESS          ] = loadAnimation( "citizen02", 911, 12);
-  animations[WG_RICH              ] = loadAnimation( "citizen03", 713, 12);
-  animations[WG_DOCTOR            ] = loadAnimation( "citizen03", 817, 12);
-  animations[WG_RICH2             ] = loadAnimation( "citizen03", 921, 12);
-  animations[WG_LIBRARIAN         ] = loadAnimation( "citizen03", 1025, 12);
-  animations[WG_SOLDIER           ] = loadAnimation( "citizen03", 553, 12);
-  animations[WG_JAVELINEER        ] = loadAnimation( "citizen03", 241, 12);
-  animations[WG_HORSEMAN          ] = loadAnimation( "citizen04", 1, 12);
+  animations[WG_POOR              ] = loadAnimation( ResourceGroup::citizen1, 1, 12 );
+  animations[WG_BATH              ] = loadAnimation( ResourceGroup::citizen1, 105, 12);
+  animations[WG_PRIEST            ] = loadAnimation( ResourceGroup::citizen1, 209, 12);
+  animations[WG_ACTOR             ] = loadAnimation( ResourceGroup::citizen1, 313, 12);
+  animations[WG_TAMER             ] = loadAnimation( ResourceGroup::citizen1, 417, 12);
+  animations[WG_TAX               ] = loadAnimation( ResourceGroup::citizen1, 617, 12);
+  animations[WG_CHILD             ] = loadAnimation( ResourceGroup::citizen1, 721, 12);
+  animations[WG_MARKETLADY        ] = loadAnimation( ResourceGroup::citizen1, 825, 12);
+  animations[WG_PUSHER            ] = loadAnimation( ResourceGroup::citizen1, 929, 12);
+  animations[WG_PUSHER2           ] = loadAnimation( ResourceGroup::citizen1, 1033, 12);
+  animations[WG_ENGINEER          ] = loadAnimation( ResourceGroup::citizen1, 1137, 12);
+  animations[WG_GLADIATOR         ] = loadAnimation( ResourceGroup::citizen2, 1, 12);
+  animations[WG_GLADIATOR2        ] = loadAnimation( ResourceGroup::citizen2, 199, 12);
+  animations[WG_PROTESTOR         ] = loadAnimation( ResourceGroup::citizen2, 351, 12);
+  animations[WG_BARBER            ] = loadAnimation( ResourceGroup::citizen2, 463, 12);
+  animations[WG_PREFECT           ] = loadAnimation( ResourceGroup::citizen2, 615, 12);
+  animations[WG_PREFECT_DRAG_WATER] = loadAnimation( ResourceGroup::citizen2, 767, 12);
+  animations[WG_PREFECT_FIGHTS_FIRE]= loadAnimation( ResourceGroup::citizen2, 863, 6);
+  animations[WG_PREFECT_FIGHT     ] = loadAnimation( ResourceGroup::citizen2, 719, 6);
+  animations[WG_HOMELESS          ] = loadAnimation( ResourceGroup::citizen2, 911, 12);
+  animations[WG_RICH              ] = loadAnimation( ResourceGroup::citizen3, 713, 12);
+  animations[WG_DOCTOR            ] = loadAnimation( ResourceGroup::citizen3, 817, 12);
+  animations[WG_RICH2             ] = loadAnimation( ResourceGroup::citizen3, 921, 12);
+  animations[WG_TEACHER           ] = loadAnimation( ResourceGroup::citizen3, 1025, 12);
+  animations[WG_SOLDIER           ] = loadAnimation( ResourceGroup::citizen3, 553, 12);
+  animations[WG_JAVELINEER        ] = loadAnimation( ResourceGroup::citizen3, 241, 12);
+  animations[WG_HORSEMAN          ] = loadAnimation( ResourceGroup::citizen4, 1, 12);
   animations[WG_HORSE_CARAVAN     ] = loadAnimation( ResourceGroup::carts, 145, 12);
   animations[WG_CAMEL_CARAVAN     ] = loadAnimation( ResourceGroup::carts, 273, 12);
-  animations[WG_MARKETLADY_HELPER ] = loadAnimation( ResourceGroup::carts, 369, 12);
+  animations[WG_MARKET_KID        ] = loadAnimation( ResourceGroup::carts, 369, 12);
   animations[WG_ANIMAL_SHEEP_WALK ] = loadAnimation( ResourceGroup::animals, 153, 5 );
   animations[WG_FISHING_BOAT      ] = loadAnimation( ResourceGroup::carts, 249, 1 );
   animations[WG_FISHING_BOAT_WORK ] = loadAnimation( ResourceGroup::carts, 257, 1 );
+  animations[WG_HOMELESS_SIT      ] = loadAnimation( ResourceGroup::citizen2, 1015, 1 );
+  animations[WG_LION              ] = loadAnimation( ResourceGroup::lion, 1, 12 );
+  animations[WG_CHARIOT           ] = loadAnimation( ResourceGroup::citizen5, 1, 12 );
 }
 
 AnimationBank& AnimationBank::instance()
@@ -140,7 +146,7 @@ AnimationBank::AnimationBank() : _d( new Impl )
 
 void AnimationBank::loadCarts()
 {
-  StringHelper::debug( 0xff, "Loading cart graphics" );
+  Logger::warning( "Loading cart graphics" );
 
   instance()._d->loadCarts();  
 }
@@ -148,16 +154,16 @@ void AnimationBank::loadCarts()
 AnimationBank::MovementAnimation AnimationBank::Impl::loadAnimation( const std::string& prefix, const int start, const int size)
 {
   MovementAnimation ioMap;
-  DirectedAction action= { Walker::acMove, D_NORTH };
+  DirectedAction action= { Walker::acMove, north };
 
-  action.direction = D_NORTH;      ioMap[action].load( prefix, start,   size, Animation::straight, 8);
-  action.direction = D_NORTH_EAST; ioMap[action].load( prefix, start+1, size, Animation::straight, 8);
-  action.direction = D_EAST;       ioMap[action].load( prefix, start+2, size, Animation::straight, 8);
-  action.direction = D_SOUTH_EAST; ioMap[action].load( prefix, start+3, size, Animation::straight, 8);
-  action.direction = D_SOUTH;      ioMap[action].load( prefix, start+4, size, Animation::straight, 8);
-  action.direction = D_SOUTH_WEST; ioMap[action].load( prefix, start+5, size, Animation::straight, 8);
-  action.direction = D_WEST;       ioMap[action].load( prefix, start+6, size, Animation::straight, 8);
-  action.direction = D_NORTH_WEST; ioMap[action].load( prefix, start+7, size, Animation::straight, 8);
+  action.direction = north;      ioMap[action].load( prefix, start,   size, Animation::straight, 8);
+  action.direction = northEast;  ioMap[action].load( prefix, start+1, size, Animation::straight, 8);
+  action.direction = east;       ioMap[action].load( prefix, start+2, size, Animation::straight, 8);
+  action.direction = southEast;  ioMap[action].load( prefix, start+3, size, Animation::straight, 8);
+  action.direction = south;      ioMap[action].load( prefix, start+4, size, Animation::straight, 8);
+  action.direction = southWest;  ioMap[action].load( prefix, start+5, size, Animation::straight, 8);
+  action.direction = west;       ioMap[action].load( prefix, start+6, size, Animation::straight, 8);
+  action.direction = northWest;  ioMap[action].load( prefix, start+7, size, Animation::straight, 8);
 
   return ioMap;
 }
@@ -167,7 +173,7 @@ const AnimationBank::MovementAnimation& AnimationBank::getWalker(const WalkerGra
   AnimationBank& inst = instance();
   if( walkerGraphic >= inst._d->animations.size() )
   {
-    StringHelper::debug( 0xff, "Can't find animation map for type %d", walkerGraphic );
+    Logger::warning( "Can't find animation map for type %d", walkerGraphic );
     return inst._d->animations[ WG_NONE ];
   }
 
@@ -176,7 +182,7 @@ const AnimationBank::MovementAnimation& AnimationBank::getWalker(const WalkerGra
 
 void AnimationBank::loadWalkers()
 {
-  StringHelper::debug( 0xff, "Start loading walkers graphics" );
+  Logger::warning( "Start loading walkers graphics" );
   instance()._d->loadWalkers();
 }
 
@@ -184,31 +190,31 @@ PicturesArray AnimationBank::Impl::fillCart( const std::string &prefix, const in
 {
   PicturesArray ioCart;
 
-  ioCart.resize(D_MAX);
+  ioCart.resize(countDirection);
 
-  ioCart[D_NORTH]      = Picture::load(ResourceGroup::carts, start);
-  ioCart[D_NORTH_EAST] = Picture::load(ResourceGroup::carts, start + 1);
-  ioCart[D_EAST]       = Picture::load(ResourceGroup::carts, start + 2);
-  ioCart[D_SOUTH_EAST] = Picture::load(ResourceGroup::carts, start + 3);
-  ioCart[D_SOUTH]      = Picture::load(ResourceGroup::carts, start + 4);
-  ioCart[D_SOUTH_WEST] = Picture::load(ResourceGroup::carts, start + 5);
-  ioCart[D_WEST]       = Picture::load(ResourceGroup::carts, start + 6);
-  ioCart[D_NORTH_WEST] = Picture::load(ResourceGroup::carts, start + 7);
+  ioCart[north]      = Picture::load(ResourceGroup::carts, start);
+  ioCart[northEast]  = Picture::load(ResourceGroup::carts, start + 1);
+  ioCart[east]       = Picture::load(ResourceGroup::carts, start + 2);
+  ioCart[southEast]  = Picture::load(ResourceGroup::carts, start + 3);
+  ioCart[south]      = Picture::load(ResourceGroup::carts, start + 4);
+  ioCart[southWest]  = Picture::load(ResourceGroup::carts, start + 5);
+  ioCart[west]       = Picture::load(ResourceGroup::carts, start + 6);
+  ioCart[northWest]  = Picture::load(ResourceGroup::carts, start + 7);
 
-  ioCart[D_SOUTH].setOffset( back ? backCartOffsetSouth : frontCartOffsetSouth);
-  ioCart[D_WEST].setOffset ( back ? backCartOffsetWest  : frontCartOffsetWest );
-  ioCart[D_NORTH].setOffset( back ? backCartOffsetNorth : frontCartOffsetNorth);
-  ioCart[D_EAST].setOffset ( back ? backCartOffsetEast  : frontCartOffsetEast );
+  ioCart[south].setOffset( back ? backCartOffsetSouth : frontCartOffsetSouth);
+  ioCart[west].setOffset ( back ? backCartOffsetWest  : frontCartOffsetWest );
+  ioCart[north].setOffset( back ? backCartOffsetNorth : frontCartOffsetNorth);
+  ioCart[east].setOffset ( back ? backCartOffsetEast  : frontCartOffsetEast );
 
-  ioCart[D_SOUTH_EAST].setOffset ( back ? backCartOffsetSouthEast  : frontCartOffsetSouthEast );
-  ioCart[D_NORTH_WEST].setOffset ( back ? backCartOffsetNorthWest  : frontCartOffsetNorthWest );
-  ioCart[D_NORTH_EAST].setOffset ( back ? backCartOffsetNorthEast  : frontCartOffsetNorthEast );
-  ioCart[D_SOUTH_WEST].setOffset ( back ? backCartOffsetSouthWest  : frontCartOffsetSouthWest );
+  ioCart[southEast].setOffset( back ? backCartOffsetSouthEast : frontCartOffsetSouthEast );
+  ioCart[northWest].setOffset( back ? backCartOffsetNorthWest : frontCartOffsetNorthWest );
+  ioCart[northEast].setOffset( back ? backCartOffsetNorthEast : frontCartOffsetNorthEast );
+  ioCart[southWest].setOffset( back ? backCartOffsetSouthWest : frontCartOffsetSouthWest );
 
   return ioCart;
 }
 
-const Picture& AnimationBank::getCart( int cartId, const DirectionType &direction)
+const Picture& AnimationBank::getCart(int cartId, constants::Direction direction)
 {
   return instance()._d->carts.at( cartId ).at( direction );
 }

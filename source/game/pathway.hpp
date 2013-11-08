@@ -17,10 +17,10 @@
 #define __OPENCAESAR3_PATHWAY_H_INCLUDED__
 
 #include "core/predefinitions.hpp"
-#include "game/enums.hpp"
 #include "core/position.hpp"
 #include "core/variant.hpp"
 #include "core/scopedptr.hpp"
+#include "core/direction.hpp"
 
 class Tilemap;
 
@@ -28,10 +28,11 @@ class PathWay
 {
 public:
   PathWay();
-  virtual ~PathWay();
-  PathWay( const PathWay &copy ); 
+  PathWay( const PathWay& copy );
 
-  void init(const Tilemap &tilemap, const Tile &origin );
+  virtual ~PathWay();
+
+  void init( const Tilemap &tilemap, const Tile &origin );
 
   int getLength() const;
   const Tile& getOrigin() const;
@@ -41,10 +42,10 @@ public:
 
   void begin();
   void rbegin();
-  virtual DirectionType getNextDirection();
+  virtual constants::Direction getNextDirection();
   bool isDestination() const;
 
-  void setNextDirection(const DirectionType direction);
+  void setNextDirection(constants::Direction direction);
   void setNextTile( const Tile& tile);
   bool contains(Tile &tile);
   ConstTilemapTiles& getAllTiles();
@@ -61,14 +62,6 @@ public:
 private:
   Tilemap const* _tilemap;
   Tile const* _origin;
-  TilePos _destination;
-
-  typedef std::vector<DirectionType> Directions;
-  Directions _directionList;
-  Directions::iterator _directionIt;
-  Directions::reverse_iterator _directionIt_reverse;
-  ConstTilemapTiles _tileList;
-  bool _isReverse;
 
   class Impl;
   ScopedPtr< Impl > _d;

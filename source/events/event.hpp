@@ -56,8 +56,8 @@ private:
 class BuildEvent : public GameEvent
 {
 public:
-  static GameEventPtr create( const TilePos&, TileOverlayType type );
-  static GameEventPtr create(const TilePos&, TileOverlayPtr overlay );
+  static GameEventPtr create( const TilePos&, TileOverlay::Type type );
+  static GameEventPtr create( const TilePos&, TileOverlayPtr overlay );
 
   virtual void exec( Game& game );
 private:
@@ -113,11 +113,15 @@ private:
   int _advisor;
 };
 
-class TogglePause : public GameEvent
+class Pause : public GameEvent
 {
 public:
-  static GameEventPtr create();
+  typedef enum { toggle, pause, play, hidepause, hideplay } Mode;
+  static GameEventPtr create( Mode mode );
   virtual void exec( Game& game );
+
+private:
+  Mode _mode;
 };
 
 class ChangeSpeed : public GameEvent

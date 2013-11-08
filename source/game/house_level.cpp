@@ -28,6 +28,7 @@
 #include "city.hpp"
 #include "game/goodhelper.hpp"
 #include "tilemap.hpp"
+#include "core/logger.hpp"
 
 #include <string>
 #include <map>
@@ -61,7 +62,7 @@ public:
   GoodConsumptionMuls consumptionMuls;
 };
 
-int HouseLevelSpec::getHouseLevel() const
+int HouseLevelSpec::getLevel() const
 {
    return _d->houseLevel;
 }
@@ -86,12 +87,12 @@ int HouseLevelSpec::getTaxRate() const
    return _d->taxRate;
 }
 
-// int HouseLevelSpec::getMinEntertainmentLevel()
-// {
-//    return _minEntertainmentLevel;
-// }
-//
-int HouseLevelSpec::getMinEducationLevel()
+int HouseLevelSpec::getMinEntertainmentLevel() const
+{
+  return _d->minEntertainmentLevel;
+}
+
+int HouseLevelSpec::getMinEducationLevel() const
 {
   return _d->minEducationLevel;
 }
@@ -485,6 +486,11 @@ int HouseLevelSpec::getProsperity() const
   return _d->prosperity;
 }
 
+int HouseLevelSpec::getCrime() const
+{
+  return _d->crime;
+}
+
 HouseLevelSpec::~HouseLevelSpec()
 {
 
@@ -563,7 +569,7 @@ HouseSpecHelper& HouseSpecHelper::getInstance()
 
 HouseSpecHelper::HouseSpecHelper() : _d( new Impl )
 {
-  StringHelper::debug( 0xff, "HouseLevelSpec INIT" );
+  Logger::warning( "HouseLevelSpec INIT" );
 
   _d->level_by_id.clear();
   _d->level_by_id[0] = 0;
@@ -631,7 +637,7 @@ int HouseSpecHelper::getHouseLevel( const std::string& name )
   {
     if( item.second.getInternalName() == name )
     {
-      return item.second.getHouseLevel();
+      return item.second.getLevel();
     }
   }
 
@@ -649,7 +655,7 @@ void HouseSpecHelper::initialize( const io::FilePath& filename )
 
   if( houses.empty() )
   {
-    StringHelper::debug( 0xff, "Can't load house model from %s", filename.toString().c_str() );
+    Logger::warning( "Can't load house model from %s", filename.toString().c_str() );
     return;
   }
 

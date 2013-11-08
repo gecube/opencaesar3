@@ -20,15 +20,18 @@
 #include "game/city.hpp"
 #include "game/tilemap.hpp"
 #include "events/event.hpp"
+#include "constants.hpp"
 
 #include <vector>
+
+using namespace constants;
 
 class LowBridgeSubTile : public Construction
 {
 public:
   enum { liftingSE=67, spanSE=68, descentSE=69, liftingSW=70, spanSW=71, descentSW=72 };
   LowBridgeSubTile( const TilePos& pos, int index )
-    : Construction( B_LOW_BRIDGE, Size( 1 ) )
+    : Construction( building::lowBridge, Size( 1 ) )
   {
     _pos = pos;
     _index = index;
@@ -49,11 +52,11 @@ public:
   void build( CityPtr city, const TilePos& pos )
   {
     Construction::build( city, pos );
-    _getForegroundPictures().clear();
+    _getFgPictures().clear();
     _pos = pos;
     _picture = Picture::load( ResourceGroup::transport, _index );
     _picture.addOffset( 10, -10 );
-    _getForegroundPictures().push_back( _picture );
+    _getFgPictures().push_back( _picture );
   }
 
   void initTerrain( Tile& terrain )
@@ -68,6 +71,10 @@ public:
     {
       _parent->deleteLater();
     }
+  }
+
+  void save(VariantMap &stream) const
+  {
   }
 
   Point getOffset( const Point& subpos ) const
@@ -100,7 +107,7 @@ class LowBridge::Impl
 {
 public:
   LowBridgeSubTiles subtiles;
-  DirectionType direction;
+  Direction direction;
 
   void addSpan( const TilePos& pos, int index )
   {
@@ -116,22 +123,22 @@ bool LowBridge::canBuild( CityPtr city, const TilePos& pos ) const
   //bool is_constructible = Construction::canBuild( pos );
 
   TilePos endPos, startPos;
-  _d->direction=D_NONE;
+  _d->direction=noneDirection;
   
   _d->subtiles.clear();
-  const_cast< LowBridge* >( this )->_getForegroundPictures().clear();
+  const_cast< LowBridge* >( this )->_getFgPictures().clear();
 
   _checkParams( city, _d->direction, startPos, endPos, pos );
  
-  if( _d->direction != D_NONE )
+  if( _d->direction != noneDirection )
   {
     const_cast< LowBridge* >( this )->_computePictures( city, startPos, endPos, _d->direction );
   }
 
-  return (_d->direction != D_NONE);
+  return (_d->direction != noneDirection);
 }
 
-LowBridge::LowBridge() : Construction( B_LOW_BRIDGE, Size(1) ), _d( new Impl )
+LowBridge::LowBridge() : Construction( constants::building::lowBridge, Size(1) ), _d( new Impl )
 {
   Picture pic;
   setPicture( pic );
@@ -142,13 +149,13 @@ void LowBridge::initTerrain(Tile& terrain )
 
 }
 
-void LowBridge::_computePictures( CityPtr city, const TilePos& startPos, const TilePos& endPos, DirectionType dir )
+void LowBridge::_computePictures( CityPtr city, const TilePos& startPos, const TilePos& endPos, constants::Direction dir )
 {
   Tilemap& tilemap = city->getTilemap();
   //Picture& water = Picture::load( "land1a", 120 );
   switch( dir )
   {
-  case D_NORTH_WEST:
+  case northWest:
     {
       TilemapArea tiles = tilemap.getArea( endPos, startPos );
 
@@ -164,7 +171,7 @@ void LowBridge::_computePictures( CityPtr city, const TilePos& startPos, const T
     }
   break;
 
-  case D_NORTH_EAST:
+  case northEast:
     {
       TilemapArea tiles = tilemap.getArea( startPos, endPos );
 
@@ -180,7 +187,7 @@ void LowBridge::_computePictures( CityPtr city, const TilePos& startPos, const T
     }
     break;
 
-  case D_SOUTH_EAST:
+  case southEast:
     {
       TilemapArea tiles = tilemap.getArea( startPos, endPos );
 
@@ -200,7 +207,7 @@ void LowBridge::_computePictures( CityPtr city, const TilePos& startPos, const T
     }
   break;
 
-  case D_SOUTH_WEST:
+  case southWest:
     {
       TilemapArea tiles = tilemap.getArea( endPos, startPos );
 
@@ -226,11 +233,11 @@ void LowBridge::_computePictures( CityPtr city, const TilePos& startPos, const T
 
   for( LowBridgeSubTiles::iterator it=_d->subtiles.begin(); it != _d->subtiles.end(); it++ )
   {
-    _getForegroundPictures().push_back( (*it)->_picture );
+    _getFgPictures().push_back( (*it)->_picture );
   }
 }
 
-void LowBridge::_checkParams( CityPtr city, DirectionType& direction, TilePos& start, TilePos& stop, const TilePos& curPos ) const
+void LowBridge::_checkParams( CityPtr city, constants::Direction& direction, TilePos& start, TilePos& stop, const TilePos& curPos ) const
 {
   start = curPos;
 
@@ -239,7 +246,7 @@ void LowBridge::_checkParams( CityPtr city, DirectionType& direction, TilePos& s
 
   if( tile.getFlag( Tile::tlRoad ) )
   {
-    direction = D_NONE;
+    direction = constants::noneDirection;
     return;
   }
 
@@ -253,7 +260,7 @@ void LowBridge::_checkParams( CityPtr city, DirectionType& direction, TilePos& s
       if( imdId == 376 || imdId == 377 || imdId == 378 || imdId == 379 )
       {
         stop = (*it)->getIJ();
-        direction = D_NORTH_WEST;
+        direction = constants::northWest;
         break;
       }
     }
@@ -267,7 +274,7 @@ void LowBridge::_checkParams( CityPtr city, DirectionType& direction, TilePos& s
       if( imdId == 384 || imdId == 385 || imdId == 386 || imdId == 387 )
       {
         stop = (*it)->getIJ();
-        direction = D_SOUTH_EAST;
+        direction = southEast;
         break;
       }
     }
@@ -281,7 +288,7 @@ void LowBridge::_checkParams( CityPtr city, DirectionType& direction, TilePos& s
       if( imdId == 380 || imdId == 381 || imdId == 382 || imdId == 383 )
       {
         stop = (*it)->getIJ();
-        direction = D_NORTH_EAST;
+        direction = northEast;
         break;
       }
     }
@@ -295,53 +302,53 @@ void LowBridge::_checkParams( CityPtr city, DirectionType& direction, TilePos& s
       if( imdId == 372 || imdId == 373 || imdId == 374 || imdId == 375 )
       {
         stop = (*it)->getIJ();
-        direction = D_SOUTH_WEST;
+        direction = southWest;
         break;
       }
     }
   }
   else 
   {
-    direction = D_NONE;
+    direction = noneDirection;
   }
 }
 
 void LowBridge::build( CityPtr city, const TilePos& pos )
 {
   TilePos endPos, startPos;
-  _d->direction=D_NONE;
+  _d->direction=noneDirection;
 
   _d->subtiles.clear();
-  _getForegroundPictures().clear();
+  _getFgPictures().clear();
 
   Tilemap& tilemap = city->getTilemap();
 
   _checkParams( city, _d->direction, startPos, endPos, pos );
   int signSum = 1;
 
-  if( _d->direction != D_NONE )
+  if( _d->direction != noneDirection )
   {    
     switch( _d->direction )
     {
-    case D_NORTH_EAST:
-      _computePictures( city, endPos, startPos, D_SOUTH_WEST );
+    case northEast:
+      _computePictures( city, endPos, startPos, southWest );
       std::swap( _d->subtiles.front()->_pos, _d->subtiles.back()->_pos );
       signSum = -1;      
     break;
 
-    case D_NORTH_WEST:
-      _computePictures( city, endPos, startPos, D_SOUTH_EAST );
+    case northWest:
+      _computePictures( city, endPos, startPos, southEast );
       std::swap( _d->subtiles.front()->_pos, _d->subtiles.back()->_pos );
       std::swap( startPos, endPos );
       signSum = -1;
     break;
 
-    case D_SOUTH_WEST:
+    case southWest:
       _computePictures( city, startPos, endPos, _d->direction );
       std::swap( startPos, endPos );
     break;
 
-    case D_SOUTH_EAST:     
+    case southEast:
       _computePictures( city, startPos, endPos, _d->direction );
     break;
 

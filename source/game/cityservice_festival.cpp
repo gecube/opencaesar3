@@ -17,14 +17,16 @@
 #include "gamedate.hpp"
 #include "city.hpp"
 #include "divinity.hpp"
+#include "events/showfeastwindow.hpp"
 
 class CityServiceFestival::Impl
 {
 public:
   CityPtr city;
 
+  DateTime lastFestivalDate;
   DateTime festivalDate;
-  RomeDivinityType godName;
+  RomeDivinityType divinity;  
   int festivalType;
 };
 
@@ -36,10 +38,35 @@ CityServicePtr CityServiceFestival::create( CityPtr city )
   return ret;
 }
 
+std::string CityServiceFestival::getDefaultName()
+{
+  return "festival";
+}
+
+DateTime CityServiceFestival::getLastFestivalDate() const
+{
+  return _d->lastFestivalDate;
+}
+
+DateTime CityServiceFestival::getNextFestivalDate() const
+{
+  return _d->festivalDate;
+}
+
+void CityServiceFestival::assignFestival( RomeDivinityType name, int size )
+{
+  _d->festivalType = size;
+  _d->festivalDate = GameDate::current();
+  _d->festivalDate.appendMonth( size * 3 );
+  _d->divinity = name;
+}
+
 CityServiceFestival::CityServiceFestival( CityPtr city )
-: CityService( "festival" ), _d( new Impl )
+: CityService( getDefaultName() ), _d( new Impl )
 {
   _d->city = city;
+  _d->lastFestivalDate = DateTime( -350, 0, 0 );
+  _d->festivalDate = DateTime( -550, 0, 0 );
 }
 
 void CityServiceFestival::update( const unsigned int time )
@@ -47,8 +74,38 @@ void CityServiceFestival::update( const unsigned int time )
   if( time % 44 != 1 )
     return;
 
-  if( _d->festivalDate == GameDate::current() )
+  const DateTime current = GameDate::current();
+  if( _d->festivalDate.getYear() == current.getYear()
+      && _d->festivalDate.getMonth() == current.getMonth() )
   {
-    DivinePantheon::doFestival4( _d->godName, _d->festivalType );
+    _d->lastFestivalDate = GameDate::current();
+    _d->festivalDate = DateTime( -550, 1, 1 );
+    DivinePantheon::doFestival( _d->divinity, _d->festivalType );
+
+    const char* titles[3] = { "##small_festival##", "##middle_festival##", "##great_festival##" };
+    const char* text[3] = { "##small_fest_description##", "##middle_fest_description##", "##big_fest_description##" };
+    int id = math::clamp( _d->festivalType, 0, 3 );
+    events::GameEventPtr e = events::ShowFeastWindow::create( text[ id ], titles[ id ],
+                                                              _d->city->getPlayer()->getName() );
+    e->dispatch();
   }
+}
+
+VariantMap CityServiceFestival::save() const
+{
+  VariantMap ret;
+  ret[ "lastDate" ] = _d->lastFestivalDate;
+  ret[ "nextDate" ] = _d->festivalDate;
+  ret[ "divinity" ] = (int)_d->divinity;
+  ret[ "festival" ] = _d->festivalType;
+
+  return ret;
+}
+
+void CityServiceFestival::load(VariantMap stream)
+{
+  _d->lastFestivalDate = stream[ "lastDate" ].toDateTime();
+  _d->festivalDate = stream[ "nextDate" ].toDateTime();
+  _d->divinity = (RomeDivinityType)stream[ "divinity" ].toInt();
+  _d->festivalType = (int)stream[ "festival" ];
 }

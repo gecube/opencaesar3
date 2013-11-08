@@ -21,10 +21,26 @@
 #include "game/tilemap.hpp"
 #include "game/city.hpp"
 #include "events/event.hpp"
+#include "core/logger.hpp"
 
-Construction::Construction( const TileOverlayType type, const Size& size)
-: TileOverlay( type, size )
+class Construction::Impl
 {
+public:
+  typedef std::map<Construction::Param, double> Params;
+  TilemapTiles accessRoads;
+  Params params;
+};
+
+Construction::Construction(const Type type, const Size& size)
+  : TileOverlay( type, size ), _d( new Impl )
+{
+  _d->params[ fire ] = 0;
+  _d->params[ damage ] = 0;
+}
+
+Construction::~Construction()
+{
+
 }
 
 bool Construction::canBuild( CityPtr city, const TilePos& pos ) const
@@ -59,7 +75,7 @@ void Construction::build( CityPtr city, const TilePos& pos )
 
 const TilemapTiles& Construction::getAccessRoads() const
 {
-   return _accessRoads;
+   return _d->accessRoads;
 }
 
 // here the problem lays: if we remove road, it is left in _accessRoads array
@@ -67,25 +83,25 @@ const TilemapTiles& Construction::getAccessRoads() const
 // on next to this road tile buildings
 void Construction::computeAccessRoads()
 {
-  _accessRoads.clear();
+  _d->accessRoads.clear();
   if( !_getMasterTile() )
       return;
 
   Tilemap& tilemap = _getCity()->getTilemap();
 
-  int maxDst2road = getMaxDistance2Road();
+  int maxDst2road = getRoadAccessDistance();
   TilemapTiles rect = tilemap.getRectangle( _getMasterTile()->getIJ() + TilePos( -maxDst2road, -maxDst2road ),
                                             getSize() + Size( 2 * maxDst2road ), !Tilemap::checkCorners );
   foreach( Tile* tile, rect )
   {
     if( tile->getFlag( Tile::tlRoad ) )
     {
-      _accessRoads.push_back( tile );
+      _d->accessRoads.push_back( tile );
     }
   }
 }
 
-int Construction::getMaxDistance2Road() const
+int Construction::getRoadAccessDistance() const
 {
   return 1;
   // it is default value
@@ -107,14 +123,96 @@ void Construction::collapse()
   event->dispatch();
 }
 
-const BuildingData::Desirability& Construction::getDesirabilityInfo() const
+const MetaData::Desirability& Construction::getDesirabilityInfo() const
 {
-  return BuildingDataHolder::instance().getData( getType() ).getDesirbilityInfo();
+  return MetaDataHolder::instance().getData( getType() ).getDesirbilityInfo();
 }
 
 void Construction::destroy()
 {
   TileOverlay::destroy();
+}
+
+void Construction::updateState(Construction::Param param, double value, bool relative)
+{
+  if( relative ) _d->params[ param ] += value;
+  else           _d->params[ param ] = value;
+}
+
+void Construction::save( VariantMap& stream) const
+{
+    TileOverlay::save( stream );
+    stream[ Serializable::damageLevel ] = getState( fire );
+    stream[ Serializable::fireLevel ] = getState( damage );
+
+//    stream.write_int(_traineeMap.size(), 1, 0, WTT_MAX);
+//    for (std::map<WalkerTraineeType, int>::iterator itLevel = _traineeMap.begin(); itLevel != _traineeMap.end(); ++itLevel)
+//    {
+//       WalkerTraineeType traineeType = itLevel->first;
+//       int traineeLevel = itLevel->second;
+//       stream.write_int((int)traineeType, 1, 0, WTT_MAX);
+//       stream.write_int(traineeLevel, 1, 0, 200);
+//    }
+//
+//    stream.write_int(_reservedTrainees.size(), 1, 0, WTT_MAX);
+//    for (std::set<WalkerTraineeType>::iterator itReservation = _reservedTrainees.begin(); itReservation != _reservedTrainees.end(); ++itReservation)
+//    {
+//       WalkerTraineeType traineeType = *itReservation;
+//       stream.write_int((int)traineeType, 1, 0, WTT_MAX);
+//    }
+}
+
+void Construction::load( const VariantMap& stream )
+{
+  TileOverlay::load( stream );
+  _d->params[ fire ] = (float)stream.get( Serializable::damageLevel, 0.f );
+  _d->params[ damage ] = (float)stream.get( Serializable::fireLevel, 0.f );
+//    Construction::unserialize(stream);
+//    _damageLevel = (float)stream.read_int(1, 0, 100);
+//    _fireLevel = (float)stream.read_int(1, 0, 100);
+//
+//    int size = stream.read_int(1, 0, WTT_MAX);
+//    for (int i=0; i<size; ++i)
+//    {
+//       WalkerTraineeType traineeType = (WalkerTraineeType) stream.read_int(1, 0, WTT_MAX);
+//       int traineeLevel = stream.read_int(1, 0, 200);
+//       _traineeMap[traineeType] = traineeLevel;
+//    }
+//
+//    size = stream.read_int(1, 0, WTT_MAX);
+//    for (int i=0; i<size; ++i)
+//    {
+//       WalkerTraineeType traineeType = (WalkerTraineeType) stream.read_int(1, 0, WTT_MAX);
+//       _reservedTrainees.insert(traineeType);
+//    }
+}
+
+double Construction::getState(Construction::Param param) const
+{
+  return _d->params[ param ];
+}
+
+TilePos Construction::getEnterPos() const
+{
+  return _d->accessRoads.empty()
+            ? getTilePos()
+            : _d->accessRoads.front()->getIJ();
+}
+
+void Construction::timeStep(const unsigned long time)
+{
+  if( getState( Construction::damage ) >= 100 )
+  {
+    Logger::warning( "Building destroyed!" );
+    collapse();
+  }
+  else if( getState( Construction::fire ) >= 100 )
+  {
+    Logger::warning( "Building catch fire!" );
+    burn();
+  }
+
+  TileOverlay::timeStep( time );
 }
 
 bool Construction::isNeedRoadAccess() const

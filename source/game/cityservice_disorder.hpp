@@ -13,29 +13,24 @@
 // You should have received a copy of the GNU General Public License
 // along with openCaesar3.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef __OPENCAESAR3_MARKET_LADY_HELPER_H_INCLUDED__
-#define __OPENCAESAR3_MARKET_LADY_HELPER_H_INCLUDED__
+#ifndef __OPENCAESAR3_CITYSERVICE_DISORDER_H_INCLUDED__
+#define __OPENCAESAR3_CITYSERVICE_DISORDER_H_INCLUDED__
 
-#include "walker.hpp"
+#include "cityservice.hpp"
+#include "core/scopedptr.hpp"
+#include "core/predefinitions.hpp"
 
-class MarketLadyHelper : public Walker
+class CityServiceDisorder : public CityService
 {
 public:
-  static MarketLadyHelperPtr create( CityPtr city, MarketLadyPtr lady );
+  static CityServicePtr create( CityPtr city );
 
-  GoodStock& getBasket();
-  void setDelay( int delay );
-
-  void send2City( MarketPtr destination );
-
-  void timeStep(const unsigned long time);
-
-  void onDestination();
+  void update( const unsigned int time );
 private:
-  MarketLadyHelper( CityPtr city );
+  CityServiceDisorder( CityPtr city );
 
   class Impl;
   ScopedPtr< Impl > _d;
 };
 
-#endif
+#endif //__OPENCAESAR3_CITYSERVICE_DISORDER_H_INCLUDED__

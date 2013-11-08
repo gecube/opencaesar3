@@ -16,10 +16,11 @@
 #include "goodhelper.hpp"
 #include "good.hpp"
 #include "core/enumerator.hpp"
-#include "game/resourcegroup.hpp"
+#include "resourcegroup.hpp"
 #include "core/stringhelper.hpp"
 #include "gfx/animation_bank.hpp"
 #include "core/gettext.hpp"
+#include "core/logger.hpp"
 #include <vector>
 
 static const int empPicId[ Good::goodCount+1 ] = { PicID::bad,
@@ -146,7 +147,7 @@ Good::Type GoodHelper::getType( const std::string& name )
 
   if( type == getInstance()._d->getInvalid() )
   {
-    StringHelper::debug( 0xff, "Can't find type for goodName %s", name.c_str() );
+    Logger::warning( "Can't find type for goodName %s", name.c_str() );
     _OC3_DEBUG_BREAK_IF( "Can't find type for goodName" );
   }
 
@@ -158,7 +159,7 @@ std::string GoodHelper::getTypeName( Good::Type type )
   return getInstance()._d->findName( type );
 }
 
-const Picture& GoodHelper::getCartPicture(const GoodStock &stock, const DirectionType &direction)
+Picture GoodHelper::getCartPicture(const GoodStock &stock, constants::Direction direction)
 {
   return AnimationBank::getCart( stock.empty() ? Good::none :  stock._type, direction );
 }

@@ -27,6 +27,9 @@
 #include "building/metadata.hpp"
 #include "game/build_options.hpp"
 #include "core/foreach.hpp"
+#include "building/constants.hpp"
+
+using namespace constants;
 
 // used to display the building name and its cost
 namespace gui
@@ -136,12 +139,12 @@ void BuildMenu::addSubmenuButton(const BuildMenuType menuType, const std::string
 }
 
 
-void BuildMenu::addBuildButton( const TileOverlayType buildingType )
+void BuildMenu::addBuildButton(const TileOverlay::Type buildingType )
 {
   //int t = DateTime::getElapsedTime();
-  const BuildingData &buildingData = BuildingDataHolder::instance().getData( buildingType );
+  const MetaData &buildingData = MetaDataHolder::instance().getData( buildingType );
 
-  int cost = buildingData.getCost();
+  int cost = buildingData.getOption( "cost" );
   bool mayBuildInCity = _options.isBuildingAvailble( buildingType );
   if( cost > 0 && mayBuildInCity )
   {
@@ -193,10 +196,10 @@ void BuildMenu::setBuildOptions( const CityBuildOptions& options )
 
 void BuildMenu_water::initialize()
 {
-  addBuildButton(B_FOUNTAIN);
-  addBuildButton(B_WELL);
-  addBuildButton(B_AQUEDUCT);
-  addBuildButton(B_RESERVOIR);
+  addBuildButton(building::B_FOUNTAIN);
+  addBuildButton(building::B_WELL);
+  addBuildButton(building::B_AQUEDUCT);
+  addBuildButton(building::B_RESERVOIR);
 
   BuildMenu::initialize();
 }
@@ -209,7 +212,7 @@ BuildMenu_water::BuildMenu_water( Widget* parent, const Rect& rectangle )
 
 void BuildMenu_security::initialize()
 {
-  addBuildButton(B_PREFECTURE);
+  addBuildButton(building::prefecture);
 
   BuildMenu::initialize();
 }
@@ -222,9 +225,9 @@ BuildMenu_security::BuildMenu_security( Widget* parent, const Rect& rectangle )
 
 void BuildMenu_education::initialize()
 {
-  addBuildButton(B_SCHOOL);
-  addBuildButton(B_LIBRARY);
-  addBuildButton(B_COLLEGE);
+  addBuildButton(building::B_SCHOOL);
+  addBuildButton(building::B_LIBRARY);
+  addBuildButton(building::B_COLLEGE);
 
   BuildMenu::initialize();
 }
@@ -237,10 +240,10 @@ BuildMenu_education::BuildMenu_education( Widget* parent, const Rect& rectangle 
 
 void BuildMenu_health::initialize()
 {
-  addBuildButton(B_DOCTOR);
-  addBuildButton(B_BARBER);
-  addBuildButton(B_BATHS);
-  addBuildButton(B_HOSPITAL);
+  addBuildButton(building::B_DOCTOR);
+  addBuildButton(building::B_BARBER);
+  addBuildButton(building::B_BATHS);
+  addBuildButton(building::B_HOSPITAL);
 
   BuildMenu::initialize();
 }
@@ -253,15 +256,15 @@ BuildMenu_health::BuildMenu_health( Widget* parent, const Rect& rectangle )
 
 void BuildMenu_engineering::initialize()
 {
-  addBuildButton(B_ENGINEER_POST);
-  addBuildButton(B_LOW_BRIDGE);
-  addBuildButton(B_HIGH_BRIDGE);
-  addBuildButton(B_DOCK);
-  addBuildButton(B_SHIPYARD);
-  addBuildButton(B_WHARF);
-  addBuildButton(B_TRIUMPHAL_ARCH);
-  addBuildButton(B_GARDEN);
-  addBuildButton(B_PLAZA);
+  addBuildButton(building::engineerPost);
+  addBuildButton(building::lowBridge);
+  addBuildButton(building::highBridge);
+  addBuildButton(building::B_DOCK);
+  addBuildButton(building::B_SHIPYARD);
+  addBuildButton(building::wharf);
+  addBuildButton(building::B_TRIUMPHAL_ARCH);
+  addBuildButton(construction::B_GARDEN);
+  addBuildButton(construction::B_PLAZA);
 
   BuildMenu::initialize();
 }
@@ -274,16 +277,16 @@ BuildMenu_engineering::BuildMenu_engineering( Widget* parent, const Rect& rectan
 
 void BuildMenu_administration::initialize()
 {
-  addBuildButton(B_FORUM);
-  addBuildButton(B_SENATE);
+  addBuildButton(building::forum);
+  addBuildButton(building::senate);
 
-  addBuildButton(B_GOVERNOR_HOUSE);
-  addBuildButton(B_GOVERNOR_VILLA);
-  addBuildButton(B_GOVERNOR_PALACE);
+  addBuildButton(building::governorHouse);
+  addBuildButton(building::governorVilla);
+  addBuildButton(building::governorPalace);
 
-  addBuildButton(B_STATUE1);
-  addBuildButton(B_STATUE2);
-  addBuildButton(B_STATUE3);
+  addBuildButton(building::B_STATUE1);
+  addBuildButton(building::B_STATUE2);
+  addBuildButton(building::B_STATUE3);
 
   BuildMenu::initialize();
 }
@@ -296,14 +299,14 @@ BuildMenu_administration::BuildMenu_administration( Widget* parent, const Rect& 
 
 void BuildMenu_entertainment::initialize()
 {
-  addBuildButton(B_THEATER);
-  addBuildButton(buildingAmphitheater);
-  addBuildButton(B_COLLOSSEUM);
-  addBuildButton(B_HIPPODROME);
-  addBuildButton(B_ACTOR_COLONY);
-  addBuildButton(B_GLADIATOR_SCHOOL);
-  addBuildButton(B_LION_HOUSE);
-  addBuildButton(B_CHARIOT_MAKER);
+  addBuildButton(building::theater);
+  addBuildButton(building::amphitheater);
+  addBuildButton(building::colloseum);
+  addBuildButton(building::hippodrome);
+  addBuildButton(building::actorColony);
+  addBuildButton(building::gladiatorSchool);
+  addBuildButton(building::lionHouse);
+  addBuildButton(building::chariotSchool);
 
   BuildMenu::initialize();
 }
@@ -320,9 +323,9 @@ void BuildMenu_commerce::initialize()
   addSubmenuButton(BM_RAW_MATERIAL, _("Raw materials") );
   addSubmenuButton(BM_FACTORY, _("Factory") );
 
-  addBuildButton(B_MARKET);
-  addBuildButton(B_GRANARY);
-  addBuildButton(B_WAREHOUSE);
+  addBuildButton(building::B_MARKET);
+  addBuildButton(building::granary);
+  addBuildButton(building::B_WAREHOUSE);
 
   BuildMenu::initialize();
 }
@@ -335,12 +338,12 @@ BuildMenu_commerce::BuildMenu_commerce( Widget* parent, const Rect& rectangle )
 
 void BuildMenu_farm::initialize()
 {
-  addBuildButton(B_WHEAT_FARM);
-  addBuildButton(B_FRUIT_FARM);
-  addBuildButton(B_OLIVE_FARM);
-  addBuildButton(B_GRAPE_FARM);
-  addBuildButton(B_PIG_FARM);
-  addBuildButton(B_VEGETABLE_FARM);
+  addBuildButton(building::wheatFarm);
+  addBuildButton(building::B_FRUIT_FARM);
+  addBuildButton(building::B_OLIVE_FARM);
+  addBuildButton(building::grapeFarm);
+  addBuildButton(building::B_PIG_FARM);
+  addBuildButton(building::B_VEGETABLE_FARM);
 
   BuildMenu::initialize();
 }
@@ -353,10 +356,10 @@ BuildMenu_farm::BuildMenu_farm( Widget* parent, const Rect& rectangle )
 
 void BuildMenu_raw_factory::initialize()
 {
-  addBuildButton(B_MARBLE_QUARRY);
-  addBuildButton(B_IRON_MINE);
-  addBuildButton(B_TIMBER_YARD);
-  addBuildButton(B_CLAY_PIT);
+  addBuildButton(building::marbleQuarry);
+  addBuildButton(building::ironMine);
+  addBuildButton(building::timberLogger);
+  addBuildButton(building::clayPit);
 
   BuildMenu::initialize();
 }
@@ -369,11 +372,11 @@ BuildMenu_raw_factory::BuildMenu_raw_factory( Widget* parent, const Rect& rectan
 
 void BuildMenu_factory::initialize()
 {
-  addBuildButton(B_WINE_WORKSHOP);
-  addBuildButton(B_OIL_WORKSHOP);
-  addBuildButton(B_WEAPONS_WORKSHOP);
-  addBuildButton(B_FURNITURE);
-  addBuildButton(B_POTTERY);
+  addBuildButton(building::B_WINE_WORKSHOP);
+  addBuildButton(building::B_OIL_WORKSHOP);
+  addBuildButton(building::B_WEAPONS_WORKSHOP);
+  addBuildButton(building::B_FURNITURE);
+  addBuildButton(building::pottery);
 
   BuildMenu::initialize();
 }
@@ -388,7 +391,7 @@ void BuildMenu_religion::initialize()
 {
   addSubmenuButton(BM_TEMPLE , _("##small_temples##") );
   addSubmenuButton(BM_BIGTEMPLE , _("##large_temples##") );
-  addBuildButton(B_TEMPLE_ORACLE);   
+  addBuildButton(building::B_TEMPLE_ORACLE);
 
   BuildMenu::initialize();
 }
@@ -401,11 +404,11 @@ BuildMenu_religion::BuildMenu_religion( Widget* parent, const Rect& rectangle )
 
 void BuildMenu_temple::initialize()
 {
-  addBuildButton(B_TEMPLE_CERES);
-  addBuildButton(B_TEMPLE_NEPTUNE);
-  addBuildButton(B_TEMPLE_MARS);
-  addBuildButton(B_TEMPLE_VENUS);
-  addBuildButton(B_TEMPLE_MERCURE);
+  addBuildButton(building::templeCeres);
+  addBuildButton(building::B_TEMPLE_NEPTUNE);
+  addBuildButton(building::B_TEMPLE_MARS);
+  addBuildButton(building::B_TEMPLE_VENUS);
+  addBuildButton(building::B_TEMPLE_MERCURE);
 
   BuildMenu::initialize();
 }
@@ -417,11 +420,11 @@ BuildMenu_temple::BuildMenu_temple( Widget* parent, const Rect& rectangle )
 }
 void BuildMenu_bigtemple::initialize()
 {
-  addBuildButton(B_BIG_TEMPLE_CERES);
-  addBuildButton(B_BIG_TEMPLE_NEPTUNE);
-  addBuildButton(B_BIG_TEMPLE_MARS);
-  addBuildButton(B_BIG_TEMPLE_VENUS);
-  addBuildButton(B_BIG_TEMPLE_MERCURE);
+  addBuildButton(building::B_BIG_TEMPLE_CERES);
+  addBuildButton(building::B_BIG_TEMPLE_NEPTUNE);
+  addBuildButton(building::B_BIG_TEMPLE_MARS);
+  addBuildButton(building::B_BIG_TEMPLE_VENUS);
+  addBuildButton(building::B_BIG_TEMPLE_MERCURE);
 
   BuildMenu::initialize();
 }

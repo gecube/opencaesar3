@@ -29,6 +29,7 @@
 #include "core/foreach.hpp"
 #include "game.hpp"
 #include "city.hpp"
+#include "core/logger.hpp"
 
 #include <vector>
 
@@ -75,8 +76,8 @@ void GameLoader::Impl::initEntryExitTile( const TilePos& tlPos, Tilemap& tileMap
 
   Tile& signTile = tileMap.at( tlPos + tlOffset );
 
-  StringHelper::debug( 0xff, "(%d, %d)", tlPos.getI(),    tlPos.getJ()    );
-  StringHelper::debug( 0xff, "(%d, %d)", tlOffset.getI(), tlOffset.getJ() );
+  Logger::warning( "(%d, %d)", tlPos.getI(),    tlPos.getJ()    );
+  Logger::warning( "(%d, %d)", tlOffset.getI(), tlOffset.getJ() );
 
   signTile.setPicture( ResourceGroup::land3a, picIdStart + idOffset );
   signTile.setFlag( Tile::tlRock, true );
@@ -87,7 +88,7 @@ void GameLoader::Impl::initWaterTileAnimation( Tilemap& tmap )
   TilemapArea area = tmap.getArea( TilePos( 0, 0 ), Size( tmap.getSize() ) );
 
   Animation water;
-  water.setFrameDelay( 12 );
+  water.setDelay( 12 );
   water.load( ResourceGroup::land1a, 121, 7 );
   water.load( ResourceGroup::land1a, 127, 7, true );
   foreach( Tile* tile, area )
@@ -95,7 +96,7 @@ void GameLoader::Impl::initWaterTileAnimation( Tilemap& tmap )
     int rId = tile->getOriginalImgId() - 364;
     if( rId >= 0 && rId < 8 )
     {
-      water.setCurrentIndex( rId );
+      water.setIndex( rId );
       tile->setAnimation( water );
     }
   }

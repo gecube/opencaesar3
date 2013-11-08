@@ -20,7 +20,7 @@
 #include "core/position.hpp"
 #include "core/size.hpp"
 #include "core/exception.hpp"
-#include "core/stringhelper.hpp"
+#include "core/logger.hpp"
 #include "gfx/tile.hpp"
 #include "core/foreach.hpp"
 
@@ -66,7 +66,7 @@ void TilemapCamera::setViewport(const Size& newSize )
 
   _d->viewSize = Size( (newSize.getWidth() + 59) / 60, ( newSize.getHeight() + 29) / 30 );
   
-  StringHelper::debug( 0xff, "TilemapArea::setViewport w=%d h=%d", _d->viewSize.getWidth(), _d->viewSize.getHeight() );
+  Logger::warning( "TilemapArea::setViewport w=%d h=%d", _d->viewSize.getWidth(), _d->viewSize.getHeight() );
 }
 
 void TilemapCamera::setCenter(const TilePos& pos )
@@ -151,6 +151,22 @@ const TilemapArea& TilemapCamera::getTiles() const
         }
       }
     }
+
+    /*for( int y=0; y < mapSize; y++ )
+    {
+      for( int t=0; t <= y; t++ )
+      {
+        _d->tiles.push_back( &_d->tilemap->at( t, mapSize - 1 - ( y - t ) ) );
+      }
+    }
+
+    for( int x=1; x < mapSize; x++ )
+    {
+      for( int t=0; t < mapSize-x; t++ )
+      {
+        _d->tiles.push_back( &_d->tilemap->at( x + t, t ) );
+      }
+    }*/
   }
 
   return _d->tiles;

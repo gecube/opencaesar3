@@ -24,6 +24,7 @@
 #include "special_orders_window.hpp"
 #include "game/goodstore.hpp"
 #include "core/stringhelper.hpp"
+#include "core/logger.hpp"
 
 namespace gui
 {
@@ -39,7 +40,7 @@ InfoBoxWarehouse::InfoBoxWarehouse( Widget* parent, const Tile& tile )
 
   CONNECT( btnOrders, onClicked(), this, InfoBoxWarehouse::showSpecialOrdersWindow );
 
-  setTitle( BuildingDataHolder::getPrettyName( _warehouse->getType() ) );
+  setTitle( MetaDataHolder::getPrettyName( _warehouse->getType() ) );
 
   // summary: total stock, free capacity
   int _paintY = _getTitle()->getBottom();

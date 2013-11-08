@@ -31,6 +31,9 @@
 #include "game/goodstore_simple.hpp"
 #include "game/city.hpp"
 #include "core/foreach.hpp"
+#include "constants.hpp"
+
+using namespace constants;
 
 class Factory::Impl
 {
@@ -47,7 +50,7 @@ public:
 };
 
 Factory::Factory(const Good::Type inType, const Good::Type outType,
-                  const TileOverlayType type, const Size& size )
+                  const TileOverlay::Type type, const Size& size )
 : WorkingBuilding( type, size ), _d( new Impl )
 {
    _d->productionRate = 2.f;
@@ -155,12 +158,12 @@ void Factory::timeStep(const unsigned long time)
        _d->progress += work;
 
        _getAnimation().update( time );
-       const Picture& pic = _getAnimation().getCurrentPicture();
+       const Picture& pic = _getAnimation().getFrame();
        if( pic.isValid() )
        {
          // animation of the working factory
-         int level = getForegroundPictures().size()-1;
-         _getForegroundPictures().at(level) = _getAnimation().getCurrentPicture();
+         int level = _getFgPictures().size()-1;
+         _getFgPictures().at(level) = _getAnimation().getFrame();
        }
      }
    }  
@@ -289,12 +292,12 @@ bool Factory::standIdle() const
   return !mayWork();
 }
 
-TimberLogger::TimberLogger() : Factory(Good::none, Good::timber, B_TIMBER_YARD, Size(2) )
+TimberLogger::TimberLogger() : Factory(Good::none, Good::timber, building::timberLogger, Size(2) )
 {
   setPicture( ResourceGroup::commerce, 72 );
 
   _getAnimation().load( ResourceGroup::commerce, 73, 10);
-  _getForegroundPictures().resize(2);
+  _getFgPictures().resize(2);
 }
 
 bool TimberLogger::canBuild( CityPtr city, const TilePos& pos ) const
@@ -315,13 +318,13 @@ bool TimberLogger::canBuild( CityPtr city, const TilePos& pos ) const
 }
 
 
-IronMine::IronMine() : Factory(Good::none, Good::iron, B_IRON_MINE, Size(2) )
+IronMine::IronMine() : Factory(Good::none, Good::iron, building::ironMine, Size(2) )
 {
   setPicture( ResourceGroup::commerce, 54 );
 
   _getAnimation().load( ResourceGroup::commerce, 55, 6 );
-  _getAnimation().setFrameDelay( 5 );
-  _getForegroundPictures().resize(2);
+  _getAnimation().setDelay( 5 );
+  _getFgPictures().resize(2);
 }
 
 bool IronMine::canBuild( CityPtr city, const TilePos& pos ) const
@@ -339,12 +342,12 @@ bool IronMine::canBuild( CityPtr city, const TilePos& pos ) const
   return (is_constructible && near_mountain);
 }
 
-WeaponsWorkshop::WeaponsWorkshop() : Factory(Good::iron, Good::weapon, B_WEAPONS_WORKSHOP, Size(2) )
+WeaponsWorkshop::WeaponsWorkshop() : Factory(Good::iron, Good::weapon, building::B_WEAPONS_WORKSHOP, Size(2) )
 {
   setPicture( ResourceGroup::commerce, 108);
 
   _getAnimation().load( ResourceGroup::commerce, 109, 6);
-  _getForegroundPictures().resize(2);
+  _getFgPictures().resize(2);
 }
 
 bool WeaponsWorkshop::canBuild(CityPtr city, const TilePos& pos) const
@@ -352,7 +355,7 @@ bool WeaponsWorkshop::canBuild(CityPtr city, const TilePos& pos) const
   bool ret = Factory::canBuild( city, pos );
 
   CityHelper helper( city );
-  bool haveIronMine = !helper.find<Building>( B_IRON_MINE ).empty();
+  bool haveIronMine = !helper.find<Building>( building::ironMine ).empty();
 
   const_cast< WeaponsWorkshop* >( this )->_setError( haveIronMine ? "" : _("##need_iron_for_work##") );
   return ret;
@@ -363,27 +366,27 @@ bool WorkshopFurniture::canBuild(CityPtr city, const TilePos& pos) const
   bool ret = Factory::canBuild( city, pos );
 
   CityHelper helper( city );
-  bool haveTimberLogger = !helper.find<TimberLogger>( B_TIMBER_YARD ).empty();
+  bool haveTimberLogger = !helper.find<TimberLogger>( building::timberLogger ).empty();
 
   const_cast< WorkshopFurniture* >( this )->_setError( haveTimberLogger ? "" : _("##need_timber_for_work##") );
 
   return ret;
 }
 
-WorkshopFurniture::WorkshopFurniture() : Factory(Good::timber, Good::furniture, B_FURNITURE, Size(2) )
+WorkshopFurniture::WorkshopFurniture() : Factory(Good::timber, Good::furniture, building::B_FURNITURE, Size(2) )
 {
   setPicture( ResourceGroup::commerce, 117 );
 
   _getAnimation().load(ResourceGroup::commerce, 118, 14);
-  _getForegroundPictures().resize(2);
+  _getFgPictures().resize(2);
 }
 
-Winery::Winery() : Factory(Good::grape, Good::wine, B_WINE_WORKSHOP, Size(2) )
+Winery::Winery() : Factory(Good::grape, Good::wine, building::B_WINE_WORKSHOP, Size(2) )
 {
   setPicture( ResourceGroup::commerce, 86 );
 
   _getAnimation().load(ResourceGroup::commerce, 87, 12);
-  _getForegroundPictures().resize(2);
+  _getFgPictures().resize(2);
 }
 
 bool Winery::canBuild(CityPtr city, const TilePos& pos) const
@@ -391,18 +394,18 @@ bool Winery::canBuild(CityPtr city, const TilePos& pos) const
   bool ret = Factory::canBuild( city, pos );
 
   CityHelper helper( city );
-  bool haveVinegrad = !helper.find<Building>( B_GRAPE_FARM ).empty();
+  bool haveVinegrad = !helper.find<Building>( building::grapeFarm ).empty();
 
   const_cast< Winery* >( this )->_setError( haveVinegrad ? "" : _("##need_vinegrad_for_work##") );
   return ret;
 }
 
-Creamery::Creamery() : Factory(Good::olive, Good::oil, B_OIL_WORKSHOP, Size(2) )
+Creamery::Creamery() : Factory(Good::olive, Good::oil, building::B_OIL_WORKSHOP, Size(2) )
 {
   setPicture( ResourceGroup::commerce, 99 );
 
   _getAnimation().load(ResourceGroup::commerce, 100, 8);
-  _getForegroundPictures().resize(2);
+  _getFgPictures().resize(2);
 }
 
 bool Creamery::canBuild(CityPtr city, const TilePos& pos) const
@@ -410,7 +413,7 @@ bool Creamery::canBuild(CityPtr city, const TilePos& pos) const
   bool ret = Factory::canBuild( city, pos );
 
   CityHelper helper( city );
-  bool haveOliveFarm = !helper.find<Building>( B_OLIVE_FARM ).empty();
+  bool haveOliveFarm = !helper.find<Building>( building::B_OLIVE_FARM ).empty();
 
   const_cast< Creamery* >( this )->_setError( haveOliveFarm ? "" : _("##need_olive_for_work##") );
 

@@ -27,6 +27,10 @@
 #include "game/name_generator.hpp"
 #include "game/tilemap.hpp"
 #include "events/event.hpp"
+#include "core/logger.hpp"
+#include "building/constants.hpp"
+
+using namespace constants;
 
 class Merchant::Impl
 {
@@ -55,7 +59,7 @@ Merchant::Merchant( CityPtr city )
   : Walker( city ), _d( new Impl )
 {
   _setGraphic( WG_HORSE_CARAVAN );
-  _setType( WT_MERCHANT );
+  _setType( walker::merchant );
   _d->maxDistance = 60;
   _d->attemptCount = 0;
 
@@ -69,8 +73,7 @@ Merchant::~Merchant()
 Propagator::DirectRoute getWarehouse4Buys( Propagator &pathPropagator,
                                            SimpleGoodStore& basket )
 {
-  Propagator::Routes pathWayList;
-  pathPropagator.getRoutes( B_WAREHOUSE, pathWayList);
+  Propagator::Routes pathWayList = pathPropagator.getRoutes( building::B_WAREHOUSE );
 
   std::map< int, Propagator::DirectRoute > warehouseRating;
 
@@ -103,8 +106,7 @@ Propagator::DirectRoute getWarehouse4Buys( Propagator &pathPropagator,
 Propagator::DirectRoute getWarehouse4Sells( Propagator &pathPropagator,
                                             SimpleGoodStore& basket )
 {
-  Propagator::Routes pathWayList;
-  pathPropagator.getRoutes( B_WAREHOUSE, pathWayList);
+  Propagator::Routes pathWayList = pathPropagator.getRoutes( building::B_WAREHOUSE );
 
   // select the warehouse with the max quantity of requested goods
   Propagator::Routes::iterator pathWayIt = pathWayList.begin(); 
@@ -149,7 +151,7 @@ void Merchant::Impl::resolveState( WalkerPtr wlk, const TilePos& position )
 
       if( !route.first.isValid() )
       {
-        route = pathPropagator.getShortestRoute( B_WAREHOUSE );
+        route = pathPropagator.getShortestRoute( building::B_WAREHOUSE );
       }
 
       if( route.first.isValid()  )
@@ -211,7 +213,7 @@ void Merchant::Impl::resolveState( WalkerPtr wlk, const TilePos& position )
       if( warehouse.isValid() )
       {
         std::map< Good::Type, int > cityGoodsAvailable;
-        WarehouseList warehouses = helper.find<Warehouse>( B_WAREHOUSE );
+        WarehouseList warehouses = helper.find<Warehouse>( building::B_WAREHOUSE );
         foreach( WarehousePtr wh, warehouses )
         {
           for( int i=Good::wheat; i < Good::goodCount; i++ )
@@ -324,7 +326,7 @@ void Merchant::Impl::resolveState( WalkerPtr wlk, const TilePos& position )
   break;
 
   default:
-    StringHelper::debug( 0xff, "Merchant: unknown state resolved" );
+    Logger::warning( "Merchant: unknown state resolved" );
   }
 }
 

@@ -17,8 +17,11 @@
 #include "game/resourcegroup.hpp"
 #include "gfx/tile.hpp"
 #include "game/city.hpp"
+#include "constants.hpp"
 
-NativeBuilding::NativeBuilding( const TileOverlayType type, const Size& size ) 
+using namespace constants;
+
+NativeBuilding::NativeBuilding(const Type type, const Size& size )
 : Building( type, size )
 {
 }
@@ -37,9 +40,9 @@ void NativeBuilding::build( CityPtr city, const TilePos& pos )
   getTile().setFlag( Tile::tlBuilding, false );
 }
 
-NativeHut::NativeHut() : NativeBuilding( B_NATIVE_HUT, Size(1) )
+NativeHut::NativeHut() : NativeBuilding( building::B_NATIVE_HUT, Size(1) )
 {
-  setPicture( Picture::load( ResourceGroup::housing, 49));
+  setPicture( ResourceGroup::housing, 49 );
   //setPicture(PicLoader::instance().get_picture("housng1a", 50));
 }
 
@@ -50,9 +53,9 @@ void NativeHut::save( VariantMap& stream) const
 
 void NativeHut::load( const VariantMap& stream) {Building::load(stream);}
 
-NativeCenter::NativeCenter() : NativeBuilding( B_NATIVE_CENTER, Size(2) )
+NativeCenter::NativeCenter() : NativeBuilding( building::B_NATIVE_CENTER, Size(2) )
 {
-  setPicture( Picture::load(ResourceGroup::housing, 51));
+  setPicture( ResourceGroup::housing, 51 );
 }
 
 void NativeCenter::save( VariantMap&stream) const 
@@ -62,9 +65,9 @@ void NativeCenter::save( VariantMap&stream) const
 
 void NativeCenter::load( const VariantMap& stream) {Building::load(stream);}
 
-NativeField::NativeField() : NativeBuilding( B_NATIVE_FIELD, Size(1) ) 
+NativeField::NativeField() : NativeBuilding( building::B_NATIVE_FIELD, Size(1) )
 {
-  setPicture(Picture::load(ResourceGroup::commerce, 13));  
+  setPicture( ResourceGroup::commerce, 13 );
 }
 
 void NativeField::save( VariantMap&stream) const 

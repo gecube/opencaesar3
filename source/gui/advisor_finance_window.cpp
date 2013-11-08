@@ -29,6 +29,9 @@
 #include "gui/texturedbutton.hpp"
 #include "game/cityfunds.hpp"
 #include "game/house_level.hpp"
+#include "building/constants.hpp"
+
+using namespace constants;
 
 namespace gui
 {
@@ -159,13 +162,13 @@ int AdvisorFinanceWindow::Impl::calculateTaxValue()
 {
   CityHelper helper( city );
 
-  HouseList houses = helper.find<House>( B_HOUSE );
+  HouseList houses = helper.find<House>( building::house );
 
   float taxValue = 0.f;
   float taxRate = city->getFunds().getTaxRate();
   foreach( HousePtr house, houses )
   {
-    taxValue += house->getLevelSpec().getTaxRate() * house->getHabitants().count( CitizenGroup::mature ) / house->getMaxHabitants() * taxRate;
+    taxValue += house->getSpec().getTaxRate() * house->getHabitants().count( CitizenGroup::mature ) / house->getMaxHabitants() * taxRate;
   }
 
   return taxValue;

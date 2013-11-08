@@ -102,7 +102,7 @@ public:
       event->dispatch();
 
       CityHelper helper( city );
-      FarmList farms = helper.find<Farm>( B_MAX );
+      FarmList farms = helper.find<Farm>( TileOverlay::any );
       foreach( FarmPtr farm, farms )
       {
         farm->updateProgress( -farm->getProgress() );
@@ -167,7 +167,7 @@ void DivinePantheon::initialize( const io::FilePath& filename )
   }
 }
 
-void DivinePantheon::doFestival4( RomeDivinityType who, int type )
+void DivinePantheon::doFestival( RomeDivinityType who, int type )
 {
   RomeDivinityPtr divn = get( who );
   if( divn.isValid() )

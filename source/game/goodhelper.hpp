@@ -18,9 +18,9 @@
 #define __OPENCAESAR3_GOODHELPER_H_INCLUDED__
 
 #include "core/scopedptr.hpp"
-#include "game/enums.hpp"
 #include "gfx/picture.hpp"
-#include "game/good.hpp"
+#include "good.hpp"
+#include "core/direction.hpp"
 
 class GoodStock;
 
@@ -33,7 +33,7 @@ public:
   static Picture getPicture( Good::Type type, bool emp=false );
   static Good::Type getType( const std::string& name );
   static std::string getTypeName( Good::Type type );
-  static const Picture& getCartPicture( const GoodStock& stock, const DirectionType& direction );
+  static Picture getCartPicture( const GoodStock& stock, constants::Direction direction );
   ~GoodHelper();
 private:
   GoodHelper();

@@ -22,16 +22,17 @@
 #include "gfx/tile.hpp"
 #include "game/path_finding.hpp"
 #include "game/city.hpp"
+#include "building/constants.hpp"
 
-Prefecture::Prefecture() : ServiceBuilding(Service::prefect, B_PREFECTURE, Size(1))
+Prefecture::Prefecture() : ServiceBuilding(Service::prefect, constants::building::prefecture, Size(1))
 {
   _fireDetect = TilePos( -1, -1 );
-  setPicture( Picture::load( ResourceGroup::security, 1 ) );
+  setPicture( ResourceGroup::security, 1 );
   
   _getAnimation().load( ResourceGroup::security, 2, 10);
-  _getAnimation().setFrameDelay( 4 );
+  _getAnimation().setDelay( 4 );
   _getAnimation().setOffset( Point( 20, 36 ) );
-  _getForegroundPictures().resize(1);
+  _getFgPictures().resize(1);
 }
 
 int Prefecture::getServiceDelay() const
@@ -62,14 +63,14 @@ void Prefecture::deliverService()
   if( getWorkers() > 0 && getWalkerList().size() == 0 )
   {
     bool fireDetect = _fireDetect.getI() >= 0;
-    WalkerPrefectPtr walker = WalkerPrefect::create( _getCity() );
+    PrefectPtr walker = Prefect::create( _getCity() );
     walker->setMaxDistance( 26 );
 
     //bool patrol = true;
     if( fireDetect )
     {
       PathWay pathway;
-      TilePos startPos = _accessRoads.front()->getIJ();
+      TilePos startPos = getAccessRoads().front()->getIJ();
       bool pathFounded = Pathfinder::getInstance().getPath( startPos, _fireDetect, pathway, false, Size( 0 ) );
       //patrol = !pathFounded;
 

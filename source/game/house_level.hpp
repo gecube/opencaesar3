@@ -31,10 +31,11 @@ class HouseLevelSpec
    friend class HouseSpecHelper;
 
 public:
-  int getHouseLevel() const;
+  int getLevel() const;
   int getMaxHabitantsByTile() const;
   int getTaxRate() const;
   int getProsperity() const;
+  int getCrime() const;
 
   // return the house type "small casa, luxury villa, ..."
   const std::string& getLevelName() const;
@@ -66,8 +67,8 @@ public:
   // float evaluateFoodNeed(House &house, const ServiceType service);
 
 
-//    int getMinEntertainmentLevel();
-  int getMinEducationLevel();
+  int getMinEntertainmentLevel() const;
+  int getMinEducationLevel() const;
 //    int getMinHealthLevel();
   int getMinReligionLevel() const;
 //    int getMinWaterLevel();

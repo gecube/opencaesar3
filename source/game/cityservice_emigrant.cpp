@@ -24,7 +24,10 @@
 #include "gfx/tile.hpp"
 #include "cityfunds.hpp"
 #include "empire.hpp"
+#include "building/constants.hpp"
 #include "settings.hpp"
+
+using namespace constants;
 
 class CityServiceEmigrant::Impl
 {
@@ -66,7 +69,7 @@ void CityServiceEmigrant::update( const unsigned int time )
 
 
   CityHelper helper( _d->city );
-  HouseList houses = helper.find<House>(B_HOUSE);
+  HouseList houses = helper.find<House>(building::house);
   foreach( HousePtr house, houses )
   {
     if( house->getAccessRoads().size() > 0 )
@@ -80,7 +83,7 @@ void CityServiceEmigrant::update( const unsigned int time )
     return;
   }
 
-  WalkerList walkers = _d->city->getWalkerList( WT_EMIGRANT );
+  WalkerList walkers = _d->city->getWalkers( walker::emigrant );
 
   if( vacantPop <= walkers.size() * 5 )
   {

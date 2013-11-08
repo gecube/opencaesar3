@@ -18,6 +18,11 @@
 #include "game/road.hpp"
 #include "gfx/animation_bank.hpp"
 #include "game/city.hpp"
+#include "constants.hpp"
+#include "corpse.hpp"
+#include "game/resourcegroup.hpp"
+
+using namespace constants;
 
 Emigrant::Emigrant( CityPtr city ) : Immigrant( city )
 {
@@ -26,7 +31,7 @@ Emigrant::Emigrant( CityPtr city ) : Immigrant( city )
   peoples[ CitizenGroup::childMin ] = 2;
   setPeoples( peoples );
 
-  _setType( WT_EMIGRANT );
+  _setType( walker::emigrant );
   _setGraphic( WG_PUSHER2 );
 }
 
@@ -47,25 +52,28 @@ void Emigrant::getPictureList(std::vector<Picture> &oPics)
   // depending on the walker direction, the cart is ahead or behind
   switch (getDirection())
   {
-  case D_WEST:
-  case D_NORTH_WEST:
-  case D_NORTH:
-  case D_NORTH_EAST:
+  case constants::west:
+  case constants::northWest:
+  case constants::north:
+  case constants::northEast:
     oPics.push_back( getCartPicture() );
     oPics.push_back( getMainPicture() );
-    break;
-  case D_EAST:
-  case D_SOUTH_EAST:
+  break;
+
+  case constants::east:
+  case constants::southEast:
     oPics.push_back( getCartPicture() );
     oPics.push_back( getMainPicture() );
-    break;
-  case D_SOUTH:
-  case D_SOUTH_WEST:
+  break;
+
+  case constants::south:
+  case constants::southWest:
     oPics.push_back( getMainPicture() );
     oPics.push_back( getCartPicture() );
-    break;
+  break;
+
   default:
-    break;
+  break;
   }
 }
 
@@ -73,6 +81,18 @@ void Emigrant::onNewDirection()
 {
   Immigrant::onNewDirection();
   setCartPicture( Picture() );  // need to get the new graphic
+}
+
+void Emigrant::timeStep(const unsigned long time)
+{
+  Walker::timeStep(time);
+}
+
+void Emigrant::die()
+{
+  Walker::die();
+
+  Corpse::create( _getCity(), getIJ(), ResourceGroup::citizen1, 1129, 1136 );
 }
 
 EmigrantPtr Emigrant::create( CityPtr city )

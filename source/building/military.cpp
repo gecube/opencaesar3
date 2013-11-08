@@ -15,42 +15,43 @@
 
 
 #include "military.hpp"
+#include "constants.hpp"
 #include "game/resourcegroup.hpp"
 
-Barracks::Barracks() : WorkingBuilding( B_BARRACKS, Size( 3 ) )
+Barracks::Barracks() : WorkingBuilding( constants::building::B_BARRACKS, Size( 3 ) )
 {
   setMaxWorkers(5);
   setWorkers(0);  
   setPicture( ResourceGroup::security, 17 );
 }
 
-FortLegionnaire::FortLegionnaire() : Building( B_FORT_LEGIONNAIRE, Size(3) )
+FortLegionnaire::FortLegionnaire() : Building( constants::building::B_FORT_LEGIONNAIRE, Size(3) )
 {
   setPicture( ResourceGroup::security, 12 );
 
   Picture logo = Picture::load(ResourceGroup::security, 16);
   logo.setOffset(80,10);
-  _getForegroundPictures().resize(1);
-  _getForegroundPictures().at( 0 ) = logo;
+  _getFgPictures().resize(1);
+  _getFgPictures().at( 0 ) = logo;
 }
 
-FortMounted::FortMounted() : Building( B_FORT_MOUNTED, Size(3) )
+FortMounted::FortMounted() : Building( constants::building::B_FORT_MOUNTED, Size(3) )
 {
-  setPicture( Picture::load(ResourceGroup::security, 12));
+  setPicture( ResourceGroup::security, 12 );
 
   Picture logo = Picture::load(ResourceGroup::security, 15);
   logo.setOffset(80,10);
-  _getForegroundPictures().resize(1);
-  _getForegroundPictures().at( 0 ) = logo;
+  _getFgPictures().resize(1);
+  _getFgPictures().at( 0 ) = logo;
 }
 
-FortJaveline::FortJaveline() : Building( B_FORT_JAVELIN, Size(3) )
+FortJaveline::FortJaveline() : Building( constants::building::B_FORT_JAVELIN, Size(3) )
 {
-  setPicture( Picture::load(ResourceGroup::security, 12));
+  setPicture( ResourceGroup::security, 12 );
 
   Picture logo = Picture::load(ResourceGroup::security, 14);
   //std::cout << logo->get_xoffset() << " " << logo->get_yoffset() << " " << logo->get_width() << " " << logo->get_height() << std::endl;
   logo.setOffset(80,10);
-  _getForegroundPictures().resize(1);
-  _getForegroundPictures().at( 0 ) = logo;
+  _getFgPictures().resize(1);
+  _getFgPictures().at( 0 ) = logo;
 }

@@ -20,7 +20,10 @@
 #include "game/city.hpp"
 #include "game/tilemap.hpp"
 #include "events/event.hpp"
+#include "constants.hpp"
 #include <vector>
+
+using namespace constants;
 
 class HighBridgeSubTile : public Construction
 {
@@ -30,7 +33,7 @@ public:
           liftingSE2=173, descentSE2=175,
           liftingSW2=176, descentSW2=178 };
   HighBridgeSubTile( const TilePos& pos, int index )
-    : Construction( B_LOW_BRIDGE, Size( 1 ) )
+    : Construction( building::lowBridge, Size( 1 ) )
   {
     _pos = pos;
     _index = index;
@@ -69,9 +72,9 @@ public:
     _picture = Picture::load( ResourceGroup::transport, _index % 100 );
     checkSecondPart();
     Construction::build( city, pos );
-    _getForegroundPictures().clear();
+    _getFgPictures().clear();
     _pos = pos;
-    _getForegroundPictures().push_back( _picture );
+    _getFgPictures().push_back( _picture );
   }
 
   void initTerrain( Tile& terrain )
@@ -120,7 +123,7 @@ class HighBridge::Impl
 {
 public:
   HighBridgeSubTiles subtiles;
-  DirectionType direction;
+  Direction direction;
   int imgLiftId, imgDescntId;
 
   void addSpan( const TilePos& pos, int index, bool isFooting=false )
@@ -137,22 +140,22 @@ bool HighBridge::canBuild( CityPtr city, const TilePos& pos ) const
   //bool is_constructible = Construction::canBuild( pos );
 
   TilePos endPos, startPos;
-  _d->direction=D_NONE;
+  _d->direction=noneDirection;
   
   _d->subtiles.clear();
-  const_cast< HighBridge* >( this )->_getForegroundPictures().clear();
+  const_cast< HighBridge* >( this )->_getFgPictures().clear();
 
   _checkParams( city, _d->direction, startPos, endPos, pos );
  
-  if( _d->direction != D_NONE )
+  if( _d->direction != noneDirection )
   {
     const_cast< HighBridge* >( this )->_computePictures( city, startPos, endPos, _d->direction );
   }
 
-  return (_d->direction != D_NONE);
+  return (_d->direction != noneDirection );
 }
 
-HighBridge::HighBridge() : Construction( B_HIGH_BRIDGE, Size(1) ), _d( new Impl )
+HighBridge::HighBridge() : Construction( building::highBridge, Size(1) ), _d( new Impl )
 {
   Picture tmp;
   setPicture( tmp );
@@ -163,13 +166,13 @@ void HighBridge::initTerrain(Tile& terrain )
 
 }
 
-void HighBridge::_computePictures( CityPtr city, const TilePos& startPos, const TilePos& endPos, DirectionType dir )
+void HighBridge::_computePictures( CityPtr city, const TilePos& startPos, const TilePos& endPos, Direction dir )
 {
   Tilemap& tilemap = city->getTilemap();
   //Picture& water = Picture::load( "land1a", 120 );
   switch( dir )
   {
-  case D_NORTH_WEST:
+  case constants::northWest:
     {
       TilemapArea tiles = tilemap.getArea( endPos, startPos );
 
@@ -191,7 +194,7 @@ void HighBridge::_computePictures( CityPtr city, const TilePos& startPos, const 
     }
   break;
 
-  case D_NORTH_EAST:
+  case northEast:
     {
       TilemapArea tiles = tilemap.getArea( startPos, endPos );
 
@@ -214,7 +217,7 @@ void HighBridge::_computePictures( CityPtr city, const TilePos& startPos, const 
     }
     break;
 
-  case D_SOUTH_EAST:
+  case southEast:
     {
       TilemapArea tiles = tilemap.getArea( startPos, endPos );
 
@@ -236,7 +239,7 @@ void HighBridge::_computePictures( CityPtr city, const TilePos& startPos, const 
     }
   break;
 
-  case D_SOUTH_WEST:
+  case constants::southWest:
     {
       TilemapArea tiles = tilemap.getArea( endPos, startPos );
       
@@ -264,11 +267,11 @@ void HighBridge::_computePictures( CityPtr city, const TilePos& startPos, const 
 
   foreach( HighBridgeSubTilePtr tile, _d->subtiles )
   {
-    _getForegroundPictures().push_back( tile->_picture );
+    _getFgPictures().push_back( tile->_picture );
   }
 }
 
-void HighBridge::_checkParams( CityPtr city, DirectionType& direction, TilePos& start, TilePos& stop, const TilePos& curPos ) const
+void HighBridge::_checkParams(CityPtr city, Direction& direction, TilePos& start, TilePos& stop, const TilePos& curPos ) const
 {
   start = curPos;
 
@@ -277,7 +280,7 @@ void HighBridge::_checkParams( CityPtr city, DirectionType& direction, TilePos& 
 
   if( tile.getFlag( Tile::tlRoad ) )
   {
-    direction = D_NONE;
+    direction = constants::noneDirection;
     return;
   }
 
@@ -291,7 +294,7 @@ void HighBridge::_checkParams( CityPtr city, DirectionType& direction, TilePos& 
       if( imdId == 376 || imdId == 377 || imdId == 378 || imdId == 379 )
       {
         stop = (*it)->getIJ();
-        direction = abs( stop.getI() - start.getI() ) > 3 ? D_NORTH_WEST : D_NONE;
+        direction = abs( stop.getI() - start.getI() ) > 3 ? northWest : noneDirection;
         break;
       }
     }
@@ -305,7 +308,7 @@ void HighBridge::_checkParams( CityPtr city, DirectionType& direction, TilePos& 
       if( imdId == 384 || imdId == 385 || imdId == 386 || imdId == 387 )
       {
         stop = (*it)->getIJ();
-        direction = abs( stop.getI() - start.getI() ) > 3 ? D_SOUTH_EAST : D_NONE;
+        direction = abs( stop.getI() - start.getI() ) > 3 ? southWest : noneDirection;
         break;
       }
     }
@@ -319,7 +322,7 @@ void HighBridge::_checkParams( CityPtr city, DirectionType& direction, TilePos& 
       if( imdId == 380 || imdId == 381 || imdId == 382 || imdId == 383 )
       {
         stop = (*it)->getIJ();
-        direction = abs( stop.getJ() - start.getJ() ) > 3 ? D_NORTH_EAST : D_NONE;
+        direction = abs( stop.getJ() - start.getJ() ) > 3 ? northEast : noneDirection;
         break;
       }
     }
@@ -333,30 +336,30 @@ void HighBridge::_checkParams( CityPtr city, DirectionType& direction, TilePos& 
       if( imdId == 372 || imdId == 373 || imdId == 374 || imdId == 375 )
       {
         stop = (*it)->getIJ();
-        direction = abs( stop.getJ() - start.getJ() ) > 3 ? D_SOUTH_WEST : D_NONE;
+        direction = abs( stop.getJ() - start.getJ() ) > 3 ? southWest : noneDirection;
         break;
       }
     }
   }
   else 
   {
-    direction = D_NONE;
+    direction = noneDirection;
   }
 }
 
 void HighBridge::build( CityPtr city, const TilePos& pos )
 {
   TilePos endPos, startPos;
-  _d->direction=D_NONE;
+  _d->direction=noneDirection;
 
   _d->subtiles.clear();
-  _getForegroundPictures().clear();
+  _getFgPictures().clear();
 
   Tilemap& tilemap = city->getTilemap();
 
   _checkParams( city, _d->direction, startPos, endPos, pos );
 
-  if( _d->direction != D_NONE )
+  if( _d->direction != noneDirection )
   {    
     _computePictures( city, startPos, endPos, _d->direction );
    

@@ -27,11 +27,12 @@ public:
   static WorkersHunterPtr create( CityPtr city );
 
   int getWorkersNeeded() const;
-  void onNewTile();
+  virtual void onNewTile();
   void hireWorkers( const int workers );
 
   void send2City( WorkingBuildingPtr building, const int workersNeeded );
 
+  virtual void die();
 private:
   WorkersHunter( CityPtr city );
 

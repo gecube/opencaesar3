@@ -21,14 +21,15 @@
 class EntertainmentBuilding : public ServiceBuilding
 {
 public:
-  EntertainmentBuilding( const Service::Type service, const TileOverlayType type,
+  EntertainmentBuilding( const Service::Type service, const TileOverlay::Type type,
                          const Size& size);
   virtual void deliverService();
   virtual int getVisitorsNumber() const;
 
   virtual unsigned int getWalkerDistance() const;
 
-  virtual float evaluateTrainee(const WalkerType traineeType);
+  virtual float evaluateTrainee(constants::walker::Type  traineeType);
+  virtual bool isShow() const;
 
 protected:
   int _getTraineeLevel();

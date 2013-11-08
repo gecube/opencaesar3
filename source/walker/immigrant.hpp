@@ -29,12 +29,14 @@ public:
 
   void send2City( Tile& startTile );
   void setPeoples( const CitizenGroup& peoples );
+  virtual void timeStep(const unsigned long time);
 
-  void onDestination();
+  virtual void onDestination();
   ~Immigrant();
 
-  void save(VariantMap& stream) const;
-  void load(const VariantMap& stream);
+  virtual void save(VariantMap& stream) const;
+  virtual void load(const VariantMap& stream);
+  virtual void die();
 
 protected:
   void setCartPicture( const Picture& pic );

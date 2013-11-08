@@ -38,7 +38,7 @@ public:
   virtual GoodStore& getGoodStore();
 
   // return the current house level
-  const HouseLevelSpec& getLevelSpec() const;
+  const HouseLevelSpec& getSpec() const;
 
   virtual void applyService(ServiceWalkerPtr walker);
   virtual float evaluateService(ServiceWalkerPtr walker);
@@ -53,9 +53,10 @@ public:
   int getHealthLevel() const;
   int getWorkersCount() const;
 
-  bool isEducationNeed( Service::Type edType ) const;
+  bool isEducationNeed( Service::Type type ) const;
+  bool isEntertainmentNeed( Service::Type type ) const;
 
-  const BuildingData::Desirability& getDesirabilityInfo() const;
+  const MetaData::Desirability& getDesirabilityInfo() const;
 
   void levelUp();
   void levelDown();
@@ -73,7 +74,7 @@ public:
 
   std::string getUpCondition() const;
 
-  int getMaxDistance2Road() const; 
+  int getRoadAccessDistance() const;
 
   bool isWalkable() const;
 
@@ -86,11 +87,5 @@ private:
   class Impl;
   ScopedPtr< Impl > _d;
 };
-
-//operator need for std::set
-inline bool operator<(HousePtr v1, HousePtr v2)
-{
-  return v1.object() < v2.object();
-}
 
 #endif //__OPENCAESAR3_HOUSE_H_INCLUDED__

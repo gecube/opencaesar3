@@ -23,8 +23,10 @@ class PathwayHelper
 public:
   typedef enum { roadOnly=0, allTerrain, roadFirst } WayType;
   static PathWay create( CityPtr city,
-                         const TilePos& startPos, const TilePos& stopPos,
+                         TilePos startPos, TilePos stopPos,
                          WayType type=roadOnly );
+
+  static PathWay randomWay( CityPtr city, TilePos startPos, int walkRadius );
 };
 
 #endif

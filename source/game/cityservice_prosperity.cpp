@@ -24,6 +24,9 @@
 #include "gamedate.hpp"
 #include "cityfunds.hpp"
 #include "empire.hpp"
+#include "building/constants.hpp"
+
+using namespace  constants;
 
 class CityServiceProsperity::Impl
 {
@@ -82,16 +85,16 @@ void CityServiceProsperity::update( const unsigned int time )
     }
 
     CityHelper helper( _d->city );
-    HouseList houses = helper.find<House>( B_HOUSE );
+    HouseList houses = helper.find<House>( building::house );
 
     int prosperityCap = 0;
     int patricianCount = 0;
     int plebsCount = 0;
     foreach( HousePtr house, houses)
     {
-      prosperityCap += house->getLevelSpec().getProsperity();
-      patricianCount += house->getLevelSpec().isPatrician() ? house->getHabitants().count() : 0;
-      plebsCount += house->getLevelSpec().getHouseLevel() < 5 ? house->getHabitants().count() : 0;
+      prosperityCap += house->getSpec().getProsperity();
+      patricianCount += house->getSpec().isPatrician() ? house->getHabitants().count() : 0;
+      plebsCount += house->getSpec().getLevel() < 5 ? house->getHabitants().count() : 0;
     }
 
     prosperityCap /= houses.size();
@@ -113,7 +116,7 @@ void CityServiceProsperity::update( const unsigned int time )
     _d->percentPlebs = plebsCount * 100/ (float)_d->city->getPopulation();
     _d->prosperityExtend += (_d->percentPlebs < 30 ? 1 : 0);
 
-    bool haveHippodrome = !helper.find<Hippodrome>( B_HIPPODROME ).empty();
+    bool haveHippodrome = !helper.find<Hippodrome>( building::hippodrome ).empty();
     _d->prosperityExtend += (haveHippodrome > 0 ? 1 : 0);
 
     _d->worklessPercent = CityStatistic::getWorklessPercent( _d->city );

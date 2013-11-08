@@ -25,8 +25,14 @@
 #include "game/name_generator.hpp"
 #include "core/stringhelper.hpp"
 #include "events/event.hpp"
+#include "core/logger.hpp"
+#include "building/constants.hpp"
+#include "corpse.hpp"
+#include "game/resourcegroup.hpp"
 
-class WalkerPrefect::Impl
+using namespace constants;
+
+class Prefect::Impl
 {
 public:
   typedef enum { patrol=0, back2Prefecture, gotoFire, fightFire, doNothing } PrefectAction; 
@@ -35,10 +41,10 @@ public:
   PrefectAction action;
 };
 
-WalkerPrefect::WalkerPrefect( CityPtr city )
+Prefect::Prefect( CityPtr city )
 : ServiceWalker( city, Service::prefect ), _d( new Impl )
 {
-  _setType( WT_PREFECT );
+  _setType( walker::prefect );
   _d->water = 0;
   _d->action = Impl::patrol;
   _setGraphic( WG_PREFECT );
@@ -46,18 +52,18 @@ WalkerPrefect::WalkerPrefect( CityPtr city )
   setName( NameGenerator::rand( NameGenerator::male ) );
 }
 
-void WalkerPrefect::onNewTile()
+void Prefect::onNewTile()
 {
   Walker::onNewTile();
 }
 
-bool WalkerPrefect::_looks4Fire( ServiceWalker::ReachedBuildings& buildings, TilePos& pos )
+bool Prefect::_looks4Fire( ServiceWalker::ReachedBuildings& buildings, TilePos& pos )
 {
   buildings = getReachedBuildings( getIJ() );
 
   foreach( BuildingPtr building, buildings )
   {
-    if( building->getType() == B_BURNING_RUINS )
+    if( building->getType() == building::B_BURNING_RUINS )
     {
       pos = building->getTilePos();
       return true;
@@ -67,17 +73,17 @@ bool WalkerPrefect::_looks4Fire( ServiceWalker::ReachedBuildings& buildings, Til
   return false;
 }
 
-void WalkerPrefect::_checkPath2NearestFire( const ReachedBuildings& buildings )
+void Prefect::_checkPath2NearestFire( const ReachedBuildings& buildings )
 {
   PathWay bestPath;
   int minLength = 9999;
   foreach( BuildingPtr building, buildings )
   {
-    if( building->getType() != B_BURNING_RUINS )
+    if( building->getType() != building::B_BURNING_RUINS )
       continue;
 
     PathWay tmp;
-    bool foundPath = Pathfinder::getInstance().getPath( getIJ(), building->getTile().getIJ(), tmp,
+    bool foundPath = Pathfinder::getInstance().getPath( getIJ(), building->getEnterPos(), tmp,
                                                         false, Size( 0 ) ); 
     if( foundPath && tmp.getLength() < minLength )
     {
@@ -96,13 +102,13 @@ void WalkerPrefect::_checkPath2NearestFire( const ReachedBuildings& buildings )
   }
 }
 
-void WalkerPrefect::onDestination()
+void Prefect::onDestination()
 { 
 }
 
-void WalkerPrefect::_back2Prefecture()
+void Prefect::_back2Prefecture()
 {
-  bool pathFound = Pathfinder::getInstance().getPath( getIJ(), getBase()->getTile().getIJ(),
+  bool pathFound = Pathfinder::getInstance().getPath( getIJ(), getBase()->getEnterPos(),
                                                       _getPathway(), false, Size( 0 ) );
 
   if( !pathFound )
@@ -119,7 +125,7 @@ void WalkerPrefect::_back2Prefecture()
   _d->action = Impl::back2Prefecture;
 }
 
-void WalkerPrefect::onMidTile()
+void Prefect::onMidTile()
 {
   ReachedBuildings reachedBuildings;
   TilePos firePos;
@@ -194,7 +200,7 @@ void WalkerPrefect::onMidTile()
     if( _getPathway().getDestination().getIJ().distanceFrom( getIJ() ) < 1.5f )
     {
       TileOverlayPtr overlay = _getPathway().getDestination().getOverlay();
-      if( overlay.isValid() && overlay->getType() == B_BURNING_RUINS )
+      if( overlay.isValid() && overlay->getType() == building::B_BURNING_RUINS )
       {
         _d->action = Impl::fightFire;
         _setGraphic( WG_PREFECT_FIGHTS_FIRE );
@@ -228,7 +234,7 @@ void WalkerPrefect::onMidTile()
   }
 }
 
-void WalkerPrefect::timeStep(const unsigned long time)
+void Prefect::timeStep(const unsigned long time)
 {
   ServiceWalker::timeStep( time );
 
@@ -236,7 +242,7 @@ void WalkerPrefect::timeStep(const unsigned long time)
   {    
     setSpeed( 0 );
     BuildingPtr building = _getPathway().getDestination().getOverlay().as<Building>();
-    bool inFire = (building.isValid() && building->getType() == B_BURNING_RUINS);
+    bool inFire = (building.isValid() && building->getType() == building::B_BURNING_RUINS);
 
     if( inFire )
     {
@@ -262,24 +268,24 @@ void WalkerPrefect::timeStep(const unsigned long time)
   }
 }
 
-WalkerPrefect::~WalkerPrefect()
+Prefect::~Prefect()
 {
 }
 
-float WalkerPrefect::getServiceValue() const
+float Prefect::getServiceValue() const
 {
   return 5;
 }
 
-WalkerPrefectPtr WalkerPrefect::create( CityPtr city )
+PrefectPtr Prefect::create( CityPtr city )
 {
-  WalkerPrefectPtr ret( new WalkerPrefect( city ) );
+  PrefectPtr ret( new Prefect( city ) );
   ret->drop();
 
   return ret;
 }
 
-void WalkerPrefect::send2City(PrefecturePtr prefecture, int water/*=0 */ )
+void Prefect::send2City(PrefecturePtr prefecture, int water/*=0 */ )
 {
   _d->action = water > 0 ? Impl::gotoFire : Impl::patrol;
   _d->water = water;
@@ -297,7 +303,14 @@ void WalkerPrefect::send2City(PrefecturePtr prefecture, int water/*=0 */ )
   }
 }
 
-void WalkerPrefect::load( const VariantMap& stream )
+void Prefect::die()
+{
+  ServiceWalker::die();
+
+  Corpse::create( _getCity(), getIJ(), ResourceGroup::citizen2, 711, 718 );
+}
+
+void Prefect::load( const VariantMap& stream )
 {
   ServiceWalker::load( stream );
  
@@ -314,17 +327,17 @@ void WalkerPrefect::load( const VariantMap& stream )
   
   if( prefecture.isNull() )
   {
-    StringHelper::debug( 0xff, "Not found prefecture on loading" );
+    Logger::warning( "Not found prefecture on loading" );
     deleteLater();
   }
 }
 
-void WalkerPrefect::save( VariantMap& stream ) const
+void Prefect::save( VariantMap& stream ) const
 {
   ServiceWalker::save( stream );
 
-  stream[ "type" ] = (int)WT_PREFECT;
+  stream[ "type" ] = (int)walker::prefect;
   stream[ "water" ] = _d->water;
   stream[ "prefectAction" ] = (int)_d->action;
-  stream[ "__debug_typeName" ] = Variant( std::string( OC3_STR_EXT(WT_PREFECT) ) );
+  stream[ "__debug_typeName" ] = Variant( std::string( OC3_STR_EXT(walker::prefect) ) );
 }

@@ -21,6 +21,12 @@
 #include "game/name_generator.hpp"
 #include "core/stringhelper.hpp"
 #include "game/tilemap.hpp"
+#include "core/logger.hpp"
+#include "constants.hpp"
+#include "game/resourcegroup.hpp"
+#include "corpse.hpp"
+
+using namespace constants;
 
 class ServiceWalker::Impl
 {
@@ -33,15 +39,15 @@ public:
 ServiceWalker::ServiceWalker( CityPtr city, const Service::Type service)
   : Walker( city ), _d( new Impl )
 {
-  _setType( WT_SERVICE );
+  _setType( walker::serviceman );
   _setGraphic( WG_NONE );
   _d->maxDistance = 5;  // TODO: _building.getMaxDistance() ?
   _d->service = service;
 
-  init(service);
+  _init(service);
 }
 
-void ServiceWalker::init(const Service::Type service)
+void ServiceWalker::_init(const Service::Type service)
 {
   _d->service = service;
   NameGenerator::NameType nameType = NameGenerator::male;
@@ -54,11 +60,6 @@ void ServiceWalker::init(const Service::Type service)
     _setGraphic( WG_NONE );
   break;
   
-  case Service::engineer:
-     _setGraphic( WG_ENGINEER );
-     _setType( WT_ENGINEER );
-  break;
-
   case Service::religionNeptune:
   case Service::religionCeres:
   case Service::religionVenus:
@@ -67,63 +68,23 @@ void ServiceWalker::init(const Service::Type service)
     _setGraphic( WG_PRIEST );
   break;
   
-  case Service::doctor:
-    _setGraphic( WG_DOCTOR );
-    _setType( WT_DOCTOR );
-  break;
+  case Service::engineer: _setGraphic( WG_ENGINEER ); _setType( walker::engineer ); break;
+  case Service::doctor:   _setGraphic( WG_DOCTOR );   _setType( walker::doctor );   break;
+  case Service::hospital: _setGraphic( WG_DOCTOR );   _setType( walker::surgeon );  break;
+  case Service::barber:   _setGraphic( WG_BARBER );   _setType( walker::barber );   break;
+  case Service::baths:    _setGraphic( WG_BATH );     _setType( walker::bathlady ); break;
+  case Service::school:   _setGraphic( WG_CHILD );                                  break;
+  case Service::theater:  _setGraphic( WG_ACTOR );    _setType( walker::actor );    break;
+  case Service::amphitheater:_setGraphic( WG_GLADIATOR ); _setType( walker::gladiator ); break;
+  case Service::colloseum:_setGraphic( WG_TAMER );    _setType( walker::tamer );    break;
+  case Service::hippodrome:_setGraphic( WG_ACTOR );   _setType( walker::charioter ); break;
+  case Service::market: _setGraphic( WG_MARKETLADY ); nameType = NameGenerator::female; break;
 
-  case Service::hospital:
-    _setGraphic( WG_DOCTOR );
-    _setType( WT_SURGEON );
-  
-  case Service::barber:
-    _setGraphic( WG_BARBER );
-    _setType( WT_BARBER );
-  break;
-  
-  case Service::baths:
-    _setGraphic( WG_BATH );
-    _setType( WT_BATHLADY );
-  break;
-  
-  case Service::school:
-    _setGraphic( WG_CHILD );
-  break;
-  
   case Service::library:
-  case Service::college:
-    _setGraphic( WG_LIBRARIAN );
-  break;
-  
-  case Service::theater:
-    _setType( WT_ACTOR );
-    _setGraphic( WG_ACTOR );
-  break;
-
-  case Service::amphitheater:
-    _setType( WT_GLADIATOR );
-    _setGraphic( WG_GLADIATOR );
-  break;
-
-  case Service::colloseum:
-    _setType( WT_TAMER );
-    _setGraphic( WG_TAMER );
-  break;
-
-  case Service::hippodrome:
-    _setType( WT_CHARIOT );
-    _setGraphic( WG_ACTOR );
-  break;
-  
-  case Service::market:
-    _setGraphic( WG_MARKETLADY );
-    nameType = NameGenerator::female;
-  break;
+  case Service::college:  _setGraphic( WG_TEACHER );                              break;
 
   case Service::forum:
-  case Service::senate:
-    _setGraphic( WG_TAX );
-  break;
+  case Service::senate:   _setGraphic( WG_TAX );                                    break;
 
   default:
   break;
@@ -136,7 +97,7 @@ BuildingPtr ServiceWalker::getBase() const
 {
   if( _d->base.isNull() )
   {
-    StringHelper::debug( 0xff, "ServiceBuilding is not initialized" );
+   Logger::warning( "ServiceBuilding is not initialized" );
   }
 
   return _d->base;
@@ -147,13 +108,11 @@ Service::Type ServiceWalker::getService() const
   return _d->service;
 }
 
-void ServiceWalker::computeWalkerPath()
-{
-  std::list<PathWay> pathWayList;
-
+void ServiceWalker::_computeWalkerPath()
+{  
   Propagator pathPropagator( _getCity() );
   pathPropagator.init( _d->base.as<Construction>() );
-  pathPropagator.getWays(_d->maxDistance, pathWayList);
+  Propagator::PathWayList pathWayList = pathPropagator.getWays(_d->maxDistance);
 
   float maxPathValue = 0.0;
   PathWay* bestPath = NULL;
@@ -266,7 +225,7 @@ void ServiceWalker::reservePath(PathWay &pathWay)
 void ServiceWalker::send2City( BuildingPtr base )
 {
   setBase( base );
-  computeWalkerPath();
+  _computeWalkerPath();
 
   if( !isDeleted() )
   {
@@ -315,7 +274,7 @@ void ServiceWalker::load( const VariantMap& stream )
   Walker::load( stream );
 
   Service::Type srvcType = ServiceHelper::getType( stream.get( "service" ).toString() );
-  init( srvcType );
+  _init( srvcType );
   _d->maxDistance = stream.get( "maxDistance" ).toInt();
 
   TilePos basePos = stream.get( "base" ).toTilePos();
@@ -324,7 +283,7 @@ void ServiceWalker::load( const VariantMap& stream )
   _d->base = overlay.as<Building>();
   if( _d->base.isNull() )
   {
-    StringHelper::debug(  0xff, "Not found base building[%d,%d] for service walker", basePos.getI(), basePos.getJ() );
+    Logger::warning( "Not found base building[%d,%d] for service walker", basePos.getI(), basePos.getJ() );
   }
   else
   {
@@ -333,6 +292,60 @@ void ServiceWalker::load( const VariantMap& stream )
     {
       wrk->addWalker( this );
     }
+  }
+}
+
+void ServiceWalker::die()
+{
+  int start=-1, stop=-1;
+  std::string rcGroup;
+  switch( _d->service )
+  {
+  case Service::engineer: start=1233; stop=1240; rcGroup=ResourceGroup::citizen1; break;
+
+  case Service::religionNeptune:
+  case Service::religionCeres:
+  case Service::religionVenus:
+  case Service::religionMars:
+  case Service::religionMercury:
+    start=305; stop=312; rcGroup=ResourceGroup::citizen1;
+  break;
+
+  case Service::doctor:
+  case Service::hospital:
+    start=913; stop=920; rcGroup=ResourceGroup::citizen3; break;
+  break;
+
+  case Service::barber: start=559; stop=566; rcGroup=ResourceGroup::citizen2; break;
+  case Service::baths: start=201; stop=208; rcGroup = ResourceGroup::citizen1; break;
+  case Service::school: start=817; stop=824; rcGroup = ResourceGroup::citizen1; break;
+
+  case Service::library:
+  case Service::college:
+    start=1121; stop=1128; rcGroup = ResourceGroup::citizen3;
+  break;
+
+  case Service::theater: start=409; stop=416; rcGroup=ResourceGroup::citizen1; break;
+  case Service::amphitheater: start=97; stop=104; rcGroup=ResourceGroup::citizen2; break;
+  case Service::colloseum: start=513; stop=520; rcGroup=ResourceGroup::citizen1; break;
+  case Service::hippodrome: break;
+
+  case Service::market: start=921; stop=928; rcGroup=ResourceGroup::citizen1; break;
+
+  case Service::forum:
+  case Service::senate:
+    start=713; stop=720; rcGroup = ResourceGroup::citizen1; break;
+  break;
+
+  default:
+  break;
+  }
+
+  Walker::die();
+
+  if( start >= 0 )
+  {
+    Corpse::create( _getCity(), getIJ(), rcGroup, start, stop );
   }
 }
 

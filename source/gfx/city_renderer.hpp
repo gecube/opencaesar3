@@ -16,8 +16,8 @@
 // Copyright 2012-2013 Gregoire Athanase, gathanase@gmail.com
 
 
-#ifndef __OPENCAESAR3_GUITILEMAP_H_INCLUDED__
-#define __OPENCAESAR3_GUITILEMAP_H_INCLUDED__
+#ifndef __OPENCAESAR3_CITYRENDERER_H_INCLUDED__
+#define __OPENCAESAR3_CITYRENDERER_H_INCLUDED__
 
 #include "picture.hpp"
 #include "game/city.hpp"
@@ -28,9 +28,11 @@
 #include "game/tilemapchangecommand.hpp"
 #include "engine.hpp"
 #include "core/event.hpp"
+#include "renderer.hpp"
+#include "layer.hpp"
 
 /* Draws the tilemap area on the screen thanks to the GfxEngine, and handle user events */
-class CityRenderer
+class CityRenderer : public Renderer
 {
 public:
   CityRenderer();
@@ -42,7 +44,7 @@ public:
 
   // draws the tilemap on the screen,
   // using a dumb back to front drawing of all pictures.
-  void draw();
+  void render();
 
   void handleEvent( NEvent& event);
 
@@ -59,6 +61,14 @@ public:
   void animate( unsigned int time );
 
   void setScrollSpeed( int value );
+
+  void addLayer( LayerPtr layer );
+
+  Point getOffset() const;
+
+  void registerTileForRendering( Tile& );
+
+  const TilemapTiles& getPostTiles() const;
 
 oc3_signals public:
   Signal1< const Tile& >& onShowTileInfo();
@@ -79,5 +89,4 @@ private:
   ScopedPtr< Impl > _d;
 };
 
-
-#endif
+#endif //__OPENCAESAR3_CITYRENDERER_H_INCLUDED__

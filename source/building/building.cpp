@@ -1,3 +1,4 @@
+
 // This file is part of openCaesar3.
 //
 // openCaesar3 is free software: you can redistribute it and/or modify
@@ -28,12 +29,14 @@
 #include "core/foreach.hpp"
 #include "game/tilemap.hpp"
 #include "events/event.hpp"
+#include "core/logger.hpp"
+#include "constants.hpp"
 
-Building::Building(const TileOverlayType type, const Size& size )
+using namespace constants;
+
+Building::Building(const TileOverlay::Type type, const Size& size )
 : Construction( type, size )
 {
-   _damageLevel = 0.0;
-   _fireLevel = 0.0;
    _damageIncrement = 1;
    _fireIncrement = 1;
 }
@@ -52,45 +55,14 @@ void Building::initTerrain( Tile &tile )
 
 void Building::timeStep(const unsigned long time)
 {
-   Construction::timeStep(time);
-
    if (time % 64 == 0)
    {
-      _damageLevel += _damageIncrement;
-      _fireLevel += _fireIncrement;
-      if (_damageLevel >= 100)
-      {
-        StringHelper::debug( 0xff, "Building destroyed!" );
-        collapse();
-      }
-      if (_fireLevel >= 100)
-      {
-        StringHelper::debug( 0xff, "Building catch fire!" );
-        burn();
-      }
+      updateState( Construction::damage, _damageIncrement );
+      updateState( Construction::fire, _fireIncrement );
    }
-}
 
-float Building::getDamageLevel()
-{
-   return _damageLevel;
+   Construction::timeStep(time);
 }
-
-void Building::setDamageLevel(const float value)
-{
-   _damageLevel = value;
-}
-
-float Building::getFireLevel()
-{
-   return _fireLevel;
-}
-
-void Building::setFireLevel(const float value)
-{
-   _fireLevel = value;
-}
-
 
 void Building::storeGoods(GoodStock &stock, const int amount)
 {
@@ -109,14 +81,8 @@ float Building::evaluateService(ServiceWalkerPtr walker)
 
    switch(service)
    {
-   case Service::engineer:
-      res = _damageLevel;
-   break;
-
-   case Service::prefect:
-      res = _fireLevel;
-   break;
-
+   case Service::engineer: res = getState( Construction::damage ); break;
+   case Service::prefect: res = getState( Construction::fire ); break;
    default: break;
    }
    return res;
@@ -143,22 +109,13 @@ void Building::applyService( ServiceWalkerPtr walker)
 
    switch( service )
    {
-   case Service::engineer:
-     {
-       _damageLevel = 0;
-     }
-   break;
-   case Service::prefect:
-    {
-      _fireLevel = 0;
-    }
-   break;
-
+   case Service::engineer: updateState( Construction::damage, 0, false ); break;
+   case Service::prefect: updateState( Construction::fire, 0, false ); break;
    default: break;
    }
 }
 
-float Building::evaluateTrainee(const WalkerType traineeType)
+float Building::evaluateTrainee(walker::Type traineeType)
 {
    float res = 0.0;
 
@@ -177,69 +134,23 @@ float Building::evaluateTrainee(const WalkerType traineeType)
    return res;
 }
 
-void Building::reserveTrainee(const WalkerType traineeType)
+void Building::reserveTrainee(walker::Type traineeType)
 {
    _reservedTrainees.insert(traineeType);
 }
 
-void Building::cancelTrainee(const WalkerType traineeType)
+void Building::cancelTrainee(walker::Type traineeType)
 {
    _reservedTrainees.erase(traineeType);
 }
 
-void Building::applyTrainee(const WalkerType traineeType)
+void Building::applyTrainee(walker::Type traineeType)
 {
    _reservedTrainees.erase(traineeType);
    _traineeMap[traineeType] += 100;
 }
 
-void Building::save( VariantMap& stream) const
-{
-    Construction::save( stream );
-    stream[ Serializable::damageLevel ] = _damageLevel;  
-    stream[ Serializable::fireLevel ] = _fireLevel;  
 
-//    stream.write_int(_traineeMap.size(), 1, 0, WTT_MAX);
-//    for (std::map<WalkerTraineeType, int>::iterator itLevel = _traineeMap.begin(); itLevel != _traineeMap.end(); ++itLevel)
-//    {
-//       WalkerTraineeType traineeType = itLevel->first;
-//       int traineeLevel = itLevel->second;
-//       stream.write_int((int)traineeType, 1, 0, WTT_MAX);
-//       stream.write_int(traineeLevel, 1, 0, 200);
-//    }
-// 
-//    stream.write_int(_reservedTrainees.size(), 1, 0, WTT_MAX);
-//    for (std::set<WalkerTraineeType>::iterator itReservation = _reservedTrainees.begin(); itReservation != _reservedTrainees.end(); ++itReservation)
-//    {
-//       WalkerTraineeType traineeType = *itReservation;
-//       stream.write_int((int)traineeType, 1, 0, WTT_MAX);
-//    }
-}
-
-void Building::load( const VariantMap& stream )
-{
-  Construction::load( stream );
-  _damageLevel = (float)stream.get( Serializable::damageLevel, 0.f );
-  _fireLevel = (float)stream.get( Serializable::fireLevel, 0.f );
-//    Construction::unserialize(stream);
-//    _damageLevel = (float)stream.read_int(1, 0, 100);
-//    _fireLevel = (float)stream.read_int(1, 0, 100);
-// 
-//    int size = stream.read_int(1, 0, WTT_MAX);
-//    for (int i=0; i<size; ++i)
-//    {
-//       WalkerTraineeType traineeType = (WalkerTraineeType) stream.read_int(1, 0, WTT_MAX);
-//       int traineeLevel = stream.read_int(1, 0, 200);
-//       _traineeMap[traineeType] = traineeLevel;
-//    }
-// 
-//    size = stream.read_int(1, 0, WTT_MAX);
-//    for (int i=0; i<size; ++i)
-//    {
-//       WalkerTraineeType traineeType = (WalkerTraineeType) stream.read_int(1, 0, WTT_MAX);
-//       _reservedTrainees.insert(traineeType);
-//    }
-}
 
 // govt     1  - small statue        1 x 1
 // govt     2  - medium statue       2 x 2
@@ -251,11 +162,11 @@ void Building::load( const VariantMap& stream )
 // transport 93 - missionaire post   2 x 2
 // circus    1 ~ 18 hippodrome    5x(5 x 5)
 
-SmallStatue::SmallStatue() : Building( B_STATUE1, Size(1) )
+SmallStatue::SmallStatue() : Building( building::B_STATUE1, Size(1) )
 {
   _fireIncrement = 0;
   _damageIncrement = 0;
-  setPicture( Picture::load( ResourceGroup::govt, 1));
+  setPicture( ResourceGroup::govt, 1 );
 }
 
 bool SmallStatue::isNeedRoadAccess() const
@@ -263,11 +174,11 @@ bool SmallStatue::isNeedRoadAccess() const
   return false;
 }
 
-MediumStatue::MediumStatue() : Building( B_STATUE2, Size(2) )
+MediumStatue::MediumStatue() : Building( building::B_STATUE2, Size(2) )
 {
   _fireIncrement = 0;
   _damageIncrement = 0;
-  setPicture( Picture::load( ResourceGroup::govt, 2));
+  setPicture( ResourceGroup::govt, 2);
 }
 
 bool MediumStatue::isNeedRoadAccess() const
@@ -275,11 +186,11 @@ bool MediumStatue::isNeedRoadAccess() const
   return false;
 }
 
-BigStatue::BigStatue() : Building( B_STATUE3, Size(3))
+BigStatue::BigStatue() : Building( building::B_STATUE3, Size(3))
 {
   _fireIncrement = 0;
   _damageIncrement = 0;
-  setPicture( Picture::load( ResourceGroup::govt, 3));
+  setPicture( ResourceGroup::govt, 3 );
 }
 
 bool BigStatue::isNeedRoadAccess() const
@@ -287,9 +198,9 @@ bool BigStatue::isNeedRoadAccess() const
   return false;
 }
 
-Shipyard::Shipyard() : Building( B_SHIPYARD, Size(2) )
+Shipyard::Shipyard() : Building( building::B_SHIPYARD, Size(2) )
 {
-  setPicture( Picture::load( ResourceGroup::transport, 1));
+  setPicture( ResourceGroup::transport, 1);
   // also transport 2 3 4 check position of river on map
 }
 
@@ -299,7 +210,7 @@ Shipyard::Shipyard() : Building( B_SHIPYARD, Size(2) )
 // transport 29       animation = 30~40
 // transport 41       animation = 42~51
 
-Dock::Dock() : Building( B_DOCK, Size(2) )
+Dock::Dock() : Building( building::B_DOCK, Size(2) )
 {
   setPicture( ResourceGroup::transport, 5);
 
@@ -308,7 +219,7 @@ Dock::Dock() : Building( B_DOCK, Size(2) )
   _getAnimation().load( ResourceGroup::transport, 15, 10, Animation::reverse );
   
   _getAnimation().setOffset( Point( 107, 61 ) );
-  _getForegroundPictures().resize(1);
+  _getFgPictures().resize(1);
 }
 
 void Dock::timeStep(const unsigned long time)
@@ -316,16 +227,16 @@ void Dock::timeStep(const unsigned long time)
   _getAnimation().update( time );
   
   // takes current animation frame and put it into foreground
-  _getForegroundPictures().at(0) = _getAnimation().getCurrentPicture();
+  _getFgPictures().at(0) = _getAnimation().getFrame();
 }
 
 // second arch pictures is land3a 45 + 46	
 
-TriumphalArch::TriumphalArch() : Building( B_TRIUMPHAL_ARCH, Size(3) )
+TriumphalArch::TriumphalArch() : Building( building::B_TRIUMPHAL_ARCH, Size(3) )
 {
   setPicture( ResourceGroup::land3a, 43 );
   _getAnimation().load("land3a", 44, 1);
   _getAnimation().setOffset( Point( 63, 97 ) );
-  _getForegroundPictures().resize(1);
-  _getForegroundPictures().at(0) = _getAnimation().getCurrentPicture();
+  _getFgPictures().resize(1);
+  _getFgPictures().at(0) = _getAnimation().getFrame();
 }

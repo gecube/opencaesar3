@@ -33,6 +33,12 @@
 #include "core/stringhelper.hpp"
 #include "game/name_generator.hpp"
 #include "game/tilemap.hpp"
+#include "core/logger.hpp"
+#include "building/constants.hpp"
+#include "corpse.hpp"
+#include "game/resourcegroup.hpp"
+
+using namespace constants;
 
 class CartPusher::Impl
 {
@@ -53,7 +59,7 @@ CartPusher::CartPusher( CityPtr city )
   : Walker( city ), _d( new Impl )
 {
   _setGraphic( WG_PUSHER );
-  _setType( WT_CART_PUSHER );
+  _setType( walker::cartPusher );
   _d->producerBuilding = NULL;
   _d->consumerBuilding = NULL;
   _d->maxDistance = 25;
@@ -156,22 +162,24 @@ void CartPusher::getPictureList(std::vector<Picture> &oPics)
    // depending on the walker direction, the cart is ahead or behind
    switch (getDirection())
    {
-   case D_WEST:
-   case D_NORTH_WEST:
-   case D_NORTH:
-   case D_NORTH_EAST:
+   case constants::west:
+   case constants::northWest:
+   case constants::north:
+   case constants::northEast:
       oPics.push_back( getCartPicture() );
       oPics.push_back( getMainPicture() );
-      break;
-   case D_EAST:
-   case D_SOUTH_EAST:
-   case D_SOUTH:
-   case D_SOUTH_WEST:
+   break;
+
+   case constants::east:
+   case constants::southEast:
+   case constants::south:
+   case constants::southWest:
       oPics.push_back( getMainPicture() );
       oPics.push_back( getCartPicture() );
-      break;
+   break;
+
    default:
-      break;
+   break;
    }
 }
 
@@ -184,7 +192,7 @@ void CartPusher::computeWalkerDestination()
 
    if( _d->producerBuilding.isNull() )
    {
-     StringHelper::debug( 0xff, "CartPusher destroyed: producerBuilding can't be NULL" );
+     Logger::warning( "CartPusher destroyed: producerBuilding can't be NULL" );
      deleteLater();
      return;
    }
@@ -221,7 +229,7 @@ void CartPusher::computeWalkerDestination()
    }
    else
    {
-     _setDirection( D_NORTH );
+     _setDirection( constants::north );
      setSpeed( 0 );
      setIJ( _d->producerBuilding->getAccessRoads().front()->getIJ() );
      walk();
@@ -229,13 +237,12 @@ void CartPusher::computeWalkerDestination()
 }
 
 template< class T >
-BuildingPtr reserveShortestPath( const TileOverlayType buildingType, 
-                                 GoodStock& stock, long& reservationID,
-                                 Propagator &pathPropagator, PathWay &oPathWay )
+BuildingPtr reserveShortestPath( const TileOverlay::Type buildingType,
+                                     GoodStock& stock, long& reservationID,
+                                     Propagator &pathPropagator, PathWay &oPathWay )
 {
   BuildingPtr res;
-  Propagator::Routes pathWayList;
-  pathPropagator.getRoutes(buildingType, pathWayList);
+  Propagator::Routes pathWayList = pathPropagator.getRoutes( buildingType );
 
   //remove factories with improrer storage
   Propagator::Routes::iterator pathWayIt= pathWayList.begin();
@@ -264,7 +271,7 @@ BuildingPtr reserveShortestPath( const TileOverlayType buildingType,
     {
       shortestPath = &pathIt->second;
       maxLength = pathIt->second.getLength();
-      res = pathIt->first;
+      res = pathIt->first.as<Building>();
     }
   }
 
@@ -289,9 +296,9 @@ BuildingPtr CartPusher::Impl::getWalkerDestination_factory(Propagator &pathPropa
 {
   BuildingPtr res;
   Good::Type goodType = stock.type();
-  TileOverlayType buildingType = BuildingDataHolder::instance().getConsumerType( goodType );
+  TileOverlay::Type buildingType = MetaDataHolder::instance().getConsumerType( goodType );
 
-  if (buildingType == unknown)
+  if (buildingType == building::unknown)
   {
      // no factory can use this good
      return 0;
@@ -306,7 +313,7 @@ BuildingPtr CartPusher::Impl::getWalkerDestination_warehouse(Propagator &pathPro
 {
   BuildingPtr res;
 
-  res = reserveShortestPath<Warehouse>( B_WAREHOUSE, stock, reservationID, pathPropagator, oPathWay );
+  res = reserveShortestPath<Warehouse>( building::B_WAREHOUSE, stock, reservationID, pathPropagator, oPathWay );
 
   return res;
 }
@@ -323,7 +330,7 @@ BuildingPtr CartPusher::Impl::getWalkerDestination_granary(Propagator &pathPropa
       return 0;
    }
 
-   res = reserveShortestPath<Granary>( B_GRANARY, stock, reservationID, pathPropagator, oPathWay );
+   res = reserveShortestPath<Granary>( building::granary, stock, reservationID, pathPropagator, oPathWay );
 
    return res;
 }
@@ -394,4 +401,11 @@ void CartPusher::load( const VariantMap& stream )
 
   _d->maxDistance = stream.get( "maxDistance" ).toInt();
   _d->reservationID = stream.get( "reservationID" ).toInt();
+}
+
+void CartPusher::die()
+{
+  Walker::die();
+
+  Corpse::create( _getCity(), getIJ(), ResourceGroup::citizen1, 1025, 1032 );
 }

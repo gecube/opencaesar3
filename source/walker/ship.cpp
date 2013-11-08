@@ -16,14 +16,26 @@
 #include "ship.hpp"
 #include "core/gettext.hpp"
 #include "game/city.hpp"
+#include "constants.hpp"
+#include "corpse.hpp"
+#include "game/resourcegroup.hpp"
+
+using namespace constants;
 
 Ship::Ship( CityPtr city )
   : Walker( city )
 {
-  _setType( WT_NONE );
+  _setType( walker::unknown );
   _setGraphic( WG_NONE );
 
   setName( _("##ship##") );
+}
+
+void Ship::die()
+{
+  Walker::die();
+
+  Corpse::create( _getCity(), getIJ(), ResourceGroup::carts, 265, 272, true );
 }
 
 Ship::~Ship()

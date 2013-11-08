@@ -27,6 +27,9 @@
 #include "core/foreach.hpp"
 #include "game/settings.hpp"
 #include "game/house_level.hpp"
+#include "building/constants.hpp"
+
+using namespace constants;
 
 namespace gui
 {
@@ -46,7 +49,7 @@ namespace {
 class EducationInfoLabel : public Label
 {
 public:
-  EducationInfoLabel( Widget* parent, const Rect& rect, const TileOverlayType service,
+  EducationInfoLabel( Widget* parent, const Rect& rect, const TileOverlay::Type service,
                       const InfrastructureInfo& info )
     : Label( parent, rect )
   {
@@ -68,9 +71,9 @@ public:
     std::string buildingStr, peoplesStr;
     switch( _service )
     {
-    case B_SCHOOL: buildingStr = _("##schools##"); peoplesStr = _("##children##"); break;
-    case B_COLLEGE: buildingStr = _("##colleges##"); peoplesStr = _("##students##"); break;
-    case B_LIBRARY: buildingStr = _("##libraries##"); peoplesStr = _("##peoples##"); break;
+    case building::B_SCHOOL: buildingStr = _("##schools##"); peoplesStr = _("##children##"); break;
+    case building::B_COLLEGE: buildingStr = _("##colleges##"); peoplesStr = _("##students##"); break;
+    case building::B_LIBRARY: buildingStr = _("##libraries##"); peoplesStr = _("##peoples##"); break;
     default: break;
     }
 
@@ -94,7 +97,7 @@ public:
   }
 
 private:
-  TileOverlayType _service;
+  TileOverlay::Type _service;
   InfrastructureInfo _info;
 };
 
@@ -109,7 +112,7 @@ public:
   EducationInfoLabel* lbCollegeInfo;
   EducationInfoLabel* lbLibraryInfo;
 
-  InfrastructureInfo getInfo( CityPtr city, const TileOverlayType service );
+  InfrastructureInfo getInfo( CityPtr city, const TileOverlay::Type service );
   StringArray getTrouble( CityPtr city );
 };
 
@@ -122,24 +125,25 @@ AdvisorEducationWindow::AdvisorEducationWindow( CityPtr city, Widget* parent, in
   setupUI( GameSettings::rcpath( "/gui/educationadv.gui" ) );
   _d->lbBackframe = findChild<Label*>( "lbBlackframe", true );
   _d->lbCityInfo = findChild<Label*>( "lbCityInfo", true );
+  _d->lbCityTrouble = findChild<Label*>( "lbCityTrouble", true );
 
   Point startPoint( 2, 2 );
   Size labelSize( 550, 20 );
   InfrastructureInfo info;
-  info = _d->getInfo( city, B_SCHOOL );
-  _d->lbSchoolInfo = new EducationInfoLabel( _d->lbBackframe, Rect( startPoint, labelSize ), B_SCHOOL, info );
+  info = _d->getInfo( city, building::B_SCHOOL );
+  _d->lbSchoolInfo = new EducationInfoLabel( _d->lbBackframe, Rect( startPoint, labelSize ), building::B_SCHOOL, info );
 
-  info = _d->getInfo( city, B_COLLEGE );
-  _d->lbCollegeInfo = new EducationInfoLabel( _d->lbBackframe, Rect( startPoint + Point( 0, 20), labelSize), B_COLLEGE, info );
+  info = _d->getInfo( city, building::B_COLLEGE );
+  _d->lbCollegeInfo = new EducationInfoLabel( _d->lbBackframe, Rect( startPoint + Point( 0, 20), labelSize), building::B_COLLEGE, info );
 
-  info = _d->getInfo( city, B_LIBRARY );
-  _d->lbLibraryInfo = new EducationInfoLabel( _d->lbBackframe, Rect( startPoint + Point( 0, 40), labelSize), B_LIBRARY, info );
+  info = _d->getInfo( city, building::B_LIBRARY );
+  _d->lbLibraryInfo = new EducationInfoLabel( _d->lbBackframe, Rect( startPoint + Point( 0, 40), labelSize), building::B_LIBRARY, info );
 
   CityHelper helper( city );
 
   int sumScholars = 0;
   int sumStudents = 0;
-  HouseList houses = helper.find<House>( B_HOUSE );
+  HouseList houses = helper.find<House>( building::house );
   foreach( HousePtr house, houses )
   {
     sumScholars += house->getHabitants().count( CitizenGroup::scholar );
@@ -163,7 +167,7 @@ void AdvisorEducationWindow::draw( GfxEngine& painter )
 }
 
 
-InfrastructureInfo AdvisorEducationWindow::Impl::getInfo(CityPtr city, const TileOverlayType bType)
+InfrastructureInfo AdvisorEducationWindow::Impl::getInfo(CityPtr city, const TileOverlay::Type bType)
 {
   CityHelper helper( city );
 
@@ -185,9 +189,9 @@ InfrastructureInfo AdvisorEducationWindow::Impl::getInfo(CityPtr city, const Til
   CitizenGroup::Age age;
   switch( bType )
   {
-  case B_SCHOOL:  service = Service::school;  maxStuding = 75;  age = CitizenGroup::scholar; break;
-  case B_COLLEGE: service = Service::college; maxStuding = 100; age = CitizenGroup::student; break;
-  case B_LIBRARY: service = Service::library; maxStuding = 800; age = CitizenGroup::mature;  break;
+  case building::B_SCHOOL:  service = Service::school;  maxStuding = 75;  age = CitizenGroup::scholar; break;
+  case building::B_COLLEGE: service = Service::college; maxStuding = 100; age = CitizenGroup::student; break;
+  case building::B_LIBRARY: service = Service::library; maxStuding = 800; age = CitizenGroup::mature;  break;
   default: break;
   }
 
@@ -200,11 +204,11 @@ InfrastructureInfo AdvisorEducationWindow::Impl::getInfo(CityPtr city, const Til
     }
   }
 
-  HouseList houses = helper.find<House>( B_HOUSE );
+  HouseList houses = helper.find<House>( building::house );
   foreach( HousePtr house, houses )
   {
     ret.need += ( house->getHabitants().count( age ) * ( house->isEducationNeed( service ) ? 1 : 0 ) );
-    ret.nextLevel += (house->getLevelSpec().next().evaluateEducationNeed( house, service ) == 100 ? 1 : 0);
+    ret.nextLevel += (house->getSpec().next().evaluateEducationNeed( house, service ) == 100 ? 1 : 0);
   }
 
   ret.coverage = ret.need > 0

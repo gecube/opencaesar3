@@ -24,8 +24,11 @@
 #include "core/variant.hpp"
 #include "game/resourcegroup.hpp"
 #include "game/city.hpp"
+#include "constants.hpp"
 
-TrainingBuilding::TrainingBuilding( const TileOverlayType type, const Size& size )
+using namespace constants;
+
+TrainingBuilding::TrainingBuilding(const Type type, const Size& size )
   : WorkingBuilding( type, size )
 {
    _trainingTimer = 0;
@@ -52,11 +55,10 @@ void TrainingBuilding::timeStep(const unsigned long time)
    }
 
    _getAnimation().update( time );
-   const Picture& pic = _getAnimation().getCurrentPicture();
+   const Picture& pic = _getAnimation().getFrame();
    if( pic.isValid() )
    {
-      int level = getForegroundPictures().size()-1;
-      _getForegroundPictures().at( level ) = _getAnimation().getCurrentPicture();
+      _getFgPictures().back() = _getAnimation().getFrame();
    }
 }
 
@@ -74,11 +76,11 @@ void TrainingBuilding::load( const VariantMap& stream )
   _trainingDelay = (int)stream.get( "trainingDelay", 80 );
 }
 
-ActorColony::ActorColony() : TrainingBuilding( B_ACTOR_COLONY, Size(3) )
+ActorColony::ActorColony() : TrainingBuilding( building::actorColony, Size(3) )
 {
   //_getAnimation().load( ResourceGroup::entertaiment, 82, 9);
   //_getAnimation().setOffset( Point( 68, -6 ) );
-  _getForegroundPictures().resize(1);
+  _getFgPictures().resize(1);
 }
 
 void ActorColony::deliverTrainee()
@@ -88,7 +90,7 @@ void ActorColony::deliverTrainee()
     return;
   }
 
-  TraineeWalkerPtr trainee = TraineeWalker::create( _getCity(), WT_ACTOR );
+  TraineeWalkerPtr trainee = TraineeWalker::create( _getCity(), walker::actor );
   trainee->setOriginBuilding(*this);
   trainee->send2City();
 
@@ -98,55 +100,55 @@ void ActorColony::deliverTrainee()
   }
 }
 
-GladiatorSchool::GladiatorSchool() : TrainingBuilding( B_GLADIATOR_SCHOOL, Size(3))
+GladiatorSchool::GladiatorSchool() : TrainingBuilding( building::gladiatorSchool, Size(3))
 {
   //setPicture( Picture::load( ResourceGroup::entertaiment, 51 ) );
 
   _getAnimation().load( ResourceGroup::entertaiment, 52, 10);
   _getAnimation().setOffset( Point( 62, 24 ) );
-  _getForegroundPictures().resize(1);
+  _getFgPictures().resize(1);
 }
 
 void GladiatorSchool::deliverTrainee()
 {
    // std::cout << "Deliver trainee!" << std::endl;
-  TraineeWalkerPtr trainee = TraineeWalker::create( _getCity(), WT_GLADIATOR);
+  TraineeWalkerPtr trainee = TraineeWalker::create( _getCity(), walker::gladiator );
   trainee->setOriginBuilding(*this);
   trainee->send2City();
 }
 
 
-LionsNursery::LionsNursery() : TrainingBuilding( B_LION_HOUSE, Size(3) )
+LionsNursery::LionsNursery() : TrainingBuilding( building::lionHouse, Size(3) )
 {
-  setPicture( Picture::load( ResourceGroup::entertaiment, 62));
+  setPicture( ResourceGroup::entertaiment, 62 );
 
    _getAnimation().load( ResourceGroup::entertaiment, 63, 18);
    _getAnimation().setOffset( Point( 78, 21) );
-   _getForegroundPictures().resize(1);
+   _getFgPictures().resize(1);
 }
 
 void LionsNursery::deliverTrainee()
 {
   // std::cout << "Deliver trainee!" << std::endl;
-  TraineeWalkerPtr trainee = TraineeWalker::create( _getCity(), WT_TAMER );
+  TraineeWalkerPtr trainee = TraineeWalker::create( _getCity(), walker::tamer );
   trainee->setOriginBuilding(*this);
   trainee->send2City();
 }
 
 
-WorkshopChariot::WorkshopChariot() : TrainingBuilding( B_CHARIOT_MAKER, Size(3) )
+WorkshopChariot::WorkshopChariot() : TrainingBuilding( building::chariotSchool, Size(3) )
 {
-  setPicture( Picture::load( ResourceGroup::entertaiment, 91));
+  setPicture( ResourceGroup::entertaiment, 91 );
 
   _getAnimation().load( ResourceGroup::entertaiment, 92, 10);
   _getAnimation().setOffset( Point( 54, 23 ));
-  _getForegroundPictures().resize(1);
+  _getFgPictures().resize(1);
 }
 
 void WorkshopChariot::deliverTrainee()
 {
    // std::cout << "Deliver trainee!" << std::endl;
-  TraineeWalkerPtr trainee = TraineeWalker::create( _getCity(), WT_CHARIOT);
+  TraineeWalkerPtr trainee = TraineeWalker::create( _getCity(), walker::charioter );
   trainee->setOriginBuilding(*this);
   trainee->send2City();
 }
