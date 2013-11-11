@@ -50,7 +50,7 @@ public:
 CartSupplier::CartSupplier( CityPtr city )
   : Walker( city ), _d( new Impl )
 {
-  _setGraphic( WG_PUSHER );
+  _setAnimation( gfx::cartPusher );
   _setType( walker::cartPusher );
 
   _d->storageBuildingPos = TilePos( -1, -1 );
@@ -71,7 +71,7 @@ void CartSupplier::onDestination()
     // walker is back in the market
     deleteLater();
     // put the content of the stock to receiver
-    BuildingPtr building = helper.find<Building>( _d->baseBuildingPos );
+    BuildingPtr building = helper.find<Building>( building::any, _d->baseBuildingPos );
 
     GoodStore* storage = 0;
     if( building.is<Factory>() )
@@ -102,7 +102,7 @@ void CartSupplier::onDestination()
 
     // get goods from destination building
     
-    BuildingPtr building = helper.find<Building>( _d->storageBuildingPos );
+    BuildingPtr building = helper.find<Building>( building::any, _d->storageBuildingPos );
 
     if( building.is<Granary>() )
     {
@@ -170,7 +170,7 @@ void CartSupplier::getPictureList(std::vector<Picture> &oPics)
 template< class T >
 TilePos getSupplierDestination2( Propagator &pathPropagator, const TileOverlay::Type type,
                                  const Good::Type what, const int needQty,
-                                 PathWay &oPathWay, long& reservId )
+                                 Pathway &oPathWay, long& reservId )
 {
   SmartPtr< T > res;
 
@@ -184,7 +184,7 @@ TilePos getSupplierDestination2( Propagator &pathPropagator, const TileOverlay::
   {
     // for every warehouse within range
     BuildingPtr building= pathWayIt->first.as<Building>();
-    PathWay& pathWay= pathWayIt->second;
+    Pathway& pathWay= pathWayIt->second;
 
     SmartPtr< T > destBuilding = building.as< T >();
     int qty = destBuilding->getGoodStore().getMaxRetrieve( what );
@@ -218,7 +218,7 @@ void CartSupplier::computeWalkerDestination(BuildingPtr building, const Good::Ty
 
   // we have something to buy!
   // get the list of buildings within reach
-  PathWay pathWay;
+  Pathway pathWay;
   Propagator pathPropagator( _d->city );
   pathPropagator.init( building.as<Construction>() );
   pathPropagator.propagate( _d->maxDistance);
@@ -230,14 +230,14 @@ void CartSupplier::computeWalkerDestination(BuildingPtr building, const Good::Ty
   if( _d->storageBuildingPos.getI() < 0 )
   {
     // try get that good from a warehouse
-    _d->storageBuildingPos = getSupplierDestination2<Warehouse>( pathPropagator, building::B_WAREHOUSE,
+    _d->storageBuildingPos = getSupplierDestination2<Warehouse>( pathPropagator, building::warehouse,
                                                                  type, qty, pathWay, _d->reservationID );
   }
 
   if( _d->storageBuildingPos.getI() >= 0 )
   {
     // we found a destination!
-    setPathWay(pathWay);    
+    setPathway(pathWay);    
   }
   else
   {

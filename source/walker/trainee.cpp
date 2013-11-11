@@ -39,24 +39,24 @@ void TraineeWalker::init(walker::Type traineeType)
   switch( traineeType )
   {
   case walker::actor:
-    _setGraphic( WG_ACTOR );
+    _setAnimation( gfx::actor );
     _buildingNeed.push_back(building::theater);
     _buildingNeed.push_back(building::amphitheater);
   break;
 
   case walker::gladiator:
-    _setGraphic( WG_GLADIATOR );
+    _setAnimation( gfx::gladiator );
     _buildingNeed.push_back(building::amphitheater);
     _buildingNeed.push_back(building::colloseum);
   break;
 
   case walker::tamer:
-    _setGraphic( WG_TAMER );
+    _setAnimation( gfx::tamer );
     _buildingNeed.push_back(building::colloseum);
   break;
 
   case walker::charioter:
-    _setGraphic( WG_NONE );  // TODO
+    _setAnimation( gfx::unknown );  // TODO
   break;
 
   default:
@@ -90,9 +90,9 @@ void TraineeWalker::computeWalkerPath()
   {
     // some building needs that trainee!
     // std::cout << "trainee sent!" << std::endl;
-    PathWay pathWay;
+    Pathway pathWay;
     pathPropagator.getPath( _destinationBuilding.as<Construction>(), pathWay);
-    setPathWay( pathWay );
+    setPathway( pathWay );
     setIJ( _getPathway().getOrigin().getIJ() );
   }
   else
@@ -145,7 +145,7 @@ void TraineeWalker::save( VariantMap& stream ) const
   stream[ "originBldPos" ] = _originBuilding->getTile().getIJ();
   stream[ "destBldPos" ] = _destinationBuilding->getTile().getIJ();
   stream[ "maxDistance" ] = _maxDistance;
-  stream[ "graphic" ] = _getGraphic();
+  stream[ "graphic" ] = _getAnimationType();
   stream[ "type" ] = (int)walker::trainee;
 }
 
@@ -156,8 +156,8 @@ void TraineeWalker::load( const VariantMap& stream )
   init( getType() );
 
   CityHelper helper( _getCity() );
-  _originBuilding = helper.find<Building>( stream.get( "originBldPos" ).toTilePos() );
-  _destinationBuilding = helper.find<Building>( stream.get( "destBldPos" ).toTilePos() );
+  _originBuilding = helper.find<Building>( building::any, stream.get( "originBldPos" ).toTilePos() );
+  _destinationBuilding = helper.find<Building>( building::any, stream.get( "destBldPos" ).toTilePos() );
   _maxDistance = (int)stream.get( "maxDistance" );
   walker::Type wtype = (walker::Type)stream.get( "graphic" ).toInt();
 

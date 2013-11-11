@@ -39,7 +39,7 @@ class Walker::Impl
 public:
   CityPtr city;
   walker::Type walkerType;
-  WalkerGraphicType walkerGraphic;
+  gfx::Type walkerGraphic;
   bool isDeleted;
   float speed;
   TilePos pos;
@@ -50,7 +50,7 @@ public:
   Animation animation;  // current animation
   Point posOnMap; // subtile coordinate across all tiles: 0..15*mapsize (ii=15*i+si)
   PointF remainMove;  // remaining movement
-  PathWay pathWay;
+  Pathway pathWay;
   DirectedAction action;
   std::string name;
   int health;
@@ -73,7 +73,7 @@ Walker::Walker( CityPtr city ) : _d( new Impl )
   _d->action.action = Walker::acMove;
   _d->action.direction = constants::noneDirection;
   _d->walkerType = walker::unknown;
-  _d->walkerGraphic = WG_NONE;
+  _d->walkerGraphic = gfx::unknown;
   _d->health = 100;
 
   _d->speed = 1.f;  // default speed
@@ -88,14 +88,14 @@ Walker::~Walker()
 {
 }
 
-int Walker::getType() const
+walker::Type Walker::getType() const
 {
    return _d->walkerType;
 }
 
 void Walker::timeStep(const unsigned long time)
 {
-  switch (_d->action.action)
+  switch(_d->action.action)
   {
   case Walker::acMove:
     walk();
@@ -160,12 +160,12 @@ Point Walker::getSubPosition() const
   return _d->tileOffset;
 }
 
-void Walker::setPathWay( const PathWay &pathWay)
+void Walker::setPathway( const Pathway& pathway)
 {
-   _d->pathWay = pathWay;
-   _d->pathWay.begin();
+  _d->pathWay = pathway;
+  _d->pathWay.begin();
 
-   onMidTile();
+  onMidTile();
 }
 
 void Walker::setSpeed(const float speed)
@@ -173,7 +173,7 @@ void Walker::setSpeed(const float speed)
    _d->speed = speed;
 }
 
-WalkerGraphicType Walker::getWalkerGraphic() const
+gfx::Type Walker::_getAnimationType() const
 {
    return _d->walkerGraphic;
 }
@@ -415,6 +415,11 @@ void Walker::updateHealth(double value)
   _d->health = math::clamp( _d->health + value, -100.0, 100.0 );
 }
 
+void Walker::acceptAction(Walker::Action, TilePos)
+{
+
+}
+
 void Walker::setName(const std::string &name)
 {
   _d->name = name;
@@ -440,7 +445,7 @@ const Picture& Walker::getMainPicture()
 {
   if( !_d->animation.isValid() )
   {
-    const AnimationBank::MovementAnimation& animMap = AnimationBank::getWalker( getWalkerGraphic() );
+    const AnimationBank::MovementAnimation& animMap = AnimationBank::getWalker( _getAnimationType() );
     std::map<DirectedAction, Animation>::const_iterator itAnimMap;
     if (_d->action.action == acNone || _d->action.direction == constants::noneDirection )
     {
@@ -541,19 +546,41 @@ void Walker::setUniqueId( const UniqueId uid )
   _d->uid = uid;
 }
 
-PathWay& Walker::_getPathway()
+Pathway& Walker::_getPathway()
 {
   return _d->pathWay;
 }
 
-const PathWay& Walker::getPathway() const
+const Pathway& Walker::getPathway() const
 {
   return _d->pathWay;
+}
+
+void Walker::turn(TilePos pos)
+{
+  int angle = (int)((pos - getIJ()).getAngle() / 45.f);
+
+  Direction directions[] = { north, northEast, east, southEast, south,
+                             southWest, west, northWest };
+
+  if( _d->action.direction != directions[ angle ] )
+  {
+    _d->action.direction = directions[ angle ];
+    onNewDirection();
+    getMainPicture();
+  }
 }
 
 Animation& Walker::_getAnimation()
 {
   return _d->animation;
+}
+
+void Walker::_updatePathway(const Pathway& pathway)
+{
+  _d->pathWay = pathway;
+  _d->pathWay.begin();
+  computeDirection();
 }
 
 void Walker::_setAction( Walker::Action action )
@@ -566,14 +593,9 @@ void Walker::_setDirection(constants::Direction direction )
   _d->action.direction = direction;
 }
 
-void Walker::_setGraphic(WalkerGraphicType type)
+void Walker::_setAnimation( gfx::Type type)
 {
   _d->walkerGraphic = type;
-}
-
-WalkerGraphicType Walker::_getGraphic() const
-{
-  return _d->walkerGraphic;
 }
 
 void Walker::_setType(walker::Type type)
@@ -613,7 +635,7 @@ void Walker::die()
 Soldier::Soldier( CityPtr city ) : Walker( city )
 {
   _setType( walker::soldier );
-  _setGraphic( WG_HORSEMAN );
+  _setAnimation( gfx::horseman );
 }
 
 class WalkerHelper::Impl : public EnumsHelper<walker::Type>

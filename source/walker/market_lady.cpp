@@ -47,7 +47,7 @@ public:
 MarketLady::MarketLady( CityPtr city )
   : Walker( city ), _d( new Impl )
 {
-   _setGraphic( WG_MARKETLADY );
+   _setAnimation( gfx::marketlady );
    _setType( walker::marketLady );
    _d->maxDistance = 25;
    _d->basket.setMaxQty(800);  // this is a big basket!
@@ -73,7 +73,7 @@ MarketLady::~MarketLady()
 template< class T >
 TilePos getWalkerDestination2( Propagator &pathPropagator, const TileOverlay::Type type,
                                MarketPtr market, SimpleGoodStore& basket, const Good::Type what,
-                               PathWay &oPathWay, long& reservId )
+                               Pathway &oPathWay, long& reservId )
 {
   SmartPtr< T > res;
 
@@ -87,7 +87,7 @@ TilePos getWalkerDestination2( Propagator &pathPropagator, const TileOverlay::Ty
   {
     // for every warehouse within range
     ConstructionPtr construction = pathWayIt->first;
-    PathWay& pathWay= pathWayIt->second;
+    Pathway& pathWay= pathWayIt->second;
 
     SmartPtr< T > destBuilding = construction.as< T >();
     int qty = destBuilding->getGoodStore().getMaxRetrieve( what );
@@ -126,7 +126,7 @@ void MarketLady::computeWalkerDestination( MarketPtr market )
      // we have something to buy!
 
      // get the list of buildings within reach
-     PathWay pathWay;
+     Pathway pathWay;
      Propagator pathPropagator( _getCity() );
      pathPropagator.init( _d->market.as<Construction>() );
      pathPropagator.propagate( _d->maxDistance);
@@ -147,14 +147,14 @@ void MarketLady::computeWalkerDestination( MarketPtr market )
         else
         {
            // try get that good from a warehouse
-           _d->destBuildingPos = getWalkerDestination2<Warehouse>( pathPropagator, building::B_WAREHOUSE, _d->market,
+           _d->destBuildingPos = getWalkerDestination2<Warehouse>( pathPropagator, building::warehouse, _d->market,
                                                                 _d->basket, _d->priorityGood, pathWay, _d->reservationID );
         }
 
         if( _d->destBuildingPos.getI() >= 0 )
         {
            // we found a destination!
-           setPathWay(pathWay);
+           setPathway(pathWay);
            break;
         }
      }
@@ -297,7 +297,7 @@ void MarketLady::load( const VariantMap& stream)
   _d->priorityGood = (Good::Type)stream.get( "priorityGood" ).toInt();
   TilePos tpos = stream.get( "marketPos" ).toTilePos();
   CityHelper helper( _getCity() );
-  _d->market = helper.find<Market>( tpos );
+  _d->market = helper.find<Market>( building::market, tpos );
   _d->basket.load( stream.get( "basket" ).toMap() );
   _d->maxDistance = stream.get( "maxDistance" ).toInt();
   _d->reservationID = stream.get( "reserationId" ).toInt();

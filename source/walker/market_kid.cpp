@@ -38,7 +38,7 @@ public:
 MarketKidPtr MarketKid::create( CityPtr city, MarketLadyPtr lady )
 {
   MarketKidPtr ret( new MarketKid( city ) );
-  ret->setPathWay( lady->getPathway() );
+  ret->setPathway( lady->getPathway() );
   ret->setIJ( lady->getIJ() );
   ret->_getPathway().rbegin();
   ret->onMidTile();
@@ -53,7 +53,7 @@ MarketKid::MarketKid( CityPtr city )
   _d->delay = 0;
   _d->birthTime = 0;
   _d->basket._maxQty = 100;
-  _setGraphic( WG_MARKET_KID );
+  _setAnimation( gfx::marketkid );
   _setType( walker::marketKid );
 
   setName( NameGenerator::rand( NameGenerator::male ) );
@@ -99,7 +99,7 @@ void MarketKid::onDestination()
   deleteLater();
 
   CityHelper cityh( _getCity() );
-  MarketPtr market = cityh.find< Market >( _d->marketPos );
+  MarketPtr market = cityh.find<Market>( building::market, _d->marketPos );
   if( market.isValid() )
   {
     market->getGoodStore().store( _d->basket, _d->basket._currentQty );

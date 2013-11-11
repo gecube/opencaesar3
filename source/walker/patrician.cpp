@@ -36,7 +36,7 @@ Patrician::Patrician( CityPtr city )
   : Walker( city ), _d( new Impl )
 {
   _setType( walker::patrician );
-  _setGraphic( rand() % 100 ? WG_RICH : WG_RICH2 );
+  _setAnimation( rand() % 100 ? gfx::patrician : gfx::patrician2 );
 
   setName( _("##patrician##") );
 }
@@ -60,11 +60,11 @@ void Patrician::load( const VariantMap& stream )
 
 void Patrician::_findNewWay( const TilePos& start )
 {
-  PathWay pathway = PathwayHelper::randomWay( _getCity(), start, 10 );
+  Pathway pathway = PathwayHelper::randomWay( _getCity(), start, 10 );
 
   if( pathway.isValid() )
   {
-    setPathWay( pathway );
+    setPathway( pathway );
     setIJ( start );
     go();
   }
@@ -78,7 +78,7 @@ void Patrician::die()
 {
   Walker::die();
 
-  if( _getGraphic() == WG_RICH )
+  if( _getAnimationType() == gfx::patrician )
   {
     Corpse::create( _getCity(), getIJ(), ResourceGroup::citizen3, 809, 816 );
   }

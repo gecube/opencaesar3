@@ -37,7 +37,7 @@ public:
   GoodStock stock;
   Mode mode;
 
-  PathWay findFishingPlace(CityPtr city, const TilePos& pos);
+  Pathway findFishingPlace(CityPtr city, const TilePos& pos);
 };
 
 void FishingBoat::save( VariantMap& stream ) const
@@ -58,7 +58,7 @@ void FishingBoat::load( const VariantMap& stream )
   _d->mode = (Impl::Mode)stream.get( "mode", (int)Impl::wait ).toInt();
 
   CityHelper helper( _getCity() );
-  _d->base = helper.find<Wharf>( (TilePos)stream.get( "base" ) );
+  _d->base = helper.find<Wharf>( building::wharf, (TilePos)stream.get( "base" ) );
   if( _d->base.isValid() )
   {
     _d->base->assignBoat( this );
@@ -76,11 +76,11 @@ void FishingBoat::timeStep(const unsigned long time)
     case Impl::ready2Catch:
     {
       _getAnimation().clear();
-      _setGraphic( WG_FISHING_BOAT );
-      PathWay way = _d->findFishingPlace( _getCity(), getIJ() );
+      _setAnimation( gfx::fishingBoat );
+      Pathway way = _d->findFishingPlace( _getCity(), getIJ() );
       if( way.isValid() )
       {
-        setPathWay( way );
+        setPathway( way );
         go();
 
         _d->mode = Impl::go2fishplace;
@@ -91,10 +91,10 @@ void FishingBoat::timeStep(const unsigned long time)
     case Impl::catchFish:
     {
       _getAnimation().clear();
-      _setGraphic( WG_FISHING_BOAT_WORK );
+      _setAnimation( gfx::fishingBoatWork );
 
       CityHelper helper( _getCity() );
-      FishPlacePtr overlay = helper.find<FishPlace>( getIJ() );
+      FishPlacePtr overlay = helper.find<FishPlace>( place::fishPlace, getIJ() );
 
       if( overlay != 0 )
       {
@@ -117,19 +117,19 @@ void FishingBoat::timeStep(const unsigned long time)
     {
       if( _d->base != 0 )
       {
-        PathWay way;
+        Pathway way;
         bool pathfound = Pathfinder::getInstance().getPath( getIJ(), _d->base->getLandingTile().getIJ(),
                                                             way, Pathfinder::waterOnly, Size(0) );
 
         if( pathfound )
         {
           _d->mode = Impl::back2Base;
-          setPathWay( way );
+          setPathway( way );
           go();
         }
 
         _getAnimation().clear();
-        _setGraphic( WG_FISHING_BOAT );
+        _setAnimation( gfx::fishingBoat );
       }
       else
       {
@@ -181,7 +181,7 @@ void FishingBoat::die()
 
 FishingBoat::FishingBoat( CityPtr city ) : Ship( city ), _d( new Impl )
 {
-  _setGraphic( WG_FISHING_BOAT );
+  _setAnimation( gfx::fishingBoat );
   _setType( walker::fishingBoat );
   setName( _("##fishing_boat##") );
   _d->mode = Impl::wait;
@@ -215,7 +215,7 @@ void FishingBoat::onNewTile()
   _getAnimation().setDelay( 3 );
 }
 
-PathWay FishingBoat::Impl::findFishingPlace( CityPtr city, const TilePos& pos )
+Pathway FishingBoat::Impl::findFishingPlace( CityPtr city, const TilePos& pos )
 {
   CityHelper helper( city );
   FishPlaceList places = helper.find<FishPlace>( place::fishPlace );
@@ -234,7 +234,7 @@ PathWay FishingBoat::Impl::findFishingPlace( CityPtr city, const TilePos& pos )
 
   if( nearest != 0 )
   {
-    PathWay way;
+    Pathway way;
     bool pathFound = Pathfinder::getInstance().getPath( pos, nearest->getTilePos(),
                                                         way, Pathfinder::waterOnly, Size(0) );
 
@@ -242,7 +242,7 @@ PathWay FishingBoat::Impl::findFishingPlace( CityPtr city, const TilePos& pos )
       return way;
   }
 
-  return PathWay();
+  return Pathway();
 }
 
 void FishingBoat::send2City( WharfPtr base, const TilePos &start )

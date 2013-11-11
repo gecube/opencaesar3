@@ -50,15 +50,15 @@ public:
   int maxDistance;
   long reservationID;
 
-  BuildingPtr getWalkerDestination_factory(Propagator& pathPropagator, PathWay &oPathWay);
-  BuildingPtr getWalkerDestination_warehouse(Propagator& pathPropagator, PathWay &oPathWay);
-  BuildingPtr getWalkerDestination_granary(Propagator& pathPropagator, PathWay &oPathWay);
+  BuildingPtr getWalkerDestination_factory(Propagator& pathPropagator, Pathway &oPathWay);
+  BuildingPtr getWalkerDestination_warehouse(Propagator& pathPropagator, Pathway &oPathWay);
+  BuildingPtr getWalkerDestination_granary(Propagator& pathPropagator, Pathway &oPathWay);
 };
 
 CartPusher::CartPusher( CityPtr city )
   : Walker( city ), _d( new Impl )
 {
-  _setGraphic( WG_PUSHER );
+  _setAnimation( gfx::cartPusher );
   _setType( walker::cartPusher );
   _d->producerBuilding = NULL;
   _d->consumerBuilding = NULL;
@@ -186,7 +186,7 @@ void CartPusher::getPictureList(std::vector<Picture> &oPics)
 void CartPusher::computeWalkerDestination()
 {
    // get the list of buildings within reach
-   PathWay pathWay;
+   Pathway pathWay;
    Propagator pathPropagator( _getCity() );
    _d->consumerBuilding = 0;
 
@@ -223,7 +223,7 @@ void CartPusher::computeWalkerDestination()
    {
       //_isDeleted = true;  // no destination!
      setConsumerBuilding( destBuilding );
-     setPathWay( pathWay );
+     setPathway( pathWay );
      setIJ( _getPathway().getOrigin().getIJ() );
      setSpeed( 1 );
    }
@@ -239,7 +239,7 @@ void CartPusher::computeWalkerDestination()
 template< class T >
 BuildingPtr reserveShortestPath( const TileOverlay::Type buildingType,
                                      GoodStock& stock, long& reservationID,
-                                     Propagator &pathPropagator, PathWay &oPathWay )
+                                     Propagator &pathPropagator, Pathway &oPathWay )
 {
   BuildingPtr res;
   Propagator::Routes pathWayList = pathPropagator.getRoutes( buildingType );
@@ -263,7 +263,7 @@ BuildingPtr reserveShortestPath( const TileOverlay::Type buildingType,
 
   //find shortest path
   int maxLength = 999;
-  PathWay* shortestPath = 0;
+  Pathway* shortestPath = 0;
   for( Propagator::Routes::iterator pathIt = pathWayList.begin(); 
     pathIt != pathWayList.end(); pathIt++ )
   {
@@ -292,7 +292,7 @@ BuildingPtr reserveShortestPath( const TileOverlay::Type buildingType,
   return res;
 }
 
-BuildingPtr CartPusher::Impl::getWalkerDestination_factory(Propagator &pathPropagator, PathWay &oPathWay)
+BuildingPtr CartPusher::Impl::getWalkerDestination_factory(Propagator &pathPropagator, Pathway &oPathWay)
 {
   BuildingPtr res;
   Good::Type goodType = stock.type();
@@ -309,16 +309,16 @@ BuildingPtr CartPusher::Impl::getWalkerDestination_factory(Propagator &pathPropa
   return res;
 }
 
-BuildingPtr CartPusher::Impl::getWalkerDestination_warehouse(Propagator &pathPropagator, PathWay &oPathWay)
+BuildingPtr CartPusher::Impl::getWalkerDestination_warehouse(Propagator &pathPropagator, Pathway &oPathWay)
 {
   BuildingPtr res;
 
-  res = reserveShortestPath<Warehouse>( building::B_WAREHOUSE, stock, reservationID, pathPropagator, oPathWay );
+  res = reserveShortestPath<Warehouse>( building::warehouse, stock, reservationID, pathPropagator, oPathWay );
 
   return res;
 }
 
-BuildingPtr CartPusher::Impl::getWalkerDestination_granary(Propagator &pathPropagator, PathWay &oPathWay)
+BuildingPtr CartPusher::Impl::getWalkerDestination_granary(Propagator &pathPropagator, Pathway &oPathWay)
 {
    BuildingPtr res;
 
