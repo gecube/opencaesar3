@@ -18,14 +18,14 @@ openCaesar3 is build using following excellent libraries:
 Releases:
 ---------
 ##### 2013-10-31
-  * warf and fishing boat add
+  * wharf and fishing boat add
   * translation system improved
-  * education adviser, employers adviser improved
+  * education advisor, employers advisor improved
   * source structure refactoring
   * add tile animation
   * city population model changed
   * speed options window and video options added add
-  * big screnn resolutions add
+  * big screen resolutions add
   * utf8 text rendering
   * paved road add
   * health layer add
