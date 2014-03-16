@@ -1,3 +1,9 @@
+**main branch of development here**
+https://bitbucket.org/dalerank/caesaria
+
+
+
+
 openCaesar3
 -----------
 openCaesar3 is a remake of the classic Caesar3 PC game, a city building game developed by Impression Games and published by Sierra Entertainment, in 1998.
