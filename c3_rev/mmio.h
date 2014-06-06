@@ -13,6 +13,10 @@ int fun_chdirToCdBasedOnExtension(const char *filename);
 void fun_storeFileExtension(const char *filename);
 void fun_strncpy(const char *src, char *dst, int len);
 void fun_strtoupper(char* a1);
+void fun_getGameTextString(int group, int number);
+void fun_drawHelpDialogWithVideo();
+
+
 void fun_chdirHome();
 void fun_getTimeAsString();
 int fun_intToString(signed int number, int offset, int addPlusSign);

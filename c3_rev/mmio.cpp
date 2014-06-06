@@ -492,6 +492,24 @@ void fun_logDebugMessage(const char *msg, const char *paramStr, int paramInt)
   }
 }
 
+
+
+void fun_getGameTextString(int group, int number)
+{
+  gametext_result = (char *)&c3eng_data + c3eng_index[group].offset;
+  while ( number > 0 )
+  {
+    if ( !*gametext_result )
+    {
+      if ( (signed int)(unsigned __int8)*(gametext_result - 1) >= ' ' || !*(gametext_result - 1) )
+        --number;
+    }
+    ++gametext_result;
+  }
+  while ( (signed int)(unsigned __int8)*gametext_result < ' ' )
+    ++gametext_result;
+}
+
 int cvtdate(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11)
 {
   int result; // eax@20

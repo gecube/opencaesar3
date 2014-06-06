@@ -22,6 +22,13 @@ int offset;
 int inUse;
 };
 
+struct C3EngHeader
+{
+char tag[16];
+int numGroups ;
+int numStrings ;
+int unknown    ;
+};
 
 
 typedef int BuildingType;
@@ -196,10 +203,14 @@ struct C3ArrowButton
 struct C3MenuItem
 {
   unsigned short yOffset;
-  unsigned short textNumber;
-  void (*handler)();
-  int field_8;
-  int parameter;
+  unsigned short textNumber;//2
+  void (*handler)();//4
+  char field_9;//8
+  char cycleMouseHelp;//9
+  short field_8;//10
+  int parameter;//12
+  char field_10;//16
+  char toggleWarnings;//17
 };
 
 struct C3Menu
