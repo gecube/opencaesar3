@@ -145,7 +145,7 @@ static int dword_9D4DE4; // weak
 static int dword_9D4DE8; // weak
 static int dword_9D4DEC; // weak
 static int dword_9D4DF0; // weak
-static __int16 drawGraphic_colorMask; // idb
+static short drawGraphic_colorMask; // idb
 
 static int help_isUrgent[0xff]; // weak
 static int help_videoLink[0xff]; // weak
@@ -213,7 +213,7 @@ static int drawGraphic_fileOffset; // weak
 static int selectAnts_index; // weak
 static int random_iv2; // weak
 static int input_cursorPosition[0xff]; // idb
-static unsigned __int8 drawGraphic_clipYCode;
+static unsigned char drawGraphic_clipYCode;
 static int random_iv1; // weak
 static int dword_6ADB50; // weak
 static int drawGraphic_visibleWidthClipRight; // weak
@@ -245,7 +245,7 @@ static char drawGraphic_type; // weak
 
 static int drawtext_hashCharAndWrap; // weak
 static char drawWinLoseButtons_isSelected; // weak
-static __int16 drawtext_color; // weak
+static short drawtext_color; // weak
 static int drawtext_wrap; // weak
 static int fullscreenImage_xOffset; // weak
 static int dword_788048; // weak
@@ -286,7 +286,7 @@ static int random_poolIndex; // weak
 static int randomcounter_768; // weak
 static int input_accepted; // weak
 static int text_yoffset; // weak
-static unsigned __int8 drawGraphic_clipXCode;
+static unsigned char drawGraphic_clipXCode;
 static LPCSTR c3eng_textstring_forMessagebox; // idb
 
 static int dword_607F34[0xff]; // weak
@@ -322,8 +322,8 @@ static int dword_607FF8; // weak
 static int ddraw_busy; // weak
 static int paintVideo_last; // weak
 static int time_current; // weak
-static __int16 *ddraw_buffer;
-static __int16 *screen_buffer;
+static short *ddraw_buffer;
+static short *screen_buffer;
 static int key_ctrl_down; // weak
 static int key_shift_down; // weak
 static int arrowkey_right_pressed; // weak
@@ -475,45 +475,45 @@ static int dword_606D98[20];
 static int dword_606D68[40];
 static int dword_606D9C[40];
 
-static __int16 graphic_id_start[0xff]; // weak
-static __int16 graphic_terrain_start; // weak
-static __int16 graphic_terrain_trees; // weak
-static __int16 graphic_terrain_uglygrass; // weak
-static __int16 graphic_terrain_shrub; // weak
-static __int16 graphic_terrain_water; // weak
-static __int16 graphic_terrain_quake; // weak
-static __int16 graphic_terrain_grass2; // weak
-static __int16 graphic_terrain_rock; // weak
-static __int16 graphic_terrain_cliff; // weak
-static __int16 graphic_terrain_grass1; // weak
-static __int16 graphic_buttons_start; // weak
-static __int16 graphic_sidepanel; // weak
-static __int16 graphic_mainMenuBg; // weak
-static __int16 graphic_buttons; // weak
-static __int16 graphic_font; // weak
-static __int16 graphic_tower; // weak
-static __int16 graphic_aqueduct; // weak
-static __int16 graphic_overlaytiles; // weak
-static __int16 graphic_fire_almost; // weak
-static __int16 graphic_market; // weak
-static __int16 graphic_well; // weak
-static __int16 graphic_wall_top; // weak
-static __int16 graphic_reservoir; // weak
-static __int16 graphic_housing_tent; // weak
-static __int16 graphic_housing_shack; // weak
-static __int16 graphic_housing_hovel; // weak
-static __int16 graphic_housing_casa; // weak
-static __int16 graphic_housing_insula; // weak
-static __int16 graphic_housing_insula2; // weak
-static __int16 graphic_housing_villa; // weak
-static __int16 graphic_housing_villa2; // weak
-static __int16 graphic_housing_palace; // weak
-static __int16 graphic_housing_palace2; // weak
-static __int16 graphic_housing_vacant; // weak
-static __int16 graphic_farm; // weak
-static __int16 graphic_quarry; // weak
-static __int16 graphic_ironMine; // weak
-static __int16 graphic_clayPit; // weak
+static short graphic_id_start[0xff]; // weak
+static short graphic_terrain_start; // weak
+static short graphic_terrain_trees; // weak
+static short graphic_terrain_uglygrass; // weak
+static short graphic_terrain_shrub; // weak
+static short graphic_terrain_water; // weak
+static short graphic_terrain_quake; // weak
+static short graphic_terrain_grass2; // weak
+static short graphic_terrain_rock; // weak
+static short graphic_terrain_cliff; // weak
+static short graphic_terrain_grass1; // weak
+static short graphic_buttons_start; // weak
+static short graphic_sidepanel; // weak
+static short graphic_mainMenuBg; // weak
+static short graphic_buttons; // weak
+static short graphic_font; // weak
+static short graphic_tower; // weak
+static short graphic_aqueduct; // weak
+static short graphic_overlaytiles; // weak
+static short graphic_fire_almost; // weak
+static short graphic_market; // weak
+static short graphic_well; // weak
+static short graphic_wall_top; // weak
+static short graphic_reservoir; // weak
+static short graphic_housing_tent; // weak
+static short graphic_housing_shack; // weak
+static short graphic_housing_hovel; // weak
+static short graphic_housing_casa; // weak
+static short graphic_housing_insula; // weak
+static short graphic_housing_insula2; // weak
+static short graphic_housing_villa; // weak
+static short graphic_housing_villa2; // weak
+static short graphic_housing_palace; // weak
+static short graphic_housing_palace2; // weak
+static short graphic_housing_vacant; // weak
+static short graphic_farm; // weak
+static short graphic_quarry; // weak
+static short graphic_ironMine; // weak
+static short graphic_clayPit; // weak
 
 static int dword_7E2C08; // weak
 
@@ -524,24 +524,24 @@ static int xOffset; // idb
 static int yOffset; // idb
 static int font_currentFontId; // idb
 
-static __int16 help_type[0xff]; // weak
-static __int16 help_messageType[0xff]; // weak
-static __int16 help_x[0xff]; // weak
-static __int16 help_y[0xff]; // weak
-static __int16 help_width[0xff]; // weak
-static __int16 help_height[0xff]; // weak
-static __int16 help_picture1_id[0xff]; // weak
-static __int16 help_picture1_x[0xff]; // weak
-static __int16 help_picture1_y[0xff]; // weak
-static __int16 help_picture2_id[0xff]; // weak
-static __int16 help_picture2_x[0xff]; // weak
-static __int16 help_picture2_y[0xff]; // weak
-static __int16 help_title_x[0xff]; // weak
-static __int16 help_title_y[0xff]; // weak
-static __int16 help_subtitle_x[0xff]; // weak
-static __int16 help_subtitle_y[0xff]; // weak
-static __int16 help_unknown20[0xff]; // weak
-static __int16 help_unknown21[0xff]; // weak
+static short help_type[0xff]; // weak
+static short help_messageType[0xff]; // weak
+static short help_x[0xff]; // weak
+static short help_y[0xff]; // weak
+static short help_width[0xff]; // weak
+static short help_height[0xff]; // weak
+static short help_picture1_id[0xff]; // weak
+static short help_picture1_x[0xff]; // weak
+static short help_picture1_y[0xff]; // weak
+static short help_picture2_id[0xff]; // weak
+static short help_picture2_x[0xff]; // weak
+static short help_picture2_y[0xff]; // weak
+static short help_title_x[0xff]; // weak
+static short help_title_y[0xff]; // weak
+static short help_subtitle_x[0xff]; // weak
+static short help_subtitle_y[0xff]; // weak
+static short help_unknown20[0xff]; // weak
+static short help_unknown21[0xff]; // weak
 
 static int currentHelpId; // weak
 static int message_month; // idb
@@ -561,8 +561,8 @@ static char byte_660728; // weak
 static int windowedMode_xOffset; // weak
 static char winState; // weak
 static char byte_660731[81]; // weak
-static __int16 mouseInfo_x; // weak
-static __int16 mouseInfo_y; // weak
+static short mouseInfo_x; // weak
+static short mouseInfo_y; // weak
 static char mouseInfo_type; // weak
 static char byte_660787; // weak
 static HCURSOR cursor_shovel;
@@ -584,7 +584,7 @@ static int graphics_format_hex; // weak
 static int dword_6608E8; // weak
 static int dword_6608EC; // weak
 static int ddraw_height; // idb
-static unsigned __int8 window_id;
+static unsigned char window_id;
 static char byte_6608FD; // weak
 static char byte_660904; // weak
 static char imagebuttons_redraw; // weak
@@ -594,5 +594,17 @@ static int dword_660B7C; // weak
 
 static int dword_64E378;
 static WindowsBitmap *c3maps_bitmap;
+
+struct CityInfo
+{
+  unsigned int population;
+
+  CityInfo()
+  {
+    memset( this, 0, sizeof(CityInfo) );
+  }
+};
+
+static CityInfo city_inform[256];
 
 #endif
