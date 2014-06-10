@@ -426,7 +426,7 @@ static int model_houses_numPeople[__TD_TR]; // weak
 static int model_houses_tax[__TD_TR]; // idb
 
 static int cityinfo_numLegionaryForts[__TD_TR]; // weak
-static int cityinfo_maxPopulationEver[__TD_TR]; // weak
+
 static int cityinfo_estimatedWageCost[__TD_TR]; // weak
 static int cityinfo_numWineTypesAvailable[__TD_TR]; // weak
 static int cityinfo_maxProsperity[__TD_TR]; // weak
@@ -591,6 +591,28 @@ static char imagebuttons_redraw; // weak
 static char drawGraphic_555file[96]; // idb
 static int dword_660B78; // weak
 static int dword_660B7C; // weak
+static int byte_605A68[0xff]; // idb
+
+static short pk_literalSequences[255]; // weak
+static short pk_literalSequencesEnd; // weak
+
+static int dictionarySize; // idb
+static char pk_implode_copyOffsetBits[0xff]; // idb
+static char pk_implode_copyOffsetCode[0xff]; // idb
+static char pk_implode_copyLengthBaseBits[0xff]; // idb
+static char pk_implode_copyLengthExtraBits[0xff]; // idb
+static char pk_implode_copyLengthBaseCode[0xff]; // idb
+static char pk_literalLengths[0xff]; // idb
+
+static __int16 pk_literalValues[256];
+static char aPkwareDataComp[193]; // weak
+static char pk_copyOffsetBits[0xff]; // idb
+static char pk_copyOffsetCode[64]; // weak
+static char pk_copyLengthExtraBits[0xff]; // idb
+static unsigned __int16 pk_copyLengthBaseValue[0xff];
+static char pk_copyLengthBaseBits[0xff]; // idb
+static char pk_copyLengthBaseCode[16]; // weak
+static char pk_literalTable[0xff]; // idb
 
 static int dword_64E378;
 static WindowsBitmap *c3maps_bitmap;
@@ -598,6 +620,12 @@ static WindowsBitmap *c3maps_bitmap;
 struct CityInfo
 {
   unsigned int population;
+  unsigned int births;
+  unsigned int maxPopulationEver;
+  char hasWonScenario;
+  int victoryContinueMonths;
+  int salary_rank;
+  int salary_amount;
 
   CityInfo()
   {
