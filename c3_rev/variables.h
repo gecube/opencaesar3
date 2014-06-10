@@ -626,6 +626,9 @@ struct CityInfo
   int victoryContinueMonths;
   int salary_rank;
   int salary_amount;
+  int tradeCenterId;
+  int shipyardBoatsRequested;
+  int wages;
 
   CityInfo()
   {
