@@ -1,6 +1,7 @@
 #ifndef __C3_REV_INCLUDE__
 #define __C3_REV_INCLUDE__
 
+#include "windows.h"
 #define __uint32_t unsigned int
 
 struct C3MapPoint
@@ -15,8 +16,41 @@ struct C3GraphicOffsetID
   int graphicId;
 };
 
+struct C3EngIndexEntry
+{
+int offset;
+int inUse;
+};
+
+struct C3EngHeader
+{
+char tag[16];
+int numGroups ;
+int numStrings ;
+int unknown    ;
+};
+
 
 typedef int BuildingType;
+
+enum EmpireCityType
+{
+City_DistantRoman  = 0,
+City_Ours        = 1,
+City_Trade       = 2,
+City_FutureTrade  = 3,
+City_DistantForeign  = 4,
+City_VulnerableRoman  = 5,
+City_FutureRoman  = 6
+};
+
+enum EnemyType
+{
+ Enemy_Barbarian  = 0,
+ Enemy_Greek      = 8,
+ Enemy_Egyptian   = 9
+};
+
 
 enum BuildingTypeT
 {
@@ -169,10 +203,14 @@ struct C3ArrowButton
 struct C3MenuItem
 {
   unsigned short yOffset;
-  unsigned short textNumber;
-  void (*handler)();
-  int field_8;
-  int parameter;
+  unsigned short textNumber;//2
+  void (*handler)();//4
+  char field_9;//8
+  char cycleMouseHelp;//9
+  short field_8;//10
+  int parameter;//12
+  char field_10;//16
+  char toggleWarnings;//17
 };
 
 struct C3Menu
@@ -238,14 +276,30 @@ struct C3ImageButton
 
 #define __TM_GD 100
 
-C3GraphicOffsetID topmenuGraphics640[__TM_GD];
-C3GraphicOffsetID topmenuGraphics800[__TM_GD];
-C3GraphicOffsetID topmenuGraphics1024[__TM_GD];
+static C3GraphicOffsetID topmenuGraphics640[__TM_GD];
+static C3GraphicOffsetID topmenuGraphics800[__TM_GD];
+static C3GraphicOffsetID topmenuGraphics1024[__TM_GD];
 
-const int Direction_Nort = 0;
-const int Direction_East = 2;
-const int Direction_South = 4;
-const int Direction_West = 6;
+struct C3GameFilePart
+{
+ int compressed;
+ int offset;
+ int length;
+};
+
+enum DirectionType
+{
+Direction_North  = 0,
+Direction_NorthEast  = 1,
+Direction_East   = 2,
+Direction_SouthEast  = 3,
+Direction_South  = 4,
+Direction_SouthWest  = 5,
+Direction_West   = 6,
+Direction_NorthWest  = 7,
+Direction_None   = 8
+};
+
 
 const int Emp_City = 2;
 const int Emp_UnusedValue2 = 3;
@@ -255,69 +309,103 @@ const int Emp_SeaTradeRoute = 6;
 const int Emp_DistantBattleRomanArmy = 7;
 const int Emp_DistantBattleEnemyArmy = 8;
 
+enum ClimateType
+{
+Climate_Central  = 0,
+Climate_Northern  = 1,
+Climate_Desert   = 2
+};
 
 
-typedef unsigned int GoodType;
+enum GoodType
+{
+G_None           = 0,
+G_Wheat          = 1,
+G_Vegetables     = 2,
+G_Fruit          = 3,
+G_Olives         = 4,
+G_Vines          = 5,
+G_MeatFish       = 6,
+G_Wine           = 7,
+G_Oil            = 8,
+G_Iron           = 9,
+G_Timber         = 10,
+G_Clay           = 11,
+G_Marble         = 12,
+G_Weapons        = 13,
+G_Furniture      = 14,
+G_Pottery        = 15,
+G_Denarii        = 16,
+G_Troops         = 17
+};
 
-const GoodType G_Wheat = 1;
-const GoodType G_Vegetables = 2;
-const GoodType G_Fruit = 3;
-const GoodType G_Olives = 4;
-const GoodType G_Vines = 5;
-const GoodType G_MeatFish = 6;
-const GoodType G_Clay = 0xb;
-const GoodType G_Marble = 0xc;
-const GoodType G_Timber = 0xA;
-const GoodType G_Wine = 0x7;
-const GoodType G_Oil = 0x8;
-const GoodType G_Weapons = 0xD;
-const GoodType G_Furniture = 0xe;
-const GoodType G_Pottery = 0xf;
-const GoodType G_Iron  = 0x9;
 
-const int Overlay_None = 0;
-const int W_MainMenu = 0;
-const int W_SavedGame_LoadSaveDeleteDialog = 0xD;
-const int W_DisplayOptionsDialog = 0xA;
-const int W_SoundOptionsDialog = 0xB;
-const int W_SpeedOptionsDialog = 0xC;
-const int W_NumericInputDialog = 0xE;
-const int W_SelectListDialog = 0xF;
-const int W_Advisors = 0x7;
-const int W_OverlaySelectionMenu = 0x8;
-const int W_EmpireMap = 0x14;
-const int W_EditorEditStartDate = 0x16;
-const int W_EditorRequests = 0x17;
-const int W_EditorEditRequest = 0x18;
-const int W_EditorInvasions = 0x19;
-const int W_EditorEditInvasion = 0x1A;
-const int W_EditorAllowedBuildings = 0x1B;
-const int W_EditorWinCriteria = 0x1C;
-const int W_EditorSpecialEvents = 0x1D;
-const int W_EditorDemandChanges = 0x1f;
-const int W_EditorEditDemandChange = 0x20;
-const int W_EditorPriceChanges = 0x21;
-const int W_EditorEditPriceChange = 0x22;
-const int W_EditorStartingConditions = 0x25;
-const int W_ResourceSettingsDialog = 0x28;
-const int W_TradePricesDialog = 0x29;
-const int W_LaborPriorityDialog = 0x2A;
-const int W_HoldFestivalDialog = 0x2B;
-const int W_SetSalaryDialog = 0x2C;
-const int W_DonateToCityDialog = 0x2D;
-const int W_SendGiftDialog = 0x2e;
-const int W_MissionBriefing = 0x35;
-const int W_ResolutionConfirmDialog = 0x3E;
-const int W_DifficultyOptionsDialog = 0x45;
+enum WindowType
+{
+W_MainMenu       = 0,
+W_Advisors       = 7,
+W_OverlaySelectionMenu  = 8,
+W_DisplayOptionsDialog  = 10,
+W_SoundOptionsDialog  = 11,
+W_SpeedOptionsDialog  = 12,
+W_SavedGame_LoadSaveDeleteDialog  = 13,
+W_NumericInputDialog  = 14,
+W_SelectListDialog  = 15,
+W_MessageList    = 17,
+W_Video          = 19,
+W_EmpireMap      = 20,
+W_EditorEditStartDate  = 22,
+W_EditorRequests  = 23,
+W_EditorEditRequest  = 24,
+W_EditorInvasions  = 25,
+W_EditorEditInvasion  = 26,
+W_EditorAllowedBuildings  = 27,
+W_EditorWinCriteria  = 28,
+W_EditorSpecialEvents  = 29,
+W_EditorDemandChanges  = 31,
+W_EditorEditDemandChange  = 32,
+W_EditorPriceChanges  = 33,
+W_EditorEditPriceChange  = 34,
+W_EditorStartingConditions  = 37,
+W_ResourceSettingsDialog  = 40,
+W_TradePricesDialog  = 41,
+W_LaborPriorityDialog  = 42,
+W_HoldFestivalDialog  = 43,
+W_SetSalaryDialog  = 44,
+W_DonateToCityDialog  = 45,
+W_SendGiftDialog  = 46,
+W_MissionBriefing  = 53,
+W_NewCampaignDialog  = 54,
+W_CckSelection   = 61,
+W_ResolutionConfirmDialog  = 62,
+W_GeneralConfirmDialog  = 63,
+W_VideoIntro     = 64,
+W_VideoCredits   = 65,
+W_VideoLogo      = 68,
+W_DifficultyOptionsDialog  = 69
+};
 
 enum GameTextGroup
 {
-  GAMETEXT_DIALOGS=5,
-  GAMETEXT_LOADING=0xB
+  GAMETEXT_MENU_FILE  = 1,
+  GAMETEXT_MENU_OPTIONS  = 2,
+  GAMETEXT_MENU_HELP  = 3,
+  GAMETEXT_MENU_ADVISORS  = 4,
+  GAMETEXT_DIALOGS  = 5,
+  GAMETEXT_MENUEXTRA  = 6,
+  GAMETEXT_EDITOR_MENU_FILE  = 7,
+  GAMETEXT_LOADING  = 11,
+  GAMETEXT_ORIENTATION  = 17,
+  GAMETEXT_WARNING  = 19,
+  GAMETEXT_MONTHS  = 25,
+  GAMETEXT_OVERLAY_INFO  = 66,
+  GAMETEXT_MOUSEOVER_INFO  = 68
+
 };
 
 enum OverlayType
 {
+  Overlay_None=0,
   Overlay_Fire=8,
   Overlay_Damage=9,
   Overlay_Crime=0xA,
@@ -359,12 +447,51 @@ enum AdvisorType {
   Adv_Chief=0xC
 };
 
+enum HelpType
+{
+Help_Manual      = 0,
+Help_About       = 1,
+Help_Message     = 2,
+Help_Mission     = 3
+};
+
+enum HelpMessageType
+{
+HelpMessage_General  = 0,
+HelpMessage_Disaster  = 1,
+HelpMessage_Imperial  = 2,
+HelpMessage_Emigration  = 3,
+HelpMessage_Tutorial  = 4,
+HelpMessage_TradeChange  = 5,
+HelpMessage_PriceChange  = 6,
+HelpMessage_Invasion  = 7
+};
+
+
+enum MessageAdvisorType {
+    MessageAdvisor_None  = 0,
+    MessageAdvisor_Labor  = 1,
+    MessageAdvisor_Trade  = 2,
+    MessageAdvisor_Population  = 3,
+    MessageAdvisor_Imperial  = 4,
+    MessageAdvisor_Military  = 5,
+    MessageAdvisor_Health  = 6,
+    MessageAdvisor_Religion  = 7
+};
+
+
 enum FontType
 {
-  F_NormalBlack=0x86,
-  F_LargeBlack=0x29e,
-  F_SmallBrown=0x430
-
+ F_NormalPlain    = 0,
+ F_NormalBlack    = 134,
+ F_NormalWhite    = 268,
+ F_NormalRed      = 402,
+ F_LargePlain     = 536,
+ F_LargeBlack     = 670,
+ F_LargeBrown     = 804,
+ F_SmallPlain     = 938,
+ F_SmallBrown     = 1072,
+ F_SmallBlack     = 1206
 };
 
 enum TradeStatusType {
@@ -465,9 +592,174 @@ Walker_Wolf      = 69,
 Walker_Zebra     = 70,
 Walker_Spear     = 71,
 Walker_HippodromeMiniHorses  = 72
-}
+};
+
+enum LaborCategory
+{
+LaborCategory_IndustryCommerce  = 0,
+LaborCategory_FoodProduction  = 1,
+LaborCategory_Engineering  = 2,
+LaborCategory_Water  = 3,
+LaborCategory_Prefectures  = 4,
+LaborCategory_Military  = 5,
+LaborCategory_Entertainment  = 6,
+LaborCategory_HealthEducation  = 7,
+LaborCategory_GovernanceReligion  = 8
+};
+
+#define _DWORD unsigned int
+#define _BYTE unsigned char
+#define _WORD unsigned short
+
+enum GodType
+{
+God_Ceres        = 0,
+God_Neptune      = 1,
+God_Mercury      = 2,
+God_Mars         = 3,
+God_Venus        = 4
+};
+
+struct PKToken
+{
+char* inputData       ;
+int field_4        ;
+int inputLength    ;
+char* compressedData  ;
+int field_10       ;
+int compressedLength;
+char* destData       ;
+int field_1C       ;
+int destLength     ;
+int field_24       ;
+int hashcode        ;
+int field_2C       ;
+int stop            ;
+};
+
+struct PKCompBuffer
+{
+int copyOffset      ;
+int outputPtr       ;
+int currentOutputBitsUsed;
+int windowSize     ;
+int copyOffsetExtraMask;
+int hasLiteralEncoding ;
+int dictionarySize ;
+char copyOffsetBits[64];
+char copyOffsetCode[64];
+char literalBits[256];
+char copyLengthBits[518];
+short literalValues[254];
+short copyLengthValues[519];
+short copyLengthEof ;
+short field_9AE       ;
+PKToken* token          ;
+int (*inputFunc)(char*, int*, struct PKToken *);
+void (*outputFunc)(char*, int*, struct PKToken *);
+short field_9BC[518];
+short analyze1[2304];
+short field_1FC8     ;
+char outputData[2050];
+char inputData[8708];
+char analyze2[8708];
+};
+
+struct PKDecompBuffer
+{
+int field_0        ;
+int hasLiteralEncoding ;
+int outputBufferPtr;
+int windowSize     ;
+int dictionarySize ;
+int currentInputByte ;
+int currentInput_bitsAvailable ;
+int inputBufferPtr ;
+int inputBufferEnd  ;
+PKToken *token;
+int (__cdecl *inputFunc)(char *, int *, struct PKToken *);
+void (__cdecl *outputFunc)(char *, int *, struct PKToken *);
+char outputBuffer[8708];//    db 8708 dup(?)
+char inputBuffer[2048];//     db 2048 dup(?)
+char copyOffsetTable[256];// db 256 dup(?)
+char copyLengthTable[256];// db 256 dup(?)
+char literalDecode1[256];//  db 256 dup(?)
+char literalDecode2[256];//  db 256 dup(?)
+char literalDecode3[128];//  db 128 dup(?)
+char literalDecode4[256];//  db 256 dup(?)
+char literalDecode5[256];//  db 256 dup(?)
+char copyOffsetBits[64];//  db 64 dup(?)
+char copyLengthBaseBits[16];// db 16 dup(?)
+char copyLengthExtraBits[16];// db 16 dup(?)
+char copyLengthBaseValue[32];// db 32 dup(?)
+char field_3134[23715];//      db 23715 dup(?)
+char end;
+};
 
 
+struct C3MapSize
+{
+int field_0;
+int field_4;
+int field_8;
+int field_C;
+short field_10;
+short field_12;
+short field_14;
+short field_16;
+};
+
+
+struct C3Warning
+{
+short warningTextId;
+short middle        ;
+short top          ;
+short inUse        ;
+short textLength   ;
+short warningboxWidth ;
+int time           ;
+short unused         ;
+char text[102]        ;
+};
+
+
+struct WindowsBitmap
+{
+  BITMAPFILEHEADER header;
+  char info[41];
+};
+
+#define _LOBYTE(x)   (*((_BYTE*)&(x)))   // low byte
+#define _LOWORD(x)   (*((_WORD*)&(x)))   // low word
+#define _LODWORD(x)  (*((_DWORD*)&(x)))  // low dword
+#define _HIBYTE(x)   (*((_BYTE*)&(x)+1))
+#define _HIWORD(x)   (*((_WORD*)&(x)+1))
+#define _HIDWORD(x)  (*((_DWORD*)&(x)+1))
+#define BYTEn(x, n)   (*((_BYTE*)&(x)+n))
+#define WORDn(x, n)   (*((_WORD*)&(x)+n))
+#define BYTE1(x)   BYTEn(x,  1)         // byte 1 (counting from 0)
+#define BYTE2(x)   BYTEn(x,  2)
+#define BYTE3(x)   BYTEn(x,  3)
+#define BYTE4(x)   BYTEn(x,  4)
+#define BYTE5(x)   BYTEn(x,  5)
+#define BYTE6(x)   BYTEn(x,  6)
+#define BYTE7(x)   BYTEn(x,  7)
+#define BYTE8(x)   BYTEn(x,  8)
+#define BYTE9(x)   BYTEn(x,  9)
+#define BYTE10(x)  BYTEn(x, 10)
+#define BYTE11(x)  BYTEn(x, 11)
+#define BYTE12(x)  BYTEn(x, 12)
+#define BYTE13(x)  BYTEn(x, 13)
+#define BYTE14(x)  BYTEn(x, 14)
+#define BYTE15(x)  BYTEn(x, 15)
+#define WORD1(x)   WORDn(x,  1)
+#define WORD2(x)   WORDn(x,  2)         // third word of the object, unsigned
+#define WORD3(x)   WORDn(x,  3)
+#define WORD4(x)   WORDn(x,  4)
+#define WORD5(x)   WORDn(x,  5)
+#define WORD6(x)   WORDn(x,  6)
+#define WORD7(x)   WORDn(x,  7)
 #endif
 
 
