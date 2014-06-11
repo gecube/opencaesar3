@@ -71,6 +71,7 @@ static short building_54_house_oil[__TD_TR]; // weak
 static short building_56_house_furniture[__TD_TR]; // weak
 static short building_58_house_pottery[__TD_TR]; // weak
 static short building_62_house_academy_barber[__TD_TR]; // weak
+static short cityinfo_byte_6500A5_always0[__TD_TR];
 
 static int setting_map_camera_x; // weak
 static int setting_map_camera_y; // weak
@@ -428,7 +429,6 @@ static int model_houses_tax[__TD_TR]; // idb
 static int cityinfo_numLegionaryForts[__TD_TR]; // weak
 
 static int cityinfo_estimatedWageCost[__TD_TR]; // weak
-static int cityinfo_numWineTypesAvailable[__TD_TR]; // weak
 static int cityinfo_maxProsperity[__TD_TR]; // weak
 
 static char current_fileExtension[32];
@@ -639,6 +639,56 @@ struct CityInfo
   int shipyardBoatsRequested;
   int wages;
   int taxrate;
+  int plannedFestival_size;
+  int treasury;
+  int cultureRating;
+  int plannedFestival_god;
+  int festivalGod;
+  int festivalSize;
+  int plannedFestival_monthsToGo;
+  int smallFestivalCost;
+  int finance_sundries_thisyear;
+  int largeFestivalCost;
+  int grandFestivalCost;
+  int grandFestivalWine;
+  int grandFestivalWineUnavailable;
+  int ratingAdvisorSelectedRating;
+  int cultureRatingExplanation;
+  int personalSavings;
+  int giftToCaesarSize;
+  int lavishGiftCost;
+  int generousGiftCost;
+  int finance_donated_thisyear;
+  int modestGiftCost;
+  int missionSavedGameWritten;
+  int imperialArmyComing;
+  int immigrationPercentageBasedOnHappiness;
+  int donateAmount;
+  int newcomersThisMonth;
+  int enemyDestroyedBuildings;
+  int prosperityRatingExplanation;
+  int happiness_immigrationDuration;
+  int happiness_immigrationAmount;
+  int happiness_emigrationDuration;
+  int happiness_emigrationValue;
+  int peaceRating;
+  int peaceRatingExplanation;
+  int favorRatingExplanation;
+  int favorRating;
+  int unemploymentForSenateDrawing;
+  int unemploymentPercentage;
+  int player_rank;
+  int crimeRate;
+  int numWineTypesAvailable;
+  int dword_654220;
+  int dword_6543C8;
+  int dword_654624;
+  int dword_654520;
+  int dword_65429C;
+  int dword_65451C;
+  int healthRate;
+  int happiness;
+  int prosperityRating;
   int resourceStockpile[20];
   LaborCategoryPriority labor_category_priority[10];
 
