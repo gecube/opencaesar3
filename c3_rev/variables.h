@@ -617,6 +617,15 @@ static char pk_literalTable[0xff]; // idb
 static int dword_64E378;
 static WindowsBitmap *c3maps_bitmap;
 
+struct LaborCategoryPriority
+{
+  int priority;
+  int numWorkersNeeded;
+  int workersAllocated;
+  int relatedToEmployeeAccess;
+  int numBuildings;
+};
+
 struct CityInfo
 {
   unsigned int population;
@@ -629,6 +638,9 @@ struct CityInfo
   int tradeCenterId;
   int shipyardBoatsRequested;
   int wages;
+  int taxrate;
+  int resourceStockpile[20];
+  LaborCategoryPriority labor_category_priority[10];
 
   CityInfo()
   {
