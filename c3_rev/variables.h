@@ -690,6 +690,7 @@ struct CityInfo
   int dword_6543BC;
   int dword_6544F0;
   int finance_exports_thisyear;
+  int debtState;
   int monthsSinceStart[100];
   int healthRate;
   int happiness;
