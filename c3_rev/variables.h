@@ -686,6 +686,11 @@ struct CityInfo
   int dword_654520;
   int dword_65429C;
   int dword_65451C;
+  int dword_6543B8;
+  int dword_6543BC;
+  int dword_6544F0;
+  int finance_exports_thisyear;
+  int monthsSinceStart[100];
   int healthRate;
   int happiness;
   int prosperityRating;
