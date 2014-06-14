@@ -734,6 +734,7 @@ struct CityInfo
   int evolveBathhouseRequired;
   int evolveClinicRequired;
   int healthDemand;
+  int religion_needsMet;
   int evolveSecondWineRequired;
   int serviceBarberRequired;
   int evolveEvenMoreReligionRequired;
@@ -749,6 +750,14 @@ struct CityInfo
   int entertainment_needsMet;
   int numWorkersNeeded;
   int theaterShows;
+  int education_needsMet;
+  int health_needsMet;
+  int pctReligionCoverage;
+  int holdFestival_65444C;
+  int holdFestival_654450;
+  int amphitheaterShows;
+  int theatersWithoutShowsWeighted;
+  int entertainmentNeedingShowsMost;
 
   LaborCategoryPriority labor_category_priority[10];
 
