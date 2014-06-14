@@ -429,8 +429,6 @@ static int model_houses_tax[__TD_TR]; // idb
 static int cityinfo_numLegionaryForts[__TD_TR]; // weak
 
 static int cityinfo_estimatedWageCost[__TD_TR]; // weak
-static int cityinfo_maxProsperity[__TD_TR]; // weak
-
 static char current_fileExtension[32];
 
 static char getextension_result_1; // weak
@@ -696,6 +694,62 @@ struct CityInfo
   int happiness;
   int prosperityRating;
   int resourceStockpile[20];
+  int monthsInDebt;
+  int dword_654568;
+  int numInvasionsFromCaesar;
+  int dword_6545B4;
+  int dword_6545B0;
+  int dword_654570;
+  int dword_65456C;
+  int dword_654574;
+  int ignoredRequestPoints;
+  int salaryDifferenceForFavor;
+  int tributeNotPaidYears;
+  int peopleInVillasAndPalaces;
+  int tributeNotPaid;
+  int peopleInLargeInsulaAndAbove;
+  int wagesRome;
+  int maxProsperity;
+  int peopleInTentsAndShacks;
+  int peopleInTents;
+  int monthsSinceFestival;
+  int dword_654640;
+  int dword_654644;
+  int dword_654514;
+  int evolveFountainRequired;
+  int evolveWaterRequired;
+  int serviceSchoolRequired;
+  int serviceLibraryRequired;
+  int educationDemand;
+  int evolveReligionRequired;
+  int religionDemand;
+  int serviceReligionRequired;
+  int entertainmentDemand;
+  int evolveEntertainmentRequired;
+  int evolveMoreReligionRequired;
+  int evolveMoreEntertainmentRequired;
+  int evolveMoreEducationRequired;
+  int serviceBathhouseRequired;
+  int evolveEducationRequired;
+  int evolveBathhouseRequired;
+  int evolveClinicRequired;
+  int healthDemand;
+  int evolveSecondWineRequired;
+  int serviceBarberRequired;
+  int evolveEvenMoreReligionRequired;
+  int evolveRequired_unknown1;
+  int evolveRequired_unknown2;
+  int evolveRequired_unknown3;
+  int evolveRequired_unknown4;
+  int evolveRequired_unknown5;
+  int evolveBarberRequired;
+  int serviceClinicRequired;
+  int evolveFoodsRequired;
+  int evolveHospitalRequired;
+  int entertainment_needsMet;
+  int numWorkersNeeded;
+  int theaterShows;
+
   LaborCategoryPriority labor_category_priority[10];
 
   CityInfo()
