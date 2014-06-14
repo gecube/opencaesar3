@@ -71,6 +71,7 @@ static short building_54_house_oil[__TD_TR]; // weak
 static short building_56_house_furniture[__TD_TR]; // weak
 static short building_58_house_pottery[__TD_TR]; // weak
 static short building_62_house_academy_barber[__TD_TR]; // weak
+static short cityinfo_byte_6500A5_always0[__TD_TR];
 
 static int setting_map_camera_x; // weak
 static int setting_map_camera_y; // weak
@@ -428,9 +429,6 @@ static int model_houses_tax[__TD_TR]; // idb
 static int cityinfo_numLegionaryForts[__TD_TR]; // weak
 
 static int cityinfo_estimatedWageCost[__TD_TR]; // weak
-static int cityinfo_numWineTypesAvailable[__TD_TR]; // weak
-static int cityinfo_maxProsperity[__TD_TR]; // weak
-
 static char current_fileExtension[32];
 
 static char getextension_result_1; // weak
@@ -617,6 +615,15 @@ static char pk_literalTable[0xff]; // idb
 static int dword_64E378;
 static WindowsBitmap *c3maps_bitmap;
 
+struct LaborCategoryPriority
+{
+  int priority;
+  int numWorkersNeeded;
+  int workersAllocated;
+  int relatedToEmployeeAccess;
+  int numBuildings;
+};
+
 struct CityInfo
 {
   unsigned int population;
@@ -629,6 +636,130 @@ struct CityInfo
   int tradeCenterId;
   int shipyardBoatsRequested;
   int wages;
+  int taxrate;
+  int plannedFestival_size;
+  int treasury;
+  int cultureRating;
+  int plannedFestival_god;
+  int festivalGod;
+  int festivalSize;
+  int plannedFestival_monthsToGo;
+  int smallFestivalCost;
+  int finance_sundries_thisyear;
+  int largeFestivalCost;
+  int grandFestivalCost;
+  int grandFestivalWine;
+  int grandFestivalWineUnavailable;
+  int ratingAdvisorSelectedRating;
+  int cultureRatingExplanation;
+  int personalSavings;
+  int giftToCaesarSize;
+  int lavishGiftCost;
+  int generousGiftCost;
+  int finance_donated_thisyear;
+  int modestGiftCost;
+  int missionSavedGameWritten;
+  int imperialArmyComing;
+  int immigrationPercentageBasedOnHappiness;
+  int donateAmount;
+  int newcomersThisMonth;
+  int enemyDestroyedBuildings;
+  int prosperityRatingExplanation;
+  int happiness_immigrationDuration;
+  int happiness_immigrationAmount;
+  int happiness_emigrationDuration;
+  int happiness_emigrationValue;
+  int peaceRating;
+  int peaceRatingExplanation;
+  int favorRatingExplanation;
+  int favorRating;
+  int unemploymentForSenateDrawing;
+  int unemploymentPercentage;
+  int player_rank;
+  int crimeRate;
+  int numWineTypesAvailable;
+  int dword_654220;
+  int dword_6543C8;
+  int dword_654624;
+  int dword_654520;
+  int dword_65429C;
+  int dword_65451C;
+  int dword_6543B8;
+  int dword_6543BC;
+  int dword_6544F0;
+  int finance_exports_thisyear;
+  int debtState;
+  int monthsSinceStart[100];
+  int healthRate;
+  int happiness;
+  int prosperityRating;
+  int resourceStockpile[20];
+  int monthsInDebt;
+  int dword_654568;
+  int numInvasionsFromCaesar;
+  int dword_6545B4;
+  int dword_6545B0;
+  int dword_654570;
+  int dword_65456C;
+  int dword_654574;
+  int ignoredRequestPoints;
+  int salaryDifferenceForFavor;
+  int tributeNotPaidYears;
+  int peopleInVillasAndPalaces;
+  int tributeNotPaid;
+  int peopleInLargeInsulaAndAbove;
+  int wagesRome;
+  int maxProsperity;
+  int peopleInTentsAndShacks;
+  int peopleInTents;
+  int monthsSinceFestival;
+  int dword_654640;
+  int dword_654644;
+  int dword_654514;
+  int evolveFountainRequired;
+  int evolveWaterRequired;
+  int serviceSchoolRequired;
+  int serviceLibraryRequired;
+  int educationDemand;
+  int evolveReligionRequired;
+  int religionDemand;
+  int serviceReligionRequired;
+  int entertainmentDemand;
+  int evolveEntertainmentRequired;
+  int evolveMoreReligionRequired;
+  int evolveMoreEntertainmentRequired;
+  int evolveMoreEducationRequired;
+  int serviceBathhouseRequired;
+  int evolveEducationRequired;
+  int evolveBathhouseRequired;
+  int evolveClinicRequired;
+  int healthDemand;
+  int religion_needsMet;
+  int evolveSecondWineRequired;
+  int serviceBarberRequired;
+  int evolveEvenMoreReligionRequired;
+  int evolveRequired_unknown1;
+  int evolveRequired_unknown2;
+  int evolveRequired_unknown3;
+  int evolveRequired_unknown4;
+  int evolveRequired_unknown5;
+  int evolveBarberRequired;
+  int serviceClinicRequired;
+  int evolveFoodsRequired;
+  int evolveHospitalRequired;
+  int entertainment_needsMet;
+  int numWorkersNeeded;
+  int theaterShows;
+  int education_needsMet;
+  int health_needsMet;
+  int pctReligionCoverage;
+  int holdFestival_65444C;
+  int holdFestival_654450;
+  int amphitheaterShows;
+  int theatersWithoutShowsWeighted;
+  int entertainmentNeedingShowsMost;
+
+  LaborCategoryPriority labor_category_priority[10];
 
   CityInfo()
   {
