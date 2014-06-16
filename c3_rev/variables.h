@@ -691,7 +691,7 @@ struct CityInfo
   int debtState;
   int monthsSinceStart[100];
   int healthRate;
-  int happiness;
+  int hapinessCity;
   int prosperityRating;
   int resourceStockpile[20];
   int monthsInDebt;
@@ -840,6 +840,93 @@ struct CityInfo
   int uncollectedTaxFromPlebs;
   int collectedTaxFromPatricians;
   int uncollectedTaxFromPatricians;
+  int finance_exports_lastyear;
+  int finance_imports_thisyear;
+  int finance_imports_lastyear;
+  int finance_interest_sofar_thisyear;
+  int finance_interest_lastyear;
+  int finance_interest_thisyear;
+  int finance_sundries_lastyear;
+
+  int finance_construction_lastyear;
+  int finance_construction_thisyear;
+  int finance_salary_lastyear;
+  int finance_salary_thisyear;
+
+  int finance_salary_sofar_thisyear;
+  int finance_totalIncome_lastyear;
+  int finance_totalIncome_thisyear;
+  int finance_totalExpenses_lastyear;
+  int finance_totalExpenses_thisyear;
+  int finance_netInOut_lastyear;
+  int finance_netInOut_thisyear;
+  int finance_balance_lastyear;
+  int finance_balance_thisyear;
+
+  __int16 resourceAmountExported[16];
+  __int16 resourceInStock[16];
+  __int16 stock_olives;
+  __int16 stock_vines;
+  __int16 stock_wine;
+  __int16 stock_oil;
+  __int16 stock_iron;
+  __int16 stock_timber;
+  __int16 stock_clay;
+  __int16 stock_marble;
+  __int16 stock_weapons;
+  __int16 stock_furniture;
+  __int16 stock_pottery;
+  __int16 resourceTradeStatus[16];
+  __int16 resourceTradeStatus_olives;
+  __int16 resourceTradeStatus_vines;
+  __int16 resourceTradeStatus_wine;
+  __int16 resourceTradeStatus_iron;
+  __int16 resourceTradeStatus_timber;
+  __int16 resourceTradeStatus_clay;
+  __int16 exportOver[16];
+  __int16 industryMothballed[16];
+  __int16 industryMonthballed_wheat;
+  __int16 industryMonthballed_vegetables;
+  __int16 industryMonthballed_fruit;
+  __int16 industryMonthballed_olives;
+  __int16 industryMonthballed_vines;
+  __int16 industryMonthballed_meat;
+  __int16 industryMonthballed_wine;
+  __int16 industryMonthballed_oil;
+  __int16 industryMonthballed_iron;
+  __int16 industryMonthballed_timber;
+  __int16 industryMonthballed_clay;
+  __int16 industryMonthballed_marble;
+  __int16 industryMonthballed_weapons;
+  __int16 industryMonthballed_furniture;
+  __int16 industryMonthballed_pottery;
+
+  int labor_categoryWater_numWorkersNeeded;
+  int labor_categoryWater_workersAllocated;
+  int labor_categoryWater_priority;
+
+  int treasury_lastyear_prosperity;
+  int culture_theater;
+  int culture_religion;
+  int culture_school;
+  int culture_library;
+  int culture_academy;
+
+   char pctReligionCoverageCeres[5];
+   //char pctReligionCoverageNeptune;
+   //char pctReligionCoverageMercury;
+   //char pctReligionCoverageMars;
+   //char pctReligionCoverageVenus;
+   char happinessGod[5];
+   //char happinessNeptune[5];
+   //char happinessMercury[5];
+   //char happinessMars[5];
+   //char happinessVenus[5];
+   char numBoltsGod[5];
+   //char numBoltsNeptune[5];
+   //char numBoltsMercury[5];
+   //char numBoltsMars[5];
+   //char numBoltsVenus[5];
 
   LaborCategoryPriority labor_category_priority[10];
 
