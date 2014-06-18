@@ -256,7 +256,7 @@ void fun_determineHouseEvolveText(int buildingId)
         _HIBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = 29;
         return;
       }
-      if ( reqWine > 1 && city_inform[ciid].numWineTypesAvailable < 2 )
+      if ( reqWine > 1 && city_inform[ciid].numWineTypesAvailable[0] < 2 )
       {
         _HIBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = 65;
         return;
@@ -372,7 +372,7 @@ LABEL_154:
                   {
                     if ( v5 <= building_52_house_wine[64 * buildingId] )
                     {
-                      if ( v5 <= 1 || city_inform[ciid].numWineTypesAvailable >= 2 )
+                      if ( v5 <= 1 || city_inform[ciid].numWineTypesAvailable[0] >= 2 )
                       {
                         _HIBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = 61;
                         if ( _LOBYTE(building_6c_word_94BDAC[64 * buildingId]) == 1 )
