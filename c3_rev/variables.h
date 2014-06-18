@@ -71,7 +71,6 @@ static short building_54_house_oil[__TD_TR]; // weak
 static short building_56_house_furniture[__TD_TR]; // weak
 static short building_58_house_pottery[__TD_TR]; // weak
 static short building_62_house_academy_barber[__TD_TR]; // weak
-static short cityinfo_byte_6500A5_always0[__TD_TR];
 
 static int setting_map_camera_x; // weak
 static int setting_map_camera_y; // weak
@@ -426,9 +425,6 @@ static int model_houses_prosperity[__TD_TR]; // weak
 static int model_houses_numPeople[__TD_TR]; // weak
 static int model_houses_tax[__TD_TR]; // idb
 
-static int cityinfo_numLegionaryForts[__TD_TR]; // weak
-
-static int cityinfo_estimatedWageCost[__TD_TR]; // weak
 static char current_fileExtension[32];
 
 static char getextension_result_1; // weak
@@ -677,7 +673,7 @@ struct CityInfo
   int unemploymentPercentage;
   int player_rank;
   int crimeRate;
-  int numWineTypesAvailable;
+  int numWineTypesAvailable[10];
   int dword_654220;
   int dword_6543C8;
   int dword_654624;
@@ -691,7 +687,7 @@ struct CityInfo
   int debtState;
   int monthsSinceStart[100];
   int healthRate;
-  int happiness;
+  int hapinessCity;
   int prosperityRating;
   int resourceStockpile[20];
   int monthsInDebt;
@@ -709,7 +705,7 @@ struct CityInfo
   int tributeNotPaid;
   int peopleInLargeInsulaAndAbove;
   int wagesRome;
-  int maxProsperity;
+  int maxProsperity[10];
   int peopleInTentsAndShacks;
   int peopleInTents;
   int monthsSinceFestival;
@@ -758,6 +754,328 @@ struct CityInfo
   int amphitheaterShows;
   int theatersWithoutShowsWeighted;
   int entertainmentNeedingShowsMost;
+  int amphitheatersWithoutShowsWeighted;
+  int colosseumShows;
+  int colosseumsWithoutShowsWeighted;
+  int hippodromeShows;
+  int hippodromeWithoutShowsWeighted;
+  int totalFoodStoredInGranaries;
+  int foodtypesEaten;
+  int foodTypesEaten;
+  int stockpile_wine;
+  int stockpile_oil;
+  int stockpile_furniture;
+  int stockpile_pottery;
+  int foodSupplyMonths;
+  int granaries_3orMoreWorkers;
+  int percentagePlebs;
+  int numPeopleOfWorkingAgeMen;
+  int numAvailableWorkers;
+  int numEmployedWorkers;
+  int numUnemployedWorkers;
+  int wageTotal_lastyear;
+  int unitsOfFoodNeededPerMonth;
+  int granaries_understaffed;
+  int granaries_lessThan3Workers;
+  int granaries_lessThan3WorkersWithFoodStored;
+  int continueGoverningSomething;
+  int wageTotal_thisyear;
+  int finance_tribute_thisyear;
+  int finance_tribute_lastyear;
+  int numHospitalWorkers;
+  int dword_6500C0_always3or0;
+  int previousPopulation;
+  int schoolAgeChildren;
+  int academyAgeChildren;
+  int populationRoomForMax;
+  int populationCanImmigrate;
+  int populationPerMonthGraph[2400];
+  int populationPerMonthGraph_nextIndex;
+  int population_totalYears;
+  int populationYearlyBirthsDeathsCalculationNeeded;
+  int lastBirthHouseBuildingId;
+  short lastHousePeopleRemovedFrom;
+  int numImmigrantsThisMonth;
+  int numEmigrantsThisMonth;
+  int wantedImmigrantsNoHousing;
+  int emigrationQueueSize;
+  int immigrationQueueSize;
+  int x_cityinfo_dword_652798;
+  int lastMigrationSize;
+  int population_averagePopPerYear;
+  int population_totalPopPerYear;
+  int entertainmentMessage_hippodromeShown;
+  int entertainmentMessage_colosseumShown;
+  int emigrationMessageShown;
+  int dword_654634;
+  int gameWinVideoShown;
+  int monthsSinceFestivalCeres[5];
+  int monthsSinceFestivalNeptune[5];
+  int monthsSinceFestivalMercury[5];
+  int monthsSinceFestivalMars[5];
+  int monthsSinceFestivalVenus[5];
+  int religionAngryGod;
+  int immigrationState;
+  int finance_wages_sofar_thisyear;
+  int finance_wages_thisyear;
+  int finance_wages_lastyear;
+  int numPlebsTaxed;
+  int numPatriciansTaxed;
+  int numPlebsNotTaxed;
+  int numPatriciansNotTaxed;
+  int percentagePlebsRegisteredForTax;
+  int percentagePatriciansRegisteredForTax;
+  int percentageRegisteredForTax;
+  int yearlyTaxFromPlebs;
+  int yearlyTaxFromPatricians;
+  int yearlyUncollectedTaxFromPlebs;
+  int yearlyUncollectedTaxFromPatricians;
+  int finance_taxes_thisyear;
+  int finance_taxes_lastyear;
+  int collectedTaxFromPlebs;
+  int uncollectedTaxFromPlebs;
+  int collectedTaxFromPatricians;
+  int uncollectedTaxFromPatricians;
+  int finance_exports_lastyear;
+  int finance_imports_thisyear;
+  int finance_imports_lastyear;
+  int finance_interest_sofar_thisyear;
+  int finance_interest_lastyear;
+  int finance_interest_thisyear;
+  int finance_sundries_lastyear;
+
+  int finance_construction_lastyear;
+  int finance_construction_thisyear;
+  int finance_salary_lastyear;
+  int finance_salary_thisyear;
+
+  int finance_salary_sofar_thisyear;
+  int finance_totalIncome_lastyear;
+  int finance_totalIncome_thisyear;
+  int finance_totalExpenses_lastyear;
+  int finance_totalExpenses_thisyear;
+  int finance_netInOut_lastyear;
+  int finance_netInOut_thisyear;
+  int finance_balance_lastyear;
+  int finance_balance_thisyear;
+
+  __int16 resourceAmountExported[16];
+  __int16 resourceInStock[16];
+  __int16 stock_olives;
+  __int16 stock_vines;
+  __int16 stock_wine;
+  __int16 stock_oil;
+  __int16 stock_iron;
+  __int16 stock_timber;
+  __int16 stock_clay;
+  __int16 stock_marble;
+  __int16 stock_weapons;
+  __int16 stock_furniture;
+  __int16 stock_pottery;
+  __int16 resourceTradeStatus[16];
+  __int16 resourceTradeStatus_olives;
+  __int16 resourceTradeStatus_vines;
+  __int16 resourceTradeStatus_wine;
+  __int16 resourceTradeStatus_iron;
+  __int16 resourceTradeStatus_timber;
+  __int16 resourceTradeStatus_clay;
+  __int16 exportOver[16];
+  __int16 industryMothballed[16];
+  __int16 industryMonthballed_wheat;
+  __int16 industryMonthballed_vegetables;
+  __int16 industryMonthballed_fruit;
+  __int16 industryMonthballed_olives;
+  __int16 industryMonthballed_vines;
+  __int16 industryMonthballed_meat;
+  __int16 industryMonthballed_wine;
+  __int16 industryMonthballed_oil;
+  __int16 industryMonthballed_iron;
+  __int16 industryMonthballed_timber;
+  __int16 industryMonthballed_clay;
+  __int16 industryMonthballed_marble;
+  __int16 industryMonthballed_weapons;
+  __int16 industryMonthballed_furniture;
+  __int16 industryMonthballed_pottery;
+
+  int labor_categoryWater_numWorkersNeeded;
+  int labor_categoryWater_workersAllocated;
+  int labor_categoryWater_priority;
+
+  int treasury_lastyear_prosperity;
+  int culture_theater;
+  int culture_religion;
+  int culture_school;
+  int culture_library;
+  int culture_academy;
+
+  int foodInGranaries_wheat[8];
+  int x_cityinfo_dword_6528E8[7];
+  int x_cityinfo_dword_652900[7];
+  int dword_652AF8;
+
+  __int16 censusGraph[100];
+  __int16 censusGraph_peopleAged100;
+  int societyGraph[20];
+
+  int dword_6544F4;
+  int dword_6544FC;
+  int dword_654500;
+  int dword_654504;
+  int dword_654508;
+  int dword_65450C;
+  int estimatedTaxIncome;
+
+  char pctReligionCoverageGod[5];
+  //char pctReligionCoverageNeptune;
+  //char pctReligionCoverageMercury;
+  //char pctReligionCoverageMars;
+  //char pctReligionCoverageVenus;
+  char happinessGod[5];
+  //char happinessNeptune[5];
+  //char happinessMercury[5];
+  //char happinessMars[5];
+  //char happinessVenus[5];
+  char numBoltsGod[5];
+  //char numBoltsNeptune[5];
+  //char numBoltsMercury[5];
+  //char numBoltsMars[5];
+  //char numBoltsVenus[5];
+
+  int finance_donated_lastyear;
+
+  __int16 word_654388[10];
+  __int16 word_6543A2;
+  __int16 numOpenSeaTradeRoutes;
+  __int16 numOpenLandTradeRoutes;
+  __int16 seaTradeProblemDuration;
+  __int16 landTradeProblemDuration;
+  __int16 numWorkingDocks;
+  __int16 word_6543AE;
+  __int16 numWorkingWharfs;
+  __int16 word_6543B4;
+  __int16 word_6543B6;
+
+  int numLegionaryForts;
+  int estimatedWageCost;
+
+  int rioting;
+
+  char byte_6543CC;
+  char byte_6543CD;
+  __int16 word_6543CE;
+  int barracksBuildingId;
+  int dword_6543D4;
+  int dword_6543EC;
+
+  int dword_654224;
+  int dword_654260;
+  int dword_654264;
+
+
+  char byte_654303[5];
+  char byte_654308[5];
+  char byte_65430D[5];
+  char byte_654312[5];
+  char byte_654317[5];
+
+  int dword_65433C;
+
+  int dword_654458;
+  int dword_65445C;
+  int dword_654460;
+  int dword_654464;
+  int dword_654468;
+  int dword_65446C;
+  int dword_654470;
+  int dword_654474;
+  int dword_654478;
+
+  int numDestroyedBuildingsByEnemies;
+
+  int favor_monthsSinceGift;
+  int favor_giftPenalty;
+  int modestGiftType;
+  int generousGiftType;
+  int lavishGiftType;
+
+  int milestoneMissed;
+
+  int favorRatingLastYear;
+  int favorRatingIncrease;
+  int dword_6544B8;
+  int dword_6544BC;
+  int dword_6544C0;
+  int dword_6544C4;
+  int dword_6544C8;
+
+  int yearsSinceStartOfPeace;
+  char distantBattleCity;
+  char byte_654581;
+  char byte_654582;
+  char byte_654583;
+  char byte_654584;
+  char byte_654585;
+  char byte_654586;
+  char availableTriumphalArches;
+  char byte_654588;
+  char byte_654589;
+  char byte_65458A;
+  char byte_65458B;
+  char byte_65458C;
+  char byte_65458D;
+  char byte_65458F;
+  char placedTriumphalArches;
+  char byte_654591;
+  char byte_654592;
+  char byte_654593;
+  int dword_654598;
+  char byte_65459C;
+  char byte_65459D;
+  char byte_65459E;
+  char byte_65459F;
+  char byte_6545A0;
+  char byte_6545A1;
+  char byte_6545A2;
+  char byte_6545A3;
+  char byte_6545A4;
+  char byte_6545AB;
+
+  int dword_6545CC[10];
+  int dword_6545D0[10];
+
+
+  int relatedToImmigration_always0;
+  __int16 word_6527E4[20];
+  __int16 warehouse_nextTakeGoods;
+  char entry_x;
+  char entry_y;
+  __int16 entry_gridOffset;
+  char exit_x;
+  char exit_y;
+  __int16 exit_gridOffset;
+  char byte_652820;
+  char byte_652821;
+  __int16 word_652822;
+  int dword_652824;
+  __int16 word_652828;
+
+  char byte_654518;
+  char byte_654519;
+  __int16 word_65451A;
+  int dword_654558;
+
+  int dword_654620;
+
+  char byte_6500A2_always1;
+  char byte_6500A3_always1;
+  int calculatedTargetHealthRate;
+
+  int deaths;
+  int dword_652784;
+  int dword_6544E8;
+  int dword_654648;
+  short byte_6500A5_always0;
+
 
   LaborCategoryPriority labor_category_priority[10];
 
@@ -767,6 +1085,30 @@ struct CityInfo
   }
 };
 
-static CityInfo city_inform[256];
+struct Walker
+{
+  int gridOffset;
+  char inUse;
+  __int16 nextIdOnSameTile;
+};
+
+static Walker walkers[1000];
+
+struct Storage
+{
+char inUse;
+char emptyAll;
+char resourceState[16];
+char stateWheat;
+char stateVegetables;
+char stateFruit;
+char stateMeatFish;
+};
+
+static Storage storages[200];
+
+static char relatedToCityInfoAlwaysZero[8];
+
+static CityInfo city_inform[8];
 
 #endif
