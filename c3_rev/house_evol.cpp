@@ -8,9 +8,9 @@ void __cdecl fun_decayService_culture()
 
   for ( i = 1; i < 2000; ++i )
   {
-    if ( building_00_inUse[128 * i] == 1 )
+    if ( buildings[i].inUse == 1 )
     {
-      if ( building_05_houseSize[128 * i] )
+      if ( buildings[i].houseSize )
       {
         if ( (signed int)_LOBYTE(building_5a_house_theater_amphi[64 * i]) <= 1 )
           _LOBYTE(building_5a_house_theater_amphi[64 * i]) = 0;

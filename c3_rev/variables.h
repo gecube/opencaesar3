@@ -11,8 +11,6 @@
 #define ANTBCODE
 
 static char building_64_house_clinic[__TD_TR]; // weak
-static unsigned char building_00_inUse[__TD_TR];
-static char building_05_houseSize[__TD_TR];
 static short building_5a_house_theater_amphi[__TD_TR];
 static short building_5c_house_amphiGlad_colo[__TD_TR];
 static short building_5e_house_coloLion_hippo[__TD_TR];
@@ -22,7 +20,7 @@ static char building_01_ciid[__TD_TR]; // weak
 static char building_02_byte_always0[__TD_TR]; // weak
 static char building_03_size[__TD_TR]; // weak
 static char building_04_house_isMerged[__TD_TR]; // weak
-static unsigned char building_06_x[__TD_TR];
+
 static unsigned char building__07_y[__TD_TR];
 static short building_08_gridOffset[__TD_TR]; // weak
 static short building_0a_type[__TD_TR]; // weak
@@ -31,7 +29,7 @@ static char building_0e_byte_94BD4E[__TD_TR]; // weak
 static short building_10_placedSequenceNumber[__TD_TR]; // weak
 static short building_12_walkerServiceAccess[__TD_TR]; // weak
 static short building_14_word_94BD54[__TD_TR]; // weak
-static short building_16_house_population[__TD_TR]; // weak
+
 static short building_18_house_roomForPeople[__TD_TR]; // weak
 static short building_1a_word_94BD5A[__TD_TR]; // weak
 static short building_1c_house_maxPopEver[__TD_TR]; // weak
@@ -403,7 +401,6 @@ static char building_79_byte_94BDB9[__TD_TR]; // weak
 static char building_7a_desirability[__TD_TR]; // weak
 static char building_7b_byte_94BDBB[__TD_TR]; // weak
 static char building_7c_adjacentToWater[__TD_TR]; // weak
-static char building_7e_house_crimeRisk[__TD_TR]; // weak
 static char building_7f_byte_94BDBF[__TD_TR]; // idb
 
 static int model_houses_des_devolve[__TD_TR]; // weak
@@ -951,8 +948,8 @@ struct CityInfo
   __int16 numWorkingDocks;
   __int16 word_6543AE;
   __int16 numWorkingWharfs;
-  __int16 word_6543B4;
-  __int16 word_6543B6;
+  __int16 moneyStolenThisYear;
+  __int16 moneyStolenLastYear;
 
   int numLegionaryForts;
   int estimatedWageCost;
@@ -1092,6 +1089,15 @@ struct Walker
   unsigned char actionState;
   int tradeCityId;
   int direction;
+  int buildingId;
+
+  unsigned char y;
+
+  int tilePosition_y;
+  int tilePosition_x;
+  int type;
+  int word_7FA344;
+  char byte_7FA34C;
 };
 
 static Walker walkers[1000];
@@ -1099,9 +1105,15 @@ static Walker walkers[1000];
 struct Building
 {
  int d7d_storageId;
+ int x;
+
+ unsigned char inUse;
+ int house_crimeRisk;
+ int houseSize;
+ int house_population;
 };
 
-static Building buildings[1000];
+static Building buildings[2000];
 
 struct Storage
 {
