@@ -1419,7 +1419,7 @@ static char byte_7FA34D[0xff]; // weak
 static char walker_state[0xff]; // weak
 static char byte_7FA34F[0xff]; // weak
 static char byte_7FA350[0xff]; // weak
-static char walker_direction[0xff]; // weak
+
 static char byte_7FA352[0xff]; // weak
 static char byte_7FA353[0xff]; // weak
 static unsigned __int8 walker_x[0xff];
@@ -1436,7 +1436,6 @@ static char byte_7FA361[0xff]; // weak
 static char byte_7FA362[0xff]; // weak
 static char byte_7FA363[0xff]; // weak
 static __int16 word_7FA366[0xff]; // weak
-static unsigned char walker_actionState[0xff]; // weak
 static char walker_progressOnTile[0xff]; // weak
 static __int16 walker_destinationpathId[0xff]; // weak
 static __int16 walker_destinationPathCurrent[0xff]; // weak
@@ -1472,7 +1471,7 @@ static char byte_7FA39A[0xff]; // weak
 static char byte_7FA39B[0xff]; // weak
 static char byte_7FA39C[0xff]; // weak
 static char byte_7FA39D[0xff]; // weak
-static char walker_tradeCityId[0xff]; // weak
+
 static char byte_7FA39F[0xff]; // weak
 static __int16 walker_name[0xff]; // weak
 static char byte_7FA3A2[0xff]; // weak
@@ -7823,13 +7822,7 @@ void  fun_minimap_hasBeenClicked()
     }
   }
 }
-// 9A04F4: using guessed type int minimap_left;
-// 9A04F8: using guessed type int minimap_right;
-// 9A04FC: using guessed type int minimap_top;
-// 9A0500: using guessed type int minimap_bottom;
-// 9D7B84: using guessed type int minimap_clicked;
 
-//----- (0040AF70) --------------------------------------------------------
 void  fun_minimap_handleClick()
 {
   int v0; // [sp+54h] [bp-8h]@7
@@ -7847,13 +7840,7 @@ void  fun_minimap_handleClick()
     }
   }
 }
-// 40160E: using guessed type _DWORD  sub_40160E(_DWORD);
-// 4017EE: using guessed type _DWORD  sub_4017EE(_DWORD, _DWORD, _DWORD, _DWORD);
-// 6608A1: using guessed type char is_right_click;
-// 9D7B84: using guessed type int minimap_clicked;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (0040B140) --------------------------------------------------------
 void  fun_topmenu_isFundsPopDateHit()
 {
   topmenu_fundsPopDateHit = 0;
@@ -7897,7 +7884,7 @@ void  fun_buildingInfo_storage_toggleGood()
   int storageId; // [sp+4Ch] [bp-Ch]@1
   int index; // [sp+54h] [bp-4h]@2
 
-  storageId = (unsigned __int8)building_7d_storageId[128 * currentlySelectedBuilding];
+  storageId = buildings[currentlySelectedBuilding].d7d_storageId;
   if ( building_0a_type[64 * currentlySelectedBuilding] == B_Warehouse )
     index = goodlist_indexToResourceId[currentButton_parameter];
   else
@@ -7927,7 +7914,7 @@ void  fun_buildingInfo_granaryOrders_click()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
 
-  v0 = (unsigned __int8)building_7d_storageId[128 * currentlySelectedBuilding];
+  v0 = buildings[currentlySelectedBuilding].d7d_storageId;
   if ( storages[v0].emptyAll )
     storages[v0].emptyAll = 0;
   else
@@ -7939,7 +7926,7 @@ void  fun_buildingInfo_warehouseOrders_click()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
 
-  v0 = (unsigned __int8)building_7d_storageId[128 * currentlySelectedBuilding];
+  v0 = buildings[currentlySelectedBuilding].d7d_storageId;
   if ( currentButton_parameter == 1 )
   {
     city_inform[ciid].tradeCenterId = currentlySelectedBuilding;
@@ -25667,7 +25654,7 @@ void  fun_drawBuildingOnProblemsOverlay(int a1, int a2, int a3)
           {
             v7 = building_22_walkerId[64 * a1];
             if ( building_22_walkerId[64 * a1]
-              && (unsigned __int8)walker_actionState[128 * v7] == 20
+              && walkers[v7].actionState == 20
               && walker_maxLevelOrRiskSeen[128 * v7] )
             {
               building_7f_byte_94BDBF[128 * a1] = 1;
@@ -25685,7 +25672,7 @@ void  fun_drawBuildingOnProblemsOverlay(int a1, int a2, int a3)
         v6 = building_22_walkerId[64 * a1];
         if ( building_22_walkerId[64 * a1] )
         {
-          if ( (unsigned __int8)walker_actionState[128 * v6] == 20 )
+          if ( walkers[v6].actionState == 20 )
           {
             if ( walker_maxLevelOrRiskSeen[128 * v6] )
               building_7f_byte_94BDBF[128 * a1] = 1;
@@ -26591,10 +26578,7 @@ void  fun_drawBridge(int x, int y)
     grid_animation[dword_9D4B4C] = 0;
   }
 }
-// 6E6CF8: using guessed type __int16 graphic_bridge;
-// 9D4B4C: using guessed type int dword_9D4B4C;
 
-//----- (004364C0) --------------------------------------------------------
 void  fun_drawWalker(int walkerId, int a2, int a3, int a4)
 {
   signed int v4; // ST70_4@279
@@ -26615,7 +26599,7 @@ void  fun_drawWalker(int walkerId, int a2, int a3, int a4)
   int v19; // [sp+68h] [bp-4h]@16
   int v20; // [sp+68h] [bp-4h]@17
 
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
   v11 = word_7FA344[64 * walkerId];
   if ( debug_showPeople != 1 )
@@ -26719,16 +26703,16 @@ void  fun_drawWalker(int walkerId, int a2, int a3, int a4)
               break;
             case Overlay_Theater:
               if ( (unsigned __int8)walker_type[128 * walkerId] != Walker_Actor
-                || ((unsigned __int8)walker_actionState[128 * walkerId] != 94
-                 && (unsigned __int8)walker_actionState[128 * walkerId] != 95 ? (v7 = word_7FA38E[64 * walkerId]) : (v7 = walker_buildingId[64 * walkerId]),
+                || (walkers[walkerId].actionState != 94
+                 && walkers[walkerId].actionState != 95 ? (v7 = word_7FA38E[64 * walkerId]) : (v7 = walker_buildingId[64 * walkerId]),
                     building_0a_type[64 * v7] != B_Theater) )
                 return;
               break;
             case Overlay_Amphiheater:
               if ( (unsigned __int8)walker_type[128 * walkerId] == Walker_Actor )
               {
-                if ( (unsigned __int8)walker_actionState[128 * walkerId] != 94
-                  && (unsigned __int8)walker_actionState[128 * walkerId] != 95 )
+                if ( walkers[walkerId].actionState != 94
+                  && walkers[walkerId].actionState != 95 )
                   v8 = word_7FA38E[64 * walkerId];
                 else
                   v8 = walker_buildingId[64 * walkerId];
@@ -26738,8 +26722,8 @@ void  fun_drawWalker(int walkerId, int a2, int a3, int a4)
               else
               {
                 if ( (unsigned __int8)walker_type[128 * walkerId] != Walker_Gladiator
-                  || ((unsigned __int8)walker_actionState[128 * walkerId] != 94
-                   && (unsigned __int8)walker_actionState[128 * walkerId] != 95 ? (v9 = word_7FA38E[64 * walkerId]) : (v9 = walker_buildingId[64 * walkerId]),
+                  || (walkers[walkerId].actionState != 94
+                   && walkers[walkerId].actionState != 95 ? (v9 = word_7FA38E[64 * walkerId]) : (v9 = walker_buildingId[64 * walkerId]),
                       building_0a_type[64 * v9] != B_Amphitheater) )
                   return;
               }
@@ -26747,8 +26731,8 @@ void  fun_drawWalker(int walkerId, int a2, int a3, int a4)
             case Overlay_Colosseum:
               if ( (unsigned __int8)walker_type[128 * walkerId] == Walker_Gladiator )
               {
-                if ( (unsigned __int8)walker_actionState[128 * walkerId] != 94
-                  && (unsigned __int8)walker_actionState[128 * walkerId] != 95 )
+                if ( walkers[walkerId].actionState != 94
+                  && walkers[walkerId].actionState != 95 )
                   v10 = word_7FA38E[64 * walkerId];
                 else
                   v10 = walker_buildingId[64 * walkerId];
@@ -26822,7 +26806,7 @@ void  fun_drawWalker(int walkerId, int a2, int a3, int a4)
               else
               {
                 if ( (unsigned __int8)walker_type[128 * walkerId] != Walker_CartPusher
-                  || (unsigned __int8)walker_actionState[128 * walkerId] != 20
+                  || walkers[walkerId].actionState != 20
                   || !walker_maxLevelOrRiskSeen[128 * walkerId] )
                   return;
               }
@@ -30244,7 +30228,7 @@ signed int  fun_minimapGetWalkerColor(int walkerId)
       && (unsigned __int8)walker_type[128 * walkerId] <= (signed int)Walker_Enemy57 )
       return 2;
     if ( (unsigned __int8)walker_type[128 * walkerId] == Walker_IndigenousNative
-      && (unsigned __int8)walker_actionState[128 * walkerId] == 159 )
+      && walkers[walkerId].actionState == 159 )
       return 2;
     if ( (unsigned __int8)walker_type[128 * walkerId] == Walker_Wolf )
       return 3;
@@ -33110,9 +33094,9 @@ LABEL_40:
             {
               tradeShipId = fun_spawnWalker(ciid, Walker_TradeShip, scn_riverEntry_x, scn_riverEntry_y, 0);
               *(__int16 *)((char *)&trade_walkerId1[33 * j] + 2 * walkerIndexToUse) = tradeShipId;
-              walker_tradeCityId[128 * tradeShipId] = j;
+              walkers[tradeShipId].tradeCityId = j;
               tradeShipId <<= 7;
-              walker_actionState[tradeShipId] = 110;
+              walkers[tradeShipId].actionState = 110;
               *(__int16 *)((char *)word_7FA366 + tradeShipId) = 10;
               return;
             }
@@ -33128,8 +33112,8 @@ LABEL_40:
                               city_inform[ciid].entry_y,
                               0);
               *(__int16 *)((char *)&trade_walkerId1[33 * j] + 2 * walkerIndexToUse) = caravanHead;
-              walker_tradeCityId[128 * caravanHead] = j;
-              walker_actionState[128 * caravanHead] = 100;
+              walkers[caravanHead].tradeCityId = j;
+              walkers[caravanHead].actionState = 100;
               word_7FA366[64 * caravanHead] = 10;
               num1 = caravanHead;
               caravanDonkey1 = fun_spawnWalker(
@@ -33138,7 +33122,7 @@ LABEL_40:
                                  city_inform[ciid].entry_x,
                                  city_inform[ciid].entry_y,
                                  0);
-              walker_actionState[128 * caravanDonkey1] = 100;
+              walkers[caravanDonkey1].actionState = 100;
               walker_tradeCaravanNextId[64 * caravanDonkey1] = num1;
               num2 = caravanDonkey1;
               caravanDonkey2 = fun_spawnWalker(
@@ -33147,7 +33131,7 @@ LABEL_40:
                                  city_inform[ciid].entry_x,
                                  city_inform[ciid].entry_y,
                                  0);
-              walker_actionState[128 * caravanDonkey2] = 100;
+              walkers[caravanDonkey2].actionState = 100;
               walker_tradeCaravanNextId[64 * caravanDonkey2] = num2;
               return;
             }
@@ -33231,7 +33215,7 @@ signed int  sub_446550(int a1, int a2, int a3, int a4, int a5)
         {
           if ( building_1a_word_94BD5A[64 * j] > 0 )
           {
-            v6 = (unsigned __int8)building_7d_storageId[128 * j];
+            v6 = buildings[j].d7d_storageId;
             v12 = 0;
             for ( k = 1; k <= 15; ++k )
             {
@@ -33372,7 +33356,7 @@ signed int  sub_446B50(int a1, int a2, int a3, int a4, int a5)
           {
             if ( (unsigned __int8)building_0e_byte_94BD4E[128 * k] == a5 )
             {
-              v6 = (unsigned __int8)building_7d_storageId[128 * k];
+              v6 = buildings[k].d7d_storageId;
               if ( storages[v6].resourceState[ city_inform[ciid].dword_6543B8 ] != 1 )
               {
                 if ( !storages[v6].emptyAll )
@@ -34688,7 +34672,7 @@ signed int  fun_startInvasion(int enemyType, int numEnemies, int invasionPoint, 
           {
             walkerId = fun_spawnWalker(0, walkerType, spawnX, spawnY, orientation);
             byte_7FA34D[128 * walkerId] = 0;
-            walker_actionState[128 * walkerId] = -105;
+            walkers[walkerId].actionState = -105;
             word_7FA366[64 * walkerId] = 200 * v12 + 10 * k + 10;
             walker_formationId[64 * walkerId] = formationId;
             fun_generateWalkerName(walkerId);
@@ -38656,11 +38640,7 @@ int  sub_454D40(int a1, int a2)
   }
   return v3;
 }
-// 94BD58: using guessed type __int16 building_18_house_roomForPeople[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD66: using guessed type __int16 building_26_immigrantId[];
 
-//----- (00454E70) --------------------------------------------------------
 void  fun_immigratePeopleToHouse(int buildingId, char numPeople)
 {
   int walkerId; // eax@1
@@ -38671,17 +38651,13 @@ void  fun_immigratePeopleToHouse(int buildingId, char numPeople)
                city_inform[ciid].entry_x,
                city_inform[ciid].entry_y,
                0);
-  walker_actionState[128 * walkerId] = 1;
+  walkers[walkerId].actionState = 1;
   walker_migrantDestinationHome[64 * walkerId] = buildingId;
   building_26_immigrantId[64 * buildingId] = walkerId;
   word_7FA366[64 * walkerId] = (building_45_byte_94BD85[128 * buildingId] & 0x7F) + 10;
   walker_migrantNumPeopleCarried[128 * walkerId] = numPeople;
 }
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38C: using guessed type __int16 walker_migrantDestinationHome[];
-// 94BD66: using guessed type __int16 building_26_immigrantId[];
 
-//----- (00454F50) --------------------------------------------------------
 void  fun_emigratePeopleFromHouse(int buildingId, signed int numEmigrants)
 {
   int emigrant; // eax@4
@@ -38697,14 +38673,11 @@ void  fun_emigratePeopleFromHouse(int buildingId, signed int numEmigrants)
     fun_revertHouseToVacantLot(buildingId);
   }
   emigrant = fun_spawnWalker(ciid, 2, building_06_x[128 * buildingId], building__07_y[128 * buildingId], 0);
-  walker_actionState[128 * emigrant] = 4;
+  walkers[emigrant].actionState = 4;
   word_7FA366[64 * emigrant] = 0;
   walker_migrantNumPeopleCarried[128 * emigrant] = numEmigrants;
 }
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
 
-//----- (00455060) --------------------------------------------------------
 int  fun_addBirthsToHouses(int ciid, int a2)
 {
   int maxPeople; // [sp+50h] [bp-10h]@16
@@ -38826,7 +38799,7 @@ void  fun_spawnWalker_homeless(int ciid, __int16 x, __int16 y, int numPeople)
   int walkerId; // eax@1
 
   walkerId = fun_spawnWalker(ciid, Walker_Homeless, x, y, 0);
-  walker_actionState[128 * walkerId] = 7;
+  walkers[walkerId].actionState = 7;
   word_7FA366[64 * walkerId] = 0;
   walker_migrantNumPeopleCarried[128 * walkerId] = numPeople;
   sub_4E3A40(ciid, numPeople);
@@ -39890,7 +39863,7 @@ signed int  sub_458E80(int a1, int a2, int a3, int a4, int a5, int a6)
               v11 = sub_4789E0(i);
               if ( a1 != v11 )
               {
-                v7 = (unsigned __int8)building_7d_storageId[128 * v11];
+                v7 = buildings[v11].d7d_storageId;
                 if ( storages[v7].resourceState[a4] != 1 )
                 {
                   if ( !storages[v7].emptyAll )
@@ -40075,7 +40048,7 @@ int  fun_removeGoodsFromCityStorage(int ciid, int goodId, int amount)
     {
       if ( building_0a_type[64 * buildingId] == B_Warehouse )
       {
-        if ( storages[building_7d_storageId[128 * buildingId]].resourceState[goodId] != 2 )
+        if ( storages[buildings[buildingId].d7d_storageId].resourceState[goodId] != 2 )
         {
           city_inform[ciid].warehouse_nextTakeGoods = buildingId;
           amount = fun_removeGoodFromWarehouse(ciid, buildingId, goodId, amount);
@@ -40099,10 +40072,7 @@ int  fun_removeGoodsFromCityStorage(int ciid, int goodId, int amount)
   }
   return requestedAmount - amount;
 }
-// 402FD1: using guessed type _DWORD  fun_removeGoodFromWarehouse(_DWORD, _DWORD, _DWORD, _DWORD);
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (00459800) --------------------------------------------------------
 signed int  fun_removeGoodFromWarehouse(int ciid, int buildingId, int resourceId, signed int amount)
 {
   signed int result; // eax@2
@@ -40246,7 +40216,7 @@ signed int  sub_459DD0(int a1, int a2)
         {
           v8 = 0;
           v9 = i;
-          v3 = (unsigned __int8)building_7d_storageId[128 * i];
+          v3 = buildings[i].d7d_storageId;
           for ( j = 0; j < 8; ++j )
           {
             v9 = building_32_warehouse_nextStorage[64 * v9];
@@ -40319,7 +40289,7 @@ signed int  sub_45A040(int a1)
   signed int v20; // [sp+68h] [bp-8h]@61
   signed int v21; // [sp+6Ch] [bp-4h]@98
 
-  v2 = (unsigned __int8)building_7d_storageId[128 * a1];
+  v2 = buildings[a1].d7d_storageId;
   if ( fun_getPercentage(building_38_num_workers[64 * a1], model_buildings_laborers[8 * building_0a_type[64 * a1]]) >= 50 )
   {
     for ( i = 1; i < 16; ++i )
@@ -40482,7 +40452,7 @@ signed int  sub_45A8D0(int a1)
   int v2; // [sp+4Ch] [bp-Ch]@1
   signed int i; // [sp+54h] [bp-4h]@4
 
-  v2 = (unsigned __int8)building_7d_storageId[128 * a1];
+  v2 = buildings[a1].d7d_storageId;
   if ( fun_getPercentage(building_38_num_workers[64 * a1], model_buildings_laborers[8 * building_0a_type[64 * a1]]) >= 50 )
   {
     if ( storages[v2].emptyAll )
@@ -40657,7 +40627,7 @@ signed int  sub_45AEB0(int a1, int a2, int a3, int a4)
     fun_getPercentage(building_38_num_workers[64 * a3], model_buildings_laborers[8 * building_0a_type[64 * a3]]);
     if ( (signed int)(unsigned __int8)byte_7FA3A3[128 * a1] < 8 )
     {
-      v6 = (unsigned __int8)building_7d_storageId[128 * a3];
+      v6 = buildings[a3].d7d_storageId;
       if ( storages[v6].emptyAll )
       {
         result = 0;
@@ -41116,7 +41086,7 @@ int  sub_45C100(int a1, int a2, int a3, signed int a4, int a5, int a6)
                                building_38_num_workers[64 * i],
                                model_buildings_laborers[8 * building_0a_type[64 * i]]) >= 100 )
                         {
-                          v7 = (unsigned __int8)building_7d_storageId[128 * i];
+                          v7 = buildings[i].d7d_storageId;
                           if ( storages[v7].resourceState[a4] != 1 )
                           {
                             if ( !storages[v7].emptyAll )
@@ -41243,7 +41213,7 @@ signed int  sub_45C460(int a1, int a2, signed int a3, int a4, int a5)
                                building_38_num_workers[64 * i],
                                model_buildings_laborers[8 * building_0a_type[64 * i]]) >= 100 )
                         {
-                          v6 = (unsigned __int8)building_7d_storageId[128 * i];
+                          v6 = buildings[i].d7d_storageId;
                           if ( storages[v6].resourceState[a3] == 2 )
                           {
                             if ( !storages[v6].emptyAll )
@@ -41301,7 +41271,7 @@ int  sub_45C720(int buildingId)
   int v10; // [sp+6Ch] [bp-4h]@18
 
   v2 = 0;
-  storageId = (unsigned __int8)building_7d_storageId[128 * buildingId];
+  storageId = (unsigned __int8)buildings[buildingId].d7d_storageId;
   if ( storages[storageId].stateWheat == 2 )
     v2 = 1;
   if ( storages[storageId].stateVegetables == 2 )
@@ -41331,7 +41301,7 @@ int  sub_45C720(int buildingId)
           v10 = word_94BBA0[i];
           if ( (unsigned __int8)building_0e_byte_94BD4E[128 * v10] == (unsigned __int8)building_0e_byte_94BD4E[128 * buildingId] )
           {
-            v7 = (unsigned __int8)building_7d_storageId[128 * v10];
+            v7 = buildings[v10].d7d_storageId;
             v6 = 0;
             if ( storages[storageId].stateWheat == 2 )
             {
@@ -41427,7 +41397,7 @@ __int16  sub_45CAF0()
           v0 = building_1a_word_94BD5A[64 * k];
           if ( v0 > 0 )
           {
-            v3 = (unsigned __int8)building_7d_storageId[128 * k];
+            v3 = buildings[k].d7d_storageId;
             v2 = 0;
             if ( storages[v3].stateWheat != 2 )
             {
@@ -41473,8 +41443,8 @@ int  sub_45CDC0(int a1, int a2)
   int v5; // [sp+58h] [bp-8h]@1
   int v6; // [sp+5Ch] [bp-4h]@1
 
-  v6 = (unsigned __int8)building_7d_storageId[128 * a1];
-  v5 = (unsigned __int8)building_7d_storageId[128 * a2];
+  v6 = buildings[a1].d7d_storageId;
+  v5 = buildings[a2].d7d_storageId;
   v3 = 0;
   resourceId = (GoodType)0;
   if ( storages[v6].stateWheat == 2 )
@@ -41560,7 +41530,7 @@ signed int  sub_45D000()
                    building_38_num_workers[64 * j],
                    model_buildings_laborers[8 * building_0a_type[64 * j]]) >= 100 )
             {
-              v2 = (unsigned __int8)building_7d_storageId[128 * j];
+              v2 = buildings[j].d7d_storageId;
               if ( building_4c_granary_capacity[64 * j] >= 1200 )
               {
                 if ( !storages[v2].emptyAll )
@@ -41621,7 +41591,7 @@ signed int  sub_45D1F0()
                    building_38_num_workers[64 * j],
                    model_buildings_laborers[8 * building_0a_type[64 * j]]) >= 100 )
             {
-              v2 = (unsigned __int8)building_7d_storageId[128 * j];
+              v2 = buildings[j].d7d_storageId;
               if ( building_4c_granary_capacity[64 * j] > 100 )
               {
                 if ( !storages[v2].emptyAll )
@@ -42396,7 +42366,7 @@ void  fun_generateWalkersForBuildings()
                   if ( v95 > -1 )
                   {
                     v88 = fun_spawnWalker(building_01_ciid[128 * i], Walker_Warehouseman, walkerGridX, walkerGridY, 4);
-                    walker_actionState[128 * v88] = 50;
+                    walkers[v88].actionState = 50;
                     byte_7FA34B[128 * v88] = v95;
                     if ( !v95 )
                       walker_itemCollecting[128 * v88] = dword_94A318;
@@ -42419,7 +42389,7 @@ void  fun_generateWalkersForBuildings()
                   if ( v96 > -1 )
                   {
                     v2 = fun_spawnWalker(building_01_ciid[128 * i], Walker_Warehouseman, walkerGridX, walkerGridY, 4);
-                    walker_actionState[128 * v2] = 50;
+                    walkers[v2].actionState = 50;
                     byte_7FA34B[128 * v2] = v96;
                     building_22_walkerId[64 * i] = v2;
                     walker_buildingId[64 * v2] = i;
@@ -42451,7 +42421,7 @@ void  fun_generateWalkersForBuildings()
                                    0);
                       building_28_towerBallistaId[64 * i] = sentryId;
                       walker_buildingId[64 * sentryId] = i;
-                      walker_actionState[128 * sentryId] = -76;
+                      walkers[sentryId].actionState = -76;
                     }
                   }
                   fun_buildingHasWalkerOfType(i, 42, 0);
@@ -42515,7 +42485,7 @@ void  fun_generateWalkersForBuildings()
                                  walkerGridX,
                                  walkerGridY,
                                  0);
-                  walker_actionState[128 * engineerId] = 60;
+                  walkers[engineerId].actionState = 60;
                   building_22_walkerId[64 * i] = engineerId;
                   walker_buildingId[64 * engineerId] = i;
                 }
@@ -42571,7 +42541,7 @@ void  fun_generateWalkersForBuildings()
                 {
                   building_2a_walkerSpawnDelay[128 * i] = 0;
                   prefectId = fun_spawnWalker(building_01_ciid[128 * i], Walker_Prefect, walkerGridX, walkerGridY, 0);
-                  walker_actionState[128 * prefectId] = 70;
+                  walkers[prefectId].actionState = 70;
                   building_22_walkerId[64 * i] = prefectId;
                   walker_buildingId[64 * prefectId] = i;
                 }
@@ -42637,7 +42607,7 @@ void  fun_generateWalkersForBuildings()
                                           walkerGridX,
                                           walkerGridY,
                                           0);
-                        walker_actionState[128 * actorColonyId] = 90;
+                        walkers[actorColonyId].actionState = 90;
                         building_22_walkerId[64 * i] = actorColonyId;
                         walker_buildingId[64 * actorColonyId] = i;
                       }
@@ -42697,7 +42667,7 @@ void  fun_generateWalkersForBuildings()
                                               walkerGridX,
                                               walkerGridY,
                                               0);
-                        walker_actionState[128 * gladiatorSchoolId] = 90;
+                        walkers[gladiatorSchoolId].actionState = 90;
                         building_22_walkerId[64 * i] = gladiatorSchoolId;
                         walker_buildingId[64 * gladiatorSchoolId] = i;
                       }
@@ -42752,7 +42722,7 @@ void  fun_generateWalkersForBuildings()
                       {
                         building_2a_walkerSpawnDelay[128 * i] = 0;
                         lionHouseId = fun_spawnWalker(building_01_ciid[128 * i], 17, walkerGridX, walkerGridY, 0);
-                        walker_actionState[128 * lionHouseId] = 90;
+                        walkers[lionHouseId].actionState = 90;
                         building_22_walkerId[64 * i] = lionHouseId;
                         walker_buildingId[64 * lionHouseId] = i;
                       }
@@ -42812,7 +42782,7 @@ void  fun_generateWalkersForBuildings()
                                            walkerGridX,
                                            walkerGridY,
                                            0);
-                        walker_actionState[128 * chariotMakerId] = 90;
+                        walkers[chariotMakerId].actionState = 90;
                         building_22_walkerId[64 * i] = chariotMakerId;
                         walker_buildingId[64 * chariotMakerId] = i;
                       }
@@ -42878,7 +42848,7 @@ void  fun_generateWalkersForBuildings()
                                   0);
                         else
                           v89 = fun_spawnWalker(building_01_ciid[128 * i], Walker_Actor, walkerGridX, walkerGridY, 0);
-                        walker_actionState[128 * v89] = 94;
+                        walkers[v89].actionState = 94;
                         building_22_walkerId[64 * i] = v89;
                         walker_buildingId[64 * v89] = i;
                         fun_roamWalker(v89);
@@ -42941,7 +42911,7 @@ void  fun_generateWalkersForBuildings()
                                       walkerGridX,
                                       walkerGridY,
                                       0);
-                        walker_actionState[128 * theaterId] = 94;
+                        walkers[theaterId].actionState = 94;
                         building_22_walkerId[64 * i] = theaterId;
                         walker_buildingId[64 * theaterId] = i;
                         fun_roamWalker(theaterId);
@@ -43010,7 +42980,7 @@ void  fun_generateWalkersForBuildings()
                                            walkerGridX,
                                            walkerGridY,
                                            0);
-                          walker_actionState[128 * hippodromeId] = 94;
+                          walkers[hippodromeId].actionState = 94;
                           building_22_walkerId[64 * i] = hippodromeId;
                           walker_buildingId[64 * hippodromeId] = i;
                           fun_roamWalker(hippodromeId);
@@ -43022,7 +42992,7 @@ void  fun_generateWalkersForBuildings()
                                     building_06_x[128 * i] + 2,
                                     building__07_y[128 * i] + 1,
                                     2);
-                            walker_actionState[128 * v13] = -56;
+                            walkers[v13].actionState = -56;
                             walker_buildingId[64 * v13] = i;
                             byte_7FA34B[128 * v13] = 0;
                             byte_7FA389[128 * v13] = 3;
@@ -43032,7 +43002,7 @@ void  fun_generateWalkersForBuildings()
                                     building_06_x[128 * i] + 2,
                                     building__07_y[128 * i] + 2,
                                     2);
-                            walker_actionState[128 * v14] = -56;
+                            walkers[v14].actionState = -56;
                             walker_buildingId[64 * v14] = i;
                             byte_7FA34B[128 * v14] = 1;
                             byte_7FA389[128 * v14] = 2;
@@ -43115,7 +43085,7 @@ void  fun_generateWalkersForBuildings()
                                           walkerGridX,
                                           walkerGridY,
                                           0);
-                        walker_actionState[128 * colosseumId] = 94;
+                        walkers[colosseumId].actionState = 94;
                         building_22_walkerId[64 * i] = colosseumId;
                         walker_buildingId[64 * colosseumId] = i;
                         fun_roamWalker(colosseumId);
@@ -43189,7 +43159,7 @@ void  fun_generateWalkersForBuildings()
                                          walkerGridX,
                                          walkerGridY,
                                          0);
-                        walker_actionState[128 * marketLadyId] = 125;
+                        walkers[marketLadyId].actionState = 125;
                         building_22_walkerId[64 * i] = marketLadyId;
                         walker_buildingId[64 * marketLadyId] = i;
                         fun_roamWalker(marketLadyId);
@@ -43217,7 +43187,7 @@ void  fun_generateWalkersForBuildings()
                                   walkerGridX,
                                   walkerGridY,
                                   0);
-                          walker_actionState[128 * v91] = -111;
+                          walkers[v91].actionState = -111;
                           building_24_laborSeekerId[64 * i] = v91;
                           walker_buildingId[64 * v91] = i;
                           word_7FA38E[64 * v91] = v87;
@@ -43239,7 +43209,7 @@ void  fun_generateWalkersForBuildings()
                             }
                             else
                             {
-                              walker_actionState[128 * v91] = -110;
+                              walkers[v91].actionState = -110;
                               walker_destination_x[128 * v91] = walker_x[128 * v91];
                               walker_destination_y[128 * v91] = walker_y[128 * v91];
                             }
@@ -43307,7 +43277,7 @@ void  fun_generateWalkersForBuildings()
                                               walkerGridX,
                                               walkerGridY,
                                               0);
-                        walker_actionState[128 * bathhouseWorkerId] = 125;
+                        walkers[bathhouseWorkerId].actionState = 125;
                         building_22_walkerId[64 * i] = bathhouseWorkerId;
                         walker_buildingId[64 * bathhouseWorkerId] = i;
                         fun_roamWalker(bathhouseWorkerId);
@@ -43377,7 +43347,7 @@ void  fun_generateWalkersForBuildings()
                                            walkerGridX,
                                            walkerGridY,
                                            0);
-                              walker_actionState[128 * child1Id] = 125;
+                              walkers[child1Id].actionState = 125;
                               building_22_walkerId[64 * i] = child1Id;
                               walker_buildingId[64 * child1Id] = i;
                               fun_roamWalker(child1Id);
@@ -43387,7 +43357,7 @@ void  fun_generateWalkersForBuildings()
                                            childX,
                                            childY,
                                            0);
-                              walker_actionState[128 * child2Id] = 125;
+                              walkers[child2Id].actionState = 125;
                               walker_buildingId[64 * child2Id] = i;
                               fun_roamWalker(child2Id);
                               child3Id = fun_spawnWalker(
@@ -43396,7 +43366,7 @@ void  fun_generateWalkersForBuildings()
                                            childX,
                                            childY,
                                            0);
-                              walker_actionState[128 * child3Id] = 125;
+                              walkers[child3Id].actionState = 125;
                               walker_buildingId[64 * child3Id] = i;
                               fun_roamWalker(child3Id);
                               child4Id = fun_spawnWalker(
@@ -43405,7 +43375,7 @@ void  fun_generateWalkersForBuildings()
                                            childX,
                                            childY,
                                            0);
-                              walker_actionState[128 * child4Id] = 125;
+                              walkers[child4Id].actionState = 125;
                               walker_buildingId[64 * child4Id] = i;
                               fun_roamWalker(child4Id);
                             }
@@ -43466,7 +43436,7 @@ void  fun_generateWalkersForBuildings()
                                               walkerGridX,
                                               walkerGridY,
                                               0);
-                              walker_actionState[128 * librarianId] = 125;
+                              walkers[librarianId].actionState = 125;
                               building_22_walkerId[64 * i] = librarianId;
                               walker_buildingId[64 * librarianId] = i;
                               fun_roamWalker(librarianId);
@@ -43523,7 +43493,7 @@ void  fun_generateWalkersForBuildings()
                             {
                               building_2a_walkerSpawnDelay[128 * i] = 0;
                               teacherId = fun_spawnWalker(building_01_ciid[128 * i], 29, walkerGridX, walkerGridY, 0);
-                              walker_actionState[128 * teacherId] = 125;
+                              walkers[teacherId].actionState = 125;
                               building_22_walkerId[64 * i] = teacherId;
                               walker_buildingId[64 * teacherId] = i;
                               fun_roamWalker(teacherId);
@@ -43585,7 +43555,7 @@ void  fun_generateWalkersForBuildings()
                                            walkerGridX,
                                            walkerGridY,
                                            0);
-                              walker_actionState[128 * barberId] = 125;
+                              walkers[barberId].actionState = 125;
                               building_22_walkerId[64 * i] = barberId;
                               walker_buildingId[64 * barberId] = i;
                               fun_roamWalker(barberId);
@@ -43647,7 +43617,7 @@ void  fun_generateWalkersForBuildings()
                                            walkerGridX,
                                            walkerGridY,
                                            0);
-                              walker_actionState[128 * doctorId] = 125;
+                              walkers[doctorId].actionState = 125;
                               building_22_walkerId[64 * i] = doctorId;
                               walker_buildingId[64 * doctorId] = i;
                               fun_roamWalker(doctorId);
@@ -43709,7 +43679,7 @@ void  fun_generateWalkersForBuildings()
                                             walkerGridX,
                                             walkerGridY,
                                             0);
-                              walker_actionState[128 * surgeonId] = 125;
+                              walkers[surgeonId].actionState = 125;
                               building_22_walkerId[64 * i] = surgeonId;
                               walker_buildingId[64 * surgeonId] = i;
                               fun_roamWalker(surgeonId);
@@ -43737,7 +43707,7 @@ void  fun_generateWalkersForBuildings()
                                                    walkerGridX,
                                                    walkerGridY,
                                                    0);
-                                  walker_actionState[128 * missionaryId] = 125;
+                                  walkers[missionaryId].actionState = 125;
                                   building_22_walkerId[64 * i] = missionaryId;
                                   walker_buildingId[64 * missionaryId] = i;
                                   fun_roamWalker(missionaryId);
@@ -43797,7 +43767,7 @@ void  fun_generateWalkersForBuildings()
                               if ( v84 < dockSpawnDelay )
                               {
                                 v93 = fun_spawnWalker(building_01_ciid[128 * i], 38, walkerGridX, walkerGridY, 4);
-                                walker_actionState[128 * v93] = -124;
+                                walkers[v93].actionState = -124;
                                 walker_buildingId[64 * v93] = i;
                                 for ( l = 0; l < 3; ++l )
                                 {
@@ -43847,7 +43817,7 @@ void  fun_generateWalkersForBuildings()
                                 building_58_house_pottery[64 * i] = 0;
                                 building_3b_industry_outputGood[128 * i] = 6;
                                 v30 = fun_spawnWalker(building_01_ciid[128 * i], 4, walkerGridX, walkerGridY, 4);
-                                walker_actionState[128 * v30] = 20;
+                                walkers[v30].actionState = 20;
                                 byte_7FA34B[128 * v30] = 6;
                                 building_22_walkerId[64 * i] = v30;
                                 walker_buildingId[64 * v30] = i;
@@ -43912,7 +43882,7 @@ void  fun_generateWalkersForBuildings()
                                        (unsigned __int8)building_03_size[128 * i]) )
                                 {
                                   v31 = fun_spawnWalker(building_01_ciid[128 * i], 25, walkerGridX, walkerGridY, 0);
-                                  walker_actionState[128 * v31] = -66;
+                                  walkers[v31].actionState = -66;
                                   building_22_walkerId[64 * i] = v31;
                                   walker_buildingId[64 * v31] = i;
                                 }
@@ -43937,7 +43907,7 @@ void  fun_generateWalkersForBuildings()
                                 {
                                   building_2a_walkerSpawnDelay[128 * i] = 0;
                                   v32 = fun_spawnWalker(building_01_ciid[128 * i], 41, walkerGridX, walkerGridY, 0);
-                                  walker_actionState[128 * v32] = -98;
+                                  walkers[v32].actionState = -98;
                                   building_22_walkerId[64 * i] = v32;
                                   walker_buildingId[64 * v32] = i;
                                 }
@@ -43968,7 +43938,7 @@ void  fun_generateWalkersForBuildings()
                                 {
                                   building_2a_walkerSpawnDelay[128 * i] = 0;
                                   v33 = fun_spawnWalker(building_01_ciid[128 * i], 58, walkerGridX, walkerGridY, 0);
-                                  walker_actionState[128 * v33] = -94;
+                                  walkers[v33].actionState = -94;
                                   building_22_walkerId[64 * i] = v33;
                                   walker_buildingId[64 * v33] = i;
                                 }
@@ -44116,7 +44086,7 @@ void  fun_generateWalkersForBuildings()
                                        walkerGridX,
                                        walkerGridY,
                                        0);
-                          walker_actionState[128 * priestId] = 125;
+                          walkers[priestId].actionState = 125;
                           building_22_walkerId[64 * i] = priestId;
                           walker_buildingId[64 * priestId] = i;
                           fun_roamWalker(priestId);
@@ -44179,7 +44149,7 @@ void  fun_generateWalkersForBuildings()
                   {
                     building_2a_walkerSpawnDelay[128 * i] = 0;
                     taxCollectorId = fun_spawnWalker(building_01_ciid[128 * i], 7, walkerGridX, walkerGridY, 0);
-                    walker_actionState[128 * taxCollectorId] = 40;
+                    walkers[taxCollectorId].actionState = 40;
                     building_22_walkerId[64 * i] = taxCollectorId;
                     walker_buildingId[64 * taxCollectorId] = i;
                   }
@@ -44205,7 +44175,7 @@ void  fun_generateWalkersForBuildings()
               {
                 sub_4520A0(i);
                 v1 = fun_spawnWalker(building_01_ciid[128 * i], 4, walkerGridX, walkerGridY, 4);
-                walker_actionState[128 * v1] = 20;
+                walkers[v1].actionState = 20;
                 byte_7FA34B[128 * v1] = building_3b_industry_outputGood[128 * i];
                 building_22_walkerId[64 * i] = v1;
                 walker_buildingId[64 * v1] = i;
@@ -44230,7 +44200,7 @@ void  fun_generateWalkersForBuildings()
               dword_98C58C = 1;
               building_2a_walkerSpawnDelay[128 * i] = 0;
               v0 = fun_spawnWalker(building_01_ciid[128 * i], 40, walkerGridX, walkerGridY, 4);
-              walker_actionState[128 * v0] = 125;
+              walkers[v0].actionState = 125;
               walker_buildingId[64 * v0] = i;
               fun_roamWalker(v0);
             }
@@ -44242,50 +44212,7 @@ LABEL_4:
     ;
   }
 }
-// 4018D9: using guessed type _DWORD  sub_4018D9(_DWORD);
-// 40197E: using guessed type _DWORD  sub_40197E(_DWORD);
-// 401D2F: using guessed type _DWORD  fun_generateTowerSentryFromBarracks(_DWORD);
-// 401F23: using guessed type _DWORD  sub_401F23(_DWORD);
-// 4024A5: using guessed type _DWORD  sub_4024A5(_DWORD);
-// 4025F9: using guessed type _DWORD  sub_4025F9(_DWORD);
-// 4025FE: using guessed type _DWORD  sub_4025FE(_DWORD);
-// 40261C: using guessed type _DWORD  sub_40261C(_DWORD);
-// 402725: using guessed type _DWORD  sub_402725(_DWORD, _DWORD, _DWORD);
-// 402969: using guessed type _DWORD  sub_402969(_DWORD, _DWORD, _DWORD);
-// 402A54: using guessed type _DWORD  fun_generateSoldierFromBarracks(_DWORD);
-// 402D10: using guessed type _DWORD  sub_402D10(_DWORD);
-// 403332: using guessed type _DWORD  sub_403332(_DWORD);
-// 4033AF: using guessed type _DWORD  sub_4033AF(_DWORD, _DWORD);
-// 6500C4: using guessed type int cityinfo_population[];
-// 6544C0: using guessed type int dword_6544C0[];
-// 654624: using guessed type int dword_654624[];
-// 654628: using guessed type int cityinfo_entertainmentMessage_hippodromeShown[];
-// 65462C: using guessed type int cityinfo_entertainmentMessage_colosseumShown[];
-// 659B50: using guessed type int message_usePopup;
-// 6E6D1E: using guessed type __int16 graphic_nativeBuilding;
-// 7FA224: using guessed type int dword_7FA224;
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 94A318: using guessed type int dword_94A318;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD52: using guessed type __int16 building_12_walkerServiceAccess[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
-// 94BD64: using guessed type __int16 building_24_laborSeekerId[];
-// 94BD68: using guessed type __int16 building_28_towerBallistaId[];
-// 94BD70: using guessed type __int16 building_30_warehouse_prevStorage[];
-// 94BD72: using guessed type __int16 building_32_warehouse_nextStorage[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
-// 94BD98: using guessed type __int16 building_58_house_pottery[];
-// 94BDAC: using guessed type __int16 building_6c_word_94BDAC[];
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
-// 98C58C: using guessed type int dword_98C58C;
 
-//----- (00463750) --------------------------------------------------------
 signed int  fun_buildingHasWalkerOfType(int buildingId, int walkerType1, int walkerType2)
 {
   signed int result; // eax@2
@@ -44327,10 +44254,7 @@ signed int  fun_buildingHasWalkerOfType(int buildingId, int walkerType1, int wal
   }
   return result;
 }
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (00463840) --------------------------------------------------------
 void  fun_generateLaborSeeker(int buildingId)
 {
   int x; // ST64_4@11
@@ -44355,7 +44279,7 @@ void  fun_generateLaborSeeker(int buildingId)
       x = walkerGridX;
       y = walkerGridY;
       walkerId = fun_spawnWalker(building_01_ciid[128 * buildingId], Walker_LaborSeeker, walkerGridX, walkerGridY, 0);
-      walker_actionState[128 * walkerId] = 125;
+      walkers[walkerId].actionState = 125;
       building_24_laborSeekerId[64 * buildingId] = walkerId;
       walker_buildingId[64 * walkerId] = buildingId;
       fun_roamWalker(walkerId);
@@ -46117,7 +46041,7 @@ void  fun_generateRioter(int buildingId)
     for ( i = 0; i < v5; ++i )
     {
       walkerId = fun_spawnWalker(ciid, Walker_Rioter, v3, v2, 4);
-      walker_actionState[128 * walkerId] = 120;
+      walkers[walkerId].actionState = 120;
       word_7FA374[64 * walkerId] = 0;
       word_7FA366[64 * walkerId] = 4 * i + 10;
       if ( v4 )
@@ -46656,8 +46580,8 @@ void  fun_deleteBuilding(int buildingId)
 
 void  fun_deleteBuildingEvent(int buildingId)
 {
-  if ( building_7d_storageId[128 * buildingId] )
-    storages[building_7d_storageId[128 * buildingId]].inUse = 0;
+  if ( buildings[buildingId].d7d_storageId )
+    storages[buildings[buildingId].d7d_storageId].inUse = 0;
 
   if ( building_0a_type[64 * buildingId] == B_SenateUpgraded )
   {
@@ -46733,11 +46657,11 @@ void  fun_setStorageBuildingIds()
     {
       if ( building_0a_type[64 * j] == B_Granary || building_0a_type[64 * j] == B_Warehouse )
       {
-        if ( building_7d_storageId[128 * j] )
+        if ( buildings[j].d7d_storageId )
         {
-          storageId = (unsigned __int8)building_7d_storageId[128 * j];
+          storageId = buildings[j].d7d_storageId;
           if ( storage_buildingId[16 * storageId] )
-            building_7d_storageId[128 * j] = fun_createStorage();
+            buildings[j].d7d_storageId = fun_createStorage();
           else
             storage_buildingId[16 * storageId] = j;
         }
@@ -46746,7 +46670,6 @@ void  fun_setStorageBuildingIds()
   }
 }
 
-//----- (0046A390) --------------------------------------------------------
 int  fun_houseCanExpand(int buildingId, int numTiles)
 {
   int v3; // [sp+4Ch] [bp-1Ch]@3
@@ -50464,7 +50387,7 @@ LABEL_390:
         fun_putBuildingOnTerrainAndGraphicGrids(v37, xPos, yPos, width, width, graphic_potteryWorkshop, 8);
         break;
       case B_Granary:
-        building_7d_storageId[128 * v37] = fun_createStorage();
+        buildings[v37].d7d_storageId = fun_createStorage();
         fun_putBuildingOnTerrainAndGraphicGrids(v37, xPos, yPos, width, width, graphic_granary, 8);
         break;
       case B_Market:
@@ -50694,7 +50617,7 @@ LABEL_390:
               fun_putBuildingOnTerrainAndGraphicGrids(v39, xPos + 10, yPos, width, width, v30, 8);
               break;
             case B_Warehouse:
-              building_7d_storageId[128 * v37] = fun_createStorage();
+              buildings[v37].d7d_storageId = fun_createStorage();
               building_30_warehouse_prevStorage[64 * v37] = 0;
               v10 = v37;
               fun_putBuildingOnTerrainAndGraphicGrids(v37, xPos, yPos, width, width, word_6E6C54, 8);
@@ -64877,7 +64800,6 @@ void  fun_walker_nobody()
   ;
 }
 
-//----- (00492B00) --------------------------------------------------------
 void  fun_walker_immigrant()
 {
   int v0; // [sp+4Ch] [bp-10h]@29
@@ -64894,7 +64816,7 @@ void  fun_walker_immigrant()
     ++byte_7FA341[128 * walkerId];
     if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
       byte_7FA341[128 * walkerId] = 0;
-    switch ( walker_actionState[128 * walkerId] )
+    switch ( walkers[walkerId].actionState )
     {
       case 0x96:
         sub_4B3390(walkerId);
@@ -64914,7 +64836,7 @@ void  fun_walker_immigrant()
                  (unsigned __int8)building_03_size[128 * buildingId],
                  2) )
           {
-            walker_actionState[128 * walkerId] = 2;
+            walkers[walkerId].actionState = 2;
             walker_destination_x[128 * walkerId] = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             word_7FA374[64 * walkerId] = 0;
@@ -64928,7 +64850,7 @@ void  fun_walker_immigrant()
       case 2:
         byte_7FA395[128 * walkerId] = 0;
         fun_walkerWalkTicks(walkerId, 1);
-        switch ( walker_direction[128 * walkerId] )
+        switch ( walkers[walkerId].direction )
         {
           case 9:
             fun_removeDestinationPathForWalker(walkerId);
@@ -64939,7 +64861,7 @@ void  fun_walker_immigrant()
             walker_state[128 * walkerId] = 2;
             break;
           case 8:
-            walker_actionState[128 * walkerId] = 3;
+            walkers[walkerId].actionState = 3;
             walker_destination_x[128 * walkerId] = building_06_x[128 * buildingId];
             walker_destination_y[128 * walkerId] = building__07_y[128 * buildingId];
             sub_4B6B70(
@@ -64983,13 +64905,13 @@ void  fun_walker_immigrant()
           byte_7FA395[128 * walkerId] = 0;
         break;
     }
-    dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+    dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+    if ( walkers[walkerId].actionState == 149 )
       word_7FA344[64 * walkerId] = word_6E6C88 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
     else
       word_7FA344[64 * walkerId] = word_6E6C88 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 2 )
+    if ( walkers[walkerId].actionState == 2 )
     {
       dword_7F87B0 = dword_65DF24 + 4;
       if ( dword_7F87B0 >= 8 )
@@ -65004,30 +64926,7 @@ void  fun_walker_immigrant()
     walker_state[128 * walkerId] = 2;
   }
 }
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 4025D1: using guessed type _DWORD  sub_4025D1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402E50: using guessed type _DWORD  sub_402E50(_DWORD, _DWORD);
-// 60779C: using guessed type int model_houses_numPeople[];
-// 607F80: using guessed type int debug_houseEvolution;
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C88: using guessed type __int16 word_6E6C88;
-// 6E6CB6: using guessed type __int16 word_6E6CB6;
-// 7F87B0: using guessed type int dword_7F87B0;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA374: using guessed type __int16 word_7FA374[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA38C: using guessed type __int16 walker_migrantDestinationHome[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD58: using guessed type __int16 building_18_house_roomForPeople[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD66: using guessed type __int16 building_26_immigrantId[];
 
-//----- (00493370) --------------------------------------------------------
 void  fun_walker_emigrant()
 {
   byte_7FA3A2[128 * walkerId] = 0;
@@ -65035,7 +64934,7 @@ void  fun_walker_emigrant()
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -65051,7 +64950,7 @@ void  fun_walker_emigrant()
       {
         if ( !sub_489070(walker_x[128 * walkerId], walker_y[128 * walkerId], 1, 5) )
           walker_state[128 * walkerId] = 2;
-        walker_actionState[128 * walkerId] = 5;
+        walkers[walkerId].actionState = 5;
         walker_destination_x[128 * walkerId] = walkerGridX;
         walker_destination_y[128 * walkerId] = walkerGridY;
         sub_4B6B70(
@@ -65069,7 +64968,7 @@ void  fun_walker_emigrant()
       byte_7FA395[128 * walkerId] = 1;
       if ( sub_4B66E0(walkerId, 1) == 1 )
       {
-        walker_actionState[128 * walkerId] = 6;
+        walkers[walkerId].actionState = 6;
         walker_destination_x[128 * walkerId] = city_inform[ciid].entry_x;
         walker_destination_y[128 * walkerId] = city_inform[ciid].entry_y;
         word_7FA374[64 * walkerId] = 0;
@@ -65084,9 +64983,9 @@ void  fun_walker_emigrant()
       byte_7FA34C[128 * walkerId] = 0;
       byte_7FA395[128 * walkerId] = 0;
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
+        if ( walkers[walkerId].direction == 8 )
           walker_state[128 * walkerId] = 2;
       }
       else
@@ -65095,13 +64994,13 @@ void  fun_walker_emigrant()
       }
       break;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6C88 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6C88 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 6 )
+  if ( walkers[walkerId].actionState == 6 )
   {
     dword_7F87B0 = dword_65DF24 + 4;
     if ( dword_7F87B0 >= 8 )
@@ -65111,22 +65010,7 @@ void  fun_walker_emigrant()
     byte_7FA39D[128 * walkerId] = byte_5FA159[2 * dword_7F87B0];
   }
 }
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 4025D1: using guessed type _DWORD  sub_4025D1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402E50: using guessed type _DWORD  sub_402E50(_DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C88: using guessed type __int16 word_6E6C88;
-// 6E6CB6: using guessed type __int16 word_6E6CB6;
-// 7F87B0: using guessed type int dword_7F87B0;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA374: using guessed type __int16 word_7FA374[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
 
-//----- (004939E0) --------------------------------------------------------
 void  fun_walker_homeless()
 {
   int v0; // [sp+4Ch] [bp-10h]@41
@@ -65140,7 +65024,7 @@ void  fun_walker_homeless()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   byte_7FA3A2[128 * walkerId] = 3;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -65164,7 +65048,7 @@ void  fun_walker_homeless()
           {
             building_26_immigrantId[64 * v2] = walkerId;
             walker_migrantDestinationHome[64 * walkerId] = v2;
-            walker_actionState[128 * walkerId] = 8;
+            walkers[walkerId].actionState = 8;
             walker_destination_x[128 * walkerId] = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             word_7FA374[64 * walkerId] = 0;
@@ -65176,7 +65060,7 @@ void  fun_walker_homeless()
         }
         else
         {
-          walker_actionState[128 * walkerId] = 10;
+          walkers[walkerId].actionState = 10;
           walker_destination_x[128 * walkerId] = city_inform[ciid].exit_x;
           walker_destination_y[128 * walkerId] = city_inform[ciid].exit_y;
           word_7FA374[64 * walkerId] = 0;
@@ -65188,11 +65072,11 @@ void  fun_walker_homeless()
       byte_7FA395[128 * walkerId] = 0;
       fun_walkerWalkTicks(walkerId, 1);
       v3 = walker_migrantDestinationHome[64 * walkerId];
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
+        if ( walkers[walkerId].direction == 8 )
         {
-          walker_actionState[128 * walkerId] = 9;
+          walkers[walkerId].actionState = 9;
           walker_destination_x[128 * walkerId] = building_06_x[128 * v3];
           walker_destination_y[128 * walkerId] = building__07_y[128 * v3];
           sub_4B6B70(
@@ -65213,7 +65097,7 @@ void  fun_walker_homeless()
       break;
     case 0xA:
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
           walker_state[128 * walkerId] = 2;
@@ -65240,7 +65124,7 @@ void  fun_walker_homeless()
           {
             building_26_immigrantId[64 * v4] = walkerId;
             walker_migrantDestinationHome[64 * walkerId] = v4;
-            walker_actionState[128 * walkerId] = 8;
+            walkers[walkerId].actionState = 8;
             walker_destination_x[128 * walkerId] = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             word_7FA374[64 * walkerId] = 0;
@@ -65282,35 +65166,14 @@ void  fun_walker_homeless()
       }
       break;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = graphic_homeless + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = graphic_homeless + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 401488: using guessed type _DWORD  sub_401488(_DWORD, _DWORD);
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 4019C4: using guessed type _DWORD  sub_4019C4(_DWORD, _DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 4025D1: using guessed type _DWORD  sub_4025D1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402E50: using guessed type _DWORD  sub_402E50(_DWORD, _DWORD);
-// 60779C: using guessed type int model_houses_numPeople[];
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C9C: using guessed type __int16 graphic_homeless;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA374: using guessed type __int16 word_7FA374[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA38C: using guessed type __int16 walker_migrantDestinationHome[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD58: using guessed type __int16 building_18_house_roomForPeople[];
-// 94BD66: using guessed type __int16 building_26_immigrantId[];
 
-//----- (00494450) --------------------------------------------------------
 void  fun_walker_cartpusher()
 {
   int v0; // [sp+4Ch] [bp-14h]@3
@@ -65333,7 +65196,7 @@ void  fun_walker_cartpusher()
   v1 = walkers[walkerId].gridOffset;
   v0 = (unsigned __int8)byte_91C920[v1];
   byte_7FA3A2[128 * walkerId] = 1;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -65366,7 +65229,7 @@ void  fun_walker_cartpusher()
         if ( v2 )
         {
           word_7FA38E[64 * walkerId] = v2;
-          walker_actionState[128 * walkerId] = 21;
+          walkers[walkerId].actionState = 21;
           word_7FA366[64 * walkerId] = 0;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
@@ -65383,7 +65246,7 @@ void  fun_walker_cartpusher()
           if ( v3 )
           {
             word_7FA38E[64 * walkerId] = v3;
-            walker_actionState[128 * walkerId] = 22;
+            walkers[walkerId].actionState = 22;
             word_7FA366[64 * walkerId] = 0;
             walker_destination_x[128 * walkerId] = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
@@ -65399,7 +65262,7 @@ void  fun_walker_cartpusher()
             if ( v4 )
             {
               word_7FA38E[64 * walkerId] = v4;
-              walker_actionState[128 * walkerId] = 23;
+              walkers[walkerId].actionState = 23;
               word_7FA366[64 * walkerId] = 0;
               walker_destination_x[128 * walkerId] = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
@@ -65416,7 +65279,7 @@ void  fun_walker_cartpusher()
               if ( v5 )
               {
                 word_7FA38E[64 * walkerId] = v5;
-                walker_actionState[128 * walkerId] = 21;
+                walkers[walkerId].actionState = 21;
                 word_7FA366[64 * walkerId] = 0;
                 walker_destination_x[128 * walkerId] = walkerGridX;
                 walker_destination_y[128 * walkerId] = walkerGridY;
@@ -65433,7 +65296,7 @@ void  fun_walker_cartpusher()
                 if ( v6 )
                 {
                   word_7FA38E[64 * walkerId] = v6;
-                  walker_actionState[128 * walkerId] = 22;
+                  walkers[walkerId].actionState = 22;
                   word_7FA366[64 * walkerId] = 0;
                   walker_destination_x[128 * walkerId] = walkerGridX;
                   walker_destination_y[128 * walkerId] = walkerGridY;
@@ -65457,15 +65320,15 @@ void  fun_walker_cartpusher()
       word_7FA346[64 * walkerId] = word_6E6C72 + 8 * (unsigned __int8)byte_7FA34B[128 * walkerId];
       word_7FA346[64 * walkerId] += fun_getResourceGraphicIdOffset((unsigned __int8)byte_7FA34B[128 * walkerId], 1);
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 24;
+          walkers[walkerId].actionState = 24;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           if ( grid_groundType[walkers[walkerId].gridOffset] != 2 )
-            walker_actionState[128 * walkerId] = 20;
+            walkers[walkerId].actionState = 20;
           word_7FA366[64 * walkerId] = 0;
           break;
         case 10:
@@ -65479,19 +65342,19 @@ void  fun_walker_cartpusher()
       word_7FA346[64 * walkerId] = word_6E6C72 + 8 * (unsigned __int8)byte_7FA34B[128 * walkerId];
       word_7FA346[64 * walkerId] += fun_getResourceGraphicIdOffset((unsigned __int8)byte_7FA34B[128 * walkerId], 1);
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 25;
+          walkers[walkerId].actionState = 25;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           if ( grid_groundType[walkers[walkerId].gridOffset] != 2 )
-            walker_actionState[128 * walkerId] = 20;
+            walkers[walkerId].actionState = 20;
           word_7FA366[64 * walkerId] = 0;
           break;
         case 10:
-          walker_actionState[128 * walkerId] = 20;
+          walkers[walkerId].actionState = 20;
           word_7FA366[64 * walkerId] = 0;
           break;
       }
@@ -65502,15 +65365,15 @@ void  fun_walker_cartpusher()
       word_7FA346[64 * walkerId] = word_6E6C72 + 8 * (unsigned __int8)byte_7FA34B[128 * walkerId];
       word_7FA346[64 * walkerId] += fun_getResourceGraphicIdOffset((unsigned __int8)byte_7FA34B[128 * walkerId], 1);
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 26;
+          walkers[walkerId].actionState = 26;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           if ( grid_groundType[walkers[walkerId].gridOffset] != 2 )
-            walker_actionState[128 * walkerId] = 20;
+            walkers[walkerId].actionState = 20;
           word_7FA366[64 * walkerId] = 0;
           break;
         case 10:
@@ -65527,7 +65390,7 @@ void  fun_walker_cartpusher()
                word_7FA38E[64 * walkerId],
                (unsigned __int8)byte_7FA34B[128 * walkerId]) )
         {
-          walker_actionState[128 * walkerId] = 27;
+          walkers[walkerId].actionState = 27;
           word_7FA366[64 * walkerId] = 0;
           walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
@@ -65535,7 +65398,7 @@ void  fun_walker_cartpusher()
         else
         {
           fun_removeDestinationPathForWalker(walkerId);
-          walker_actionState[128 * walkerId] = 20;
+          walkers[walkerId].actionState = 20;
           word_7FA366[64 * walkerId] = 0;
         }
       }
@@ -65548,7 +65411,7 @@ void  fun_walker_cartpusher()
       {
         if ( sub_45D3D0(word_7FA38E[64 * walkerId], (unsigned __int8)byte_7FA34B[128 * walkerId], 1) )
         {
-          walker_actionState[128 * walkerId] = 27;
+          walkers[walkerId].actionState = 27;
           word_7FA366[64 * walkerId] = 0;
           walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
@@ -65565,7 +65428,7 @@ void  fun_walker_cartpusher()
           if ( v7 )
           {
             word_7FA38E[64 * walkerId] = v7;
-            walker_actionState[128 * walkerId] = 22;
+            walkers[walkerId].actionState = 22;
             word_7FA366[64 * walkerId] = 0;
             walker_destination_x[128 * walkerId] = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
@@ -65582,7 +65445,7 @@ void  fun_walker_cartpusher()
             if ( v8 )
             {
               word_7FA38E[64 * walkerId] = v8;
-              walker_actionState[128 * walkerId] = 21;
+              walkers[walkerId].actionState = 21;
               word_7FA366[64 * walkerId] = 0;
               walker_destination_x[128 * walkerId] = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
@@ -65599,7 +65462,7 @@ void  fun_walker_cartpusher()
               if ( v9 )
               {
                 word_7FA38E[64 * walkerId] = v9;
-                walker_actionState[128 * walkerId] = 22;
+                walkers[walkerId].actionState = 22;
                 word_7FA366[64 * walkerId] = 0;
                 walker_destination_x[128 * walkerId] = walkerGridX;
                 walker_destination_y[128 * walkerId] = walkerGridY;
@@ -65619,7 +65482,7 @@ void  fun_walker_cartpusher()
       if ( word_7FA366[64 * walkerId] > 5 )
       {
         sub_45E740(word_7FA38E[64 * walkerId]);
-        walker_actionState[128 * walkerId] = 27;
+        walkers[walkerId].actionState = 27;
         word_7FA366[64 * walkerId] = 0;
         walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
@@ -65629,10 +65492,10 @@ void  fun_walker_cartpusher()
     case 0x1B:
       word_7FA346[64 * walkerId] = word_6E6C72;
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 20;
+          walkers[walkerId].actionState = 20;
           walker_state[128 * walkerId] = 2;
           break;
         case 9:
@@ -65644,12 +65507,12 @@ void  fun_walker_cartpusher()
       }
       break;
   }
-  if ( walker_direction[128 * walkerId] < 8 )
-    dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  if ( walkers[walkerId].direction < 8 )
+    dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   else
     dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
   {
     word_7FA344[64 * walkerId] = word_6E6C86 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
     word_7FA346[64 * walkerId] = 0;
@@ -65665,27 +65528,7 @@ void  fun_walker_cartpusher()
     byte_7FA39D[128 * walkerId] = byte_5FA159[2 * dword_65DF24];
   }
 }
-// 4014FB: using guessed type _DWORD  sub_4014FB(_DWORD);
-// 401703: using guessed type _DWORD  sub_401703(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 401744: using guessed type _DWORD  sub_401744(_DWORD, _DWORD, _DWORD);
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 401DA7: using guessed type _DWORD  sub_401DA7(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 4030DF: using guessed type _DWORD  sub_4030DF(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C72: using guessed type __int16 word_6E6C72;
-// 6E6C86: using guessed type __int16 word_6E6C86;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 862D40: using guessed type int dword_862D40;
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (00495B20) --------------------------------------------------------
 void  fun_walker_laborSeeker()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -65700,23 +65543,14 @@ void  fun_walker_laborSeeker()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   sub_49FFE0(1);
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6C22 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6C22 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 401D7A: using guessed type _DWORD  sub_401D7A(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C22: using guessed type __int16 word_6E6C22;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD64: using guessed type __int16 building_24_laborSeekerId[];
 
-//----- (00495D20) --------------------------------------------------------
 void  fun_walker_explosion()
 {
   byte_7FA34C[128 * walkerId] = 1;
@@ -65729,12 +65563,7 @@ void  fun_walker_explosion()
   else
     word_7FA344[64 * walkerId] = word_6E6C7C + 7;
 }
-// 402E50: using guessed type _DWORD  sub_402E50(_DWORD, _DWORD);
-// 5FA2A8: using guessed type int dword_5FA2A8[24];
-// 6E6C7C: using guessed type __int16 word_6E6C7C;
-// 7FA344: using guessed type __int16 word_7FA344[];
 
-//----- (00495E40) --------------------------------------------------------
 void  fun_walker_taxCollector()
 {
   int v0; // [sp+50h] [bp-Ch]@1
@@ -65748,7 +65577,7 @@ void  fun_walker_taxCollector()
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 150:
       sub_4B3390(walkerId);
@@ -65768,7 +65597,7 @@ void  fun_walker_taxCollector()
                (unsigned __int8)building_03_size[128 * v0],
                2) )
         {
-          walker_actionState[128 * walkerId] = 41;
+          walkers[walkerId].actionState = 41;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           sub_4B6B70(
@@ -65797,7 +65626,7 @@ void  fun_walker_taxCollector()
         }
         else
         {
-          walker_actionState[128 * walkerId] = 42;
+          walkers[walkerId].actionState = 42;
           fun_roamWalker(walkerId);
           word_7FA374[64 * walkerId] = 0;
         }
@@ -65814,7 +65643,7 @@ void  fun_walker_taxCollector()
                (unsigned __int8)building_03_size[128 * v0],
                2) )
         {
-          walker_actionState[128 * walkerId] = 43;
+          walkers[walkerId].actionState = 43;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
         }
@@ -65827,11 +65656,11 @@ void  fun_walker_taxCollector()
       break;
     case 43:
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
+        if ( walkers[walkerId].direction == 8 )
         {
-          walker_actionState[128 * walkerId] = 41;
+          walkers[walkerId].actionState = 41;
           walker_destination_x[128 * walkerId] = building_06_x[128 * v0];
           walker_destination_y[128 * walkerId] = building__07_y[128 * v0];
           sub_4B6B70(
@@ -65850,32 +65679,14 @@ void  fun_walker_taxCollector()
       }
       break;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6C80 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6C80 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 4025D1: using guessed type _DWORD  sub_4025D1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402CDE: using guessed type _DWORD  sub_402CDE(_DWORD, _DWORD);
-// 402E50: using guessed type _DWORD  sub_402E50(_DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C80: using guessed type __int16 word_6E6C80;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA374: using guessed type __int16 word_7FA374[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (00496640) --------------------------------------------------------
 void  fun_walker_engineer()
 {
   int v0; // [sp+50h] [bp-Ch]@1
@@ -65889,7 +65700,7 @@ void  fun_walker_engineer()
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 150:
       sub_4B3390(walkerId);
@@ -65909,7 +65720,7 @@ void  fun_walker_engineer()
                (unsigned __int8)building_03_size[128 * v0],
                2) )
         {
-          walker_actionState[128 * walkerId] = 61;
+          walkers[walkerId].actionState = 61;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           sub_4B6B70(
@@ -65938,7 +65749,7 @@ void  fun_walker_engineer()
         }
         else
         {
-          walker_actionState[128 * walkerId] = 62;
+          walkers[walkerId].actionState = 62;
           fun_roamWalker(walkerId);
           word_7FA374[64 * walkerId] = 0;
         }
@@ -65955,7 +65766,7 @@ void  fun_walker_engineer()
                (unsigned __int8)building_03_size[128 * v0],
                2) )
         {
-          walker_actionState[128 * walkerId] = 63;
+          walkers[walkerId].actionState = 63;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
         }
@@ -65968,11 +65779,11 @@ void  fun_walker_engineer()
       break;
     case 63:
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
+        if ( walkers[walkerId].direction == 8 )
         {
-          walker_actionState[128 * walkerId] = 61;
+          walkers[walkerId].actionState = 61;
           walker_destination_x[128 * walkerId] = building_06_x[128 * v0];
           walker_destination_y[128 * walkerId] = building__07_y[128 * v0];
           sub_4B6B70(
@@ -65991,32 +65802,14 @@ void  fun_walker_engineer()
       }
       break;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6C8C + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6C8C + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 4025D1: using guessed type _DWORD  sub_4025D1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402CDE: using guessed type _DWORD  sub_402CDE(_DWORD, _DWORD);
-// 402E50: using guessed type _DWORD  sub_402E50(_DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C8C: using guessed type __int16 word_6E6C8C;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA374: using guessed type __int16 word_7FA374[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (00496E40) --------------------------------------------------------
 void  fun_walker_warehouseman()
 {
   int v0; // [sp+4Ch] [bp-20h]@3
@@ -66049,7 +65842,7 @@ void  fun_walker_warehouseman()
     byte_7FA341[128 * walkerId] = 0;
   word_7FA346[64 * walkerId] = 0;
   v0 = (unsigned __int8)byte_91C920[walkers[walkerId].gridOffset];
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 150:
       sub_4B3390(walkerId);
@@ -66078,7 +65871,7 @@ void  fun_walker_warehouseman()
             if ( v6 )
             {
               word_7FA38E[64 * walkerId] = v6;
-              walker_actionState[128 * walkerId] = 51;
+              walkers[walkerId].actionState = 51;
               word_7FA366[64 * walkerId] = 0;
               walker_destination_x[128 * walkerId] = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
@@ -66096,7 +65889,7 @@ void  fun_walker_warehouseman()
               if ( v7 )
               {
                 word_7FA38E[64 * walkerId] = v7;
-                walker_actionState[128 * walkerId] = 51;
+                walkers[walkerId].actionState = 51;
                 word_7FA366[64 * walkerId] = 0;
                 walker_destination_x[128 * walkerId] = walkerGridX;
                 walker_destination_y[128 * walkerId] = walkerGridY;
@@ -66114,7 +65907,7 @@ void  fun_walker_warehouseman()
                 if ( v8 )
                 {
                   word_7FA38E[64 * walkerId] = v8;
-                  walker_actionState[128 * walkerId] = 51;
+                  walkers[walkerId].actionState = 51;
                   word_7FA366[64 * walkerId] = 0;
                   walker_destination_x[128 * walkerId] = walkerGridX;
                   walker_destination_y[128 * walkerId] = walkerGridY;
@@ -66134,7 +65927,7 @@ void  fun_walker_warehouseman()
             {
               byte_7FA3A3[128 * walkerId] = 0;
               word_7FA38E[64 * walkerId] = v5;
-              walker_actionState[128 * walkerId] = 54;
+              walkers[walkerId].actionState = 54;
               word_7FA366[64 * walkerId] = 0;
               walker_destination_x[128 * walkerId] = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
@@ -66157,7 +65950,7 @@ void  fun_walker_warehouseman()
             if ( v10 )
             {
               word_7FA38E[64 * walkerId] = v10;
-              walker_actionState[128 * walkerId] = 51;
+              walkers[walkerId].actionState = 51;
               word_7FA366[64 * walkerId] = 0;
               walker_destination_x[128 * walkerId] = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
@@ -66173,7 +65966,7 @@ void  fun_walker_warehouseman()
               if ( v11 )
               {
                 word_7FA38E[64 * walkerId] = v11;
-                walker_actionState[128 * walkerId] = 51;
+                walkers[walkerId].actionState = 51;
                 word_7FA366[64 * walkerId] = 0;
                 walker_destination_x[128 * walkerId] = walkerGridX;
                 walker_destination_y[128 * walkerId] = walkerGridY;
@@ -66190,7 +65983,7 @@ void  fun_walker_warehouseman()
                 if ( v12 )
                 {
                   word_7FA38E[64 * walkerId] = v12;
-                  walker_actionState[128 * walkerId] = 51;
+                  walkers[walkerId].actionState = 51;
                   word_7FA366[64 * walkerId] = 0;
                   walker_destination_x[128 * walkerId] = walkerGridX;
                   walker_destination_y[128 * walkerId] = walkerGridY;
@@ -66206,7 +65999,7 @@ void  fun_walker_warehouseman()
                   if ( v13 )
                   {
                     word_7FA38E[64 * walkerId] = v13;
-                    walker_actionState[128 * walkerId] = 51;
+                    walkers[walkerId].actionState = 51;
                     word_7FA366[64 * walkerId] = 0;
                     walker_destination_x[128 * walkerId] = walkerGridX;
                     walker_destination_y[128 * walkerId] = walkerGridY;
@@ -66229,7 +66022,7 @@ void  fun_walker_warehouseman()
                       else
                       {
                         word_7FA38E[64 * walkerId] = v14;
-                        walker_actionState[128 * walkerId] = 51;
+                        walkers[walkerId].actionState = 51;
                         word_7FA366[64 * walkerId] = 0;
                         walker_destination_x[128 * walkerId] = walkerGridX;
                         walker_destination_y[128 * walkerId] = walkerGridY;
@@ -66246,7 +66039,7 @@ void  fun_walker_warehouseman()
                       if ( v15 )
                       {
                         word_7FA38E[64 * walkerId] = v15;
-                        walker_actionState[128 * walkerId] = 51;
+                        walkers[walkerId].actionState = 51;
                         word_7FA366[64 * walkerId] = 0;
                         walker_destination_x[128 * walkerId] = walkerGridX;
                         walker_destination_y[128 * walkerId] = walkerGridY;
@@ -66276,7 +66069,7 @@ void  fun_walker_warehouseman()
             {
               byte_7FA3A3[128 * walkerId] = 0;
               word_7FA38E[64 * walkerId] = v9;
-              walker_actionState[128 * walkerId] = 57;
+              walkers[walkerId].actionState = 57;
               word_7FA366[64 * walkerId] = 0;
               walker_destination_x[128 * walkerId] = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
@@ -66303,10 +66096,10 @@ void  fun_walker_warehouseman()
         word_7FA346[64 * walkerId] += fun_getResourceGraphicIdOffset((unsigned __int8)byte_7FA34B[128 * walkerId], 1);
       }
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 52;
+          walkers[walkerId].actionState = 52;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -66339,7 +66132,7 @@ void  fun_walker_warehouseman()
             sub_45E740(v16);
             break;
         }
-        walker_actionState[128 * walkerId] = 53;
+        walkers[walkerId].actionState = 53;
         word_7FA366[64 * walkerId] = 0;
         walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
@@ -66349,7 +66142,7 @@ void  fun_walker_warehouseman()
     case 53:
       word_7FA346[64 * walkerId] = word_6E6C72;
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
           walker_state[128 * walkerId] = 2;
@@ -66365,10 +66158,10 @@ void  fun_walker_warehouseman()
     case 54:
       word_7FA346[64 * walkerId] = word_6E6C72;
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 55;
+          walkers[walkerId].actionState = 55;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -66386,7 +66179,7 @@ void  fun_walker_warehouseman()
       {
         byte_7FA3A3[128 * walkerId] = sub_45CDC0(v20, v17);
         byte_7FA34B[128 * walkerId] = dword_94B3B0;
-        walker_actionState[128 * walkerId] = 56;
+        walkers[walkerId].actionState = 56;
         word_7FA366[64 * walkerId] = 0;
         walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
@@ -66427,7 +66220,7 @@ void  fun_walker_warehouseman()
                                           1);
       }
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
           for ( i = 0; i < (unsigned __int8)byte_7FA3A3[128 * walkerId]; ++i )
@@ -66446,10 +66239,10 @@ void  fun_walker_warehouseman()
       byte_7FA3A2[128 * walkerId] = 3;
       word_7FA346[64 * walkerId] = word_6E6C72;
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 58;
+          walkers[walkerId].actionState = 58;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -66472,7 +66265,7 @@ void  fun_walker_warehouseman()
               ++j )
           ++byte_7FA3A3[128 * walkerId];
         byte_7FA34B[128 * walkerId] = walker_itemCollecting[128 * walkerId];
-        walker_actionState[128 * walkerId] = 59;
+        walkers[walkerId].actionState = 59;
         word_7FA366[64 * walkerId] = 0;
         walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
@@ -66517,7 +66310,7 @@ void  fun_walker_warehouseman()
                                           1);
       }
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
           for ( k = 0; k < (unsigned __int8)byte_7FA3A3[128 * walkerId]; ++k )
@@ -66533,12 +66326,12 @@ void  fun_walker_warehouseman()
       }
       break;
   }
-  if ( walker_direction[128 * walkerId] < 8 )
-    dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  if ( walkers[walkerId].direction < 8 )
+    dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   else
     dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
   {
     word_7FA344[64 * walkerId] = word_6E6C86 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
     word_7FA346[64 * walkerId] = 0;
@@ -66556,39 +66349,7 @@ void  fun_walker_warehouseman()
       byte_7FA39D[128 * walkerId] -= 40;
   }
 }
-// 40126C: using guessed type _DWORD  sub_40126C(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 4012E9: using guessed type _DWORD  sub_4012E9(_DWORD, _DWORD);
-// 4014FB: using guessed type _DWORD  sub_4014FB(_DWORD);
-// 401703: using guessed type _DWORD  sub_401703(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 401744: using guessed type _DWORD  sub_401744(_DWORD, _DWORD, _DWORD);
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 40199C: using guessed type _DWORD  sub_40199C(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 401B40: using guessed type _DWORD  sub_401B40(_DWORD, _DWORD, _DWORD, _DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 401C99: using guessed type _DWORD  sub_401C99(_DWORD);
-// 401DA7: using guessed type _DWORD  sub_401DA7(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402329: using guessed type _DWORD  sub_402329(_DWORD, _DWORD);
-// 4024D2: using guessed type _DWORD  sub_4024D2(_DWORD, _DWORD, _DWORD, _DWORD);
-// 402FD1: using guessed type _DWORD  fun_removeGoodFromWarehouse(_DWORD, _DWORD, _DWORD, _DWORD);
-// 4030DF: using guessed type _DWORD  sub_4030DF(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 403224: using guessed type _DWORD  sub_403224(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C72: using guessed type __int16 word_6E6C72;
-// 6E6C86: using guessed type __int16 word_6E6C86;
-// 6E6D8A: using guessed type __int16 word_6E6D8A;
-// 6E6DA4: using guessed type __int16 word_6E6DA4;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 94B3B0: using guessed type int dword_94B3B0;
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (00498F20) --------------------------------------------------------
 void  fun_walker_prefect()
 {
   int v0; // ST68_4@71
@@ -66608,7 +66369,7 @@ void  fun_walker_prefect()
     byte_7FA341[128 * walkerId] = 0;
   if ( !sub_49A250(walkerId) )
     sub_499FE0(walkerId);
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -66628,7 +66389,7 @@ void  fun_walker_prefect()
                (unsigned __int8)building_03_size[128 * v4],
                2) )
         {
-          walker_actionState[128 * walkerId] = 71;
+          walkers[walkerId].actionState = 71;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           sub_4B6B70(
@@ -66657,7 +66418,7 @@ void  fun_walker_prefect()
         }
         else
         {
-          walker_actionState[128 * walkerId] = 72;
+          walkers[walkerId].actionState = 72;
           fun_roamWalker(walkerId);
           word_7FA374[64 * walkerId] = 0;
         }
@@ -66674,7 +66435,7 @@ void  fun_walker_prefect()
                (unsigned __int8)building_03_size[128 * v4],
                2) )
         {
-          walker_actionState[128 * walkerId] = 73;
+          walkers[walkerId].actionState = 73;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           fun_removeDestinationPathForWalker(walkerId);
@@ -66688,11 +66449,11 @@ void  fun_walker_prefect()
       break;
     case 0x49:
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
+        if ( walkers[walkerId].direction == 8 )
         {
-          walker_actionState[128 * walkerId] = 71;
+          walkers[walkerId].actionState = 71;
           walker_destination_x[128 * walkerId] = building_06_x[128 * v4];
           walker_destination_y[128 * walkerId] = building__07_y[128 * v4];
           sub_4B6B70(
@@ -66713,11 +66474,11 @@ void  fun_walker_prefect()
     case 0x4A:
       byte_7FA3A2[128 * walkerId] = 0;
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
+        if ( walkers[walkerId].direction == 8 )
         {
-          walker_actionState[128 * walkerId] = 75;
+          walkers[walkerId].actionState = 75;
           fun_removeDestinationPathForWalker(walkerId);
           word_7FA374[64 * walkerId] = 0;
           word_7FA366[64 * walkerId] = 50;
@@ -66777,7 +66538,7 @@ void  fun_walker_prefect()
                  (unsigned __int8)building_03_size[128 * walker_buildingId[64 * walkerId]],
                  2) )
           {
-            walker_actionState[128 * walkerId] = 73;
+            walkers[walkerId].actionState = 73;
             walker_destination_x[128 * walkerId] = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             fun_removeDestinationPathForWalker(walkerId);
@@ -66799,7 +66560,7 @@ void  fun_walker_prefect()
                (unsigned __int8)building_03_size[128 * walker_buildingId[64 * walkerId]],
                2) )
         {
-          walker_actionState[128 * walkerId] = 73;
+          walkers[walkerId].actionState = 73;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           fun_removeDestinationPathForWalker(walkerId);
@@ -66811,9 +66572,9 @@ void  fun_walker_prefect()
         }
       }
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
+        if ( walkers[walkerId].direction == 8 )
         {
           v0 = word_7FA3B0[64 * walkerId];
           walker_destination_x[128 * walkerId] = walker_x[128 * v0];
@@ -66827,26 +66588,26 @@ void  fun_walker_prefect()
       }
       break;
   }
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 75 )
+  if ( walkers[walkerId].actionState == 75 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
   else
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+    if ( walkers[walkerId].actionState == 150 )
     {
       dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
     }
     else
     {
-      if ( walker_direction[128 * walkerId] < 8 )
-        dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+      if ( walkers[walkerId].direction < 8 )
+        dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
       else
         dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
     }
   }
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x4A:
       word_7FA344[64 * walkerId] = word_6E6CA2 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
@@ -66876,33 +66637,7 @@ void  fun_walker_prefect()
       break;
   }
 }
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401BE5: using guessed type _DWORD  sub_401BE5(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 40243C: using guessed type _DWORD  sub_40243C(_DWORD);
-// 4025D1: using guessed type _DWORD  sub_4025D1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402CDE: using guessed type _DWORD  sub_402CDE(_DWORD, _DWORD);
-// 402E50: using guessed type _DWORD  sub_402E50(_DWORD, _DWORD);
-// 4031E3: using guessed type _DWORD  sub_4031E3(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C9A: using guessed type __int16 word_6E6C9A;
-// 6E6CA2: using guessed type __int16 word_6E6CA2;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA374: using guessed type __int16 word_7FA374[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 7FA3B0: using guessed type __int16 word_7FA3B0[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
-// 94BD82: using guessed type __int16 building_42_word_94BD82[];
 
-//----- (00499FE0) --------------------------------------------------------
 signed int  sub_499FE0(int a1)
 {
   signed int result; // eax@2
@@ -66910,7 +66645,7 @@ signed int  sub_499FE0(int a1)
 
   if ( dword_98BF18 > 0 )
   {
-    switch ( walker_actionState[128 * a1] )
+    switch ( walkers[a1].actionState )
     {
       case 0x96:
         result = 0;
@@ -66946,7 +66681,7 @@ signed int  sub_499FE0(int a1)
             if ( dword_94A2F8 <= 25 )
             {
               byte_7FA39B[128 * a1] = 0;
-              walker_actionState[128 * a1] = 74;
+              walkers[a1].actionState = 74;
               walker_destination_x[128 * a1] = building_20_byte_94BD60[128 * v2];
               walker_destination_y[128 * a1] = building_21_byte_94BD61[128 * v2];
               word_7FA38E[64 * a1] = v2;
@@ -66977,13 +66712,7 @@ signed int  sub_499FE0(int a1)
   }
   return result;
 }
-// 401F0F: using guessed type _DWORD  sub_401F0F(_DWORD, _DWORD);
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 94A2F8: using guessed type int dword_94A2F8;
-// 94BD68: using guessed type __int16 building_28_towerBallistaId[];
-// 98BF18: using guessed type int dword_98BF18;
 
-//----- (0049A250) --------------------------------------------------------
 signed int  sub_49A250(int a1)
 {
   signed int result; // eax@3
@@ -66991,7 +66720,7 @@ signed int  sub_49A250(int a1)
 
   if ( city_inform[ciid].dword_654468 > 0 || dword_819848 > 0 )
   {
-    switch ( walker_actionState[128 * a1] )
+    switch ( walkers[a1].actionState )
     {
       case 0x96:
         result = 0;
@@ -67028,7 +66757,7 @@ signed int  sub_49A250(int a1)
             if ( dword_7FA2A4 <= 30 )
             {
               byte_7FA3AE[128 * a1] = 0;
-              walker_actionState[128 * a1] = 76;
+              walkers[a1].actionState = 76;
               walker_destination_x[128 * a1] = walker_x[128 * v2];
               walker_destination_y[128 * a1] = walker_y[128 * v2];
               word_7FA3B0[64 * a1] = v2;
@@ -67094,7 +66823,7 @@ signed int  sub_49A510(int a1, int a2)
         }
         else
         {
-          if ( (unsigned __int8)walker_type[128 * i] != 41 || (unsigned __int8)walker_actionState[128 * i] != 159 )
+          if ( (unsigned __int8)walker_type[128 * i] != 41 || walkers[i].actionState != 159 )
           {
             if ( (signed int)(unsigned __int8)walker_type[128 * i] < 43
               || (signed int)(unsigned __int8)walker_type[128 * i] > 57 )
@@ -67123,10 +66852,7 @@ signed int  sub_49A510(int a1, int a2)
   }
   return v3;
 }
-// 7FA2A4: using guessed type int dword_7FA2A4;
-// 7FA3B2: using guessed type __int16 word_7FA3B2[];
 
-//----- (0049A7D0) --------------------------------------------------------
 void  fun_walker_soldier()
 {
   int v0; // ST70_4@99
@@ -67146,7 +66872,7 @@ void  fun_walker_soldier()
     byte_7FA341[128 * walkerId] = 0;
   word_7FA346[64 * walkerId] = 0;
   if ( (unsigned __int8)formation_start_inUse[128 * v4] != 1 )
-    walker_actionState[128 * walkerId] = -107;
+    walkers[walkerId].actionState = -107;
   if ( (unsigned __int8)walker_type[128 * walkerId] == Walker_FortJavelin )
   {
     v5 = 2;
@@ -67165,14 +66891,14 @@ void  fun_walker_soldier()
   }
   else
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 81 )
+    if ( walkers[walkerId].actionState == 81 )
       v7 = 7;
   }
   byte_7FA362[128 * walkerId] = *((_BYTE *)&dword_5F3CB0[32 * v7] + 8 * (unsigned __int8)byte_7FA392[128 * walkerId])
                               + formation_x[128 * v4];
   byte_7FA363[128 * walkerId] = *((_BYTE *)&dword_5F3CB4[32 * v7] + 8 * (unsigned __int8)byte_7FA392[128 * walkerId])
                               + formation_y[128 * v4];
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 150:
       sub_4B3390(walkerId);
@@ -67187,7 +66913,7 @@ void  fun_walker_soldier()
       byte_7FA341[128 * walkerId] = 0;
       if ( walker_x[128 * walkerId] != (unsigned __int8)byte_7FA362[128 * walkerId]
         || walker_y[128 * walkerId] != (unsigned __int8)byte_7FA363[128 * walkerId] )
-        walker_actionState[128 * walkerId] = 81;
+        walkers[walkerId].actionState = 81;
       break;
     case 81:
       word_7FA366[64 * walkerId] = 0;
@@ -67198,10 +66924,10 @@ void  fun_walker_soldier()
                                  + (unsigned __int8)walker_destination_x[128 * walkerId]
                                  + (_WORD)setting_map_startGridOffset;
       fun_walkerWalkTicks(walkerId, v5);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 80;
+          walkers[walkerId].actionState = 80;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -67220,10 +66946,10 @@ void  fun_walker_soldier()
                                  + (unsigned __int8)walker_destination_x[128 * walkerId]
                                  + (_WORD)setting_map_startGridOffset;
       fun_walkerWalkTicks(walkerId, v5);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 80;
+          walkers[walkerId].actionState = 80;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -67238,7 +66964,7 @@ void  fun_walker_soldier()
       walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
       walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
       fun_walkerWalkTicks(walkerId, v5);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
           walker_state[128 * walkerId] = 2;
@@ -67268,10 +66994,10 @@ void  fun_walker_soldier()
                                  + (unsigned __int8)walker_destination_x[128 * walkerId]
                                  + (_WORD)setting_map_startGridOffset;
       fun_walkerWalkTicks(walkerId, v5);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 84;
+          walkers[walkerId].actionState = 84;
           byte_7FA341[128 * walkerId] = 0;
           break;
         case 9:
@@ -67309,18 +67035,18 @@ void  fun_walker_soldier()
           {
             if ( formation_56[64 * v4] <= 0 )
             {
-              walker_actionState[128 * walkerId] = 83;
+              walkers[walkerId].actionState = 83;
               walkers[walkerId].inUse = 0;
             }
           }
         }
       }
       if ( (unsigned __int8)walker_type[128 * walkerId] != 11
-        || (unsigned __int8)walker_actionState[128 * walkerId] == 83 )
+        || walkers[walkerId].actionState == 83 )
       {
         if ( (unsigned __int8)walker_type[128 * walkerId] == 13 )
         {
-          if ( (unsigned __int8)walker_actionState[128 * walkerId] != 83 )
+          if ( walkers[walkerId].actionState != 83 )
             sub_4B32F0(walkerId);
         }
       }
@@ -67333,7 +67059,7 @@ void  fun_walker_soldier()
           if ( sub_4ADB30(walkerId, 10) )
           {
             byte_7FA39A[128 * walkerId] = 1;
-            walker_direction[128 * walkerId] = fun_pathing_getDirection8(
+            walkers[walkerId].direction = fun_pathing_getDirection8(
                                                  walker_x[128 * walkerId],
                                                  walker_y[128 * walkerId],
                                                  walkerGridX,
@@ -67365,7 +67091,7 @@ void  fun_walker_soldier()
         word_7FA3B0[64 * walkerId] = 0;
         v6 = 0;
       }
-      if ( (unsigned __int8)walker_actionState[128 * v6] == 149 )
+      if ( walkers[v6].actionState== 149 )
       {
         word_7FA3B0[64 * walkerId] = 0;
         v6 = 0;
@@ -67383,7 +67109,7 @@ void  fun_walker_soldier()
         }
         else
         {
-          walker_actionState[128 * walkerId] = 84;
+          walkers[walkerId].actionState = 84;
           byte_7FA341[128 * walkerId] = 0;
         }
         fun_removeDestinationPathForWalker(walkerId);
@@ -67391,9 +67117,9 @@ void  fun_walker_soldier()
       if ( v6 )
       {
         fun_walkerWalkTicks(walkerId, v5);
-        if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+        if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
         {
-          if ( walker_direction[128 * walkerId] == 8 )
+          if ( walkers[walkerId].direction == 8 )
           {
             v0 = word_7FA3B0[64 * walkerId];
             walker_destination_x[128 * walkerId] = walker_x[128 * v0];
@@ -67403,7 +67129,7 @@ void  fun_walker_soldier()
         }
         else
         {
-          walker_actionState[128 * walkerId] = 84;
+          walkers[walkerId].actionState = 84;
           word_7FA3B0[64 * walkerId] = 0;
           byte_7FA341[128 * walkerId] = 0;
         }
@@ -67413,10 +67139,10 @@ void  fun_walker_soldier()
       formation_hasMilitaryTraining[64 * v4] = 1;
       byte_7FA393[128 * walkerId] = 1;
       fun_walkerWalkTicks(walkerId, v5);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 81;
+          walkers[walkerId].actionState = 81;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -67431,10 +67157,10 @@ void  fun_walker_soldier()
       walker_destination_x[128 * walkerId] = city_inform[ciid].exit_x;
       walker_destination_y[128 * walkerId] = city_inform[ciid].exit_y;
       fun_walkerWalkTicks(walkerId, v5);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 89;
+          walkers[walkerId].actionState = 89;
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 9:
@@ -67459,10 +67185,10 @@ void  fun_walker_soldier()
                                  + (unsigned __int8)walker_destination_x[128 * walkerId]
                                  + (_WORD)setting_map_startGridOffset;
       fun_walkerWalkTicks(walkerId, v5);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 80;
+          walkers[walkerId].actionState = 80;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -67473,7 +67199,7 @@ void  fun_walker_soldier()
       }
       break;
   }
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
@@ -67481,18 +67207,18 @@ void  fun_walker_soldier()
   {
     if ( formation_54[64 * v4] )
     {
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     }
     else
     {
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 84 )
+      if ( walkers[walkerId].actionState == 84 )
       {
         dword_65DF24 = (unsigned __int8)formation_63[128 * v4] - setting_map_orientation;
       }
       else
       {
-        if ( walker_direction[128 * walkerId] < 8 )
-          dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+        if ( walkers[walkerId].direction < 8 )
+          dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
         else
           dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
       }
@@ -67501,7 +67227,7 @@ void  fun_walker_soldier()
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
   if ( (unsigned __int8)walker_type[128 * walkerId] == 11 )
   {
-    switch ( walker_actionState[128 * walkerId] )
+    switch ( walkers[walkerId].actionState )
     {
       case 0x96:
         if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
@@ -67533,7 +67259,7 @@ void  fun_walker_soldier()
   {
     if ( (unsigned __int8)walker_type[128 * walkerId] == 12 )
     {
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+      if ( walkers[walkerId].actionState == 150 )
       {
         if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
         {
@@ -67547,7 +67273,7 @@ void  fun_walker_soldier()
       }
       else
       {
-        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+        if ( walkers[walkerId].actionState == 149 )
           word_7FA344[64 * walkerId] = word_6E6D80 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 144;
         else
           word_7FA344[64 * walkerId] = word_6E6D80 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
@@ -67555,7 +67281,7 @@ void  fun_walker_soldier()
     }
     else
     {
-      switch ( walker_actionState[128 * walkerId] )
+      switch ( walkers[walkerId].actionState )
       {
         case 0x96:
           if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
@@ -67675,20 +67401,7 @@ void  fun_walker_militaryStandard()
     }
   }
 }
-// 6E6CAC: using guessed type __int16 word_6E6CAC;
-// 6E6D92: using guessed type __int16 word_6E6D92;
-// 7F87C4: using guessed type __int16 formation_walkerType[];
-// 7F87EC: using guessed type __int16 formation_morale[];
-// 7F8812: using guessed type __int16 formation_52[];
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA390: using guessed type __int16 walker_formationId[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0049CAE0) --------------------------------------------------------
 void  fun_walker_entertainer()
 {
   int v0; // [sp+4Ch] [bp-18h]@12
@@ -67709,21 +67422,21 @@ void  fun_walker_entertainer()
     byte_7FA39B[128 * walkerId] = 0;
   if ( event_gladiatorRevolt_state == 1
     && (unsigned __int8)walker_type[128 * walkerId] == Walker_Gladiator
-    && ((unsigned __int8)walker_actionState[128 * walkerId] == 92
-     || (unsigned __int8)walker_actionState[128 * walkerId] == 94
-     || (unsigned __int8)walker_actionState[128 * walkerId] == 95) )
+    && (walkers[walkerId].actionState == 92
+     || walkers[walkerId].actionState == 94
+     || walkers[walkerId].actionState == 95) )
   {                                             // gladiator revolt
     walker_type[128 * walkerId] = Walker_Enemy54;
     fun_removeDestinationPathForWalker(walkerId);
     word_7FA374[64 * walkerId] = 0;
-    walker_actionState[128 * walkerId] = -98;
+    walkers[walkerId].actionState = -98;
     return;
   }
   if ( (unsigned __int8)walker_type[128 * walkerId] == Walker_Charioteer )
     v0 = 2;
   else
     v0 = 1;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 150:
       sub_4B3390(walkerId);
@@ -67747,7 +67460,7 @@ void  fun_walker_entertainer()
                (unsigned __int8)building_03_size[128 * v3],
                2) )
         {
-          walker_actionState[128 * walkerId] = 91;
+          walkers[walkerId].actionState = 91;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           sub_4B6B70(
@@ -67810,7 +67523,7 @@ void  fun_walker_entertainer()
                  2) )
           {
             word_7FA38E[64 * walkerId] = v2;
-            walker_actionState[128 * walkerId] = 92;
+            walkers[walkerId].actionState = 92;
             walker_destination_x[128 * walkerId] = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             word_7FA374[64 * walkerId] = 0;
@@ -67833,7 +67546,7 @@ void  fun_walker_entertainer()
       if ( word_7FA374[64 * walkerId] >= 3200 )
         walker_state[128 * walkerId] = 2;
       fun_walkerWalkTicks(walkerId, v0);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
           sub_466330(walkerId);
@@ -67858,7 +67571,7 @@ void  fun_walker_entertainer()
                (unsigned __int8)building_03_size[128 * v3],
                2) )
         {
-          walker_actionState[128 * walkerId] = 95;
+          walkers[walkerId].actionState = 95;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
         }
@@ -67871,9 +67584,9 @@ void  fun_walker_entertainer()
       break;
     case 95:
       fun_walkerWalkTicks(walkerId, v0);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
+        if ( walkers[walkerId].direction == 8 )
           walker_state[128 * walkerId] = 2;
       }
       else
@@ -67882,8 +67595,8 @@ void  fun_walker_entertainer()
       }
       break;
   }
-  if ( walker_direction[128 * walkerId] < 8 )
-    dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  if ( walkers[walkerId].direction < 8 )
+    dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   else
     dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
@@ -67908,7 +67621,7 @@ void  fun_walker_entertainer()
   if ( (unsigned __int8)walker_type[128 * walkerId] != Walker_Charioteer )
   {
 LABEL_83:
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+    if ( walkers[walkerId].actionState == 150 )
     {
       if ( (unsigned __int8)walker_type[128 * walkerId] == Walker_Gladiator )
         word_7FA344[64 * walkerId] = graphic_id_start[v1]
@@ -67920,7 +67633,7 @@ LABEL_83:
     }
     else
     {
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+      if ( walkers[walkerId].actionState == 149 )
       {
         word_7FA344[64 * walkerId] = graphic_id_start[v1]
                                    + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2]
@@ -67943,40 +67656,19 @@ LABEL_83:
     return;
   }
   word_7FA346[64 * walkerId] = 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     word_7FA344[64 * walkerId] = dword_65DF24 + word_6E6D5E;
   }
   else
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+    if ( walkers[walkerId].actionState == 149 )
       word_7FA344[64 * walkerId] = dword_65DF24 + word_6E6D5E;
     else
       word_7FA344[64 * walkerId] = dword_65DF24 + word_6E6D5E + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
   }
 }
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 4025D1: using guessed type _DWORD  sub_4025D1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402CDE: using guessed type _DWORD  sub_402CDE(_DWORD, _DWORD);
-// 402E50: using guessed type _DWORD  sub_402E50(_DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 6E6C72: using guessed type __int16 word_6E6C72;
-// 6E6CF6: using guessed type __int16 word_6E6CF6;
-// 6E6D5E: using guessed type __int16 word_6E6D5E;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA374: using guessed type __int16 word_7FA374[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 8E1494: using guessed type int event_gladiatorRevolt_state;
 
-//----- (0049DA80) --------------------------------------------------------
 void  fun_walker_tradecaravan()
 {
   int v0; // [sp+4Ch] [bp-1Ch]@10
@@ -67993,7 +67685,7 @@ void  fun_walker_tradecaravan()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   word_7FA346[64 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -68016,11 +67708,11 @@ void  fun_walker_tradecaravan()
           v1 = walker_x[128 * walkerId];
           v0 = walker_y[128 * walkerId];
         }
-        v5 = sub_446550(walkerId, v1, v0, (unsigned __int8)walker_tradeCityId[128 * walkerId], 0);
+        v5 = sub_446550(walkerId, v1, v0, walkers[walkerId].tradeCityId, 0);
         if ( v5 )
         {
           word_7FA38E[64 * walkerId] = v5;
-          walker_actionState[128 * walkerId] = 101;
+          walkers[walkerId].actionState = 101;
           word_7FA366[64 * walkerId] = 0;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
@@ -68028,7 +67720,7 @@ void  fun_walker_tradecaravan()
         else
         {
           word_7FA366[64 * walkerId] = 0;
-          walker_actionState[128 * walkerId] = 103;
+          walkers[walkerId].actionState = 103;
           word_7FA366[64 * walkerId] = 0;
           walker_destination_x[128 * walkerId] = city_inform[ciid].exit_x;
           walker_destination_y[128 * walkerId] = city_inform[ciid].exit_y;
@@ -68038,10 +67730,10 @@ void  fun_walker_tradecaravan()
       break;
     case 0x65:
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 102;
+          walkers[walkerId].actionState = 102;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -68064,17 +67756,17 @@ void  fun_walker_tradecaravan()
                walkerId,
                (unsigned __int8)byte_7FA34F[128 * walkerId],
                word_7FA38E[64 * walkerId],
-               (unsigned __int8)walker_tradeCityId[128 * walkerId]) )
+               walkers[walkerId].tradeCityId) )
         {
           v3 = sub_45AB50(
                  (unsigned __int8)byte_7FA34F[128 * walkerId],
                  word_7FA38E[64 * walkerId],
-                 (unsigned __int8)walker_tradeCityId[128 * walkerId]);
+                 walkers[walkerId].tradeCityId);
           if ( v3 )
           {
             ++*(int *)((char *)&tradedSoFar[16
                                           * (unsigned __int8)trade_routeId[66
-                                                                         * (unsigned __int8)walker_tradeCityId[128 * walkerId]]]
+                                                                         * walkers[walkerId].tradeCityId]]
                      + 4 * v3);
             sub_445B60(walkerId, v3);
             ++byte_7FA39F[128 * walkerId];
@@ -68092,17 +67784,17 @@ void  fun_walker_tradecaravan()
                walkerId,
                (unsigned __int8)byte_7FA34F[128 * walkerId],
                word_7FA38E[64 * walkerId],
-               (unsigned __int8)walker_tradeCityId[128 * walkerId]) )
+               walkers[walkerId].tradeCityId) )
         {
           v4 = sub_45B220(
                  (unsigned __int8)byte_7FA34F[128 * walkerId],
                  word_7FA38E[64 * walkerId],
-                 (unsigned __int8)walker_tradeCityId[128 * walkerId]);
+                 walkers[walkerId].tradeCityId);
           if ( v4 )
           {
             ++*(int *)((char *)&tradedSoFar[16
                                           * (unsigned __int8)trade_routeId[66
-                                                                         * (unsigned __int8)walker_tradeCityId[128 * walkerId]]]
+                                                                         * walkers[walkerId].tradeCityId]]
                      + 4 * v4);
             sub_445AB0(walkerId, v4);
             ++byte_7FA3A3[128 * walkerId];
@@ -68122,19 +67814,19 @@ void  fun_walker_tradecaravan()
                  walkerId,
                  walker_x[128 * walkerId],
                  walker_y[128 * walkerId],
-                 (unsigned __int8)walker_tradeCityId[128 * walkerId],
+                 walkers[walkerId].tradeCityId,
                  -1);
           if ( v6 )
           {
             word_7FA38E[64 * walkerId] = v6;
-            walker_actionState[128 * walkerId] = 101;
+            walkers[walkerId].actionState = 101;
             word_7FA366[64 * walkerId] = 0;
             walker_destination_x[128 * walkerId] = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
           }
           else
           {
-            walker_actionState[128 * walkerId] = 103;
+            walkers[walkerId].actionState = 103;
             word_7FA366[64 * walkerId] = 0;
             walker_destination_x[128 * walkerId] = city_inform[ciid].exit_x;
             walker_destination_y[128 * walkerId] = city_inform[ciid].exit_y;
@@ -68145,10 +67837,10 @@ void  fun_walker_tradecaravan()
       break;
     case 0x67:
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 100;
+          walkers[walkerId].actionState = 100;
           walker_state[128 * walkerId] = 2;
           break;
         case 9:
@@ -68160,30 +67852,14 @@ void  fun_walker_tradecaravan()
       }
       break;
   }
-  if ( walker_direction[128 * walkerId] < 8 )
-    dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  if ( walkers[walkerId].direction < 8 )
+    dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   else
     dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
   word_7FA344[64 * walkerId] = word_6E6CB4 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 4011E0: using guessed type _DWORD  sub_4011E0(_DWORD, _DWORD, _DWORD);
-// 40141F: using guessed type _DWORD  sub_40141F(_DWORD, _DWORD, _DWORD);
-// 4015D2: using guessed type _DWORD  sub_4015D2(_DWORD, _DWORD, _DWORD, _DWORD);
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401A8C: using guessed type _DWORD  sub_401A8C(_DWORD, _DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 402E8C: using guessed type _DWORD  sub_402E8C(_DWORD, _DWORD, _DWORD, _DWORD);
-// 402FAE: using guessed type _DWORD  sub_402FAE(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 654594: using guessed type int cityinfo_tradeCenterId[];
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6CB4: using guessed type __int16 word_6E6CB4;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
 
-//----- (0049E5D0) --------------------------------------------------------
 void  fun_walker_tradeship()
 {
   int v0; // ecx@9
@@ -68198,7 +67874,7 @@ void  fun_walker_tradeship()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   word_7FA346[64 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -68217,7 +67893,7 @@ void  fun_walker_tradeship()
         if ( v2 )
         {
           word_7FA38E[64 * walkerId] = v2;
-          walker_actionState[128 * walkerId] = 111;
+          walkers[walkerId].actionState = 111;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
         }
@@ -68225,7 +67901,7 @@ void  fun_walker_tradeship()
         {
           if ( sub_48ABC0(/*v0*/) )
           {
-            walker_actionState[128 * walkerId] = 113;
+            walkers[walkerId].actionState = 113;
             walker_destination_x[128 * walkerId] = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
           }
@@ -68241,10 +67917,10 @@ void  fun_walker_tradeship()
     case 0x71:
       fun_walkerWalkTicks(walkerId, 1);
       byte_7FA3A5[128 * walkerId] = 0;
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 114;
+          walkers[walkerId].actionState = 114;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -68262,7 +67938,7 @@ void  fun_walker_tradeship()
         if ( v3 )
         {
           word_7FA38E[64 * walkerId] = v3;
-          walker_actionState[128 * walkerId] = 111;
+          walkers[walkerId].actionState = 111;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
         }
@@ -68273,7 +67949,7 @@ void  fun_walker_tradeship()
           {
             if ( sub_48ABC0(/*v1*/) )
             {
-              walker_actionState[128 * walkerId] = 113;
+              walkers[walkerId].actionState = 113;
               walker_destination_x[128 * walkerId] = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
             }
@@ -68286,10 +67962,10 @@ void  fun_walker_tradeship()
     case 0x6F:
       fun_walkerWalkTicks(walkerId, 1);
       byte_7FA3A5[128 * walkerId] = 0;
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 112;
+          walkers[walkerId].actionState = 112;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -68306,7 +67982,7 @@ void  fun_walker_tradeship()
       }
       if ( building_00_inUse[128 * word_7FA38E[64 * walkerId]] != 1 )
       {
-        walker_actionState[128 * walkerId] = 115;
+        walkers[walkerId].actionState = 115;
         word_7FA366[64 * walkerId] = 0;
         walker_destination_x[128 * walkerId] = scn_riverEntry_x;
         walker_destination_y[128 * walkerId] = scn_riverEntry_y;
@@ -68317,7 +67993,7 @@ void  fun_walker_tradeship()
       if ( sub_4A4CC0(walkerId) )
       {
         byte_7FA3A9[128 * walkerId] = 0;
-        walker_actionState[128 * walkerId] = 115;
+        walkers[walkerId].actionState = 115;
         word_7FA366[64 * walkerId] = 0;
         walker_destination_x[128 * walkerId] = scn_riverEntry_x;
         walker_destination_y[128 * walkerId] = scn_riverEntry_y;
@@ -68327,7 +68003,7 @@ void  fun_walker_tradeship()
         if ( sub_4A4B50(walkerId) )
         {
           byte_7FA3A9[128 * walkerId] = 0;
-          walker_actionState[128 * walkerId] = 115;
+          walkers[walkerId].actionState = 115;
           word_7FA366[64 * walkerId] = 0;
           walker_destination_x[128 * walkerId] = scn_riverEntry_x;
           walker_destination_y[128 * walkerId] = scn_riverEntry_y;
@@ -68339,19 +68015,19 @@ void  fun_walker_tradeship()
       {
         if ( (unsigned __int8)building_68_house_neptune[128 * v4] == 1 )
         {
-          walker_direction[128 * walkerId] = 4;
+          walkers[walkerId].direction = 4;
         }
         else
         {
           if ( (unsigned __int8)building_68_house_neptune[128 * v4] == 2 )
-            walker_direction[128 * walkerId] = 6;
+            walkers[walkerId].direction = 6;
           else
-            walker_direction[128 * walkerId] = 0;
+            walkers[walkerId].direction = 0;
         }
       }
       else
       {
-        walker_direction[128 * walkerId] = 2;
+        walkers[walkerId].direction = 2;
       }
       byte_7FA341[128 * walkerId] = 0;
       dword_65DE30 = 0;
@@ -68359,10 +68035,10 @@ void  fun_walker_tradeship()
     case 0x73:
       fun_walkerWalkTicks(walkerId, 1);
       byte_7FA3A5[128 * walkerId] = 0;
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = 110;
+          walkers[walkerId].actionState = 110;
           walker_state[128 * walkerId] = 2;
           break;
         case 9:
@@ -68374,33 +68050,14 @@ void  fun_walker_tradeship()
       }
       break;
   }
-  if ( walker_direction[128 * walkerId] < 8 )
-    dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  if ( walkers[walkerId].direction < 8 )
+    dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   else
     dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
   word_7FA344[64 * walkerId] = dword_65DF24 + word_6E6CFA;
 }
-// 40114F: using guessed type int __thiscall sub_40114F(_DWORD);
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 40274D: using guessed type _DWORD  sub_40274D(_DWORD);
-// 402BD5: using guessed type _DWORD  sub_402BD5(_DWORD);
-// 402E37: using guessed type _DWORD  sub_402E37(_DWORD);
-// 659B50: using guessed type int message_usePopup;
-// 65DE30: using guessed type int dword_65DE30;
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6CFA: using guessed type __int16 word_6E6CFA;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
-// 98EF04: using guessed type __int16 scn_riverEntry_x;
-// 98EF06: using guessed type __int16 scn_riverEntry_y;
 
-//----- (0049F090) --------------------------------------------------------
 void  fun_walker_tradecaravanDonkey()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -68414,7 +68071,7 @@ void  fun_walker_tradecaravanDonkey()
   word_7FA346[64 * walkerId] = 0;
   if ( v0 > 0 )
   {
-    if ( (unsigned __int8)walker_actionState[128 * v0] == 149 )
+    if ( walkers[v0].actionState == 149 )
     {
       walker_state[128 * walkerId] = 2;
     }
@@ -68439,21 +68096,14 @@ void  fun_walker_tradecaravanDonkey()
   }
   if ( byte_7FA395[128 * v0] )
     byte_7FA395[128 * walkerId] = 1;
-  if ( walker_direction[128 * walkerId] < 8 )
-    dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  if ( walkers[walkerId].direction < 8 )
+    dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   else
     dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
   word_7FA344[64 * walkerId] = word_6E6CB4 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 403170: using guessed type _DWORD  sub_403170(_DWORD, _DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6CB4: using guessed type __int16 word_6E6CB4;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA398: using guessed type __int16 walker_tradeCaravanNextId[];
 
-//----- (0049F330) --------------------------------------------------------
 void  fun_walker_protestor()
 {
   byte_7FA3A2[128 * walkerId] = 1;
@@ -68461,7 +68111,7 @@ void  fun_walker_protestor()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 64 )
     byte_7FA341[128 * walkerId] = 0;
   word_7FA346[64 * walkerId] = 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     walker_state[128 * walkerId] = 2;
   ++word_7FA366[64 * walkerId];
   if ( word_7FA366[64 * walkerId] > 200 )
@@ -68469,19 +68119,14 @@ void  fun_walker_protestor()
     walker_state[128 * walkerId] = 2;
     byte_7FA341[128 * walkerId] = 0;
   }
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6C96 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6C96
                                + LOWORD(dword_5FA3C8[(signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 2])
                                + 104;
 }
-// 6E6C96: using guessed type __int16 word_6E6C96;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
 
-//----- (0049F520) --------------------------------------------------------
 void  fun_walker_criminal()
 {
   byte_7FA3A2[128 * walkerId] = 1;
@@ -68489,7 +68134,7 @@ void  fun_walker_criminal()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 32 )
     byte_7FA341[128 * walkerId] = 0;
   word_7FA346[64 * walkerId] = 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     walker_state[128 * walkerId] = 2;
   ++word_7FA366[64 * walkerId];
   if ( word_7FA366[64 * walkerId] > 200 )
@@ -68497,19 +68142,14 @@ void  fun_walker_criminal()
     walker_state[128 * walkerId] = 2;
     byte_7FA341[128 * walkerId] = 0;
   }
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6C96 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6C96
                                + LOWORD(dword_5FA3C8[(signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 1])
                                + 104;
 }
-// 6E6C96: using guessed type __int16 word_6E6C96;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
 
-//----- (0049F710) --------------------------------------------------------
 void  fun_walker_rioter()
 {
   int v0; // [sp+4Ch] [bp-4h]@12
@@ -68522,7 +68162,7 @@ void  fun_walker_rioter()
   word_7FA372[64 * walkerId] = 480;
   word_7FA346[64 * walkerId] = 0;
   byte_7FA395[128 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -68537,7 +68177,7 @@ void  fun_walker_rioter()
       ++word_7FA366[64 * walkerId];
       if ( word_7FA366[64 * walkerId] >= 160 )
       {
-        walker_actionState[128 * walkerId] = 121;
+        walkers[walkerId].actionState = 121;
         //v0 = sub_4C1100();
         if ( v0 )
         {
@@ -68557,9 +68197,9 @@ void  fun_walker_rioter()
       if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
         byte_7FA341[128 * walkerId] = 0;
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
+        if ( walkers[walkerId].direction == 8 )
         {
           //v1 = sub_4C1100();
           if ( v1 )
@@ -68576,7 +68216,7 @@ void  fun_walker_rioter()
         }
         else
         {
-          if ( walker_direction[128 * walkerId] == 11 )
+          if ( walkers[walkerId].direction == 11 )
           {
             if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] > 12 )
               byte_7FA341[128 * walkerId] = 0;
@@ -68585,31 +68225,31 @@ void  fun_walker_rioter()
       }
       else
       {
-        walker_actionState[128 * walkerId] = 120;
+        walkers[walkerId].actionState = 120;
         fun_removeDestinationPathForWalker(walkerId);
       }
       break;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( walker_direction[128 * walkerId] == 11 )
+  if ( walkers[walkerId].direction == 11 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
   else
   {
-    if ( walker_direction[128 * walkerId] < 8 )
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+    if ( walkers[walkerId].direction < 8 )
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     else
       dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   }
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
   {
     word_7FA344[64 * walkerId] = word_6E6C96 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   }
   else
   {
-    if ( walker_direction[128 * walkerId] == 11 )
+    if ( walkers[walkerId].direction == 11 )
     {
       word_7FA344[64 * walkerId] = word_6E6C96
                                  + LOWORD(dword_5FA3C8[(unsigned __int8)byte_7FA341[128 * walkerId]])
@@ -68617,7 +68257,7 @@ void  fun_walker_rioter()
     }
     else
     {
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 121 )
+      if ( walkers[walkerId].actionState == 121 )
         word_7FA344[64 * walkerId] = word_6E6C96 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
       else
         word_7FA344[64 * walkerId] = word_6E6C96
@@ -68626,20 +68266,7 @@ void  fun_walker_rioter()
     }
   }
 }
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 654354: using guessed type int cityinfo_rioting[];
-// 654468: using guessed type int dword_654468[];
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C96: using guessed type __int16 word_6E6C96;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 7FA3B2: using guessed type __int16 word_7FA3B2[];
 
-//----- (0049FDE0) --------------------------------------------------------
 signed int  sub_49FDE0(int walkerId)
 {
   int v1; // edx@4
@@ -68670,41 +68297,31 @@ signed int  sub_49FDE0(int walkerId)
   fun_postMessageToPlayer(14, building_0a_type[64 * v3], walkers[walkerId].gridOffset);
   ++dword_65DE2C;
   sub_46E3D0(v3, 0);
-  walker_actionState[128 * walkerId] = 120;
+  walkers[walkerId].actionState = 120;
   word_7FA366[64 * walkerId] = 0;
-  walker_direction[128 * walkerId] = i;
+  walkers[walkerId].direction = i;
   return 1;
 }
-// 608008: using guessed type int time_current;
-// 659C14: using guessed type int dword_659C14;
-// 65DE2C: using guessed type int dword_65DE2C;
-// 65DED0: using guessed type int dword_65DED0;
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
 
-//----- (0049FFE0) --------------------------------------------------------
 int  sub_49FFE0(int a1)
 {
   int result; // eax@2
   int v2; // [sp+4Ch] [bp-4h]@1
 
   v2 = walker_buildingId[64 * walkerId];
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     /*result =*/ sub_4B3390(walkerId);
   }
   else
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+    if ( walkers[walkerId].actionState == 149 )
     {
       result = sub_4B3B80(walkerId);
     }
     else
     {
-      result = (unsigned __int8)walker_actionState[128 * walkerId];
+      result = walkers[walkerId].actionState;
       if ( result == 125 )
       {
         byte_7FA395[128 * walkerId] = 0;
@@ -68717,7 +68334,7 @@ int  sub_49FFE0(int a1)
                  (unsigned __int8)building_03_size[128 * v2],
                  2) )
           {
-            walker_actionState[128 * walkerId] = 126;
+            walkers[walkerId].actionState = 126;
             walker_destination_x[128 * walkerId] = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             fun_removeDestinationPathForWalker(walkerId);
@@ -68732,13 +68349,13 @@ int  sub_49FFE0(int a1)
       }
       else
       {
-        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 126 )
+        if ( walkers[walkerId].actionState == 126 )
         {
           fun_walkerWalkTicks(walkerId, a1);
-          result = walker_direction[128 * walkerId];
-          if ( result != 9 && walker_direction[128 * walkerId] != 10 )
+          result = walkers[walkerId].direction;
+          if ( result != 9 && walkers[walkerId].direction != 10 )
           {
-            if ( walker_direction[128 * walkerId] == 8 )
+            if ( walkers[walkerId].direction == 8 )
             {
               result = walkerId << 7;
               walker_state[128 * walkerId] = 2;
@@ -68755,14 +68372,7 @@ int  sub_49FFE0(int a1)
   }
   return result;
 }
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 402CDE: using guessed type _DWORD  sub_402CDE(_DWORD, _DWORD);
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA374: using guessed type __int16 word_7FA374[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
 
-//----- (004A02B0) --------------------------------------------------------
 void  fun_walker_fishingBoat()
 {
   int v0; // [sp+4Ch] [bp-14h]@41
@@ -68773,7 +68383,7 @@ void  fun_walker_fishingBoat()
   v3 = walker_buildingId[64 * walkerId];
   if ( building_00_inUse[128 * v3] != 1 )
     walker_state[128 * walkerId] = 2;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] != 190 )
+  if ( walkers[walkerId].actionState != 190 )
   {
     if ( building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v3] != walkerId )
     {
@@ -68782,7 +68392,7 @@ void  fun_walker_fishingBoat()
       {
         walker_buildingId[64 * walkerId] = v3;
         building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v3] = walkerId;
-        walker_actionState[128 * walkerId] = -63;
+        walkers[walkerId].actionState = -63;
         walker_destination_x[128 * walkerId] = walkerGridX;
         walker_destination_y[128 * walkerId] = walkerGridY;
         byte_7FA360[128 * walkerId] = walkerGridX;
@@ -68801,7 +68411,7 @@ void  fun_walker_fishingBoat()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   word_7FA346[64 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0xBE:
       ++word_7FA366[64 * walkerId];
@@ -68814,7 +68424,7 @@ void  fun_walker_fishingBoat()
           building_22_walkerId[64 * v3] = 0;
           walker_buildingId[64 * walkerId] = v2;
           building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v2] = walkerId;
-          walker_actionState[128 * walkerId] = -63;
+          walkers[walkerId].actionState = -63;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           byte_7FA360[128 * walkerId] = walkerGridX;
@@ -68826,11 +68436,11 @@ void  fun_walker_fishingBoat()
     case 0xBF:
       fun_walkerWalkTicks(walkerId, 1);
       byte_7FA3A5[128 * walkerId] = 0;
-      if ( walker_direction[128 * walkerId] == 8 )
+      if ( walkers[walkerId].direction == 8 )
       {
         if ( sub_48A6F0(walkerId) )
         {
-          walker_actionState[128 * walkerId] = -64;
+          walkers[walkerId].actionState = -64;
           word_7FA366[64 * walkerId] = 0;
         }
         else
@@ -68838,14 +68448,14 @@ void  fun_walker_fishingBoat()
           fun_removeDestinationPathForWalker(walkerId);
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
-          walker_direction[128 * walkerId] = byte_7FA352[128 * walkerId];
+          walkers[walkerId].direction = byte_7FA352[128 * walkerId];
         }
       }
       else
       {
-        if ( walker_direction[128 * walkerId] == 9 || walker_direction[128 * walkerId] == 10 )
+        if ( walkers[walkerId].direction == 9 || walkers[walkerId].direction == 10 )
         {
-          walker_actionState[128 * walkerId] = -62;
+          walkers[walkerId].actionState = -62;
           walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         }
@@ -68856,7 +68466,7 @@ void  fun_walker_fishingBoat()
       if ( word_7FA366[64 * walkerId] >= 200 )
       {
         word_7FA366[64 * walkerId] = 0;
-        walker_actionState[128 * walkerId] = -61;
+        walkers[walkerId].actionState = -61;
         walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         fun_removeDestinationPathForWalker(walkerId);
@@ -68865,10 +68475,10 @@ void  fun_walker_fishingBoat()
     case 0xC1:
       fun_walkerWalkTicks(walkerId, 1);
       byte_7FA3A5[128 * walkerId] = 0;
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = -62;
+          walkers[walkerId].actionState = -62;
           word_7FA366[64 * walkerId] = 0;
           break;
         case 9:
@@ -68904,7 +68514,7 @@ void  fun_walker_fishingBoat()
           word_7FA366[64 * walkerId] = 0;
           if ( sub_48A590(walkerId) )
           {
-            walker_actionState[128 * walkerId] = -65;
+            walkers[walkerId].actionState = -65;
             walker_destination_x[128 * walkerId] = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             fun_removeDestinationPathForWalker(walkerId);
@@ -68915,10 +68525,10 @@ void  fun_walker_fishingBoat()
     case 0xC3:
       fun_walkerWalkTicks(walkerId, 1);
       byte_7FA3A5[128 * walkerId] = 0;
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = -62;
+          walkers[walkerId].actionState = -62;
           word_7FA366[64 * walkerId] = 0;
           building_2a_walkerSpawnDelay[128 * v3] = 1;
           ++building_58_house_pottery[64 * v3];
@@ -68932,34 +68542,17 @@ void  fun_walker_fishingBoat()
       }
       break;
   }
-  if ( walker_direction[128 * walkerId] < 8 )
-    dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  if ( walkers[walkerId].direction < 8 )
+    dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   else
     dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 192 )
+  if ( walkers[walkerId].actionState == 192 )
     word_7FA344[64 * walkerId] = word_6E6CFA + dword_65DF24 + 16;
   else
     word_7FA344[64 * walkerId] = word_6E6CFA + dword_65DF24 + 8;
 }
-// 402A36: using guessed type _DWORD  sub_402A36(_DWORD);
-// 402C6B: using guessed type _DWORD  sub_402C6B(_DWORD);
-// 403166: using guessed type _DWORD  sub_403166(_DWORD);
-// 659B50: using guessed type int message_usePopup;
-// 65DE4C: using guessed type int dword_65DE4C[13];
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6CFA: using guessed type __int16 word_6E6CFA;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD98: using guessed type __int16 building_58_house_pottery[];
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (004A0DD0) --------------------------------------------------------
 void  fun_walker_marketTrader()
 {
   int v0; // ST50_4@7
@@ -68975,7 +68568,7 @@ void  fun_walker_marketTrader()
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 125 )
+  if ( walkers[walkerId].actionState == 125 )
   {
     v0 = sub_452DD0(v2);
     v1 = sub_452ED0(v2) + v0;
@@ -68986,26 +68579,14 @@ void  fun_walker_marketTrader()
     }
   }
   sub_49FFE0(1);
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6C84 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6C84 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 401D7A: using guessed type _DWORD  sub_401D7A(_DWORD);
-// 402351: using guessed type _DWORD  sub_402351(_DWORD);
-// 403346: using guessed type _DWORD  sub_403346(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C84: using guessed type __int16 word_6E6C84;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA374: using guessed type __int16 word_7FA374[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (004A1060) --------------------------------------------------------
 void  fun_walker_priest()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -69020,23 +68601,14 @@ void  fun_walker_priest()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   sub_49FFE0(1);
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6C66 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6C66 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 401D7A: using guessed type _DWORD  sub_401D7A(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C66: using guessed type __int16 word_6E6C66;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (004A1260) --------------------------------------------------------
 void  fun_walker_schoolChild()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -69050,7 +68622,7 @@ void  fun_walker_schoolChild()
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -69066,26 +68638,14 @@ void  fun_walker_schoolChild()
       sub_4B3F00(walkerId, 2);
       break;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6C82 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6C82 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 402CDE: using guessed type _DWORD  sub_402CDE(_DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C82: using guessed type __int16 word_6E6C82;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA374: using guessed type __int16 word_7FA374[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (004A1560) --------------------------------------------------------
 void  fun_walker_teacher()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -69100,23 +68660,14 @@ void  fun_walker_teacher()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   sub_49FFE0(1);
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6D7E + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6D7E + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 401D7A: using guessed type _DWORD  sub_401D7A(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D7E: using guessed type __int16 word_6E6D7E;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (004A1760) --------------------------------------------------------
 void  fun_walker_librarian()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -69131,23 +68682,14 @@ void  fun_walker_librarian()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   sub_49FFE0(1);
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6D7E + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6D7E + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 401D7A: using guessed type _DWORD  sub_401D7A(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D7E: using guessed type __int16 word_6E6D7E;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (004A1960) --------------------------------------------------------
 void  fun_walker_barber()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -69162,23 +68704,14 @@ void  fun_walker_barber()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   sub_49FFE0(1);
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6C98 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6C98 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 401D7A: using guessed type _DWORD  sub_401D7A(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C98: using guessed type __int16 word_6E6C98;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (004A1B60) --------------------------------------------------------
 void  fun_walker_bathhouseWorker()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -69193,23 +68726,14 @@ void  fun_walker_bathhouseWorker()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   sub_49FFE0(1);
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6C60 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6C60 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 401D7A: using guessed type _DWORD  sub_401D7A(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C60: using guessed type __int16 word_6E6C60;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (004A1D60) --------------------------------------------------------
 void  fun_walker_doctor()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -69224,23 +68748,14 @@ void  fun_walker_doctor()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   sub_49FFE0(1);
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6D78 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6D78 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 401D7A: using guessed type _DWORD  sub_401D7A(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D78: using guessed type __int16 word_6E6D78;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (004A1F60) --------------------------------------------------------
 void  fun_walker_surgeon()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -69255,9 +68770,9 @@ void  fun_walker_surgeon()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   sub_49FFE0(1);
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6D78 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6D78 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
@@ -69359,27 +68874,7 @@ void  fun_walker_mapFlag()
   walker_tilePosition_x[64 * walkerId] += 7;
   sub_4B8A40(walkerId);
 }
-// 6E6CAE: using guessed type __int16 word_6E6CAE;
-// 6E6CC6: using guessed type __int16 word_6E6CC6;
-// 6E6CC8: using guessed type __int16 word_6E6CC8;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 990C78: using guessed type __int16 map_earthquake_x;
-// 990C7A: using guessed type __int16 map_earthquake_y;
-// 990C7C: using guessed type __int16 map_entry_x[];
-// 990C7E: using guessed type __int16 map_entry_y;
-// 990C80: using guessed type __int16 map_exit_x;
-// 990C82: using guessed type __int16 map_exit_y[];
-// 990CA4: using guessed type __int16 map_riverEntry_x;
-// 990CA6: using guessed type __int16 map_riverEntry_y;
-// 990CA8: using guessed type __int16 map_riverExit_x;
-// 990CAA: using guessed type __int16 map_riverExit_y;
 
-//----- (004A2820) --------------------------------------------------------
 void  fun_walker_flotsam()
 {
   walker_isBoat[128 * walkerId] = 2;
@@ -69391,14 +68886,14 @@ LABEL_9:
     byte_7FA395[128 * walkerId] = 0;
     word_7FA346[64 * walkerId] = 0;
     byte_7FA3A2[128 * walkerId] = 0;
-    switch ( walker_actionState[128 * walkerId] )
+    switch ( walkers[walkerId].actionState )
     {
       case 0x80:
         byte_7FA395[128 * walkerId] = 1;
         --word_7FA366[64 * walkerId];
         if ( word_7FA366[64 * walkerId] <= 0 )
         {
-          walker_actionState[128 * walkerId] = -127;
+          walkers[walkerId].actionState = -127;
           word_7FA366[64 * walkerId] = 0;
           if ( city_inform[ciid].dword_654620 )
           {
@@ -69432,16 +68927,16 @@ LABEL_9:
           fun_walkerWalkTicks(walkerId, 1);
           byte_7FA395[128 * walkerId] = 0;
           byte_7FA3A5[128 * walkerId] = 0;
-          switch ( walker_direction[128 * walkerId] )
+          switch ( walkers[walkerId].direction )
           {
             case 8:
-              walker_actionState[128 * walkerId] = -126;
+              walkers[walkerId].actionState = -126;
               break;
             case 9:
-              walker_actionState[128 * walkerId] = -126;
+              walkers[walkerId].actionState = -126;
               break;
             case 10:
-              walker_actionState[128 * walkerId] = -126;
+              walkers[walkerId].actionState = -126;
               break;
           }
         }
@@ -69449,7 +68944,7 @@ LABEL_9:
       case 0x82:
         byte_7FA395[128 * walkerId] = 1;
         walker_maxLevelOrRiskSeen[128 * walkerId] = 0;
-        walker_actionState[128 * walkerId] = -128;
+        walkers[walkerId].actionState = -128;
         if ( word_7FA366[64 * walkerId] < 400 )
         {
           if ( word_7FA366[64 * walkerId] < 200 )
@@ -69541,32 +69036,7 @@ LABEL_9:
   if ( scn_riverExit_x != -1 && scn_riverExit_y != -1 )
     goto LABEL_9;
 }
-// 654620: using guessed type int dword_654620[];
-// 6AD9EC: using guessed type int random_7f_1;
-// 6E6CE2: using guessed type __int16 word_6E6CE2;
-// 6E6CE4: using guessed type __int16 word_6E6CE4;
-// 6E6CE6: using guessed type __int16 word_6E6CE6;
-// 6E6CE8: using guessed type __int16 word_6E6CE8;
-// 6E6D94: using guessed type __int16 word_6E6D94;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 98EF04: using guessed type __int16 scn_riverEntry_x;
-// 98EF06: using guessed type __int16 scn_riverEntry_y;
-// 98EF08: using guessed type __int16 scn_riverExit_x;
-// 98EF0A: using guessed type __int16 scn_riverExit_y;
-// 990CA4: using guessed type __int16 map_riverEntry_x;
-// 990CA6: using guessed type __int16 map_riverEntry_y;
-// 990CA8: using guessed type __int16 map_riverExit_x;
-// 990CAA: using guessed type __int16 map_riverExit_y;
-// 990CC9: using guessed type char map_flotsam;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (004A3210) --------------------------------------------------------
 void  fun_walker_docker()
 {
   int v0; // [sp+4Ch] [bp-24h]@11
@@ -69600,7 +69070,7 @@ void  fun_walker_docker()
     {
       if ( dword_993F60[12 * v0] < 12 && dword_993F64[12 * v0] < 12 )
       {
-        if ( (unsigned __int8)walker_actionState[128 * v7] == 115 )
+        if ( walkers[v7].actionState == 115 )
           building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v5] = 0;
       }
       else
@@ -69614,7 +69084,7 @@ void  fun_walker_docker()
     }
   }
   byte_7FA3A2[128 * walkerId] = 1;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 150:
       sub_4B3390(walkerId);
@@ -69643,7 +69113,7 @@ void  fun_walker_docker()
         ++word_7FA366[64 * walkerId];
         if ( word_7FA366[64 * walkerId] >= 80 )
         {
-          walker_actionState[128 * walkerId] = -121;
+          walkers[walkerId].actionState = -121;
           word_7FA366[64 * walkerId] = 0;
           word_7FA346[64 * walkerId] = word_6E6C72 + 8 * (unsigned __int8)byte_7FA34B[128 * walkerId];
           word_7FA346[64 * walkerId] += fun_getResourceGraphicIdOffset(
@@ -69662,8 +69132,7 @@ void  fun_walker_docker()
           {
             if ( (unsigned __int8)walker_state[128 * v6] == 1 )
             {
-              if ( (unsigned __int8)walker_actionState[128 * v6] == 133
-                || (unsigned __int8)walker_actionState[128 * v6] == 134 )
+              if ( walkers[v6].actionState == 133 || walkers[v6].actionState == 134 )
               {
                 if ( building_4a_grow_value_house_foodstocks[64 * v5] == v6 )
                   v1 = 1;
@@ -69689,7 +69158,7 @@ void  fun_walker_docker()
         ++word_7FA366[64 * walkerId];
         if ( word_7FA366[64 * walkerId] >= 80 )
         {
-          walker_actionState[128 * walkerId] = -124;
+          walkers[walkerId].actionState = -124;
           word_7FA366[64 * walkerId] = 0;
           word_7FA344[64 * walkerId] = 0;
           word_7FA346[64 * walkerId] = 0;
@@ -69699,7 +69168,7 @@ void  fun_walker_docker()
       ++word_7FA366[64 * walkerId];
       if ( word_7FA366[64 * walkerId] >= 20 )
       {
-        walker_actionState[128 * walkerId] = -124;
+        walkers[walkerId].actionState = -124;
         word_7FA366[64 * walkerId] = 0;
       }
       byte_7FA341[128 * walkerId] = 0;
@@ -69708,10 +69177,10 @@ void  fun_walker_docker()
       word_7FA346[64 * walkerId] = word_6E6C72 + 8 * (unsigned __int8)byte_7FA34B[128 * walkerId];
       word_7FA346[64 * walkerId] += fun_getResourceGraphicIdOffset((unsigned __int8)byte_7FA34B[128 * walkerId], 1);
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = -117;
+          walkers[walkerId].actionState = -117;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -69726,10 +69195,10 @@ void  fun_walker_docker()
     case 136:
       word_7FA346[64 * walkerId] = word_6E6C72;
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = -116;
+          walkers[walkerId].actionState = -116;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -69745,10 +69214,10 @@ void  fun_walker_docker()
       word_7FA346[64 * walkerId] = word_6E6C72 + 8 * (unsigned __int8)byte_7FA34B[128 * walkerId];
       word_7FA346[64 * walkerId] += fun_getResourceGraphicIdOffset((unsigned __int8)byte_7FA34B[128 * walkerId], 1);
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = -122;
+          walkers[walkerId].actionState = -122;
           word_7FA366[64 * walkerId] = 0;
           break;
         case 9:
@@ -69768,7 +69237,7 @@ void  fun_walker_docker()
       if ( word_7FA366[64 * walkerId] > 10 )
       {
         if ( building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v5] )
-          v2 = (unsigned __int8)walker_tradeCityId[128 * building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v5]];
+          v2 = walkers[128 * building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v5]].tradeCityId;
         else
           v2 = 0;
         if ( fun_importOneGoodFromCity(word_7FA38E[64 * walkerId], (unsigned __int8)byte_7FA34B[128 * walkerId], v2) )
@@ -69776,7 +69245,7 @@ void  fun_walker_docker()
           sub_445AB0(
             building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v5],
             (unsigned __int8)byte_7FA34B[128 * walkerId]);
-          walker_actionState[128 * walkerId] = -118;
+          walkers[walkerId].actionState = -118;
           word_7FA366[64 * walkerId] = 0;
           walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
@@ -69785,7 +69254,7 @@ void  fun_walker_docker()
         }
         else
         {
-          walker_actionState[128 * walkerId] = -118;
+          walkers[walkerId].actionState = -118;
           word_7FA366[64 * walkerId] = 0;
           walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
@@ -69797,13 +69266,13 @@ void  fun_walker_docker()
     case 140:
       word_7FA346[64 * walkerId] = word_6E6C72;
       if ( building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v5] )
-        v3 = (unsigned __int8)walker_tradeCityId[128 * building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v5]];
+        v3 = walkers[128 * building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v5]].tradeCityId;
       else
         v3 = 0;
       ++word_7FA366[64 * walkerId];
       if ( word_7FA366[64 * walkerId] > 10 )
       {
-        walker_actionState[128 * walkerId] = -118;
+        walkers[walkerId].actionState = -118;
         word_7FA366[64 * walkerId] = 0;
         walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
@@ -69813,7 +69282,7 @@ void  fun_walker_docker()
           sub_445B60(
             building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v5],
             (unsigned __int8)byte_7FA34B[128 * walkerId]);
-          walker_actionState[128 * walkerId] = -119;
+          walkers[walkerId].actionState = -119;
         }
         else
         {
@@ -69826,10 +69295,10 @@ void  fun_walker_docker()
       word_7FA346[64 * walkerId] = word_6E6C72 + 8 * (unsigned __int8)byte_7FA34B[128 * walkerId];
       word_7FA346[64 * walkerId] += fun_getResourceGraphicIdOffset((unsigned __int8)byte_7FA34B[128 * walkerId], 1);
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = -124;
+          walkers[walkerId].actionState = -124;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -69840,12 +69309,12 @@ void  fun_walker_docker()
       }
       break;
   }
-  if ( walker_direction[128 * walkerId] < 8 )
-    dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  if ( walkers[walkerId].direction < 8 )
+    dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   else
     dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
   {
     word_7FA344[64 * walkerId] = word_6E6C86 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
     word_7FA346[64 * walkerId] = 0;
@@ -69865,27 +69334,7 @@ void  fun_walker_docker()
     word_7FA344[64 * walkerId] = 0;
   }
 }
-// 4013C0: using guessed type _DWORD  sub_4013C0(_DWORD);
-// 4013FC: using guessed type _DWORD  sub_4013FC(_DWORD);
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401A8C: using guessed type _DWORD  sub_401A8C(_DWORD, _DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C72: using guessed type __int16 word_6E6C72;
-// 6E6C86: using guessed type __int16 word_6E6C86;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
-// 94BDAC: using guessed type __int16 building_6c_word_94BDAC[];
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
-// 993F60: using guessed type int dword_993F60[];
-// 993F64: using guessed type int dword_993F64[];
 
-//----- (004A46D0) --------------------------------------------------------
 signed int  sub_4A46D0(int a1)
 {
   signed int result; // eax@2
@@ -69897,7 +69346,7 @@ signed int  sub_4A46D0(int a1)
   v4 = building_72_wharf_hasBoat_house_evolveStatusDesir[64 * a1];
   if ( building_72_wharf_hasBoat_house_evolveStatusDesir[64 * a1] )
   {
-    if ( (unsigned __int8)walker_actionState[128 * v4] == 112 )
+    if ( walkers[v4].actionState == 112 )
     {
       if ( (signed int)(unsigned __int8)byte_7FA3A3[128 * v4] > 0 )
       {
@@ -69914,7 +69363,7 @@ signed int  sub_4A46D0(int a1)
         v5 = sub_446B50(
                v3,
                v2,
-               (unsigned __int8)walker_tradeCityId[128 * v4],
+               walkers[v4].tradeCityId,
                building_1a_word_94BD5A[64 * a1],
                (unsigned __int8)building_0e_byte_94BD4E[128 * a1]);
         if ( v5 )
@@ -69922,7 +69371,7 @@ signed int  sub_4A46D0(int a1)
           --byte_7FA3A3[128 * v4];
           word_7FA38E[64 * walkerId] = v5;
           word_7FA366[64 * walkerId] = 0;
-          walker_actionState[128 * walkerId] = -123;
+          walkers[walkerId].actionState = -123;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           byte_7FA34B[128 * walkerId] = LOBYTE(city_inform[ciid].dword_6543B8);
@@ -69949,15 +69398,7 @@ signed int  sub_4A46D0(int a1)
   }
   return result;
 }
-// 402685: using guessed type _DWORD  sub_402685(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 6543B8: using guessed type int dword_6543B8[];
-// 654594: using guessed type int cityinfo_tradeCenterId[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (004A4910) --------------------------------------------------------
 signed int  sub_4A4910(int a1)
 {
   signed int result; // eax@2
@@ -69969,7 +69410,7 @@ signed int  sub_4A4910(int a1)
   v4 = building_72_wharf_hasBoat_house_evolveStatusDesir[64 * a1];
   if ( building_72_wharf_hasBoat_house_evolveStatusDesir[64 * a1] )
   {
-    if ( (unsigned __int8)walker_actionState[128 * v4] == 112 )
+    if ( walkers[v4].actionState == 112 )
     {
       if ( (signed int)(unsigned __int8)byte_7FA39F[128 * v4] < 12 )
       {
@@ -69986,14 +69427,14 @@ signed int  sub_4A4910(int a1)
         v5 = sub_447210(
                v3,
                v2,
-               (unsigned __int8)walker_tradeCityId[128 * v4],
+               walkers[v4].tradeCityId,
                building_1a_word_94BD5A[64 * a1],
                (unsigned __int8)building_0e_byte_94BD4E[128 * a1]);
         if ( v5 )
         {
           ++byte_7FA39F[128 * v4];
           word_7FA38E[64 * walkerId] = v5;
-          walker_actionState[128 * walkerId] = -120;
+          walkers[walkerId].actionState = -120;
           word_7FA366[64 * walkerId] = 0;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
@@ -70049,7 +69490,7 @@ signed int  sub_4A4B50(int a1)
           v2 = *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v4] + 2 * i);
           if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v4] + 2 * i)
             && (unsigned __int8)walker_state[128 * v2] == 1
-            && (unsigned __int8)walker_actionState[128 * v2] != 132 )
+            && walkers[v2].actionState != 132 )
             return 0;
         }
         ++byte_7FA3A9[128 * a1];
@@ -70111,12 +69552,7 @@ bool  sub_4A4CC0(int a1)
   }
   return result;
 }
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (004A4D70) --------------------------------------------------------
 signed int  sub_4A4D70(int a1)
 {
   signed int result; // eax@2
@@ -70135,21 +69571,21 @@ signed int  sub_4A4D70(int a1)
         if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v4] + 2 * i)
           && (unsigned __int8)walker_state[128 * v2] == 1 )
         {
-          if ( (unsigned __int8)walker_actionState[128 * v2] == 133 )
+          if ( walkers[v2].actionState == 133 )
             return 1;
-          if ( (unsigned __int8)walker_actionState[128 * v2] == 135 )
+          if ( walkers[v2].actionState == 135 )
             return 1;
-          if ( (unsigned __int8)walker_actionState[128 * v2] == 139 )
+          if ( walkers[v2].actionState == 139 )
             return 1;
-          if ( (unsigned __int8)walker_actionState[128 * v2] == 138 )
+          if ( walkers[v2].actionState == 138 )
             return 1;
-          if ( (unsigned __int8)walker_actionState[128 * v2] == 134 )
+          if ( walkers[v2].actionState == 134 )
             return 2;
-          if ( (unsigned __int8)walker_actionState[128 * v2] == 136 )
+          if ( walkers[v2].actionState == 136 )
             return 2;
-          if ( (unsigned __int8)walker_actionState[128 * v2] == 137 )
+          if ( walkers[v2].actionState == 137 )
             return 2;
-          if ( (unsigned __int8)walker_actionState[128 * v2] == 140 )
+          if ( walkers[v2].actionState == 140 )
             return 2;
         }
       }
@@ -70166,11 +69602,7 @@ signed int  sub_4A4D70(int a1)
   }
   return result;
 }
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BDAC: using guessed type __int16 building_6c_word_94BDAC[];
 
-//----- (004A4F80) --------------------------------------------------------
 int  sub_4A4F80(int a1)
 {
   int v2; // [sp+4Ch] [bp-Ch]@4
@@ -70183,13 +69615,13 @@ int  sub_4A4F80(int a1)
     if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * a1] + 2 * i) )
     {
       v2 = *(__int16 *)((char *)&building_6c_word_94BDAC[64 * a1] + 2 * i);
-      if ( (unsigned __int8)walker_actionState[128 * v2] == 132 )
+      if ( walkers[v2].actionState == 132 )
       {
         ++v3;
       }
       else
       {
-        if ( (unsigned __int8)walker_actionState[128 * v2] == 133 )
+        if ( walkers[v2].actionState == 133 )
           ++v3;
       }
     }
@@ -70241,7 +69673,7 @@ void  fun_walker_marketBuyer()
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 150:
       sub_4B3390(walkerId);
@@ -70251,7 +69683,7 @@ void  fun_walker_marketBuyer()
       break;
     case 145:
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] == 8 )
+      if ( walkers[walkerId].direction == 8 )
       {
         if ( walker_itemCollecting[128 * walkerId]
           && (unsigned __int8)walker_itemCollecting[128 * walkerId] != 1
@@ -70266,15 +69698,15 @@ void  fun_walker_marketBuyer()
           if ( !sub_4A5680(walkerId, v0, word_7FA38E[64 * walkerId]) )
             walker_state[128 * walkerId] = 2;
         }
-        walker_actionState[128 * walkerId] = -110;
+        walkers[walkerId].actionState = -110;
         walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
       }
       else
       {
-        if ( walker_direction[128 * walkerId] == 9 || walker_direction[128 * walkerId] == 10 )
+        if ( walkers[walkerId].direction == 9 || walkers[walkerId].direction == 10 )
         {
-          walker_actionState[128 * walkerId] = -110;
+          walkers[walkerId].actionState = -110;
           walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
           fun_removeDestinationPathForWalker(walkerId);
@@ -70283,7 +69715,7 @@ void  fun_walker_marketBuyer()
       break;
     case 146:
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
           walker_state[128 * walkerId] = 2;
@@ -70297,9 +69729,9 @@ void  fun_walker_marketBuyer()
       }
       break;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6C84 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6C84 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
@@ -70570,11 +70002,7 @@ signed int  sub_4A5EB0(int a1, int a2, int a3)
   }
   return result;
 }
-// 402FD1: using guessed type _DWORD  fun_removeGoodFromWarehouse(_DWORD, _DWORD, _DWORD, _DWORD);
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA398: using guessed type __int16 walker_tradeCaravanNextId[];
 
-//----- (004A6130) --------------------------------------------------------
 void  fun_walker_patrician()
 {
   byte_7FA3A2[128 * walkerId] = 1;
@@ -70586,22 +70014,14 @@ void  fun_walker_patrician()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   sub_49FFE0(1);
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6D7A + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6D7A + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 401D7A: using guessed type _DWORD  sub_401D7A(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D7A: using guessed type __int16 word_6E6D7A;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
 
-//----- (004A6310) --------------------------------------------------------
 void  fun_walker_indigenousNative()
 {
   __int64 v0; // qax@48
@@ -70616,7 +70036,7 @@ void  fun_walker_indigenousNative()
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -70629,14 +70049,14 @@ void  fun_walker_indigenousNative()
       ++city_inform[ciid].dword_654648;
       byte_7FA3A2[128 * walkerId] = 2;
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
-          walker_actionState[128 * walkerId] = -98;
+        if ( walkers[walkerId].direction == 8 )
+          walkers[walkerId].actionState = -98;
       }
       else
       {
-        walker_actionState[128 * walkerId] = -98;
+        walkers[walkerId].actionState = -98;
       }
       break;
     case 0x9E:
@@ -70647,7 +70067,7 @@ void  fun_walker_indigenousNative()
         word_7FA366[64 * walkerId] = 0;
         if ( city_inform[ciid].dword_6544B8 )
         {
-          walker_actionState[128 * walkerId] = -97;
+          walkers[walkerId].actionState = -97;
           walker_destination_x[128 * walkerId] = formation_34[0];
           walker_destination_y[128 * walkerId] = formation_35[0];
           word_7FA38E[64 * walkerId] = formation_36[0];
@@ -70659,7 +70079,7 @@ void  fun_walker_indigenousNative()
                  building__07_y[128 * building_0c_level_resourceId[64 * v1]],
                  (unsigned __int8)building_03_size[128 * building_0c_level_resourceId[64 * v1]]) )
           {
-            walker_actionState[128 * walkerId] = -100;
+            walkers[walkerId].actionState = -100;
             walker_destination_x[128 * walkerId] = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
           }
@@ -70669,11 +70089,11 @@ void  fun_walker_indigenousNative()
       break;
     case 0x9C:
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
+        if ( walkers[walkerId].direction == 8 )
         {
-          walker_actionState[128 * walkerId] = -99;
+          walkers[walkerId].actionState = -99;
           walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         }
@@ -70685,33 +70105,33 @@ void  fun_walker_indigenousNative()
       break;
     case 0x9D:
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] == 9 || walker_direction[128 * walkerId] == 10 )
+      if ( walkers[walkerId].direction == 9 || walkers[walkerId].direction == 10 )
         walker_state[128 * walkerId] = 2;
-      if ( walker_direction[128 * walkerId] == 8 )
+      if ( walkers[walkerId].direction == 8 )
         walker_state[128 * walkerId] = 2;
       break;
   }
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
   else
   {
-    if ( walker_direction[128 * walkerId] == 11 )
+    if ( walkers[walkerId].direction == 11 )
     {
       dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
     }
     else
     {
-      if ( walker_direction[128 * walkerId] < 8 )
-        dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+      if ( walkers[walkerId].direction < 8 )
+        dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
       else
         dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
     }
   }
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
   byte_7FA342[128 * walkerId] = 1;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
     {
@@ -70725,13 +70145,13 @@ void  fun_walker_indigenousNative()
   }
   else
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+    if ( walkers[walkerId].actionState == 149 )
     {
       word_7FA344[64 * walkerId] = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 441;
     }
     else
     {
-      if ( walker_direction[128 * walkerId] == 11 )
+      if ( walkers[walkerId].direction == 11 )
       {
         word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
                                    + 8 * ((signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 1)
@@ -70739,7 +70159,7 @@ void  fun_walker_indigenousNative()
       }
       else
       {
-        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 159 )
+        if ( walkers[walkerId].actionState == 159 )
           word_7FA344[64 * walkerId] = (_WORD)dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId] + 297;
         else
           word_7FA344[64 * walkerId] = dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId] + 201;
@@ -70747,22 +70167,7 @@ void  fun_walker_indigenousNative()
     }
   }
 }
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 402725: using guessed type _DWORD  sub_402725(_DWORD, _DWORD, _DWORD);
-// 654468: using guessed type int dword_654468[];
-// 6544B8: using guessed type int dword_6544B8[];
-// 65DF24: using guessed type int dword_65DF24;
-// 7F87F6: using guessed type __int16 formation_36[];
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (004A6C80) --------------------------------------------------------
 void  fun_walker_towerSentry()
 {
   int v0; // [sp+4Ch] [bp-8h]@41
@@ -70780,7 +70185,7 @@ void  fun_walker_towerSentry()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   sub_4A7DC0(walkerId);
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 150:
       sub_4B3390(walkerId);
@@ -70796,7 +70201,7 @@ void  fun_walker_towerSentry()
         word_7FA366[64 * walkerId] = 0;
         if ( sub_4A7760(walkerId) )
         {
-          walker_actionState[128 * walkerId] = -85;
+          walkers[walkerId].actionState = -85;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           fun_removeDestinationPathForWalker(walkerId);
@@ -70808,9 +70213,9 @@ void  fun_walker_towerSentry()
       byte_7FA395[128 * walkerId] = 0;
       byte_7FA3A5[128 * walkerId] = 0;
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
+        if ( walkers[walkerId].direction == 8 )
         {
           fun_removeWalkerFromTileList(walkerId);
           walker_x[128 * walkerId] = building_06_x[128 * v1];
@@ -70821,7 +70226,7 @@ void  fun_walker_towerSentry()
                                            + walker_x[128 * walkerId]
                                            + (_WORD)setting_map_startGridOffset;
           sub_4B8A40(walkerId);
-          walker_actionState[128 * walkerId] = -86;
+          walkers[walkerId].actionState = -86;
           fun_removeDestinationPathForWalker(walkerId);
         }
       }
@@ -70832,11 +70237,11 @@ void  fun_walker_towerSentry()
       break;
     case 171:
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
+        if ( walkers[walkerId].direction == 8 )
         {
-          walker_actionState[128 * walkerId] = -83;
+          walkers[walkerId].actionState = -83;
           walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
           fun_removeDestinationPathForWalker(walkerId);
@@ -70844,15 +70249,15 @@ void  fun_walker_towerSentry()
       }
       else
       {
-        walker_actionState[128 * walkerId] = -86;
+        walkers[walkerId].actionState = -86;
       }
       break;
     case 173:
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
-          walker_actionState[128 * walkerId] = -86;
+        if ( walkers[walkerId].direction == 8 )
+          walkers[walkerId].actionState = -86;
       }
       else
       {
@@ -70867,7 +70272,7 @@ void  fun_walker_towerSentry()
       {
         if ( sub_4ADB30(walkerId, 10) )
         {
-          walker_direction[128 * walkerId] = fun_pathing_getDirection8(
+          walkers[walkerId].direction = fun_pathing_getDirection8(
                                                walker_x[128 * walkerId],
                                                walker_y[128 * walkerId],
                                                walkerGridX,
@@ -70877,7 +70282,7 @@ void  fun_walker_towerSentry()
         }
         else
         {
-          walker_actionState[128 * walkerId] = -83;
+          walkers[walkerId].actionState = -83;
           walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
           fun_removeDestinationPathForWalker(walkerId);
@@ -70898,7 +70303,7 @@ void  fun_walker_towerSentry()
     }
     else
     {
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] != 174 )
+      if ( walkers[walkerId].actionState != 174 )
         walker_state[128 * walkerId] = 2;
     }
   }
@@ -70907,15 +70312,15 @@ void  fun_walker_towerSentry()
     --byte_7FA370[128 * walkerId];
     byte_7FA3A5[128 * walkerId] = 0;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
   {
     word_7FA344[64 * walkerId] = word_6E6D34 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 136;
   }
   else
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 172 )
+    if ( walkers[walkerId].actionState == 172 )
       word_7FA344[64 * walkerId] = word_6E6D34
                                  + dword_65DF24
                                  + 96
@@ -71063,13 +70468,13 @@ void  sub_4A7A70()
           walker_tilePosition_x[64 * i] = 15 * walkerGridY;
           walkers[i].gridOffset = 162 * walkerGridY + walkerGridX + (_WORD)setting_map_startGridOffset;
           sub_4B8A40(i);
-          walker_actionState[128 * walkerId] = -83;
+          walkers[walkerId].actionState = -83;
           walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         }
         else
         {
-          walker_actionState[128 * i] = -86;
+          walkers[i].actionState = -86;
           fun_removeWalkerFromTileList(i);
           v0 = walker_buildingId[64 * i];
           walker_x[128 * i] = building_06_x[128 * v0];
@@ -71078,34 +70483,27 @@ void  sub_4A7A70()
           byte_7FA361[128 * i] = walker_y[128 * i];
           walkers[i].gridOffset = 162 * walker_y[128 * i] + walker_x[128 * i] + (_WORD)setting_map_startGridOffset;
           sub_4B8A40(i);
-          walker_actionState[128 * i] = -86;
+          walkers[i].actionState = -86;
           fun_removeDestinationPathForWalker(i);
         }
       }
     }
   }
 }
-// 40173A: using guessed type _DWORD  sub_40173A(_DWORD, _DWORD, _DWORD, _DWORD);
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004A7DC0) --------------------------------------------------------
 signed int  sub_4A7DC0(int a1)
 {
   signed int result; // eax@2
 
   if ( dword_819848 > 0 )
   {
-    if ( (unsigned __int8)walker_actionState[128 * a1] == 150 )
+    if ( walkers[a1].actionState == 150 )
     {
       result = 0;
     }
     else
     {
-      if ( (unsigned __int8)walker_actionState[128 * a1] == 149 )
+      if ( walkers[a1].actionState == 149 )
       {
         result = 0;
       }
@@ -71125,7 +70523,7 @@ signed int  sub_4A7DC0(int a1)
             {
               if ( dword_7FA2A4 <= 10 )
               {
-                walker_actionState[128 * a1] = -84;
+                walkers[a1].actionState = -84;
                 walker_destination_x[128 * a1] = walker_x[128 * a1];
                 walker_destination_y[128 * a1] = walker_y[128 * a1];
                 result = 1;
@@ -71154,11 +70552,7 @@ signed int  sub_4A7DC0(int a1)
   }
   return result;
 }
-// 4028BA: using guessed type _DWORD  sub_4028BA(_DWORD, _DWORD);
-// 7FA2A4: using guessed type int dword_7FA2A4;
-// 819848: using guessed type int dword_819848;
 
-//----- (004A7F30) --------------------------------------------------------
 void  sub_4A7F30()
 {
   __int64 v0; // qax@14
@@ -71174,7 +70568,7 @@ void  sub_4A7F30()
   word_7FA346[64 * walkerId] = 0;
   byte_7FA389[128 * walkerId] = 1;
   sub_4AC350();
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
@@ -71182,12 +70576,12 @@ void  sub_4A7F30()
   {
     if ( formation_54[64 * v4] )
     {
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     }
     else
     {
-      if ( walker_direction[128 * walkerId] < 8 )
-        dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+      if ( walkers[walkerId].direction < 8 )
+        dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
       else
         dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
     }
@@ -71197,7 +70591,7 @@ void  sub_4A7F30()
   switch ( formation_enemyType[128 * v4] )
   {
     case 8:
-      switch ( walker_actionState[128 * walkerId] )
+      switch ( walkers[walkerId].actionState )
       {
         case 0x96:
           if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
@@ -71220,7 +70614,7 @@ void  sub_4A7F30()
           word_7FA344[64 * walkerId] = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 793;
           break;
         default:
-          if ( walker_direction[128 * walkerId] == 11 )
+          if ( walkers[walkerId].direction == 11 )
             word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
                                        + 8 * ((signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 1)
                                        + 745;
@@ -71230,7 +70624,7 @@ void  sub_4A7F30()
       }
       break;
     case 7:
-      switch ( walker_actionState[128 * walkerId] )
+      switch ( walkers[walkerId].actionState )
       {
         case 0x96:
           if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
@@ -71253,7 +70647,7 @@ void  sub_4A7F30()
           word_7FA344[64 * walkerId] = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 793;
           break;
         default:
-          if ( walker_direction[128 * walkerId] == 11 )
+          if ( walkers[walkerId].direction == 11 )
             word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
                                        + 8 * ((signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 1)
                                        + 745;
@@ -71263,7 +70657,7 @@ void  sub_4A7F30()
       }
       break;
     case 5:
-      switch ( walker_actionState[128 * walkerId] )
+      switch ( walkers[walkerId].actionState )
       {
         case 0x96:
           if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
@@ -71286,7 +70680,7 @@ void  sub_4A7F30()
           word_7FA344[64 * walkerId] = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 793;
           break;
         default:
-          if ( walker_direction[128 * walkerId] == 11 )
+          if ( walkers[walkerId].direction == 11 )
             word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
                                        + 8 * ((signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 1)
                                        + 745;
@@ -71296,7 +70690,7 @@ void  sub_4A7F30()
       }
       break;
     case 6:
-      switch ( walker_actionState[128 * walkerId] )
+      switch ( walkers[walkerId].actionState )
       {
         case 0x96:
           if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
@@ -71319,7 +70713,7 @@ void  sub_4A7F30()
           word_7FA344[64 * walkerId] = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 793;
           break;
         default:
-          if ( walker_direction[128 * walkerId] == 11 )
+          if ( walkers[walkerId].direction == 11 )
             word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
                                        + 8 * ((signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 1)
                                        + 745;
@@ -71330,14 +70724,7 @@ void  sub_4A7F30()
       break;
   }
 }
-// 65DF24: using guessed type int dword_65DF24;
-// 7F8814: using guessed type __int16 formation_54[];
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004A8A30) --------------------------------------------------------
 void  sub_4A8A30()
 {
   __int64 v0; // qax@12
@@ -71352,14 +70739,14 @@ void  sub_4A8A30()
   word_7FA346[64 * walkerId] = 0;
   byte_7FA389[128 * walkerId] = 1;
   sub_4AC350();
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
   else
   {
-    if ( walker_direction[128 * walkerId] < 8 )
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+    if ( walkers[walkerId].direction < 8 )
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     else
       dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   }
@@ -71368,7 +70755,7 @@ void  sub_4A8A30()
   switch ( formation_enemyType[128 * v3] )
   {
     case 5:
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+      if ( walkers[walkerId].actionState == 150 )
       {
         if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
         {
@@ -71382,13 +70769,13 @@ void  sub_4A8A30()
       }
       else
       {
-        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+        if ( walkers[walkerId].actionState == 149 )
         {
           word_7FA344[64 * walkerId] = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 593;
         }
         else
         {
-          if ( walker_direction[128 * walkerId] == 11 )
+          if ( walkers[walkerId].direction == 11 )
             word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
                                        + 8 * ((signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 1)
                                        + 545;
@@ -71398,7 +70785,7 @@ void  sub_4A8A30()
       }
       break;
     case 6:
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+      if ( walkers[walkerId].actionState == 150 )
       {
         if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
         {
@@ -71412,13 +70799,13 @@ void  sub_4A8A30()
       }
       else
       {
-        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+        if ( walkers[walkerId].actionState == 149 )
         {
           word_7FA344[64 * walkerId] = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 593;
         }
         else
         {
-          if ( walker_direction[128 * walkerId] == 11 )
+          if ( walkers[walkerId].direction == 11 )
             word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
                                        + 8 * ((signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 1)
                                        + 545;
@@ -71428,7 +70815,7 @@ void  sub_4A8A30()
       }
       break;
     case 9:
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+      if ( walkers[walkerId].actionState == 150 )
       {
         if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
         {
@@ -71442,13 +70829,13 @@ void  sub_4A8A30()
       }
       else
       {
-        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+        if ( walkers[walkerId].actionState == 149 )
         {
           word_7FA344[64 * walkerId] = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 593;
         }
         else
         {
-          if ( walker_direction[128 * walkerId] == 11 )
+          if ( walkers[walkerId].direction == 11 )
             word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
                                        + 8 * ((signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 1)
                                        + 545;
@@ -71459,13 +70846,7 @@ void  sub_4A8A30()
       break;
   }
 }
-// 65DF24: using guessed type int dword_65DF24;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004A9140) --------------------------------------------------------
 void  sub_4A9140()
 {
   __int64 v0; // qax@12
@@ -71480,14 +70861,14 @@ void  sub_4A9140()
   word_7FA346[64 * walkerId] = 0;
   byte_7FA389[128 * walkerId] = 1;
   sub_4AC350();
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
   else
   {
-    if ( walker_direction[128 * walkerId] < 8 )
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+    if ( walkers[walkerId].direction < 8 )
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     else
       dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   }
@@ -71496,7 +70877,7 @@ void  sub_4A9140()
   switch ( formation_enemyType[128 * v3] )
   {
     case 8:
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+      if ( walkers[walkerId].actionState == 150 )
       {
         if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
         {
@@ -71510,13 +70891,13 @@ void  sub_4A9140()
       }
       else
       {
-        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+        if ( walkers[walkerId].actionState == 149 )
         {
           word_7FA344[64 * walkerId] = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 593;
         }
         else
         {
-          if ( walker_direction[128 * walkerId] == 11 )
+          if ( walkers[walkerId].direction == 11 )
             word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
                                        + 8 * ((signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 1)
                                        + 545;
@@ -71526,7 +70907,7 @@ void  sub_4A9140()
       }
       break;
     case 0xA:
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+      if ( walkers[walkerId].actionState == 150 )
       {
         if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
         {
@@ -71540,13 +70921,13 @@ void  sub_4A9140()
       }
       else
       {
-        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+        if ( walkers[walkerId].actionState == 149 )
         {
           word_7FA344[64 * walkerId] = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 593;
         }
         else
         {
-          if ( walker_direction[128 * walkerId] == 11 )
+          if ( walkers[walkerId].direction == 11 )
             word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
                                        + 8 * ((signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 1)
                                        + 545;
@@ -71556,7 +70937,7 @@ void  sub_4A9140()
       }
       break;
     case 7:
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+      if ( walkers[walkerId].actionState == 150 )
       {
         if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
         {
@@ -71570,13 +70951,13 @@ void  sub_4A9140()
       }
       else
       {
-        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+        if ( walkers[walkerId].actionState == 149 )
         {
           word_7FA344[64 * walkerId] = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 593;
         }
         else
         {
-          if ( walker_direction[128 * walkerId] == 11 )
+          if ( walkers[walkerId].direction == 11 )
             word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
                                        + 8 * ((signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 1)
                                        + 545;
@@ -71587,13 +70968,7 @@ void  sub_4A9140()
       break;
   }
 }
-// 65DF24: using guessed type int dword_65DF24;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004A9850) --------------------------------------------------------
 int  sub_4A9850()
 {
   int result; // eax@11
@@ -71606,7 +70981,7 @@ int  sub_4A9850()
   word_7FA346[64 * walkerId] = 0;
   byte_7FA389[128 * walkerId] = 1;
   sub_4AC350();
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
@@ -71614,26 +70989,26 @@ int  sub_4A9850()
   {
     if ( formation_54[64 * v1] )
     {
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     }
     else
     {
-      if ( walker_direction[128 * walkerId] < 8 )
-        dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+      if ( walkers[walkerId].direction < 8 )
+        dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
       else
         dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
     }
   }
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
   byte_7FA342[128 * walkerId] = 1;
-  if ( walker_direction[128 * walkerId] == 11 )
+  if ( walkers[walkerId].direction == 11 )
   {
     result = 601;
     word_7FA344[64 * walkerId] = dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId] + 601;
   }
   else
   {
-    switch ( walker_actionState[128 * walkerId] )
+    switch ( walkers[walkerId].actionState )
     {
       case 0x96:
         result = walkerId << 7;
@@ -71657,14 +71032,7 @@ int  sub_4A9850()
   }
   return result;
 }
-// 65DF24: using guessed type int dword_65DF24;
-// 7F8814: using guessed type __int16 formation_54[];
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004A9BC0) --------------------------------------------------------
 int  sub_4A9BC0()
 {
   int result; // eax@9
@@ -71675,34 +71043,34 @@ int  sub_4A9BC0()
   word_7FA346[64 * walkerId] = 0;
   byte_7FA389[128 * walkerId] = 1;
   sub_4AC350();
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
   else
   {
-    if ( walker_direction[128 * walkerId] < 8 )
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+    if ( walkers[walkerId].direction < 8 )
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     else
       dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   }
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
   byte_7FA342[128 * walkerId] = 1;
-  if ( walker_direction[128 * walkerId] == 11 )
+  if ( walkers[walkerId].direction == 11 )
   {
     result = dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId] + 601;
     word_7FA344[64 * walkerId] = result;
   }
   else
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+    if ( walkers[walkerId].actionState == 150 )
     {
       result = 601;
       word_7FA344[64 * walkerId] = dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId] + 601;
     }
     else
     {
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+      if ( walkers[walkerId].actionState == 149 )
       {
         result = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 705;
         word_7FA344[64 * walkerId] = result;
@@ -71716,12 +71084,7 @@ int  sub_4A9BC0()
   }
   return result;
 }
-// 65DF24: using guessed type int dword_65DF24;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
 
-//----- (004A9EA0) --------------------------------------------------------
 int  sub_4A9EA0()
 {
   int result; // eax@9
@@ -71732,20 +71095,20 @@ int  sub_4A9EA0()
   word_7FA346[64 * walkerId] = 0;
   byte_7FA389[128 * walkerId] = 3;
   sub_4AC350();
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
   else
   {
-    if ( walker_direction[128 * walkerId] < 8 )
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+    if ( walkers[walkerId].direction < 8 )
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     else
       dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   }
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
   byte_7FA342[128 * walkerId] = 1;
-  if ( walker_direction[128 * walkerId] == 11 )
+  if ( walkers[walkerId].direction == 11 )
   {
     result = walkerId << 7;
     word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
@@ -71754,7 +71117,7 @@ int  sub_4A9EA0()
   }
   else
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+    if ( walkers[walkerId].actionState == 150 )
     {
       result = walkerId << 7;
       word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
@@ -71763,7 +71126,7 @@ int  sub_4A9EA0()
     }
     else
     {
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+      if ( walkers[walkerId].actionState == 149 )
       {
         result = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 745;
         word_7FA344[64 * walkerId] = result;
@@ -71777,12 +71140,7 @@ int  sub_4A9EA0()
   }
   return result;
 }
-// 65DF24: using guessed type int dword_65DF24;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
 
-//----- (004AA1A0) --------------------------------------------------------
 int  sub_4AA1A0()
 {
   int result; // eax@11
@@ -71798,14 +71156,14 @@ int  sub_4AA1A0()
   word_7FA346[64 * walkerId] = 0;
   byte_7FA389[128 * walkerId] = 2;
   sub_4AC350();
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
   else
   {
-    if ( walker_direction[128 * walkerId] < 8 )
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+    if ( walkers[walkerId].direction < 8 )
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     else
       dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   }
@@ -71815,7 +71173,7 @@ int  sub_4AA1A0()
   {
     if ( (unsigned __int8)formation_enemyType[128 * v4] == 1 )
     {
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+      if ( walkers[walkerId].actionState == 150 )
       {
         if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
         {
@@ -71832,14 +71190,14 @@ int  sub_4AA1A0()
       }
       else
       {
-        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+        if ( walkers[walkerId].actionState == 149 )
         {
           result = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 641;
           word_7FA344[64 * walkerId] = result;
         }
         else
         {
-          if ( walker_direction[128 * walkerId] == 11 )
+          if ( walkers[walkerId].direction == 11 )
           {
             result = walkerId << 7;
             word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
@@ -71859,7 +71217,7 @@ int  sub_4AA1A0()
       result = v4 << 7;
       if ( (unsigned __int8)formation_enemyType[128 * v4] == 4 )
       {
-        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+        if ( walkers[walkerId].actionState == 150 )
         {
           if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
           {
@@ -71876,14 +71234,14 @@ int  sub_4AA1A0()
         }
         else
         {
-          if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+          if ( walkers[walkerId].actionState == 149 )
           {
             result = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 593;
             word_7FA344[64 * walkerId] = result;
           }
           else
           {
-            if ( walker_direction[128 * walkerId] == 11 )
+            if ( walkers[walkerId].direction == 11 )
             {
               result = walkerId << 7;
               word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
@@ -71902,7 +71260,7 @@ int  sub_4AA1A0()
   }
   else
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+    if ( walkers[walkerId].actionState == 150 )
     {
       if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
       {
@@ -71919,14 +71277,14 @@ int  sub_4AA1A0()
     }
     else
     {
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+      if ( walkers[walkerId].actionState == 149 )
       {
         result = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 441;
         word_7FA344[64 * walkerId] = result;
       }
       else
       {
-        if ( walker_direction[128 * walkerId] == 11 )
+        if ( walkers[walkerId].direction == 11 )
         {
           result = walkerId << 7;
           word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
@@ -71943,13 +71301,7 @@ int  sub_4AA1A0()
   }
   return result;
 }
-// 65DF24: using guessed type int dword_65DF24;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004AA8C0) --------------------------------------------------------
 int  sub_4AA8C0()
 {
   int result; // eax@11
@@ -71964,14 +71316,14 @@ int  sub_4AA8C0()
   word_7FA346[64 * walkerId] = 0;
   byte_7FA389[128 * walkerId] = 1;
   sub_4AC350();
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
   else
   {
-    if ( walker_direction[128 * walkerId] < 8 )
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+    if ( walkers[walkerId].direction < 8 )
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     else
       dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   }
@@ -71979,7 +71331,7 @@ int  sub_4AA8C0()
   byte_7FA342[128 * walkerId] = 1;
   if ( (unsigned __int8)formation_enemyType[128 * v3] == 3 )
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+    if ( walkers[walkerId].actionState == 150 )
     {
       if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
       {
@@ -71996,14 +71348,14 @@ int  sub_4AA8C0()
     }
     else
     {
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+      if ( walkers[walkerId].actionState == 149 )
       {
         result = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 593;
         word_7FA344[64 * walkerId] = result;
       }
       else
       {
-        if ( walker_direction[128 * walkerId] == 11 )
+        if ( walkers[walkerId].direction == 11 )
         {
           result = walkerId << 7;
           word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
@@ -72023,7 +71375,7 @@ int  sub_4AA8C0()
     result = v3 << 7;
     if ( (unsigned __int8)formation_enemyType[128 * v3] == 2 )
     {
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+      if ( walkers[walkerId].actionState == 150 )
       {
         if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
         {
@@ -72040,14 +71392,14 @@ int  sub_4AA8C0()
       }
       else
       {
-        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+        if ( walkers[walkerId].actionState == 149 )
         {
           result = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 593;
           word_7FA344[64 * walkerId] = result;
         }
         else
         {
-          if ( walker_direction[128 * walkerId] == 11 )
+          if ( walkers[walkerId].direction == 11 )
           {
             result = walkerId << 7;
             word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
@@ -72065,13 +71417,7 @@ int  sub_4AA8C0()
   }
   return result;
 }
-// 65DF24: using guessed type int dword_65DF24;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004AADF0) --------------------------------------------------------
 int  sub_4AADF0()
 {
   int result; // eax@10
@@ -72085,7 +71431,7 @@ int  sub_4AADF0()
   word_7FA346[64 * walkerId] = 0;
   byte_7FA389[128 * walkerId] = 2;
   sub_4AC350();
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
@@ -72093,12 +71439,12 @@ int  sub_4AADF0()
   {
     if ( formation_54[64 * v2] )
     {
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     }
     else
     {
-      if ( walker_direction[128 * walkerId] < 8 )
-        dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+      if ( walkers[walkerId].direction < 8 )
+        dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
       else
         dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
     }
@@ -72108,7 +71454,7 @@ int  sub_4AADF0()
   result = (unsigned __int8)formation_enemyType[128 * v2];
   if ( result == 1 )
   {
-    switch ( walker_actionState[128 * walkerId] )
+    switch ( walkers[walkerId].actionState )
     {
       case 0x96:
         if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
@@ -72135,7 +71481,7 @@ int  sub_4AADF0()
         word_7FA344[64 * walkerId] = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 641;
         break;
       default:
-        if ( walker_direction[128 * walkerId] == 11 )
+        if ( walkers[walkerId].direction == 11 )
         {
           result = 449;
           word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
@@ -72152,14 +71498,7 @@ int  sub_4AADF0()
   }
   return result;
 }
-// 65DF24: using guessed type int dword_65DF24;
-// 7F8814: using guessed type __int16 formation_54[];
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004AB200) --------------------------------------------------------
 int  sub_4AB200()
 {
   int result; // eax@11
@@ -72172,7 +71511,7 @@ int  sub_4AB200()
   word_7FA346[64 * walkerId] = 0;
   byte_7FA389[128 * walkerId] = 3;
   sub_4AC350();
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
@@ -72180,26 +71519,26 @@ int  sub_4AB200()
   {
     if ( formation_54[64 * v1] )
     {
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     }
     else
     {
-      if ( walker_direction[128 * walkerId] < 8 )
-        dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+      if ( walkers[walkerId].direction < 8 )
+        dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
       else
         dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
     }
   }
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
   byte_7FA342[128 * walkerId] = 1;
-  if ( walker_direction[128 * walkerId] == 11 )
+  if ( walkers[walkerId].direction == 11 )
   {
     result = 601;
     word_7FA344[64 * walkerId] = dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId] + 601;
   }
   else
   {
-    switch ( walker_actionState[128 * walkerId] )
+    switch ( walkers[walkerId].actionState )
     {
       case 0x96:
         result = walkerId << 7;
@@ -72223,14 +71562,7 @@ int  sub_4AB200()
   }
   return result;
 }
-// 65DF24: using guessed type int dword_65DF24;
-// 7F8814: using guessed type __int16 formation_54[];
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004AB570) --------------------------------------------------------
 int  sub_4AB570()
 {
   int result; // eax@8
@@ -72244,14 +71576,14 @@ int  sub_4AB570()
   word_7FA346[64 * walkerId] = 0;
   byte_7FA389[128 * walkerId] = 1;
   sub_4AC350();
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
   else
   {
-    if ( walker_direction[128 * walkerId] < 8 )
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+    if ( walkers[walkerId].direction < 8 )
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     else
       dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   }
@@ -72260,7 +71592,7 @@ int  sub_4AB570()
   byte_7FA342[128 * walkerId] = 1;
   if ( (unsigned __int8)formation_enemyType[128 * v2] == 2 )
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+    if ( walkers[walkerId].actionState == 150 )
     {
       if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
       {
@@ -72277,14 +71609,14 @@ int  sub_4AB570()
     }
     else
     {
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+      if ( walkers[walkerId].actionState == 149 )
       {
         result = (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 745;
         word_7FA344[64 * walkerId] = result;
       }
       else
       {
-        if ( walker_direction[128 * walkerId] == 11 )
+        if ( walkers[walkerId].direction == 11 )
         {
           result = walkerId << 7;
           word_7FA344[64 * walkerId] = (_WORD)dword_65DF24
@@ -72314,14 +71646,14 @@ int  sub_4AB8D0()
     byte_7FA341[128 * walkerId] = 0;
   if ( event_gladiatorRevolt_state == 2 )
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] != 149 )
+    if ( walkers[walkerId].actionState != 149 )
     {
-      walker_actionState[128 * walkerId] = -107;
+      walkers[walkerId].actionState = -107;
       word_7FA366[64 * walkerId] = 0;
-      walker_direction[128 * walkerId] = 0;
+      walkers[walkerId].direction = 0;
     }
   }
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -72336,14 +71668,14 @@ int  sub_4AB8D0()
       city_inform[ciid].dword_654468 = 10;
       byte_7FA3A2[128 * walkerId] = 2;
       fun_walkerWalkTicks(walkerId, 1);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
-          walker_actionState[128 * walkerId] = -98;
+        if ( walkers[walkerId].direction == 8 )
+          walkers[walkerId].actionState = -98;
       }
       else
       {
-        walker_actionState[128 * walkerId] = -98;
+        walkers[walkerId].actionState = -98;
       }
       break;
     case 0x9E:
@@ -72352,7 +71684,7 @@ int  sub_4AB8D0()
       if ( word_7FA366[64 * walkerId] > (walkerId & 3) + 10 )
       {
         word_7FA366[64 * walkerId] = 0;
-        walker_actionState[128 * walkerId] = -97;
+        walkers[walkerId].actionState = -97;
         //v1 = sub_4C1100();
         if ( v1 )
         {
@@ -72368,28 +71700,28 @@ int  sub_4AB8D0()
       }
       break;
   }
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
   else
   {
-    if ( walker_direction[128 * walkerId] == 11 )
+    if ( walkers[walkerId].direction == 11 )
     {
       dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
     }
     else
     {
-      if ( walker_direction[128 * walkerId] < 8 )
-        dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+      if ( walkers[walkerId].direction < 8 )
+        dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
       else
         dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
     }
   }
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] != 150 && walker_direction[128 * walkerId] != 11 )
+  if ( walkers[walkerId].actionState != 150 && walkers[walkerId].direction != 11 )
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+    if ( walkers[walkerId].actionState == 149 )
     {
       result = word_6E6C8E + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
       word_7FA344[64 * walkerId] = result;
@@ -72407,29 +71739,17 @@ int  sub_4AB8D0()
   }
   return result;
 }
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 654468: using guessed type int dword_654468[];
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C8E: using guessed type __int16 word_6E6C8E;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 8E1494: using guessed type int event_gladiatorRevolt_state;
 
-//----- (004ABEF0) --------------------------------------------------------
 void  empty_4ABEF0()
 {
   ;
 }
 
-//----- (004ABF10) --------------------------------------------------------
 void  empty_4ABF10()
 {
   ;
 }
 
-//----- (004ABF30) --------------------------------------------------------
 void  sub_4ABF30()
 {
   __int64 v0; // qax@9
@@ -72444,24 +71764,24 @@ void  sub_4ABF30()
   word_7FA346[64 * walkerId] = 0;
   byte_7FA389[128 * walkerId] = 1;
   sub_4AC350();
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     dword_65DF24 = byte_7FA353[128 * walkerId] - setting_map_orientation;
   }
   else
   {
-    if ( walker_direction[128 * walkerId] < 8 )
-      dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+    if ( walkers[walkerId].direction < 8 )
+      dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
     else
       dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   }
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( walker_direction[128 * walkerId] == 11 )
+  if ( walkers[walkerId].direction == 11 )
   {
     v0 = (unsigned __int8)byte_7FA39A[128 * walkerId] - 12;
     word_7FA344[64 * walkerId] = word_6E6D88 + dword_65DF24 + 8 * (((_DWORD)v0 - _HIDWORD(v0)) >> 1);
   }
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       if ( (signed int)(unsigned __int8)byte_7FA39A[128 * walkerId] >= 12 )
@@ -72488,19 +71808,7 @@ void  sub_4ABF30()
       break;
   }
 }
-// 654564: using guessed type int cityinfo_enemyDestroyedBuildings[];
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D48: using guessed type __int16 word_6E6D48;
-// 6E6D88: using guessed type __int16 word_6E6D88;
-// 7F87EA: using guessed type __int16 formation_layout[];
-// 7F8812: using guessed type __int16 formation_52[];
-// 7F8816: using guessed type __int16 formation_56[];
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004AC350) --------------------------------------------------------
 void  sub_4AC350()
 {
   int v0; // ST70_4@93
@@ -72516,17 +71824,17 @@ void  sub_4AC350()
                                 + 8 * (unsigned __int8)byte_7FA392[128 * walkerId]);
   byte_7FA363[128 * walkerId] = *((_BYTE *)&dword_5F3CB4[32 * formation_layout[64 * v3]]
                                 + 8 * (unsigned __int8)byte_7FA392[128 * walkerId]);
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+  if ( walkers[walkerId].actionState == 150 )
   {
     sub_4B3390(walkerId);
     return;
   }
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
   {
     sub_4B3B80(walkerId);
     return;
   }
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 151 )
+  if ( walkers[walkerId].actionState == 151 )
   {
     sub_4B8B80(walkerId);
     byte_7FA341[128 * walkerId] = 0;
@@ -72554,7 +71862,7 @@ void  sub_4AC350()
       byte_7FA395[128 * walkerId] = 0;
       if ( formation_48[64 * v3] )
       {
-        walker_actionState[128 * walkerId] = -102;
+        walkers[walkerId].actionState = -102;
       }
       else
       {
@@ -72565,7 +71873,7 @@ void  sub_4AC350()
                                             walker_y[128 * walkerId],
                                             (unsigned __int8)walker_destination_x[128 * walkerId],
                                             (unsigned __int8)walker_destination_y[128 * walkerId]) < 8 )
-          walker_actionState[128 * walkerId] = -103;
+          walkers[walkerId].actionState = -103;
       }
     }
     if ( (unsigned __int8)walker_type[128 * walkerId] == Walker_Enemy43
@@ -72582,7 +71890,7 @@ void  sub_4AC350()
         if ( sub_4ADE90(walkerId, 10, v1) )
         {
           byte_7FA39A[128 * walkerId] = 1;
-          walker_direction[128 * walkerId] = fun_pathing_getDirection8(
+          walkers[walkerId].direction = fun_pathing_getDirection8(
                                                walker_x[128 * walkerId],
                                                walker_y[128 * walkerId],
                                                walkerGridX,
@@ -72635,14 +71943,14 @@ void  sub_4AC350()
   }
   else
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 148 )
+    if ( walkers[walkerId].actionState == 148 )
     {
       walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
       walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
       fun_walkerWalkTicks(walkerId, (unsigned __int8)byte_7FA389[128 * walkerId]);
-      if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+      if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
-        if ( walker_direction[128 * walkerId] == 8 )
+        if ( walkers[walkerId].direction == 8 )
           walker_state[128 * walkerId] = 2;
       }
       else
@@ -72652,12 +71960,12 @@ void  sub_4AC350()
     }
     else
     {
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 152 )
+      if ( walkers[walkerId].actionState == 152 )
       {
         sub_4B8B80(walkerId);
         return;
       }
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] == 153 )
+      if ( walkers[walkerId].actionState == 153 )
       {
         --word_7FA366[64 * walkerId];
         if ( word_7FA366[64 * walkerId] <= 0 )
@@ -72671,29 +71979,29 @@ void  sub_4AC350()
                                   (unsigned __int8)walker_destination_x[128 * walkerId],
                                   (unsigned __int8)walker_destination_y[128 * walkerId]) == 8 )
           {
-            walker_actionState[128 * walkerId] = -105;
+            walkers[walkerId].actionState = -105;
             return;
           }
           word_7FA38E[64 * walkerId] = formation_36[64 * v3];
           fun_removeDestinationPathForWalker(walkerId);
         }
         fun_walkerWalkTicks(walkerId, (unsigned __int8)byte_7FA389[128 * walkerId]);
-        if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+        if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
         {
-          if ( walker_direction[128 * walkerId] == 8 )
-            walker_actionState[128 * walkerId] = -105;
+          if ( walkers[walkerId].direction == 8 )
+            walkers[walkerId].actionState = -105;
         }
         else
         {
-          walker_actionState[128 * walkerId] = -105;
+          walkers[walkerId].actionState = -105;
         }
       }
       else
       {
-        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 154 )
+        if ( walkers[walkerId].actionState == 154 )
         {
           if ( !formation_48[64 * v3] )
-            walker_actionState[128 * walkerId] = -105;
+            walkers[walkerId].actionState = -105;
           if ( (unsigned __int8)walker_type[128 * walkerId] != 46 )
           {
             if ( (unsigned __int8)walker_type[128 * walkerId] != 47 )
@@ -72725,7 +72033,7 @@ void  sub_4AC350()
             word_7FA3B0[64 * walkerId] = 0;
             v4 = 0;
           }
-          if ( (unsigned __int8)walker_actionState[128 * v4] == 149 )
+          if ( walkers[v4].actionState == 149 )
           {
             word_7FA3B0[64 * walkerId] = 0;
             v4 = 0;
@@ -72746,9 +72054,9 @@ void  sub_4AC350()
           if ( v4 > 0 )
           {
             fun_walkerWalkTicks(walkerId, (unsigned __int8)byte_7FA389[128 * walkerId]);
-            if ( walker_direction[128 * walkerId] != 9 && walker_direction[128 * walkerId] != 10 )
+            if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
             {
-              if ( walker_direction[128 * walkerId] == 8 )
+              if ( walkers[walkerId].direction == 8 )
               {
                 v0 = word_7FA3B0[64 * walkerId];
                 walker_destination_x[128 * walkerId] = walker_x[128 * v0];
@@ -72758,13 +72066,13 @@ void  sub_4AC350()
             }
             else
             {
-              walker_actionState[128 * walkerId] = -105;
+              walkers[walkerId].actionState = -105;
               word_7FA3B0[64 * walkerId] = 0;
             }
           }
           else
           {
-            walker_actionState[128 * walkerId] = -105;
+            walkers[walkerId].actionState = -105;
             word_7FA366[64 * walkerId] = 50;
           }
         }
@@ -72772,28 +72080,7 @@ void  sub_4AC350()
     }
   }
 }
-// 401203: using guessed type _DWORD  sub_401203(_DWORD);
-// 401389: using guessed type _DWORD  sub_401389(_DWORD, _DWORD);
-// 4016D1: using guessed type _DWORD  sub_4016D1(__int16, _DWORD, _DWORD, char, char, _DWORD);
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 40235B: using guessed type _DWORD  sub_40235B(_DWORD, _DWORD, _DWORD);
-// 5F3CB0: using guessed type int dword_5F3CB0[];
-// 654554: using guessed type int cityinfo_imperialArmyComing[];
-// 654598: using guessed type int dword_654598[];
-// 7F87EA: using guessed type __int16 formation_layout[];
-// 7F87F6: using guessed type __int16 formation_36[];
-// 7F8808: using guessed type __int16 formation_48[];
-// 7F8814: using guessed type __int16 formation_54[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 7FA390: using guessed type __int16 walker_formationId[];
-// 7FA3B0: using guessed type __int16 word_7FA3B0[];
-// 7FA3B2: using guessed type __int16 word_7FA3B2[];
-// 7FA3B4: using guessed type __int16 word_7FA3B4[];
-// 7FA3B6: using guessed type __int16 word_7FA3B6[];
 
-//----- (004AD320) --------------------------------------------------------
 signed int  sub_4AD320(int a1, int a2)
 {
   signed int result; // eax@18
@@ -72808,7 +72095,7 @@ signed int  sub_4AD320(int a1, int a2)
   {
     if ( (unsigned __int8)walker_state[128 * i] == 1 )
     {
-      if ( (unsigned __int8)walker_actionState[128 * i] != 149 )
+      if ( walkers[i].actionState != 149 )
       {
         if ( !word_7FA3B2[64 * i] )
         {
@@ -72837,7 +72124,7 @@ signed int  sub_4AD320(int a1, int a2)
     for ( j = 1; j < 1000; ++j )
     {
       if ( (unsigned __int8)walker_state[128 * j] == 1
-        && (unsigned __int8)walker_actionState[128 * j] != 149
+        && walkers[j].actionState != 149
         && (signed int)(unsigned __int8)walker_type[128 * j] >= 11
         && (signed int)(unsigned __int8)walker_type[128 * j] <= 13 )
         return j;
@@ -72846,10 +72133,7 @@ signed int  sub_4AD320(int a1, int a2)
   }
   return result;
 }
-// 7FA2A4: using guessed type int dword_7FA2A4;
-// 7FA3B2: using guessed type __int16 word_7FA3B2[];
 
-//----- (004AD500) --------------------------------------------------------
 signed int  sub_4AD500(int a1, int a2, int a3)
 {
   signed int result; // eax@40
@@ -72862,7 +72146,7 @@ signed int  sub_4AD500(int a1, int a2, int a3)
   for ( i = 1; i < 1000; ++i )
   {
     if ( (unsigned __int8)walker_state[128 * i] == 1
-      && (unsigned __int8)walker_actionState[128 * i] != 149
+      && walkers[i].actionState != 149
       && walker_type[128 * i]
       && (unsigned __int8)walker_type[128 * i] != Walker_Explosion
       && (unsigned __int8)walker_type[128 * i] != Walker_FortStandard
@@ -72874,7 +72158,7 @@ signed int  sub_4AD500(int a1, int a2, int a3)
       if ( (unsigned __int8)walker_type[128 * i] >= (signed int)Walker_FortJavelin
         && (unsigned __int8)walker_type[128 * i] <= (signed int)Walker_FortLegionary )
       {
-        if ( (unsigned __int8)walker_actionState[128 * i] == 80 )
+        if (walkers[i].actionState == 80 )
           continue;
         v5 = fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walker_y[128 * i]);
         goto LABEL_34;
@@ -72910,10 +72194,7 @@ LABEL_34:
   }
   return result;
 }
-// 7FA2A4: using guessed type int dword_7FA2A4;
-// 7FA3B2: using guessed type __int16 word_7FA3B2[];
 
-//----- (004AD800) --------------------------------------------------------
 signed int  sub_4AD800(int a1, int a2, int a3)
 {
   signed int result; // eax@25
@@ -72926,7 +72207,7 @@ signed int  sub_4AD800(int a1, int a2, int a3)
   dword_7FA2A4 = 10000;
   for ( i = 1; i < 1000; ++i )
   {
-    if ( (unsigned __int8)walker_state[128 * i] == 1 && (unsigned __int8)walker_actionState[128 * i] != 149 )
+    if ( (unsigned __int8)walker_state[128 * i] == 1 && walkers[i].actionState!= 149 )
     {
       if ( (signed int)(unsigned __int8)walker_type[128 * i] >= 43
         && (signed int)(unsigned __int8)walker_type[128 * i] <= 57 )
@@ -72939,7 +72220,7 @@ signed int  sub_4AD800(int a1, int a2, int a3)
         v5 = fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walker_y[128 * i]);
         goto LABEL_17;
       }
-      if ( (unsigned __int8)walker_type[128 * i] == 41 && (unsigned __int8)walker_actionState[128 * i] == 159 )
+      if ( (unsigned __int8)walker_type[128 * i] == 41 && walkers[i].actionState == 159 )
       {
         v5 = fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walker_y[128 * i]);
 LABEL_17:
@@ -72965,14 +72246,14 @@ LABEL_17:
   {
     for ( j = 1; j < 1000; ++j )
     {
-      if ( (unsigned __int8)walker_state[128 * j] == 1 && (unsigned __int8)walker_actionState[128 * j] != 149 )
+      if ( (unsigned __int8)walker_state[128 * j] == 1 && walkers[j].actionState != 149 )
       {
         if ( (signed int)(unsigned __int8)walker_type[128 * j] >= 43
           && (signed int)(unsigned __int8)walker_type[128 * j] <= 57 )
           return j;
         if ( (unsigned __int8)walker_type[128 * j] == 24 )
           return j;
-        if ( (unsigned __int8)walker_type[128 * j] == 41 && (unsigned __int8)walker_actionState[128 * j] == 159 )
+        if ( (unsigned __int8)walker_type[128 * j] == 41 && walkers[j].actionState == 159 )
           return j;
       }
     }
@@ -72980,10 +72261,7 @@ LABEL_17:
   }
   return result;
 }
-// 7FA2A4: using guessed type int dword_7FA2A4;
-// 7FA3B2: using guessed type __int16 word_7FA3B2[];
 
-//----- (004ADB30) --------------------------------------------------------
 signed int  sub_4ADB30(int a1, int a2)
 {
   signed int result; // eax@27
@@ -72999,12 +72277,12 @@ signed int  sub_4ADB30(int a1, int a2)
   dword_7FA2A4 = a2;
   for ( i = 1; i < 1000; ++i )
   {
-    if ( (unsigned __int8)walker_state[128 * i] == 1 && (unsigned __int8)walker_actionState[128 * i] != 149 )
+    if ( (unsigned __int8)walker_state[128 * i] == 1 && walkers[i].actionState != 149 )
     {
       if ( (signed int)(unsigned __int8)walker_type[128 * i] < 43
         || (signed int)(unsigned __int8)walker_type[128 * i] > 57 )
       {
-        if ( (unsigned __int8)walker_type[128 * i] != 41 || (unsigned __int8)walker_actionState[128 * i] != 159 )
+        if ( (unsigned __int8)walker_type[128 * i] != 41 || walkers[i].actionState != 159 )
         {
           if ( (unsigned __int8)walker_type[128 * i] == 69 )
           {
@@ -73055,10 +72333,7 @@ signed int  sub_4ADB30(int a1, int a2)
   }
   return result;
 }
-// 401294: using guessed type _DWORD  sub_401294(_DWORD, _DWORD, _DWORD, _DWORD);
-// 7FA2A4: using guessed type int dword_7FA2A4;
 
-//----- (004ADE90) --------------------------------------------------------
 signed int  sub_4ADE90(int a1, int a2, int a3)
 {
   signed int result; // eax@58
@@ -73075,7 +72350,7 @@ signed int  sub_4ADE90(int a1, int a2, int a3)
   for ( i = 1; i < 1000; ++i )
   {
     if ( (unsigned __int8)walker_state[128 * i] == 1
-      && (unsigned __int8)walker_actionState[128 * i] != 149
+      && walkers[i].actionState != 149
       && walker_type[128 * i]
       && (unsigned __int8)walker_type[128 * i] != Walker_Explosion
       && (unsigned __int8)walker_type[128 * i] != Walker_FortStandard
@@ -73129,10 +72404,7 @@ LABEL_52:
   }
   return result;
 }
-// 401294: using guessed type _DWORD  sub_401294(_DWORD, _DWORD, _DWORD, _DWORD);
-// 7FA2A4: using guessed type int dword_7FA2A4;
 
-//----- (004AE2F0) --------------------------------------------------------
 void  fun_walker_nativeTrader()
 {
   int v0; // ST60_4@26
@@ -73145,7 +72417,7 @@ void  fun_walker_nativeTrader()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   word_7FA346[64 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -73163,7 +72435,7 @@ void  fun_walker_nativeTrader()
         if ( v1 )
         {
           word_7FA38E[64 * walkerId] = v1;
-          walker_actionState[128 * walkerId] = -96;
+          walkers[walkerId].actionState = -96;
           word_7FA366[64 * walkerId] = 0;
           walker_destination_x[128 * walkerId] = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
@@ -73177,10 +72449,10 @@ void  fun_walker_nativeTrader()
       break;
     case 0xA0:
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_actionState[128 * walkerId] = -93;
+          walkers[walkerId].actionState = -93;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
@@ -73210,14 +72482,14 @@ void  fun_walker_nativeTrader()
           if ( v2 )
           {
             word_7FA38E[64 * walkerId] = v2;
-            walker_actionState[128 * walkerId] = -96;
+            walkers[walkerId].actionState = -96;
             word_7FA366[64 * walkerId] = 0;
             walker_destination_x[128 * walkerId] = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
           }
           else
           {
-            walker_actionState[128 * walkerId] = -95;
+            walkers[walkerId].actionState = -95;
             word_7FA366[64 * walkerId] = 0;
             walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
             walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
@@ -73228,7 +72500,7 @@ void  fun_walker_nativeTrader()
       break;
     case 0xA1:
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 8:
           walker_state[128 * walkerId] = 2;
@@ -73242,12 +72514,12 @@ void  fun_walker_nativeTrader()
       }
       break;
   }
-  if ( walker_direction[128 * walkerId] < 8 )
-    dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  if ( walkers[walkerId].direction < 8 )
+    dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   else
     dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
   {
     word_7FA344[64 * walkerId] = word_6E6C86 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
     word_7FA346[64 * walkerId] = 0;
@@ -73319,7 +72591,7 @@ void  fun_walker_arrow()
     else
     {
       byte_7FA359[128 * v5] = v3 + 1;
-      walker_actionState[128 * v5] = -107;
+      walkers[v5].actionState = -107;
       word_7FA366[64 * v5] = 0;
       sub_4B8080((unsigned __int8)walker_type[128 * v5]);
       fun_formationDecreaseMoraleAfterComradeDeath(v1);
@@ -73335,7 +72607,7 @@ void  fun_walker_arrow()
     if ( v6 )
       walker_state[128 * walkerId] = 2;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - 2 * setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - 2 * setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 0x10 : 0;
   word_7FA344[64 * walkerId] = word_6E6D3C + dword_65DF24 + 16;
 }
@@ -73395,7 +72667,7 @@ int  fun_walker_javelin()
     else
     {
       byte_7FA359[128 * v6] = v4 + 1;
-      walker_actionState[128 * v6] = -107;
+      walkers[v6].actionState = -107;
       word_7FA366[64 * v6] = 0;
       sub_4B8080((unsigned __int8)walker_type[128 * v6]);
       fun_formationDecreaseMoraleAfterComradeDeath(v2);
@@ -73411,7 +72683,7 @@ int  fun_walker_javelin()
     if ( v7 )
       walker_state[128 * walkerId] = 2;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - 2 * setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - 2 * setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 0x10 : 0;
   result = walkerId << 7;
   word_7FA344[64 * walkerId] = dword_65DF24 + word_6E6D3C;
@@ -73463,7 +72735,7 @@ void  fun_walker_bolt()
     else
     {
       byte_7FA359[128 * v4] = v1 + 1;
-      walker_actionState[128 * v4] = -107;
+      walkers[v4].actionState = -107;
       word_7FA366[64 * v4] = 0;
       sub_4B8080((unsigned __int8)walker_type[128 * v4]);
       fun_formationDecreaseMoraleAfterComradeDeath(v3);
@@ -73479,7 +72751,7 @@ void  fun_walker_bolt()
       fun_sound_playChannel(14);
     }
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - 2 * setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - 2 * setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 0x10 : 0;
   word_7FA344[64 * walkerId] = word_6E6D3C + dword_65DF24 + 32;
 }
@@ -73534,7 +72806,7 @@ void  fun_walker_ballista()
                                    + walker_x[128 * walkerId]
                                    + (_WORD)setting_map_startGridOffset;
   sub_4B8A40(walkerId);
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x95:
       walker_state[128 * walkerId] = 2;
@@ -73546,7 +72818,7 @@ void  fun_walker_ballista()
         word_7FA366[64 * walkerId] = 0;
         if ( sub_4ADB30(walkerId, 15) )
         {
-          walker_actionState[128 * walkerId] = -75;
+          walkers[walkerId].actionState = -75;
           byte_7FA39B[128 * walkerId] = byte_5F60FB[10 * (unsigned __int8)walker_type[128 * walkerId]];
         }
       }
@@ -73558,7 +72830,7 @@ void  fun_walker_ballista()
       {
         if ( sub_4ADB30(walkerId, 15) )
         {
-          walker_direction[128 * walkerId] = fun_pathing_getDirection8(
+          walkers[walkerId].direction = fun_pathing_getDirection8(
                                                walker_x[128 * walkerId],
                                                walker_y[128 * walkerId],
                                                walkerGridX,
@@ -73569,14 +72841,14 @@ void  fun_walker_ballista()
         }
         else
         {
-          walker_actionState[128 * walkerId] = -76;
+          walkers[walkerId].actionState = -76;
         }
       }
       break;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 181 )
+  if ( walkers[walkerId].actionState == 181 )
     word_7FA344[64 * walkerId] = dword_65DF24
                                + word_6E6D40
                                + 8
@@ -73584,26 +72856,12 @@ void  fun_walker_ballista()
   else
     word_7FA344[64 * walkerId] = dword_65DF24 + word_6E6D40;
 }
-// 4016D1: using guessed type _DWORD  sub_4016D1(__int16, _DWORD, _DWORD, char, char, _DWORD);
-// 4028BA: using guessed type _DWORD  sub_4028BA(_DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D40: using guessed type __int16 word_6E6D40;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 94BD62: using guessed type __int16 building_22_walkerId[];
-// 94BD68: using guessed type __int16 building_28_towerBallistaId[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
 
-//----- (004AFBE0) --------------------------------------------------------
 void  fun_walker_creature()
 {
   ;
 }
 
-//----- (004AFC00) --------------------------------------------------------
 void  fun_walker_missionary()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -73618,9 +72876,9 @@ void  fun_walker_missionary()
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
   sub_49FFE0(1);
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6D7C + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6D7C + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
@@ -73675,15 +72933,7 @@ void  fun_walker_seagulls()
     word_7FA344[64 * walkerId] = word_6E6D4C + (unsigned __int8)byte_7FA341[128 * walkerId] / 3 + 18;
   }
 }
-// 4025D1: using guessed type _DWORD  sub_4025D1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402E50: using guessed type _DWORD  sub_402E50(_DWORD, _DWORD);
-// 5FA4F8: using guessed type __int16 word_5FA4F8[];
-// 6E6D4C: using guessed type __int16 word_6E6D4C;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
 
-//----- (004B0130) --------------------------------------------------------
 void  fun_walker_deliveryBoy()
 {
   int v0; // [sp+4Ch] [bp-8h]@1
@@ -73699,7 +72949,7 @@ void  fun_walker_deliveryBoy()
   word_7FA346[64 * walkerId] = 0;
   if ( v1 > 0 )
   {
-    if ( (unsigned __int8)walker_actionState[128 * v1] == 149 )
+    if ( walkers[v1].actionState == 149 )
     {
       walker_state[128 * walkerId] = 2;
     }
@@ -73726,12 +72976,12 @@ void  fun_walker_deliveryBoy()
   }
   if ( byte_7FA395[128 * v1] )
     byte_7FA395[128 * walkerId] = 1;
-  if ( walker_direction[128 * walkerId] < 8 )
-    dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  if ( walkers[walkerId].direction < 8 )
+    dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   else
     dword_65DF24 = byte_7FA352[128 * walkerId] - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
     word_7FA344[64 * walkerId] = word_6E6D52 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
     word_7FA344[64 * walkerId] = word_6E6D52 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
@@ -73778,16 +73028,7 @@ void  fun_walker_shipwreck()
     walker_state[128 * walkerId] = 2;
   word_7FA344[64 * walkerId] = ((signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 4) + word_6E6D74;
 }
-// 402D38: using guessed type _DWORD  sub_402D38(_DWORD);
-// 6E6D74: using guessed type __int16 word_6E6D74;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004B07A0) --------------------------------------------------------
 void  fun_walker_sheep()
 {
   __int16 v0; // dx@23
@@ -73801,7 +73042,7 @@ void  fun_walker_sheep()
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 6 )
     byte_7FA341[128 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -73814,7 +73055,7 @@ void  fun_walker_sheep()
       if ( word_7FA366[64 * walkerId] > 400 )
       {
         word_7FA366[64 * walkerId] = walkerId & 0x1F;
-        walker_actionState[128 * walkerId] = -59;
+        walkers[walkerId].actionState = -59;
         walker_destination_x[128 * walkerId] = LOBYTE(dword_5F4130[2 * (unsigned __int8)byte_7FA392[128 * walkerId]])
                                              + formation_34[128 * v1];
         walker_destination_y[128 * walkerId] = dword_5F4134[8 * (unsigned __int8)byte_7FA392[128 * walkerId]]
@@ -73824,33 +73065,33 @@ void  fun_walker_sheep()
       break;
     case 0xC5:
       fun_walkerWalkTicks(walkerId, 1);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_direction[128 * walkerId] = byte_7FA352[128 * walkerId];
-          walker_actionState[128 * walkerId] = -60;
+          walkers[walkerId].direction = byte_7FA352[128 * walkerId];
+          walkers[walkerId].actionState = -60;
           word_7FA366[64 * walkerId] = walkerId & 0x1F;
           break;
         case 8:
-          walker_direction[128 * walkerId] = byte_7FA352[128 * walkerId];
-          walker_actionState[128 * walkerId] = -60;
+          walkers[walkerId].direction = byte_7FA352[128 * walkerId];
+          walkers[walkerId].actionState = -60;
           word_7FA366[64 * walkerId] = walkerId & 0x1F;
           break;
       }
       break;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
   {
     word_7FA344[64 * walkerId] = word_6E6D82 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 104;
   }
   else
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 196 )
+    if ( walkers[walkerId].actionState == 196 )
     {
       if ( walkerId & 3 )
       {
@@ -73882,7 +73123,7 @@ void  fun_walker_wolf()
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -73895,7 +73136,7 @@ void  fun_walker_wolf()
       if ( word_7FA366[64 * walkerId] > 400 )
       {
         word_7FA366[64 * walkerId] = walkerId & 0x1F;
-        walker_actionState[128 * walkerId] = -59;
+        walkers[walkerId].actionState = -59;
         walker_destination_x[128 * walkerId] = LOBYTE(dword_5F4130[2 * (unsigned __int8)byte_7FA392[128 * walkerId]])
                                              + formation_34[128 * v1];
         walker_destination_y[128 * walkerId] = dword_5F4134[8 * (unsigned __int8)byte_7FA392[128 * walkerId]]
@@ -73905,14 +73146,14 @@ void  fun_walker_wolf()
       break;
     case 0xC7:
       fun_walkerWalkTicks(walkerId, 2);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_direction[128 * walkerId] = byte_7FA352[128 * walkerId];
-          walker_actionState[128 * walkerId] = -60;
+          walkers[walkerId].direction = byte_7FA352[128 * walkerId];
+          walkers[walkerId].actionState = -60;
           word_7FA366[64 * walkerId] = walkerId & 0x1F;
           break;
         case 8:
@@ -73928,8 +73169,8 @@ void  fun_walker_wolf()
           }
           else
           {
-            walker_direction[128 * walkerId] = byte_7FA352[128 * walkerId];
-            walker_actionState[128 * walkerId] = -60;
+            walkers[walkerId].direction = byte_7FA352[128 * walkerId];
+            walkers[walkerId].actionState = -60;
             word_7FA366[64 * walkerId] = walkerId & 0x1F;
           }
           break;
@@ -73937,27 +73178,27 @@ void  fun_walker_wolf()
       break;
     case 0xC5:
       fun_walkerWalkTicks(walkerId, 2);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_direction[128 * walkerId] = byte_7FA352[128 * walkerId];
-          walker_actionState[128 * walkerId] = -60;
+          walkers[walkerId].direction = byte_7FA352[128 * walkerId];
+          walkers[walkerId].actionState = -60;
           word_7FA366[64 * walkerId] = walkerId & 0x1F;
           break;
         case 8:
-          walker_direction[128 * walkerId] = byte_7FA352[128 * walkerId];
-          walker_actionState[128 * walkerId] = -60;
+          walkers[walkerId].direction = byte_7FA352[128 * walkerId];
+          walkers[walkerId].actionState = -60;
           word_7FA366[64 * walkerId] = walkerId & 0x1F;
           break;
       }
       break;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x95:
       word_7FA344[64 * walkerId] = word_6E6D84 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
@@ -73989,7 +73230,7 @@ void  fun_walker_zebra()
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0x96:
       sub_4B3390(walkerId);
@@ -74002,7 +73243,7 @@ void  fun_walker_zebra()
       if ( word_7FA366[64 * walkerId] > 200 )
       {
         word_7FA366[64 * walkerId] = walkerId & 0x1F;
-        walker_actionState[128 * walkerId] = -59;
+        walkers[walkerId].actionState = -59;
         walker_destination_x[128 * walkerId] = LOBYTE(dword_5F4130[2 * (unsigned __int8)byte_7FA392[128 * walkerId]])
                                              + formation_34[128 * v0];
         walker_destination_y[128 * walkerId] = dword_5F4134[8 * (unsigned __int8)byte_7FA392[128 * walkerId]]
@@ -74012,33 +73253,33 @@ void  fun_walker_zebra()
       break;
     case 0xC5:
       fun_walkerWalkTicks(walkerId, 2);
-      switch ( walker_direction[128 * walkerId] )
+      switch ( walkers[walkerId].direction )
       {
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_direction[128 * walkerId] = byte_7FA352[128 * walkerId];
-          walker_actionState[128 * walkerId] = -60;
+          walkers[walkerId].direction = byte_7FA352[128 * walkerId];
+          walkers[walkerId].actionState = -60;
           word_7FA366[64 * walkerId] = walkerId & 0x1F;
           break;
         case 8:
-          walker_direction[128 * walkerId] = byte_7FA352[128 * walkerId];
-          walker_actionState[128 * walkerId] = -60;
+          walkers[walkerId].direction = byte_7FA352[128 * walkerId];
+          walkers[walkerId].actionState = -60;
           word_7FA366[64 * walkerId] = walkerId & 0x1F;
           break;
       }
       break;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
-  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 149 )
+  if ( walkers[walkerId].actionState == 149 )
   {
     word_7FA344[64 * walkerId] = word_6E6D86 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   }
   else
   {
-    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 196 )
+    if ( walkers[walkerId].actionState == 196 )
       word_7FA344[64 * walkerId] = dword_65DF24 + word_6E6D86;
     else
       word_7FA344[64 * walkerId] = word_6E6D86 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
@@ -74096,7 +73337,7 @@ void  fun_walker_spear()
     else
     {
       byte_7FA359[128 * v5] = v3 + 1;
-      walker_actionState[128 * v5] = -107;
+      walkers[v5].actionState = -107;
       word_7FA366[64 * v5] = 0;
       sub_4B8080((unsigned __int8)walker_type[128 * v5]);
       fun_formationDecreaseMoraleAfterComradeDeath(v1);
@@ -74112,25 +73353,11 @@ void  fun_walker_spear()
     if ( v6 )
       walker_state[128 * walkerId] = 2;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - 2 * setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - 2 * setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 0x10 : 0;
   word_7FA344[64 * walkerId] = dword_65DF24 + word_6E6D3C;
 }
-// 401C8A: using guessed type _DWORD  sub_401C8A(_DWORD);
-// 402919: using guessed type _DWORD  sub_402919(_DWORD);
-// 402E50: using guessed type _DWORD  sub_402E50(_DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D3C: using guessed type __int16 word_6E6D3C;
-// 7F87EA: using guessed type __int16 formation_layout[];
-// 7F8812: using guessed type __int16 formation_52[];
-// 7F8816: using guessed type __int16 formation_56[];
-// 7F8818: using guessed type __int16 formation_58[];
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004B1D70) --------------------------------------------------------
 void  fun_walker_hippodromeHorse()
 {
   city_inform[ciid].dword_654624 = 1;
@@ -74139,7 +73366,7 @@ void  fun_walker_hippodromeHorse()
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 8 )
     byte_7FA341[128 * walkerId] = 0;
-  switch ( walker_actionState[128 * walkerId] )
+  switch ( walkers[walkerId].actionState )
   {
     case 0xC8:
       byte_7FA341[128 * walkerId] = 0;
@@ -74150,7 +73377,7 @@ void  fun_walker_hippodromeHorse()
       {
         if ( !byte_7FA34B[128 * walkerId] )
         {
-          walker_actionState[128 * walkerId] = -55;
+          walkers[walkerId].actionState = -55;
           word_7FA366[64 * walkerId] = 0;
         }
       }
@@ -74159,18 +73386,18 @@ void  fun_walker_hippodromeHorse()
       {
         if ( (unsigned __int8)byte_7FA34B[128 * walkerId] == 1 )
         {
-          walker_actionState[128 * walkerId] = -55;
+          walkers[walkerId].actionState = -55;
           word_7FA366[64 * walkerId] = 0;
         }
       }
       break;
     case 0xC9:
-      walker_direction[128 * walkerId] = fun_walkerGetSimpleDestinationDirection(
+      walkers[walkerId].direction = fun_walkerGetSimpleDestinationDirection(
                                            walker_x[128 * walkerId],
                                            walker_y[128 * walkerId],
                                            (unsigned __int8)walker_destination_x[128 * walkerId],
                                            (unsigned __int8)walker_destination_y[128 * walkerId]);
-      if ( walker_direction[128 * walkerId] == 8 )
+      if ( walkers[walkerId].direction == 8 )
       {
         ++byte_7FA39B[128 * walkerId];
         if ( (signed int)(unsigned __int8)byte_7FA39B[128 * walkerId] < 22 )
@@ -74189,7 +73416,7 @@ void  fun_walker_hippodromeHorse()
           ++walker_tradeCaravanNextId[64 * walkerId];
           if ( walker_tradeCaravanNextId[64 * walkerId] >= 6 )
           {
-            walker_actionState[128 * walkerId] = -54;
+            walkers[walkerId].actionState = -54;
             word_7FA366[64 * walkerId] = 0;
           }
           if ( (walkerId + random_7f_1) & 1 )
@@ -74198,7 +73425,7 @@ void  fun_walker_hippodromeHorse()
             byte_7FA389[128 * walkerId] = 4;
         }
         sub_4B2740(walkerId, 1);
-        walker_direction[128 * walkerId] = fun_walkerGetSimpleDestinationDirection(
+        walkers[walkerId].direction = fun_walkerGetSimpleDestinationDirection(
                                              walker_x[128 * walkerId],
                                              walker_y[128 * walkerId],
                                              (unsigned __int8)walker_destination_x[128 * walkerId],
@@ -74211,14 +73438,14 @@ void  fun_walker_hippodromeHorse()
           15 * (unsigned __int8)walker_destination_y[128 * walkerId],
           0);
       }
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] != 202 )
+      if ( walkers[walkerId].actionState != 202 )
         sub_4B66E0(walkerId, (unsigned __int8)byte_7FA389[128 * walkerId]);
       break;
     case 0xCA:
       if ( !word_7FA366[64 * walkerId] )
       {
         sub_4B2740(walkerId, 2);
-        walker_direction[128 * walkerId] = fun_walkerGetSimpleDestinationDirection(
+        walkers[walkerId].direction = fun_walkerGetSimpleDestinationDirection(
                                              walker_x[128 * walkerId],
                                              walker_y[128 * walkerId],
                                              (unsigned __int8)walker_destination_x[128 * walkerId],
@@ -74231,7 +73458,7 @@ void  fun_walker_hippodromeHorse()
           15 * (unsigned __int8)walker_destination_y[128 * walkerId],
           0);
       }
-      if ( walker_direction[128 * walkerId] != 8 )
+      if ( walkers[walkerId].direction != 8 )
         sub_4B66E0(walkerId, 1);
       ++word_7FA366[64 * walkerId];
       if ( word_7FA366[64 * walkerId] > 30 )
@@ -74241,7 +73468,7 @@ void  fun_walker_hippodromeHorse()
         walker_state[128 * walkerId] = 2;
       break;
   }
-  dword_65DF24 = walker_direction[128 * walkerId] - setting_map_orientation;
+  dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
   if ( byte_7FA34B[128 * walkerId] )
   {
@@ -74399,7 +73626,7 @@ void  sub_4B2D50(int a1, int a2)
   v3 = 0;
   v2 = 0;
   v5 = (unsigned __int8)byte_5F60F4[10 * (unsigned __int8)walker_type[128 * a1]];
-  if ( v5 > 0 && v5 < 4 && (unsigned __int8)walker_actionState[128 * a1] != 150 )
+  if ( v5 > 0 && v5 < 4 && walkers[a1].actionState != 150 )
   {
     while ( 1 )
     {
@@ -74417,7 +73644,7 @@ void  sub_4B2D50(int a1, int a2)
         v4 = (unsigned __int8)byte_5F60F4[10 * (unsigned __int8)walker_type[128 * a2]];
         if ( (unsigned __int8)walker_state[128 * a2] == 1 )
         {
-          if ( (unsigned __int8)walker_actionState[128 * a2] == 149 )
+          if ( walkers[a2].actionState == 149 )
           {
             v3 = 0;
           }
@@ -74475,7 +73702,7 @@ void  sub_4B2D50(int a1, int a2)
             }
             else
             {
-              if ( (unsigned __int8)walker_actionState[128 * a2] == 159 )
+              if ( walkers[a2].actionState == 159 )
                 v3 = 1;
             }
           }
@@ -74486,7 +73713,7 @@ void  sub_4B2D50(int a1, int a2)
         }
         if ( v3 )
         {
-          if ( (unsigned __int8)walker_actionState[128 * a2] == 150 )
+          if ( walkers[a2].actionState == 150 )
           {
             if ( (signed int)(unsigned __int8)byte_7FA3B9[128 * a2] >= 2 )
               v3 = 0;
@@ -74494,8 +73721,8 @@ void  sub_4B2D50(int a1, int a2)
         }
         if ( v3 )
         {
-          byte_7FA350[128 * a1] = walker_actionState[128 * a1];
-          walker_actionState[128 * a1] = -106;
+          byte_7FA350[128 * a1] = walkers[a1].actionState;
+          walkers[a1].actionState = -106;
           word_7FA3BE[64 * a1] = a2;
           word_7FA3BA[64 * a1] = a2;
           byte_7FA3B9[128 * a1] = 1;
@@ -74515,10 +73742,10 @@ void  sub_4B2D50(int a1, int a2)
                                       walker_y[128 * a2]);
           if ( byte_7FA353[128 * a1] >= 8 )
             byte_7FA353[128 * a1] = 0;
-          if ( (unsigned __int8)walker_actionState[128 * a2] != 150 )
+          if (walkers[a2].actionState != 150 )
           {
-            byte_7FA350[128 * a2] = walker_actionState[128 * a2];
-            walker_actionState[128 * a2] = -106;
+            byte_7FA350[128 * a2] = walkers[a2].actionState;
+            walkers[a2].actionState  = -106;
             byte_7FA39A[128 * a2] = 0;
             byte_7FA353[128 * a2] = byte_7FA353[128 * a1] + 4;
             if ( byte_7FA353[128 * a2] >= 8 )
@@ -74552,7 +73779,7 @@ void  sub_4B32F0(int a1)
   signed int i; // [sp+54h] [bp-4h]@1
 
   v1 = walkers[a1].gridOffset;
-  for ( i = 0; i < 8 && (unsigned __int8)walker_actionState[128 * a1] != 150; ++i )
+  for ( i = 0; i < 8 && walkers[a1].actionState != 150; ++i )
     sub_4B2D50(a1, grid_walkerIds[dword_5FFE4C[i] + v1]);
 }
 
@@ -74584,7 +73811,7 @@ void  sub_4B3390(int walkerId)
   if ( (unsigned __int8)byte_7FA3B9[128 * walkerId] == 1 )
   {
     v8 = word_7FA3BE[64 * walkerId];
-    if ( (unsigned __int8)walker_state[128 * v8] != 1 || (unsigned __int8)walker_actionState[128 * v8] == 149 )
+    if ( (unsigned __int8)walker_state[128 * v8] != 1 || walkers[v8].actionState == 149 )
     {
       sub_4B3C20(walkerId);
       return;
@@ -74595,7 +73822,7 @@ void  sub_4B3390(int walkerId)
     if ( (unsigned __int8)byte_7FA3B9[128 * walkerId] == 2 )
     {
       v9 = word_7FA3BE[64 * walkerId];
-      if ( (unsigned __int8)walker_state[128 * v9] != 1 || (unsigned __int8)walker_actionState[128 * v9] == 149 )
+      if ( (unsigned __int8)walker_state[128 * v9] != 1 || walkers[v9].actionState == 149 )
       {
         if ( v9 == word_7FA3BA[64 * walkerId] )
         {
@@ -74607,7 +73834,7 @@ void  sub_4B3390(int walkerId)
             word_7FA3BE[64 * walkerId] = word_7FA3BA[64 * walkerId];
         }
         v10 = word_7FA3BE[64 * walkerId];
-        if ( (unsigned __int8)walker_state[128 * v10] != 1 || (unsigned __int8)walker_actionState[128 * v10] == 149 )
+        if ( (unsigned __int8)walker_state[128 * v10] != 1 || walkers[v10].actionState == 149 )
         {
           sub_4B3C20(walkerId);
           return;
@@ -74708,27 +73935,14 @@ void  sub_4B3390(int walkerId)
     }
     else
     {
-      walker_actionState[128 * v11] = -107;
+      walkers[v1].actionState = -107;
       word_7FA366[64 * v11] = 0;
       sub_4B8080((unsigned __int8)walker_type[128 * v11]);
       fun_formationDecreaseMoraleAfterComradeDeath(v6);
     }
   }
 }
-// 4014EC: using guessed type _DWORD  sub_4014EC(_DWORD, _DWORD);
-// 4017C1: using guessed type _DWORD  sub_4017C1(_DWORD);
-// 401C8A: using guessed type _DWORD  sub_401C8A(_DWORD);
-// 401EA6: using guessed type _DWORD  sub_401EA6(_DWORD);
-// 65E928: using guessed type int setting_difficulty;
-// 7F87C4: using guessed type __int16 formation_walkerType[];
-// 7F87EA: using guessed type __int16 formation_layout[];
-// 7F8812: using guessed type __int16 formation_52[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA390: using guessed type __int16 walker_formationId[];
-// 7FA3BA: using guessed type __int16 word_7FA3BA[];
-// 7FA3BC: using guessed type __int16 word_7FA3BC[];
 
-//----- (004B3A40) --------------------------------------------------------
 bool  sub_4B3A40(int a1, int a2)
 {
   bool result; // eax@2
@@ -74811,22 +74025,17 @@ int  sub_4B3B80(int a1)
   }
   return result;
 }
-// 7FA366: using guessed type __int16 word_7FA366[];
 
-//----- (004B3C20) --------------------------------------------------------
 void  sub_4B3C20(int a1)
 {
   byte_7FA3B9[128 * a1] = 0;
-  walker_actionState[128 * a1] = byte_7FA350[128 * a1];
+  walkers[a1].actionState = byte_7FA350[128 * a1];
   word_7FA3BE[64 * a1] = 0;
   word_7FA3BA[64 * a1] = 0;
   word_7FA3BC[64 * a1] = 0;
   fun_removeDestinationPathForWalker(a1);
 }
-// 7FA3BA: using guessed type __int16 word_7FA3BA[];
-// 7FA3BC: using guessed type __int16 word_7FA3BC[];
 
-//----- (004B3CB0) --------------------------------------------------------
 char  fun_roamWalker(int walkerId)
 {
   signed int v1; // eax@19
@@ -74986,21 +74195,21 @@ LABEL_10:
             }
             do
             {
-              if ( dword_8A11C0[walker_direction[128 * a1]] && walker_direction[128 * a1] != v6 )
+              if ( dword_8A11C0[walkers[a1].direction] && walkers[a1].direction != v6 )
                 break;
-              walker_direction[128 * a1] += byte_7FA378[128 * a1];
-              if ( walker_direction[128 * a1] > 6 )
-                walker_direction[128 * a1] = 0;
-              if ( walker_direction[128 * a1] < 0 )
-                walker_direction[128 * a1] = 6;
+              walkers[a1].direction += byte_7FA378[128 * a1];
+              if ( walkers[a1].direction > 6 )
+                walkers[a1].direction = 0;
+              if (walkers[a1].direction < 0 )
+                walkers[a1].direction = 6;
               v3 = v7++;
             }
             while ( v3 < 4 );
           }
           else
           {
-            walker_direction[128 * a1] = (byte_7FA377[128 * a1] + grid_random[walkers[a1].gridOffset]) & 6;
-            if ( !dword_8A11C0[walker_direction[128 * a1]] || walker_direction[128 * a1] == v6 )
+            walkers[a1].direction = (byte_7FA377[128 * a1] + grid_random[walkers[a1].gridOffset]) & 6;
+            if ( !dword_8A11C0[walkers[a1].direction] || walkers[a1].direction == v6 )
             {
               --byte_7FA379[128 * a1];
               if ( byte_7FA379[128 * a1] <= 0 )
@@ -75010,13 +74219,13 @@ LABEL_10:
               }
               do
               {
-                if ( dword_8A11C0[walker_direction[128 * a1]] && walker_direction[128 * a1] != v6 )
+                if ( dword_8A11C0[walkers[a1].direction] && walkers[a1].direction != v6 )
                   break;
-                walker_direction[128 * a1] += byte_7FA378[128 * a1];
-                if ( walker_direction[128 * a1] > 6 )
-                  walker_direction[128 * a1] = 0;
-                if ( walker_direction[128 * a1] < 0 )
-                  walker_direction[128 * a1] = 6;
+                walkers[a1].direction += byte_7FA378[128 * a1];
+                if ( walkers[a1].direction > 6 )
+                  walkers[a1].direction = 0;
+                if ( walkers[a1].direction < 0 )
+                  walkers[a1].direction = 6;
                 v4 = v7++;
               }
               while ( v4 < 4 );
@@ -75027,15 +74236,15 @@ LABEL_10:
         {
           do
           {
-            walker_direction[128 * a1] = 2 * v7;
-            if ( dword_8A11C0[walker_direction[128 * a1]] )
+            walkers[a1].direction = 2 * v7;
+            if ( dword_8A11C0[walkers[a1].direction] )
               break;
             v2 = v7++;
           }
           while ( v2 < 4 );
         }
         ++walker_destinationPathCurrent[64 * a1];
-        byte_7FA352[128 * a1] = walker_direction[128 * a1];
+        byte_7FA352[128 * a1] = walkers[a1].direction;
         walker_progressOnTile[128 * a1] = 0;
         sub_4B5BE0(a1);
         fun_walkerAdvanceTick(a1);
@@ -75046,9 +74255,9 @@ LABEL_10:
   {
     dword_7FA238 = 1;
     fun_walkerWalkTicks(a1, a2);
-    if ( walker_direction[128 * a1] != 9 && walker_direction[128 * a1] != 10 )
+    if ( walkers[a1].direction != 9 && walkers[a1].direction != 10 )
     {
-      if ( walker_direction[128 * a1] == 8 )
+      if ( walkers[a1].direction == 8 )
       {
         byte_7FA376[128 * a1] = 1;
         word_7FA374[64 * a1] = 0;
@@ -75061,25 +74270,12 @@ LABEL_10:
     if ( byte_7FA376[128 * a1] )
     {
       byte_7FA379[128 * a1] = 100;
-      walker_direction[128 * a1] = byte_7FA352[128 * a1];
+      walkers[a1].direction = byte_7FA352[128 * a1];
       goto LABEL_10;
     }
   }
 }
-// 401CF8: using guessed type _DWORD  sub_401CF8(_DWORD);
-// 402423: using guessed type _DWORD  sub_402423(_DWORD);
-// 402BF3: using guessed type _DWORD  sub_402BF3(_DWORD);
-// 7FA238: using guessed type int dword_7FA238;
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA36C: using guessed type __int16 walker_destinationPathCurrent[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA374: using guessed type __int16 word_7FA374[];
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8A11C8: using guessed type int dword_8A11C8;
-// 8A11D0: using guessed type int dword_8A11D0;
-// 8A11D8: using guessed type int dword_8A11D8;
 
-//----- (004B4630) --------------------------------------------------------
 int  sub_4B4630(int a1)
 {
   int result; // eax@1
@@ -75150,21 +74346,19 @@ int  sub_4B4630(int a1)
   if ( v8 <= v7 )
   {
     _LOBYTE(result) = v6;
-    walker_direction[128 * a1] = v6;
+    walkers[a1].direction = v6;
     byte_7FA378[128 * a1] = 2;
   }
   else
   {
     _LOBYTE(result) = v5;
-    walker_direction[128 * a1] = v5;
+    walkers[a1].direction = v5;
     byte_7FA378[128 * a1] = -2;
   }
   byte_7FA379[128 * a1] = 5;
   return result;
 }
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004B4880) --------------------------------------------------------
 void  sub_4B4880(int a1, int a2, int a3)
 {
   if ( walker_x[128 * a1] == (unsigned __int8)byte_7FA360[128 * a1] )
@@ -75183,14 +74377,14 @@ void  sub_4B4880(int a1, int a2, int a3)
     else
     {
       walker_progressOnTile[128 * a1] = 15;
-      walker_direction[128 * a1] = fun_walkerGetSimpleDestinationDirection(
+      walkers[a1].direction = fun_walkerGetSimpleDestinationDirection(
                                      walker_x[128 * a1],
                                      walker_y[128 * a1],
                                      (unsigned __int8)byte_7FA356[128 * a2],
                                      (unsigned __int8)byte_7FA357[128 * a2]);
-      if ( walker_direction[128 * a1] >= 8 )
+      if ( walkers[a1].direction >= 8 )
         return;
-      byte_7FA352[128 * a1] = walker_direction[128 * a1];
+      byte_7FA352[128 * a1] = walkers[a1].direction;
       walker_progressOnTile[128 * a1] = 0;
       sub_4B5BE0(a1);
       fun_walkerAdvanceTick(a1);
@@ -75217,10 +74411,10 @@ void  fun_walkerWalkTicks(int walkerId, int numTicks)
         fun_determineDestinationPathForWalker(walkerId);
       fun_walkerGetNextTileDirection(walkerId);
       fun_walkerAdvanceTile(walkerId);
-      if ( walker_direction[128 * walkerId] >= 8 )
+      if ( walkers[walkerId].direction >= 8 )
         break;
       ++walker_destinationPathCurrent[64 * walkerId];
-      byte_7FA352[128 * walkerId] = walker_direction[128 * walkerId];
+      byte_7FA352[128 * walkerId] = walkers[walkerId].direction;
       walker_progressOnTile[128 * walkerId] = 0;
       sub_4B5BE0(walkerId);
       fun_walkerAdvanceTick(walkerId);
@@ -75491,24 +74685,24 @@ void  fun_walkerGetNextTileDirection(int walkerId)
   {
     if ( walker_destinationPathCurrent[64 * walkerId] < walker_destinationPathLength[64 * walkerId] )
     {
-      walker_direction[128 * walkerId] = *(&destinationpath_data[500 * walker_destinationpathId[64 * walkerId]]
+      walkers[walkerId].direction = *(&destinationpath_data[500 * walker_destinationpathId[64 * walkerId]]
                                          + walker_destinationPathCurrent[64 * walkerId]);
     }
     else
     {
       fun_removeDestinationPathForWalker(walkerId);
-      walker_direction[128 * walkerId] = 8;
+      walkers[walkerId].direction = 8;
     }
   }
   else
   {
-    walker_direction[128 * walkerId] = fun_walkerGetSimpleDestinationDirection(
+    walkers[walkerId].direction = fun_walkerGetSimpleDestinationDirection(
                                          walker_x[128 * walkerId],
                                          walker_y[128 * walkerId],
                                          (unsigned __int8)walker_destination_x[128 * walkerId],
                                          (unsigned __int8)walker_destination_y[128 * walkerId]);
-    if ( walker_direction[128 * walkerId] != 8 )
-      walker_direction[128 * walkerId] = 10;
+    if ( walkers[walkerId].direction != 8 )
+      walkers[walkerId].direction = 10;
   }
 }
 // 7FA36A: using guessed type __int16 walker_destinationpathId[];
@@ -75524,16 +74718,16 @@ void  fun_walkerAdvanceTile(int walkerId)
   int v4; // [sp+5Ch] [bp-8h]@3
   int v5; // [sp+60h] [bp-4h]@3
 
-  if ( walker_direction[128 * walkerId] < 8 )
+  if ( walkers[walkerId].direction < 8 )
   {
     v4 = walkers[walkerId].gridOffset;
-    v5 = dword_5FFE4C[walker_direction[128 * walkerId]];
+    v5 = dword_5FFE4C[walkers[walkerId].direction];
     v3 = grid_terrain[v5 + v4] & 0xC75F;
     v1 = grid_buildingIds[v5 + v4];
     if ( walker_isBoat[128 * walkerId] )
     {
       if ( !(v3 & 4) )
-        walker_direction[128 * walkerId] = 9;
+        walkers[walkerId].direction = 9;
     }
     else
     {
@@ -75549,29 +74743,29 @@ void  fun_walkerAdvanceTile(int walkerId)
               switch ( v2 )
               {
                 case 1:
-                  byte_7FA353[128 * walkerId] = walker_direction[128 * walkerId];
-                  walker_direction[128 * walkerId] = 11;
+                  byte_7FA353[128 * walkerId] = walkers[walkerId].direction;
+                  walkers[walkerId].direction = 11;
                   if ( !(game_ticks & 3) )
                     fun_enemyHitBuilding(v5 + v4, 10);
                   break;
                 case 2:
                   if ( !(grid_terrain[v5 + v4] & 0x1420) )
                   {
-                    byte_7FA353[128 * walkerId] = walker_direction[128 * walkerId];
-                    walker_direction[128 * walkerId] = 11;
+                    byte_7FA353[128 * walkerId] = walkers[walkerId].direction;
+                    walkers[walkerId].direction = 11;
                     if ( !(game_ticks & 3) )
                       fun_enemyHitBuilding(v5 + v4, 10);
                   }
                   break;
                 case 3:
-                  byte_7FA353[128 * walkerId] = walker_direction[128 * walkerId];
-                  walker_direction[128 * walkerId] = 11;
+                  byte_7FA353[128 * walkerId] = walkers[walkerId].direction;
+                  walkers[walkerId].direction = 11;
                   if ( !(game_ticks & 3) )
                     fun_enemyHitBuilding(v5 + v4, 200);
                   break;
                 default:
-                  byte_7FA353[128 * walkerId] = walker_direction[128 * walkerId];
-                  walker_direction[128 * walkerId] = 11;
+                  byte_7FA353[128 * walkerId] = walkers[walkerId].direction;
+                  walkers[walkerId].direction = 11;
                   if ( !(game_ticks & 3) )
                     fun_enemyHitBuilding(v5 + v4, 150);
                   break;
@@ -75581,7 +74775,7 @@ void  fun_walkerAdvanceTile(int walkerId)
         }
         else
         {
-          walker_direction[128 * walkerId] = 9;
+          walkers[walkerId].direction = 9;
         }
       }
       else
@@ -75589,7 +74783,7 @@ void  fun_walkerAdvanceTile(int walkerId)
         if ( (unsigned __int8)byte_7FA3A2[128 * walkerId] == 4 )
         {
           if ( *(&byte_61AA20[v5] + v4) <= -1 )
-            walker_direction[128 * walkerId] = 9;
+            walkers[walkerId].direction = 9;
         }
         else
         {
@@ -75600,7 +74794,7 @@ void  fun_walkerAdvanceTile(int walkerId)
               if ( v3 & 8 )
               {
                 if ( building_0a_type[64 * v1] == 58 )
-                  walker_direction[128 * walkerId] = 9;
+                  walkers[walkerId].direction = 9;
               }
             }
           }
@@ -75615,7 +74809,7 @@ void  fun_walkerAdvanceTile(int walkerId)
                   if ( building_0a_type[64 * v1] != 56 )
                   {
                     if ( building_0a_type[64 * v1] != 54 )
-                      walker_direction[128 * walkerId] = 9;
+                      walkers[walkerId].direction = 9;
                   }
                 }
               }
@@ -75623,7 +74817,7 @@ void  fun_walkerAdvanceTile(int walkerId)
             else
             {
               if ( grid_terrain[v5 + v4] & 0xC75F )
-                walker_direction[128 * walkerId] = 9;
+                walkers[walkerId].direction = 9;
             }
           }
         }
@@ -75631,12 +74825,7 @@ void  fun_walkerAdvanceTile(int walkerId)
     }
   }
 }
-// 7FA238: using guessed type int dword_7FA238;
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (004B5BE0) --------------------------------------------------------
 char  sub_4B5BE0(int a1)
 {
   int v1; // eax@1
@@ -75649,7 +74838,7 @@ char  sub_4B5BE0(int a1)
   v6 = walker_x[128 * a1];
   v5 = walker_y[128 * a1];
   fun_removeWalkerFromTileList(a1);
-  v1 = walker_direction[128 * a1];
+  v1 = walkers[a1].direction;
   switch ( v1 )
   {
     case 0:
@@ -75762,7 +74951,7 @@ LABEL_10:
 
 void  fun_walkerAdvanceTick(int walkerId)
 {
-  switch ( walker_direction[128 * walkerId] )
+  switch ( walkers[walkerId].direction )
   {
     case 0:
       --walker_tilePosition_x[64 * walkerId];
@@ -75821,10 +75010,10 @@ void  fun_walkerAdvanceTick(int walkerId)
 void  unused_4B6590(int a1, int a2)
 {
   fun_removeWalkerFromTileList(a1);
-  walker_direction[128 * a1] = walker_direction[128 * a2];
+  walkers[a1].direction = walkers[a2].direction;
   byte_7FA352[128 * a1] = byte_7FA352[128 * a2];
   walker_progressOnTile[128 * a1] = walker_progressOnTile[128 * a2];
-  walker_actionState[128 * a1] = walker_actionState[128 * a2];
+  walkers[a1].actionState = walkers[a2].actionState;
   walker_tilePosition_y[64 * a1] = walker_tilePosition_y[64 * a2];
   walker_tilePosition_x[64 * a1] = walker_tilePosition_x[64 * a2];
   walker_x[128 * a1] = walker_x[128 * a2];
@@ -75945,44 +75134,44 @@ int  sub_4B6B70(int a1, int a2, int a3, int a4, int a5, int a6)
   }
   if ( a6 )
   {
-    walker_direction[128 * a1] = fun_pathing_getDirection16(a2, a3, a4, a5);
+    walkers[a1].direction = fun_pathing_getDirection16(a2, a3, a4, a5);
   }
   else
   {
-    walker_direction[128 * a1] = fun_walkerGetSimpleDestinationDirection(a2, a3, a4, a5);
+    walkers[a1].direction = fun_walkerGetSimpleDestinationDirection(a2, a3, a4, a5);
     if ( word_7FA384[64 * a1] > 2 * word_7FA382[64 * a1] )
     {
-      switch ( walker_direction[128 * a1] )
+      switch ( walkers[a1].direction )
       {
         case 1:
-          walker_direction[128 * a1] = 0;
+          walkers[a1].direction = 0;
           break;
         case 3:
-          walker_direction[128 * a1] = 4;
+          walkers[a1].direction = 4;
           break;
         case 5:
-          walker_direction[128 * a1] = 4;
+          walkers[a1].direction = 4;
           break;
         case 7:
-          walker_direction[128 * a1] = 0;
+          walkers[a1].direction = 0;
           break;
       }
     }
     if ( word_7FA382[64 * a1] > 2 * word_7FA384[64 * a1] )
     {
-      switch ( walker_direction[128 * a1] )
+      switch ( walkers[a1].direction )
       {
         case 1:
-          walker_direction[128 * a1] = 2;
+          walkers[a1].direction = 2;
           break;
         case 3:
-          walker_direction[128 * a1] = 2;
+          walkers[a1].direction = 2;
           break;
         case 5:
-          walker_direction[128 * a1] = 6;
+          walkers[a1].direction = 6;
           break;
         case 7:
-          walker_direction[128 * a1] = 6;
+          walkers[a1].direction = 6;
           break;
       }
     }
@@ -76198,12 +75387,7 @@ int  sub_4B75B0(__int16 a1, __int16 x, __int16 y, char a4, char a5, int walkerTy
   }
   return v7;
 }
-// 4025D1: using guessed type _DWORD  sub_4025D1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
 
-//----- (004B76D0) --------------------------------------------------------
 bool  sub_4B76D0(int a1)
 {
   bool result; // eax@2
@@ -76214,7 +75398,7 @@ bool  sub_4B76D0(int a1)
   {
     if ( (unsigned __int8)walker_state[128 * v2] == 1 )
     {
-      if ( (unsigned __int8)walker_actionState[128 * v2] == 149 )
+      if ( walkers[v2].actionState == 149 )
         result = 0;
       else
         result = (unsigned __int16)word_7FA3B4[64 * v2] == (unsigned __int16)word_7FA3B6[64 * a1];
@@ -76230,11 +75414,7 @@ bool  sub_4B76D0(int a1)
   }
   return result;
 }
-// 7FA3B0: using guessed type __int16 word_7FA3B0[];
-// 7FA3B4: using guessed type __int16 word_7FA3B4[];
-// 7FA3B6: using guessed type __int16 word_7FA3B6[];
 
-//----- (004B7780) --------------------------------------------------------
 void  fun_neptuneSinkAllShips()
 {
   signed int i; // [sp+50h] [bp-4h]@1
@@ -76292,7 +75472,7 @@ int  fun_spawnWalker(char a1, int type, __int16 x, __int16 y, char a5)
   byte_7FA34C[128 * walkerId] = 0;
   byte_7FA34D[128 * walkerId] = 1;
   word_7FA3B4[64 * walkerId] = dword_607FC8++;
-  walker_direction[128 * walkerId] = a5;
+  walkers[walkerId].direction = a5;
   byte_7FA360[128 * walkerId] = x;
   walker_destination_x[128 * walkerId] = x;
   byte_7FA356[128 * walkerId] = x;
@@ -76397,23 +75577,23 @@ void  fun_deleteWalker(int walkerId)
       }
       break;
   }
-  if ( walker_tradeCityId[128 * walkerId] )
+  if ( walkers[walkerId].tradeCityId )
   {
-    trade_unknown0[33 * (unsigned __int8)walker_tradeCityId[128 * walkerId]] = 0;
-    if ( trade_walkerId1[33 * (unsigned __int8)walker_tradeCityId[128 * walkerId]] == walkerId )
+    trade_unknown0[33 * walkers[walkerId].tradeCityId] = 0;
+    if ( trade_walkerId1[33 * walkers[walkerId].tradeCityId] == walkerId )
     {
-      trade_walkerId1[33 * (unsigned __int8)walker_tradeCityId[128 * walkerId]] = 0;
+      trade_walkerId1[33 * walkers[walkerId].tradeCityId] = 0;
     }
     else
     {
-      if ( trade_walkerId2[33 * (unsigned __int8)walker_tradeCityId[128 * walkerId]] == walkerId )
+      if ( trade_walkerId2[33 * walkers[walkerId].tradeCityId] == walkerId )
       {
-        trade_walkerId2[33 * (unsigned __int8)walker_tradeCityId[128 * walkerId]] = 0;
+        trade_walkerId2[33 * walkers[walkerId].tradeCityId] = 0;
       }
       else
       {
-        if ( trade_walkerId3[33 * (unsigned __int8)walker_tradeCityId[128 * walkerId]] == walkerId )
-          trade_walkerId3[33 * (unsigned __int8)walker_tradeCityId[128 * walkerId]] = 0;
+        if ( trade_walkerId3[33 * walkers[walkerId].tradeCityId] == walkerId )
+          trade_walkerId3[33 * walkers[walkerId].tradeCityId] = 0;
       }
     }
   }
@@ -76857,13 +76037,13 @@ int  sub_4B8F30(int walkerId)
 
   for ( i = grid_walkerIds[walkers[walkerId].gridOffset]; i > 0; i = walkers[i].nextIdOnSameTile )
   {
-    if ( (unsigned __int8)walker_actionState[128 * i] != 149 )
+    if ( walkers[i].actionState!= 149 )
     {
       if ( (unsigned __int8)walker_type[128 * i] >= (signed int)Walker_Enemy43
         && (unsigned __int8)walker_type[128 * i] <= (signed int)Walker_Enemy57 )
         return i;
       if ( (unsigned __int8)walker_type[128 * i] == Walker_IndigenousNative
-        && (unsigned __int8)walker_actionState[128 * i] == 159 )
+        && walkers[i].actionState == 159 )
         return i;
       if ( (unsigned __int8)walker_type[128 * i] == Walker_Wolf )
         return i;
@@ -76882,7 +76062,7 @@ int  sub_4B9080(int walkerId)
 
   for ( i = grid_walkerIds[walkers[walkerId].gridOffset]; i > 0; i = walkers[i].nextIdOnSameTile )
   {
-    if ( (unsigned __int8)walker_actionState[128 * i] != 149
+    if ( walkers[i].actionState != 149
       && walker_type[128 * i]
       && (unsigned __int8)walker_type[128 * i] != Walker_Explosion
       && (unsigned __int8)walker_type[128 * i] != Walker_FortStandard
@@ -77259,29 +76439,7 @@ void  fun_generateWalkerName(int walkerId)
     }
   }
 }
-// 7E324C: using guessed type int seqWalkerName_citizen;
-// 7F87A4: using guessed type int seqWalkerName_taxCollector;
-// 7F87B4: using guessed type int seqWalkerName_actor;
-// 7F87B8: using guessed type int seqWalkerName_javelinThrower;
-// 7FA0C0: using guessed type int seqWalkerName_barbarian;
-// 7FA230: using guessed type int seqWalkerName_patrician;
-// 7FA390: using guessed type __int16 walker_formationId[];
-// 7FA3A0: using guessed type __int16 walker_name[];
-// 819740: using guessed type int seqWalkerName_lionTamer;
-// 819744: using guessed type int seqWalkerName_legionary;
-// 819844: using guessed type int seqWalkerName_female;
-// 81984C: using guessed type int seqWalkerName_prefect;
-// 819854: using guessed type int seqWalkerName_cavalry;
-// 819944: using guessed type int seqWalkerName_charioteer;
-// 862D4C: using guessed type int seqWalkerName_gladiator;
-// 862D50: using guessed type int seqWalkerName_arabian;
-// 862D54: using guessed type int seqWalkerName_trader;
-// 862E4C: using guessed type int seqWalkerName_engineer;
-// 862E50: using guessed type int seqWalkerName_greek;
-// 863310: using guessed type int seqWalkerName_tradeShip;
-// 863314: using guessed type int seqWalkerName_egyptian;
 
-//----- (004BA5E0) --------------------------------------------------------
 void  fun_moveLegionTo(int x, int y, int legionId)
 {
   int walkerId; // [sp+4Ch] [bp-14h]@15
@@ -77302,9 +76460,9 @@ void  fun_moveLegionTo(int x, int y, int legionId)
         for ( i = 0; i < 16 && *(__int16 *)((char *)&formation_walkerIds[64 * legionId] + 2 * i); ++i )
         {
           walkerId = *(__int16 *)((char *)&formation_walkerIds[64 * legionId] + 2 * i);
-          if ( (unsigned __int8)walker_actionState[128 * walkerId] != 149 )
+          if ( walkers[walkerId].actionState != 149 )
           {
-            if ( (unsigned __int8)walker_actionState[128 * walkerId] != 150 )
+            if ( walkers[walkerId].actionState != 150 )
             {
               if ( !formation_69[128 * legionId] )
               {
@@ -77313,7 +76471,7 @@ void  fun_moveLegionTo(int x, int y, int legionId)
                   if ( (unsigned __int8)formation_5e[128 * legionId] == 1 )
                     fun_formationIncreaseMorale(legionId, 10);
                   walkers[walkerId].inUse = 0;
-                  walker_actionState[128 * walkerId] = 83;
+                  walkers[walkerId].actionState = 83;
                   fun_removeDestinationPathForWalker(walkerId);
                 }
               }
@@ -77347,9 +76505,9 @@ void  sub_4BA850(int formationId)
       for ( i = 0; i < 16 && *(__int16 *)((char *)&formation_walkerIds[64 * formationId] + 2 * i); ++i )
       {
         v1 = *(__int16 *)((char *)&formation_walkerIds[64 * formationId] + 2 * i);
-        if ( (unsigned __int8)walker_actionState[128 * v1] != 149 )
+        if ( walkers[v1].actionState != 149 )
         {
-          if ( (unsigned __int8)walker_actionState[128 * v1] != 150 )
+          if ( walkers[v1].actionState != 150 )
           {
             if ( !formation_69[128 * formationId] )
             {
@@ -77357,7 +76515,7 @@ void  sub_4BA850(int formationId)
               {
                 if ( (unsigned __int8)formation_5e[128 * formationId] == 1 )
                   fun_formationIncreaseMorale(formationId, 10);
-                walker_actionState[128 * v1] = 81;
+                walkers[v1].actionState = 81;
                 fun_removeDestinationPathForWalker(v1);
               }
             }
@@ -77367,14 +76525,7 @@ void  sub_4BA850(int formationId)
     }
   }
 }
-// 402EAA: using guessed type _DWORD  sub_402EAA(_DWORD, _DWORD, _DWORD, _DWORD);
-// 634480: using guessed type __int16 grid_pathingDistance[];
-// 7F87EA: using guessed type __int16 formation_layout[];
-// 7F881A: using guessed type __int16 formation_5a[];
-// 7F881C: using guessed type __int16 formation_cursedByMars[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004BAA80) --------------------------------------------------------
 int  unused_4BAA80(int a1)
 {
   int result; // eax@1
@@ -77555,7 +76706,7 @@ signed int  fun_generateSoldierFromBarracks(int buildingId)
              building__07_y[128 * v7],
              (unsigned __int8)building_03_size[128 * v7]) )
       {
-        walker_actionState[128 * v9] = 85;
+        walkers[v9].actionState = 85;
         walker_destination_x[128 * v9] = walkerGridX;
         walker_destination_y[128 * v9] = walkerGridY;
         word_7FA35E[64 * v9] = 162 * (unsigned __int8)walker_destination_y[128 * v9]
@@ -77564,12 +76715,12 @@ signed int  fun_generateSoldierFromBarracks(int buildingId)
       }
       else
       {
-        walker_actionState[128 * v9] = 81;
+        walkers[v9].actionState = 81;
       }
     }
     else
     {
-      walker_actionState[128 * v9] = 81;
+      walkers[v9].actionState = 81;
     }
   }
   sub_4BC600();
@@ -77609,7 +76760,7 @@ signed int  fun_generateTowerSentryFromBarracks(int buildingId)
         break;
     }
     v3 = fun_spawnWalker(building_01_ciid[128 * buildingId], Walker_TowerSentry, walkerGridX, walkerGridY, 0);
-    walker_actionState[128 * v3] = -82;
+    walkers[v3].actionState = -82;
     if ( !fun_determineAccessRoad(
             building_06_x[128 * i],
             building__07_y[128 * i],
@@ -77627,13 +76778,7 @@ signed int  fun_generateTowerSentryFromBarracks(int buildingId)
   }
   return result;
 }
-// 7FA224: using guessed type int dword_7FA224;
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
 
-//----- (004BB4C0) --------------------------------------------------------
 void  fun_removeTowerSentry(int x, int y)
 {
   signed int i; // [sp+50h] [bp-4h]@1
@@ -77644,7 +76789,7 @@ void  fun_removeTowerSentry(int x, int y)
     {
       if ( (unsigned __int8)walker_type[128 * i] == Walker_TowerSentry )
       {
-        if ( (unsigned __int8)walker_actionState[128 * i] != 149 )
+        if ( walkers[i].actionState != 149 )
         {
           if ( fun_getDistanceMaximum(walker_x[128 * i], walker_y[128 * i], x, y) <= 1 )
             walker_state[128 * i] = 2;
@@ -77654,7 +76799,6 @@ void  fun_removeTowerSentry(int x, int y)
   }
 }
 
-//----- (004BB5B0) --------------------------------------------------------
 signed int  sub_4BB5B0()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -77666,9 +76810,7 @@ signed int  sub_4BB5B0()
   }
   return 0;
 }
-// 7F87FE: using guessed type __int16 formation_3e[];
 
-//----- (004BB640) --------------------------------------------------------
 signed int  sub_4BB640(int a1)
 {
   signed int v2; // [sp+4Ch] [bp-14h]@1
@@ -77732,7 +76874,7 @@ void  sub_4BB790(int a1)
             {
               if ( *(__int16 *)((char *)&formation_walkerIds[64 * v1] + 2 * i) <= 0 )
                 continue;
-              walker_actionState[128 * *(__int16 *)((char *)&formation_walkerIds[64 * v1] + 2 * i)] = 82;
+              walkers[ *(__int16 *)((char *)&formation_walkerIds[64 * v1] + 2 * i) ].actionState = 82;
               --v2;
               if ( v2 > 0 )
                 continue;
@@ -77846,7 +76988,6 @@ int  fun_calculateNumForts()
   return numForts;
 }
 
-//----- (004BBC90) --------------------------------------------------------
 void  sub_4BBC90()
 {
   signed int i; // [sp+50h] [bp-4h]@1
@@ -77859,7 +77000,7 @@ void  sub_4BBC90()
       {
         if ( (unsigned __int8)walker_type[128 * i] <= (signed int)Walker_FortLegionary )
         {
-          if ( (unsigned __int8)walker_actionState[128 * i] == 80 )
+          if ( walkers[i].actionState == 80 )
           {
             if ( byte_7FA359[128 * i] )
               --byte_7FA359[128 * i];
@@ -77870,7 +77011,6 @@ void  sub_4BBC90()
   }
 }
 
-//----- (004BBD90) --------------------------------------------------------
 void  sub_4BBD90()
 {
   int i; // [sp+4Ch] [bp-4h]@1
@@ -78210,7 +77350,7 @@ void  sub_4BC600()
             {
               if ( *(__int16 *)((char *)&formation_walkerIds[64 * m] + 2 * n) )
               {
-                if ( walker_direction[128 * *(__int16 *)((char *)&formation_walkerIds[64 * m] + 2 * n)] != 8 )
+                if ( walkers[ *(__int16 *)((char *)&formation_walkerIds[64 * m] + 2 * n)].direction != 8 )
                   formation_52[64 * m] = 0;
               }
             }
@@ -78353,7 +77493,7 @@ int  sub_4BCF70()
         {
           if ( formation_54[64 * i] )
           {
-            formation_63[128 * i] = walker_direction[128 * formation_walkerIds[64 * i]];
+            formation_63[128 * i] = walkers[formation_walkerIds[64 * i]].direction;
           }
           else
           {
@@ -78517,8 +77657,8 @@ void sub_4BD5C0()
               {
                 if ( (unsigned __int8)walker_state[128 * v1] == 1 )
                 {
-                  if ( (unsigned __int8)walker_actionState[128 * v1] != 149 )
-                    walker_actionState[128 * v1] = 87;
+                  if ( walkers[v1].actionState != 149 )
+                    walkers[v1].actionState = 87;
                 }
               }
             }
@@ -78530,11 +77670,7 @@ void sub_4BD5C0()
   if ( v0 > 0 )
     city_inform[ciid].byte_654585 = scn_distantBattle_romanTravelTime;
 }
-// 7F87C4: using guessed type __int16 formation_walkerType[];
-// 7F8800: using guessed type __int16 formation_hasMilitaryTraining[];
-// 98EF34: using guessed type char scn_distantBattle_romanTravelTime;
 
-//----- (004BD8D0) --------------------------------------------------------
 int  sub_4BD8D0()
 {
   int result; // eax@2
@@ -78558,9 +77694,9 @@ int  sub_4BD8D0()
             {
               if ( (unsigned __int8)walker_state[128 * v1] == 1 )
               {
-                if ( (unsigned __int8)walker_actionState[128 * v1] != 149 )
+                if ( walkers[v1].actionState!= 149 )
                 {
-                  walker_actionState[128 * v1] = 88;
+                  walkers[v1].actionState = 88;
                   byte_7FA393[128 * v1] = 1;
                 }
               }
@@ -78602,7 +77738,7 @@ void  sub_4BDA20(int a1)
             {
               if ( (unsigned __int8)walker_state[128 * v3] == 1 )
               {
-                if ( (unsigned __int8)walker_actionState[128 * v3] != 149 )
+                if ( walkers[v3].actionState != 149 )
                   ++v2;
               }
             }
@@ -78620,7 +77756,7 @@ void  sub_4BDA20(int a1)
             {
               if ( (unsigned __int8)walker_state[128 * v4] == 1 )
               {
-                if ( (unsigned __int8)walker_actionState[128 * v4] != 149 )
+                if ( walkers[v4].actionState != 149 )
                 {
                   if ( v1 )
                   {
@@ -78669,7 +77805,7 @@ int  sub_4BDC50()
         }
         for ( j = 0; j < 16; ++j )
         {
-          if ( (unsigned __int8)walker_actionState[128 * *(__int16 *)((char *)&formation_walkerIds[64 * i] + 2 * j)] == 150 )
+          if ( walkers[ *(__int16 *)((char *)&formation_walkerIds[64 * i] + 2 * j)].actionState == 150 )
             formation_48[64 * i] = 6;
         }
         if ( formation_69[128 * i] || formation_5e[128 * i] )
@@ -78677,13 +77813,13 @@ int  sub_4BDC50()
           for ( k = 0; k < 16; ++k )
           {
             v1 = *(__int16 *)((char *)&formation_walkerIds[64 * i] + 2 * k);
-            if ( (unsigned __int8)walker_actionState[128 * v1] != 150 )
+            if ( walkers[v1].actionState != 150 )
             {
-              if ( (unsigned __int8)walker_actionState[128 * v1] != 149 )
+              if ( walkers[v1].actionState != 149 )
               {
-                if ( (unsigned __int8)walker_actionState[128 * v1] != 148 )
+                if ( walkers[v1].actionState != 148 )
                 {
-                  walker_actionState[128 * v1] = -108;
+                  walkers[v1].actionState = -108;
                   fun_removeDestinationPathForWalker(v1);
                 }
               }
@@ -78701,10 +77837,10 @@ int  sub_4BDC50()
                 v2 = *(__int16 *)((char *)&formation_walkerIds[64 * i] + 2 * l);
                 if ( v2 > 0 )
                 {
-                  if ( (unsigned __int8)walker_actionState[128 * v2] != 150 )
+                  if (walkers[v2].actionState != 150 )
                   {
-                    if ( (unsigned __int8)walker_actionState[128 * v2] != 149 )
-                      walker_actionState[128 * v2] = 86;
+                    if ( walkers[v2].actionState != 149 )
+                      walkers[v2].actionState = 86;
                   }
                 }
               }
@@ -78844,12 +77980,12 @@ void  sub_4BE200()
             for ( k = 0; k < 16; ++k )
             {
               v10 = *(__int16 *)((char *)&formation_walkerIds[64 * j] + 2 * k);
-              if ( (unsigned __int8)walker_actionState[128 * v10] == 150 )
+              if ( walkers[v10].actionState == 150 )
               {
                 v9 = word_7FA3BE[64 * v10];
                 if ( (unsigned __int8)walker_state[128 * v9] == 1 )
                 {
-                  if ( (unsigned __int8)walker_actionState[128 * v9] != 149 )
+                  if ( walkers[v9].actionState != 149 )
                   {
                     if ( (signed int)(unsigned __int8)walker_type[128 * v9] >= 11 )
                     {
@@ -78865,13 +78001,13 @@ void  sub_4BE200()
               for ( l = 0; l < 16; ++l )
               {
                 v11 = *(__int16 *)((char *)&formation_walkerIds[64 * j] + 2 * l);
-                if ( (unsigned __int8)walker_actionState[128 * v11] != 150 )
+                if ( walkers[v11].actionState != 150 )
                 {
-                  if ( (unsigned __int8)walker_actionState[128 * v11] != 149 )
+                  if ( walkers[v11].actionState != 149 )
                   {
-                    if ( (unsigned __int8)walker_actionState[128 * v11] != 148 )
+                    if ( walkers[v11].actionState != 148 )
                     {
-                      walker_actionState[128 * v11] = -108;
+                      walkers[v11].actionState = -108;
                       fun_removeDestinationPathForWalker(v11);
                     }
                   }
@@ -79266,7 +78402,7 @@ void  sub_4BF500()
                                  (unsigned __int8)formation_x[128 * i],
                                  (unsigned __int8)formation_y[128 * i],
                                  0);
-                      walker_actionState[128 * wolfId] = -60;
+                      walkers[wolfId].actionState = -60;
                       walker_formationId[64 * wolfId] = i;
                       word_7FA366[64 * wolfId] = wolfId & 0x1F;
                     }
@@ -79279,7 +78415,7 @@ void  sub_4BF500()
                 v6 = *(__int16 *)((char *)&formation_walkerIds[64 * i] + 2 * j);
                 if ( v6 > 0 )
                 {
-                  if ( (unsigned __int8)walker_actionState[128 * v6] == 150 )
+                  if ( walkers[v6].actionState == 150 )
                     ++v1;
                 }
               }
@@ -79330,9 +78466,9 @@ LABEL_50:
                     v8 = *(__int16 *)((char *)&formation_walkerIds[64 * i] + 2 * k);
                     if ( v8 > 0 )
                     {
-                      if ( (unsigned __int8)walker_actionState[128 * v8] != 150 )
+                      if ( walkers[v8].actionState != 150 )
                       {
-                        if ( (unsigned __int8)walker_actionState[128 * v8] != 149 )
+                        if ( walkers[v8].actionState != 149 )
                         {
                           word_7FA366[64 * v8] = 401;
                           if ( v1 )
@@ -79340,7 +78476,7 @@ LABEL_50:
                             v5 = sub_4AD500(walker_x[128 * v8], walker_y[128 * v8], 6);
                             if ( v5 )
                             {
-                              walker_actionState[128 * v8] = -57;
+                              walkers[v8].actionState = -57;
                               walker_destination_x[128 * v8] = walker_x[128 * v5];
                               walker_destination_y[128 * v8] = walker_y[128 * v5];
                               word_7FA3B0[64 * v8] = v5;
@@ -79350,12 +78486,12 @@ LABEL_50:
                             }
                             else
                             {
-                              walker_actionState[128 * v8] = -60;
+                              walkers[v8].actionState = -60;
                             }
                           }
                           else
                           {
-                            walker_actionState[128 * v8] = -60;
+                            walkers[v8].actionState = -60;
                           }
                         }
                       }
@@ -79542,7 +78678,7 @@ void  fun_killEnemiesSpiritOfMars()
           {
             if ( (unsigned __int8)walker_type[128 * i] <= (signed int)Walker_Enemy57 )
             {
-              walker_actionState[128 * i] = -107;
+              walkers[i].actionState = -107;
               --v1;
               if ( !gridOffset )
                 gridOffset = walkers[i].gridOffset;
@@ -79551,7 +78687,7 @@ void  fun_killEnemiesSpiritOfMars()
         }
         else
         {
-          walker_actionState[128 * i] = -107;
+          walkers[i].actionState = -107;
           --v1;
           if ( !gridOffset )
             gridOffset = walkers[i].gridOffset;
@@ -79578,18 +78714,17 @@ void  unused_4C01E0()
         if ( (signed int)(unsigned __int8)walker_type[128 * i] >= 55 )
         {
           if ( (signed int)(unsigned __int8)walker_type[128 * i] <= 57 )
-            walker_actionState[128 * i] = -107;
+            walkers[i].actionState = -107;
         }
       }
       else
       {
-        walker_actionState[128 * i] = -107;
+        walkers[i].actionState = -107;
       }
     }
   }
 }
 
-//----- (004C02C0) --------------------------------------------------------
 signed int  sub_4C02C0()
 {
   signed int result; // eax@14
@@ -79625,7 +78760,7 @@ signed int  sub_4C02C0()
     {
       v1 = *(__int16 *)((char *)&formation_walkerIds[64 * v4] + 2 * j);
       if ( v1 > 0 )
-        walker_actionState[128 * v1] = 82;
+        walkers[v1].actionState = 82;
     }
     formation_cursedByMars[64 * v4] = 96;
     sub_4BC600();
@@ -79637,10 +78772,7 @@ signed int  sub_4C02C0()
   }
   return result;
 }
-// 7F87C4: using guessed type __int16 formation_walkerType[];
-// 7F881C: using guessed type __int16 formation_cursedByMars[];
 
-//----- (004C0410) --------------------------------------------------------
 void  sub_4C0410(int a1)
 {
   int v1; // [sp+4Ch] [bp-8h]@4
@@ -79651,11 +78783,11 @@ void  sub_4C0410(int a1)
     v1 = *(__int16 *)((char *)&formation_walkerIds[64 * a1] + 2 * i);
     if ( v1 > 0 )
     {
-      if ( (unsigned __int8)walker_actionState[128 * v1] != 150 )
+      if ( walkers[v1].actionState != 150 )
       {
-        if ( (unsigned __int8)walker_actionState[128 * v1] != 149 )
+        if ( walkers[v1].actionState != 149 )
         {
-          walker_actionState[128 * v1] = -105;
+          walkers[v1].actionState = -105;
           word_7FA366[64 * v1] = 0;
         }
       }
@@ -80213,8 +79345,8 @@ signed int  fun_walkerProvideServiceCoverage(int walkerId)
         return 1;
       break;
     case Walker_Actor:
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] != 94
-        && (unsigned __int8)walker_actionState[128 * walkerId] != 95 )
+      if ( walkers[walkerId].actionState != 94
+        && walkers[walkerId].actionState != 95 )
         v4 = word_7FA38E[64 * walkerId];
       else
         v4 = walker_buildingId[64 * walkerId];
@@ -80234,8 +79366,8 @@ signed int  fun_walkerProvideServiceCoverage(int walkerId)
       }
       break;
     case Walker_Gladiator:
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] != 94
-        && (unsigned __int8)walker_actionState[128 * walkerId] != 95 )
+      if ( walkers[walkerId].actionState != 94
+        && walkers[walkerId].actionState != 95 )
         v5 = word_7FA38E[64 * walkerId];
       else
         v5 = walker_buildingId[64 * walkerId];
@@ -80258,8 +79390,8 @@ signed int  fun_walkerProvideServiceCoverage(int walkerId)
       }
       break;
     case Walker_LionTamer:
-      if ( (unsigned __int8)walker_actionState[128 * walkerId] != 94
-        && (unsigned __int8)walker_actionState[128 * walkerId] != 95 )
+      if ( walkers[walkerId].actionState != 94
+        && walkers[walkerId].actionState != 95 )
         v6 = word_7FA38E[64 * walkerId];
       else
         v6 = walker_buildingId[64 * walkerId];
@@ -80418,7 +79550,7 @@ void  fun_createFishHerdFlotsamWalkers(__int16 riverEntryX, __int16 riverEntryY,
           {
             fun_generateRandomness();
             v4 = fun_spawnWalker(1, type, scn_herd_x[k], scn_herd_y[k], 0);
-            walker_actionState[128 * v4] = -60;
+            walkers[v4].actionState = -60;
             walker_formationId[64 * v4] = formationId;
             word_7FA366[64 * v4] = v4 & 0x1F;
           }
@@ -80441,7 +79573,7 @@ void  fun_createFishHerdFlotsamWalkers(__int16 riverEntryX, __int16 riverEntryY,
       for ( n = 0; n < 20; ++n )
       {
         v10 = fun_spawnWalker(1, Walker_Flotsam, riverEntryX, riverEntryY, 0);
-        walker_actionState[128 * v10] = -128;
+        walkers[v10].actionState= -128;
         if ( !n )
         {
           byte_7FA34B[128 * v10] = 3;
@@ -96195,7 +95327,7 @@ signed int  sub_4E6EC0()
                   break;
                 if ( (unsigned __int8)walker_state[128 * v15] != 2 )
                 {
-                  if ( (unsigned __int8)walker_actionState[128 * v15] != 149 )
+                  if ( walkers[v15].actionState != 149 )
                   {
                     if ( walker_type[128 * v15] )
                     {
@@ -97419,7 +96551,7 @@ void  fun_drawWalkerRightClickInfoText(int walkerId)
               rightclickInfoDialog_y + 139,
               graphic_font + F_SmallBlack,
               0);
-            if ( (unsigned __int8)walker_actionState[128 * walkerId] == 145 )
+            if ( walkers[walkerId].actionState == 145 )
             {
               v21 = fun_convertCollectIdToResourceId((unsigned __int8)walker_itemCollecting[128 * walkerId]);
               fun_drawGameText(
@@ -97437,7 +96569,7 @@ void  fun_drawWalkerRightClickInfoText(int walkerId)
             }
             else
             {
-              if ( (unsigned __int8)walker_actionState[128 * walkerId] == 146 )
+              if ( walkers[walkerId].actionState == 146 )
               {
                 v26 = fun_convertCollectIdToResourceId((unsigned __int8)walker_itemCollecting[128 * walkerId]);
                 fun_drawGameText(
@@ -97467,8 +96599,8 @@ void  fun_drawWalkerRightClickInfoText(int walkerId)
           else
           {
             v36 = bigPeopleGraphicFromWalkerType[(unsigned __int8)walker_type[128 * walkerId]] - 1;
-            if ( (unsigned __int8)walker_actionState[128 * walkerId] == 74
-              || (unsigned __int8)walker_actionState[128 * walkerId] == 75 )
+            if ( walkers[walkerId].actionState == 74
+              || walkers[walkerId].actionState == 75 )
               v36 = 18;
             fun_drawGraphic(v36 + graphic_bigpeople, rightclickInfoDialog_x + 28, rightclickInfoDialog_y + 112);
             text_xoffset = 0;
@@ -97520,7 +96652,7 @@ void  fun_drawWalkerRightClickInfoText(int walkerId)
             rightclickInfoDialog_y + 139,
             graphic_font + 1206,
             0);
-          if ( (unsigned __int8)walker_actionState[128 * walkerId] != 132 )
+          if ( walkers[walkerId].actionState != 132 )
           {
             if ( byte_7FA34B[128 * walkerId] )
             {
@@ -97544,22 +96676,22 @@ void  fun_drawWalkerRightClickInfoText(int walkerId)
             v32 = walker_buildingId[64 * walkerId];
             v31 = word_7FA38E[64 * walkerId];
             text_xoffset = 0;
-            if ( (unsigned __int8)walker_actionState[128 * walkerId] == 27 )
+            if ( walkers[walkerId].actionState == 27 )
             {
               v34 = 1;
             }
             else
             {
-              if ( (unsigned __int8)walker_actionState[128 * walkerId] != 53
-                && (unsigned __int8)walker_actionState[128 * walkerId] != 56
-                && (unsigned __int8)walker_actionState[128 * walkerId] != 59 )
-                v34 = (unsigned __int8)walker_actionState[128 * walkerId] == 134
-                   || (unsigned __int8)walker_actionState[128 * walkerId] == 137
-                   || (unsigned __int8)walker_actionState[128 * walkerId] == 138;
+              if ( walkers[walkerId].actionState != 53
+                && walkers[walkerId].actionState != 56
+                && walkers[walkerId].actionState != 59 )
+                v34 = walkers[walkerId].actionState == 134
+                   || walkers[walkerId].actionState == 137
+                   || walkers[walkerId].actionState == 138;
               else
                 v34 = 1;
             }
-            if ( (unsigned __int8)walker_actionState[128 * walkerId] != 132 )
+            if ( walkers[walkerId].actionState != 132 )
             {
               if ( v34 )
               {
@@ -97753,7 +96885,7 @@ void  fun_drawWalkerRightClickInfoText(int walkerId)
       walkerId = walker_tradeCaravanNextId[64 * walkerId];
     if ( (unsigned __int8)walker_type[128 * walkerId] == Walker_TradeCaravanDonkey )
       walkerId = walker_tradeCaravanNextId[64 * walkerId];
-    v43 = (unsigned __int8)walker_tradeCityId[128 * walkerId];
+    v43 = walkers[walkerId].tradeCityId;
     text_xoffset = 0;
     fun_drawGameText(
       64,
@@ -97792,7 +96924,7 @@ void  fun_drawWalkerRightClickInfoText(int walkerId)
     v37 = (unsigned __int8)byte_7FA3AD[128 * walkerId];
     if ( (unsigned __int8)walker_type[128 * walkerId] == Walker_TradeShip )
     {
-      switch ( walker_actionState[128 * walkerId] )
+      switch ( walkers[walkerId].actionState )
       {
         case 114:
           fun_drawGameText(129, 6, rightclickInfoDialog_x + 40, rightclickInfoDialog_y + 150, graphic_font + 1206, 0);
@@ -97810,7 +96942,7 @@ void  fun_drawWalkerRightClickInfoText(int walkerId)
     }
     else
     {
-      switch ( walker_actionState[128 * walkerId] )
+      switch ( walkers[walkerId].actionState )
       {
         case 102:
           fun_drawGameText(129, 10, rightclickInfoDialog_x + 40, rightclickInfoDialog_y + 150, graphic_font + 1206, 0);
@@ -101081,10 +100213,7 @@ void  fun_drawGranarySpecialOrdersButton()
     graphic_font + 134,
     0);
 }
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 9D7B28: using guessed type int mouseover_button_id;
 
-//----- (004F2910) --------------------------------------------------------
 void  fun_showGranaryInstructionsDialog()
 {
   dialog_help_id = 3;
@@ -101113,7 +100242,7 @@ void  sub_4F29B0()
   int v8; // [sp+58h] [bp-8h]@9
   int i; // [sp+5Ch] [bp-4h]@7
 
-  v6 = (unsigned __int8)building_7d_storageId[128 * currentlySelectedBuilding];
+  v6 = buildings[currentlySelectedBuilding].d7d_storageId;
   if ( mouseover_button_id == 1 )
     fun_drawBorderedButton(0, rightclickInfoDialog_x + 80, 436, 16 * (rightclickInfoDialog_widthBlocks - 10), 20, 1);
   else
@@ -101279,9 +100408,9 @@ void  fun_showBuildingInfoWarehouse()
   v10 = building_22_walkerId[64 * currentlySelectedBuilding];
   if ( building_22_walkerId[64 * currentlySelectedBuilding] && (unsigned __int8)walker_state[128 * v10] == 1 )
   {
-    if ( (unsigned __int8)walker_actionState[128 * v10] != 53
-      && (unsigned __int8)walker_actionState[128 * v10] != 56
-      && (unsigned __int8)walker_actionState[128 * v10] != 59 )
+    if ( walkers[v10].actionState != 53
+      && walkers[v10].actionState != 56
+      && walkers[v10].actionState != 59 )
     {
       if ( building_22_walkerId[64 * currentlySelectedBuilding] )
       {
@@ -101399,10 +100528,7 @@ void  fun_drawWarehouseSpecialOrdersButton()
     graphic_font + 134,
     0);
 }
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 9D7B28: using guessed type int mouseover_button_id;
 
-//----- (004F35A0) --------------------------------------------------------
 void  fun_showWarehouseInstructionsDialog()
 {
   dialog_help_id = 4;
@@ -101431,7 +100557,7 @@ void  sub_4F3640()
   int v8; // [sp+58h] [bp-8h]@15
   int i; // [sp+5Ch] [bp-4h]@13
 
-  storageId = (unsigned __int8)building_7d_storageId[128 * currentlySelectedBuilding];
+  storageId = buildings[currentlySelectedBuilding].d7d_storageId;
   if ( mouseover_button_id == 1 )
     fun_drawBorderedButton(0, rightclickInfoDialog_x + 80, 436, 16 * (rightclickInfoDialog_widthBlocks - 10), 20, 1);
   else
@@ -101785,7 +100911,7 @@ void  fun_showBuildingInfoWharf()
     if ( building_72_wharf_hasBoat_house_evolveStatusDesir[64 * currentlySelectedBuilding] > 0 )
     {
       v4 = building_72_wharf_hasBoat_house_evolveStatusDesir[64 * currentlySelectedBuilding];
-      switch ( walker_actionState[128 * v4] )
+      switch ( walkers[v4].actionState )
       {
         case 0xBF:
           fun_drawGameTextWrapped(
@@ -108305,7 +107431,7 @@ signed int  sub_5023D0(int gridOffset)
   {
     while ( walkerId )
     {
-      if ( !byte_7FA34D[128 * walkerId] && (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+      if ( !byte_7FA34D[128 * walkerId] && walkers[walkerId].actionState == 150 )
         return 0;
       walkerId = walkers[walkerId].nextIdOnSameTile;
     }
@@ -108329,7 +107455,7 @@ signed int  sub_502470(int gridOffset)
     while ( walkerId )
     {
       if ( (unsigned __int8)byte_7FA34D[128 * walkerId] == 1
-        && (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+        && walkers[walkerId].actionState == 150 )
         return 0;
       walkerId = walkers[walkerId].nextIdOnSameTile;
     }
@@ -108341,9 +107467,7 @@ signed int  sub_502470(int gridOffset)
   }
   return result;
 }
-// 7FA348: using guessed type __int16 walker_nextIdOnSameTile[];
 
-//----- (00502510) --------------------------------------------------------
 signed int  sub_502510(int a1, int a2, int a3, int a4)
 {
   signed int result; // eax@25
@@ -120670,7 +119794,7 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
           {
             if ( (unsigned __int8)walker_type[128 * walkerId] == Walker_LionTamer )
             {
-              if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+              if ( walkers[walkerId].actionState == 150 )
               {
                 ++byte_7FA3AA[128 * walkerId];
                 if ( (signed int)(unsigned __int8)byte_7FA3AA[128 * walkerId] >= 3 )
@@ -120682,7 +119806,7 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
             {
               if ( (unsigned __int8)walker_type[128 * walkerId] == Walker_Gladiator )
               {
-                if ( (unsigned __int8)walker_actionState[128 * walkerId] == 150 )
+                if ( walkers[walkerId].actionState == 150 )
                   currentMoodSoundId = 7;
               }
               else
@@ -120722,25 +119846,25 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
                                   }
                                   break;
                                 case Walker_MarketTrader:
-                                  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 126 )
+                                  if ( walkers[walkerId].actionState == 126 )
                                   {
                                     if ( sub_452DD0(walker_buildingId[64 * walkerId]) <= 0 )
                                       currentMoodSoundId = 9;
                                   }
                                   break;
                                 case Walker_MarketBuyer:
-                                  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 145 )
+                                  if ( walkers[walkerId].actionState == 145 )
                                   {
                                     currentMoodSoundId = 7;
                                   }
                                   else
                                   {
-                                    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 146 )
+                                    if ( walkers[walkerId].actionState == 146 )
                                       currentMoodSoundId = 8;
                                   }
                                   break;
                                 case Walker_CartPusher:
-                                  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 20 )
+                                  if ( walkers[walkerId].actionState == 20 )
                                   {
                                     if ( (unsigned __int8)walker_maxLevelOrRiskSeen[128 * walkerId] == 2 )
                                     {
@@ -120754,9 +119878,9 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
                                   }
                                   else
                                   {
-                                    if ( (unsigned __int8)walker_actionState[128 * walkerId] == 21
-                                      || (unsigned __int8)walker_actionState[128 * walkerId] == 22
-                                      || (unsigned __int8)walker_actionState[128 * walkerId] == 23 )
+                                    if ( walkers[walkerId].actionState == 21
+                                      || walkers[walkerId].actionState == 22
+                                      || walkers[walkerId].actionState == 23 )
                                     {
                                       if ( fun_getDistanceMaximum(
                                              (unsigned __int8)walker_destination_x[128 * walkerId],
@@ -120768,7 +119892,7 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
                                   }
                                   break;
                                 case Walker_Warehouseman:
-                                  if ( (unsigned __int8)walker_actionState[128 * walkerId] == 51 )
+                                  if ( walkers[walkerId].actionState == 51 )
                                   {
                                     if ( fun_getDistanceMaximum(
                                            (unsigned __int8)walker_destination_x[128 * walkerId],
@@ -120786,7 +119910,7 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
                                       ++byte_7FA3AA[128 * walkerId];
                                       if ( (signed int)(unsigned __int8)byte_7FA3AA[128 * walkerId] >= 4 )
                                         byte_7FA3AA[128 * walkerId] = 0;
-                                      switch ( walker_actionState[128 * walkerId] )
+                                      switch ( walkers[walkerId].actionState )
                                       {
                                         case 0x4A:
                                           currentMoodSoundId = 10;
@@ -120943,7 +120067,7 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
                                                         currentMoodSoundId = (unsigned __int8)byte_7FA3AA[128 * walkerId]
                                                                            + 8;
                                                         v1 = (unsigned __int8)byte_7FA3AD[128 * walkerId];
-                                                        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 103 )
+                                                        if ( walkers[walkerId].actionState == 103 )
                                                         {
                                                           if ( !dword_993F64[12 * v1] )
                                                           {
@@ -120953,13 +120077,13 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
                                                         }
                                                         else
                                                         {
-                                                          if ( (unsigned __int8)walker_actionState[128 * walkerId] == 102 )
+                                                          if ( walkers[walkerId].actionState == 102 )
                                                           {
                                                             if ( sub_45AA70(
                                                                    walkerId,
                                                                    ciid,
                                                                    word_7FA38E[64 * walkerId],
-                                                                   (unsigned __int8)walker_tradeCityId[128 * walkerId]) )
+                                                                   walkers[walkerId].tradeCityId) )
                                                             {
                                                               currentMoodSoundId = 11;
                                                             }
@@ -120969,7 +120093,7 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
                                                                      walkerId,
                                                                      ciid,
                                                                      word_7FA38E[64 * walkerId],
-                                                                     (unsigned __int8)walker_tradeCityId[128 * walkerId]) )
+                                                                     walkers[walkerId].tradeCityId) )
                                                                 currentMoodSoundId = 10;
                                                             }
                                                           }
@@ -120977,7 +120101,7 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
                                                         break;
                                                       case Walker_TradeShip:
                                                         v2 = (unsigned __int8)byte_7FA3AD[128 * walkerId];
-                                                        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 115 )
+                                                        if ( walkers[walkerId].actionState == 115 )
                                                         {
                                                           if ( dword_993F64[12 * v2] || dword_993F60[12 * v2] )
                                                             currentMoodSoundId = 11;
@@ -120986,7 +120110,7 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
                                                         }
                                                         else
                                                         {
-                                                          if ( (unsigned __int8)walker_actionState[128 * walkerId] == 112 )
+                                                          if ( walkers[walkerId].actionState == 112 )
                                                           {
                                                             v4 = sub_4A4D70(walkerId);
                                                             if ( v4 == 1 )
@@ -121008,8 +120132,8 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
                                                         }
                                                         break;
                                                       case Walker_Dockman:
-                                                        if ( (unsigned __int8)walker_actionState[128 * walkerId] == 135
-                                                          || (unsigned __int8)walker_actionState[128 * walkerId] == 136 )
+                                                        if ( walkers[walkerId].actionState == 135
+                                                          || walkers[walkerId].actionState == 136 )
                                                         {
                                                           if ( fun_getDistanceMaximum(
                                                                  (unsigned __int8)walker_destination_x[128 * walkerId],

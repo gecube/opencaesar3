@@ -403,7 +403,6 @@ static char building_79_byte_94BDB9[__TD_TR]; // weak
 static char building_7a_desirability[__TD_TR]; // weak
 static char building_7b_byte_94BDBB[__TD_TR]; // weak
 static char building_7c_adjacentToWater[__TD_TR]; // weak
-static char building_7d_storageId[__TD_TR]; // weak
 static char building_7e_house_crimeRisk[__TD_TR]; // weak
 static char building_7f_byte_94BDBF[__TD_TR]; // idb
 
@@ -1090,9 +1089,19 @@ struct Walker
   int gridOffset;
   char inUse;
   __int16 nextIdOnSameTile;
+  unsigned char actionState;
+  int tradeCityId;
+  int direction;
 };
 
 static Walker walkers[1000];
+
+struct Building
+{
+ int d7d_storageId;
+};
+
+static Building buildings[1000];
 
 struct Storage
 {
