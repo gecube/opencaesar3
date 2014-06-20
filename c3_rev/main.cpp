@@ -14,6 +14,7 @@
 #include <time.h>
 #include <crtdbg.h>
 #include "mmio.h"
+#include "pk.h"
 //#include "C:/Qt/Qt5.1.1/Tools/mingw48_32/i686-w64-mingw32/include/ddraw.h"
 //#include "C:/Qt/Qt5.1.1/Tools/mingw48_32/i686-w64-mingw32/include/dsound.h"
 
@@ -1416,19 +1417,18 @@ static __int16 word_7FA346[0xff]; // weak
 static char byte_7FA34B[0xff]; // weak
 
 static char byte_7FA34D[0xff]; // weak
-static char walker_state[0xff]; // weak
+
 static char byte_7FA34F[0xff]; // weak
 static char byte_7FA350[0xff]; // weak
 
 static char byte_7FA352[0xff]; // weak
 static char byte_7FA353[0xff]; // weak
-static unsigned __int8 walker_x[0xff];
 
 static char byte_7FA356[0xff]; // weak
 static char byte_7FA357[0xff]; // weak
-static char byte_7FA358[0xff]; // weak
+
 static char byte_7FA359[0xff]; // weak
-static char walker_destination_x[0xff]; // weak
+
 static char walker_destination_y[0xff]; // weak
 static __int16 word_7FA35E[0xff]; // weak
 static char byte_7FA360[0xff]; // weak
@@ -1436,7 +1436,7 @@ static char byte_7FA361[0xff]; // weak
 static char byte_7FA362[0xff]; // weak
 static char byte_7FA363[0xff]; // weak
 static __int16 word_7FA366[0xff]; // weak
-static char walker_progressOnTile[0xff]; // weak
+
 static __int16 walker_destinationpathId[0xff]; // weak
 static __int16 walker_destinationPathCurrent[0xff]; // weak
 static __int16 walker_destinationPathLength[0xff]; // weak
@@ -1477,7 +1477,7 @@ static char byte_7FA3A2[0xff]; // weak
 static char byte_7FA3A3[0xff]; // weak
 static char walker_isBoat[0xff]; // weak
 static char byte_7FA3A5[0xff]; // weak
-static char byte_7FA3A6[0xff]; // weak
+
 static char byte_7FA3A7[0xff]; // weak
 static char walker_itemCollecting[0xff]; // weak
 static char byte_7FA3A9[0xff]; // weak
@@ -2851,7 +2851,7 @@ _DWORD  fun_generateTowerSentryFromBarracks(_DWORD); // weak
 void  fun_doGameTick_0_noop();
 void  fun_unused_writeToC4mapsBmp();
 void  fun_strTrimSpacesLeft(char *a1);
-int  fun_pkCompress(int *hashcode, int *compressedSize, char *inputBuffer, char *outputBuffer, int inputLength); // idb
+
 void  fun_clearGroundTypeGrid();
 void  fun_drawMessageListButtons();
 
@@ -2903,7 +2903,7 @@ void fun_showVictoryScreen(void); // weak
 int  fun_getDistanceMinimum(int x1, int y1, int x2, int y2); // idb
 void  fun_editor_winCriteria_timeLimitToggle();
 void  fun_editor_editEmpire_moveEmpireCity(int direction, __int16 amount);
-int  fun_pkDecompress(int *hashcode, char *compressedData, int compressedLength, char *destBuffer, int destLength);
+
 void  fun_drawSpeedOptionsDialog();
 signed int  fun_walkerProvideMissionaryAccess(int x, int y); // idb
 void  fun_drawColoredRectangle(int x, int y, int a3); // idb
@@ -5076,11 +5076,7 @@ signed int  unused_compressFile(const char *inputFile, const char *outputFile);
 signed int  unused_decompressFile(char *inputFile, const char *outputFile);
 int  fun_pk_inputFunc(char *buffer, int *length, struct PKToken *token);
 void  fun_pk_outputFunc(char *Src, int *a2, struct PKToken *a3);
-int  fun_pkCompress(int *hashcode, int *compressedSize, char *inputBuffer, char *outputBuffer, int inputLength); // idb
-int  fun_pkDecompress(int *hashcode, char *compressedData, int compressedLength, char *destBuffer, int destLength);
-// DWORD __stdcall CommDlgExtendedError();
-// BOOL __stdcall GetOpenFileNameA(LPOPENFILENAMEA);
-// BOOL __stdcall GetSaveFileNameA(LPOPENFILENAMEA);
+
 int  fun_pk_hashBuffer(char *a1, int a2, int *a3);
 signed int  fun_pk_implode(int ( *inputFunc)(char *, int *, struct PKToken *), void ( *outputFunc)(char *, int *, struct PKToken *), struct PKCompBuffer *buffer, struct PKToken *token, int *hasLiteralEncoding, int *dictionarySize);
 void  fun_pk_implodeData(struct PKCompBuffer *buffer);
@@ -5104,19 +5100,16 @@ int  freeMemory(void *a1, signed int a2);
 
 bool  sub_538D90(int a1);
 
-//----- (004059B0) --------------------------------------------------------
 void  fun_clickDoNothing()
 {
   ;
 }
 
-//----- (004059D0) --------------------------------------------------------
 void  fun_confirmdialog_doNothing()
 {
   ;
 }
 
-//----- (004059F0) --------------------------------------------------------
 void fun_confirmdialog_deleteFort()
 {
   if ( (unsigned __int8)confirmdialog_okClicked == 1 )
@@ -25764,9 +25757,9 @@ void  fun_drawBuildingOnWorkersOverlay(int buildingId, int a2, int a3)
 
   if ( !buildings[buildingId].houseSize )
   {
-    if ( building_12_walkerServiceAccess[64 * buildingId] > 0 )
+    if ( buildings[buildingId].walkerServiceAccess > 0 )
     {
-      v3 = fun_getPercentage(building_12_walkerServiceAccess[64 * buildingId], 300) / 10;
+      v3 = fun_getPercentage(buildings[buildingId].walkerServiceAccess, 300) / 10;
       fun_drawOverlayColumn(v3, a2, a3, 0);
     }
   }
@@ -26611,13 +26604,13 @@ void  fun_drawWalker(int walkerId, int a2, int a3, int a4)
         v18 = *(&byte_5F10D0[16 * v12] + v13);
         v14 = *(&byte_5F11D0[16 * v12] + v13);
       }
-      v15 = v14 - (unsigned __int8)byte_7FA358[128 * walkerId];
+      v15 = v14 - walkers[walkerId].byte_7FA358;
     }
     else
     {
-      v18 = *(&byte_5F14D0[16 * dword_65DF24] + walker_progressOnTile[128 * walkerId]);
-      v15 = *(&byte_5F1550[16 * dword_65DF24] + walker_progressOnTile[128 * walkerId])
-          - (unsigned __int8)byte_7FA3A6[128 * walkerId];
+      v18 = *(&byte_5F14D0[16 * dword_65DF24] + walkers[walkerId].progressOnTile);
+      v15 = *(&byte_5F1550[16 * dword_65DF24] + walkers[walkerId].progressOnTile)
+          - walkers[walkerId].byte_7FA3A6;
       if ( byte_7FA3B8[128 * walkerId] )
       {
         if ( walkers[walkerId].type != Walker_Ballista )
@@ -29817,7 +29810,7 @@ void  sub_43E7A0(int a1, int a2)
         v4 = (unsigned __int8)building_2d_house_hasFountain[128 * v3];
         break;
       case 12:
-        v4 = building_12_walkerServiceAccess[64 * v3];
+        v4 = buildings[v3].walkerServiceAccess;
         break;
       case 13:
         v4 = building_1a_word_94BD5A[64 * v3];
@@ -37132,10 +37125,10 @@ void  sub_4516B0()
     {
       if ( building_0a_type[64 * i] != 59 )
       {
-        if ( building_12_walkerServiceAccess[64 * i] <= 1 )
-          building_12_walkerServiceAccess[64 * i] = 0;
+        if ( buildings[i].walkerServiceAccess <= 1 )
+          buildings[i].walkerServiceAccess = 0;
         else
-          --building_12_walkerServiceAccess[64 * i];
+          --buildings[i].walkerServiceAccess;
       }
     }
   }
@@ -37153,7 +37146,7 @@ void  sub_451770()
       if ( building_3b_industry_outputGood[128 * i] )
       {
         building_69_house_mercury[128 * i] = 0;
-        if ( building_12_walkerServiceAccess[64 * i] >= 1 )
+        if ( buildings[i].walkerServiceAccess >= 1 )
         {
           if ( building_38_num_workers[64 * i] > 0 )
           {
@@ -37222,7 +37215,7 @@ void  sub_451AB0()
       {
         if ( building_3b_industry_outputGood[128 * i] )
         {
-          if ( building_12_walkerServiceAccess[64 * i] >= 1 )
+          if ( buildings[i].walkerServiceAccess >= 1 )
           {
             if ( building_38_num_workers[64 * i] > 0 )
             {
@@ -38380,7 +38373,7 @@ void  fun_immigratePeople(signed int immigrantsToGo)
     v3 = gametick_tmpBuildingList[gametick_tmpBuildingList_ctr++];
     if ( building_26_immigrantId[64 * v3] )
     {
-      if ( (unsigned __int8)walker_state[128 * building_26_immigrantId[64 * v3]] != 1 )
+      if ( walkers[building_26_immigrantId[64 * v3]].state != 1 )
         building_26_immigrantId[64 * v3] = 0;
     }
   }
@@ -38747,7 +38740,7 @@ void  fun_calculateWorkersNeededPerCategory()
     if ( buildings[buildingId].inUse == 1 )
     {
       category = laborCategoryForBuildingId[building_0a_type[64 * buildingId]];
-      building_3a_laborCategory[128 * buildingId] = category;
+      buildings[buildingId].laborCategory = category;
       if ( category >= 0 )
       {
         if ( category == 2 )
@@ -38755,7 +38748,7 @@ void  fun_calculateWorkersNeededPerCategory()
         if ( category == 6 )
         {
           if ( (building_0a_type[64 * buildingId] != B_Hippodrome || !building_30_warehouse_prevStorage[64 * buildingId])
-            && building_12_walkerServiceAccess[64 * buildingId] > 0 )
+            && buildings[buildingId].walkerServiceAccess > 0 )
             goto LABEL_31;
         }
         else
@@ -38764,16 +38757,16 @@ void  fun_calculateWorkersNeededPerCategory()
             goto LABEL_31;
           if ( category && category != 1 )
           {
-            if ( building_12_walkerServiceAccess[64 * buildingId] > 0 )
+            if ( buildings[buildingId].walkerServiceAccess > 0 )
               goto LABEL_31;
           }
           else
           {
-            if ( !fun_isIndustryForBuildingEnabled(buildingId) && building_12_walkerServiceAccess[64 * buildingId] > 0 )
+            if ( !fun_isIndustryForBuildingEnabled(buildingId) && buildings[buildingId].walkerServiceAccess > 0 )
             {
 LABEL_31:
               city_inform[ciid].labor_category_priority[category].numWorkersNeeded += model_buildings_laborers[8 * building_0a_type[64 * buildingId]];
-              city_inform[ciid].labor_category_priority[category].relatedToEmployeeAccess += building_12_walkerServiceAccess[64 * buildingId];
+              city_inform[ciid].labor_category_priority[category].relatedToEmployeeAccess += buildings[buildingId].walkerServiceAccess;
               ++city_inform[ciid].labor_category_priority[category].numBuildings;
               continue;
             }
@@ -38977,9 +38970,9 @@ void  sub_456230()
         else
         {
           building_14_word_94BD54[64 * i] = 0;
-          if ( building_12_walkerServiceAccess[64 * i] )
+          if ( buildings[i].walkerServiceAccess )
             building_14_word_94BD54[64 * i] = fun_getPercentage(
-                                                100 * building_12_walkerServiceAccess[64 * i],
+                                                100 * buildings[i].walkerServiceAccess,
                                                 city_inform[ciid].labor_category_priority[category].relatedToEmployeeAccess);
         }
       }
@@ -42225,7 +42218,7 @@ void  fun_generateWalkersForBuildings()
           switch ( building_0a_type[64 * i] )
           {
             case B_Warehouse:
-              if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+              if ( buildings[i].walkerServiceAccess <= 0 )
                 building_7f_byte_94BDBF[128 * i] = 2;
               v85 = i;
               for ( j = 0; j < 8; ++j )
@@ -42240,7 +42233,7 @@ void  fun_generateWalkersForBuildings()
                      (unsigned __int8)building_03_size[128 * i])
                 || fun_determineAccessRoad(buildings[i].x, building__07_y[128 * i], 3) )
               {
-                if ( building_12_walkerServiceAccess[64 * i] <= 100 )
+                if ( buildings[i].walkerServiceAccess <= 100 )
                   fun_generateLaborSeeker(i);
                 if ( !fun_buildingHasWalkerOfType(i, Walker_Warehouseman, 0) )
                 {
@@ -42259,11 +42252,11 @@ void  fun_generateWalkersForBuildings()
               }
               break;
             case B_Granary:
-              if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+              if ( buildings[i].walkerServiceAccess <= 0 )
                 building_7f_byte_94BDBF[128 * i] = 2;
               if ( fun_granaryHasRoadAccess(buildings[i].x, building__07_y[128 * i]) )
               {
-                if ( building_12_walkerServiceAccess[64 * i] <= 100 )
+                if ( buildings[i].walkerServiceAccess <= 100 )
                   fun_generateLaborSeeker(i);
                 if ( !fun_buildingHasWalkerOfType(i, 9, 0) )
                 {
@@ -42280,14 +42273,14 @@ void  fun_generateWalkersForBuildings()
               }
               break;
             case B_Tower:
-              if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+              if ( buildings[i].walkerServiceAccess <= 0 )
                 building_7f_byte_94BDBF[128 * i] = 2;
               if ( fun_determineAccessRoad(
                      buildings[i].x,
                      building__07_y[128 * i],
                      (unsigned __int8)building_03_size[128 * i]) )
               {
-                if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                if ( buildings[i].walkerServiceAccess <= 50 )
                   fun_generateLaborSeeker(i);
                 if ( building_38_num_workers[64 * i] > 0 )
                 {
@@ -42313,7 +42306,7 @@ void  fun_generateWalkersForBuildings()
               }
               break;
             case B_EngineersPost:
-              if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+              if ( buildings[i].walkerServiceAccess <= 0 )
                 building_7f_byte_94BDBF[128 * i] = 2;
               if ( !fun_buildingHasWalkerOfType(i, Walker_Engineer, 0)
                 && fun_determineAccessRoad(
@@ -42321,7 +42314,7 @@ void  fun_generateWalkersForBuildings()
                      building__07_y[128 * i],
                      (unsigned __int8)building_03_size[128 * i]) )
               {
-                if ( building_12_walkerServiceAccess[64 * i] <= 100 )
+                if ( buildings[i].walkerServiceAccess <= 100 )
                   fun_generateLaborSeeker(i);
                 engineerEmployment = fun_getPercentage(
                                        building_38_num_workers[64 * i],
@@ -42374,7 +42367,7 @@ void  fun_generateWalkersForBuildings()
               }
               break;
             case B_Prefecture:
-              if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+              if ( buildings[i].walkerServiceAccess <= 0 )
                 building_7f_byte_94BDBF[128 * i] = 2;
               if ( !fun_buildingHasWalkerOfType(i, 10, 0)
                 && fun_determineAccessRoad(
@@ -42382,7 +42375,7 @@ void  fun_generateWalkersForBuildings()
                      building__07_y[128 * i],
                      (unsigned __int8)building_03_size[128 * i]) )
               {
-                if ( building_12_walkerServiceAccess[64 * i] <= 100 )
+                if ( buildings[i].walkerServiceAccess <= 100 )
                   fun_generateLaborSeeker(i);
                 prefectEmployment = fun_getPercentage(
                                       building_38_num_workers[64 * i],
@@ -42436,14 +42429,14 @@ void  fun_generateWalkersForBuildings()
                 switch ( building_0a_type[64 * i] )
                 {
                   case B_ActorColony:
-                    if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                    if ( buildings[i].walkerServiceAccess <= 0 )
                       building_7f_byte_94BDBF[128 * i] = 2;
                     if ( fun_determineAccessRoad(
                            buildings[i].x,
                            building__07_y[128 * i],
                            (unsigned __int8)building_03_size[128 * i]) )
                     {
-                      if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                      if ( buildings[i].walkerServiceAccess <= 50 )
                         fun_generateLaborSeeker(i);
                       actorColonyEmployment = fun_getPercentage(
                                                 building_38_num_workers[64 * i],
@@ -42496,14 +42489,14 @@ void  fun_generateWalkersForBuildings()
                     }
                     break;
                   case B_GladiatorSchool:
-                    if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                    if ( buildings[i].walkerServiceAccess <= 0 )
                       building_7f_byte_94BDBF[128 * i] = 2;
                     if ( fun_determineAccessRoad(
                            buildings[i].x,
                            building__07_y[128 * i],
                            (unsigned __int8)building_03_size[128 * i]) )
                     {
-                      if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                      if ( buildings[i].walkerServiceAccess <= 50 )
                         fun_generateLaborSeeker(i);
                       gladiatorSchoolEmployment = fun_getPercentage(
                                                     building_38_num_workers[64 * i],
@@ -42556,14 +42549,14 @@ void  fun_generateWalkersForBuildings()
                     }
                     break;
                   case B_LionHouse:
-                    if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                    if ( buildings[i].walkerServiceAccess <= 0 )
                       building_7f_byte_94BDBF[128 * i] = 2;
                     if ( fun_determineAccessRoad(
                            buildings[i].x,
                            building__07_y[128 * i],
                            (unsigned __int8)building_03_size[128 * i]) )
                     {
-                      if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                      if ( buildings[i].walkerServiceAccess <= 50 )
                         fun_generateLaborSeeker(i);
                       lionHouseEmployment = fun_getPercentage(
                                               building_38_num_workers[64 * i],
@@ -42611,14 +42604,14 @@ void  fun_generateWalkersForBuildings()
                     }
                     break;
                   case B_ChariotMaker:
-                    if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                    if ( buildings[i].walkerServiceAccess <= 0 )
                       building_7f_byte_94BDBF[128 * i] = 2;
                     if ( fun_determineAccessRoad(
                            buildings[i].x,
                            building__07_y[128 * i],
                            (unsigned __int8)building_03_size[128 * i]) )
                     {
-                      if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                      if ( buildings[i].walkerServiceAccess <= 50 )
                         fun_generateLaborSeeker(i);
                       chariotMakerEmployment = fun_getPercentage(
                                                  building_38_num_workers[64 * i],
@@ -42671,7 +42664,7 @@ void  fun_generateWalkersForBuildings()
                     }
                     break;
                   case B_Amphitheater:
-                    if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                    if ( buildings[i].walkerServiceAccess <= 0 )
                       building_7f_byte_94BDBF[128 * i] = 2;
                     if ( !fun_buildingHasWalkerOfType(i, Walker_Actor, Walker_Gladiator)
                       && fun_determineAccessRoad(
@@ -42679,7 +42672,7 @@ void  fun_generateWalkersForBuildings()
                            building__07_y[128 * i],
                            (unsigned __int8)building_03_size[128 * i]) )
                     {
-                      if ( building_12_walkerServiceAccess[64 * i] <= 50
+                      if ( buildings[i].walkerServiceAccess <= 50
                         || (signed int)(unsigned __int8)building_65_house_bathhouse_dock_numships_entert_days[128 * i] <= 0
                         && (signed int)(unsigned __int8)building_66_house_hospital_entert_days2[128 * i] <= 0 )
                         fun_generateLaborSeeker(i);
@@ -42738,7 +42731,7 @@ void  fun_generateWalkersForBuildings()
                     }
                     break;
                   case B_Theater:
-                    if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                    if ( buildings[i].walkerServiceAccess <= 0 )
                       building_7f_byte_94BDBF[128 * i] = 2;
                     if ( !fun_buildingHasWalkerOfType(i, Walker_Actor, 0)
                       && fun_determineAccessRoad(
@@ -42746,7 +42739,7 @@ void  fun_generateWalkersForBuildings()
                            building__07_y[128 * i],
                            (unsigned __int8)building_03_size[128 * i]) )
                     {
-                      if ( building_12_walkerServiceAccess[64 * i] <= 50
+                      if ( buildings[i].walkerServiceAccess <= 50
                         || (signed int)(unsigned __int8)building_65_house_bathhouse_dock_numships_entert_days[128 * i] <= 0 )
                         fun_generateLaborSeeker(i);
                       theaterEmployment = fun_getPercentage(
@@ -42801,7 +42794,7 @@ void  fun_generateWalkersForBuildings()
                     }
                     break;
                   case B_Hippodrome:
-                    if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                    if ( buildings[i].walkerServiceAccess <= 0 )
                       building_7f_byte_94BDBF[128 * i] = 2;
                     if ( !building_30_warehouse_prevStorage[64 * i] )
                     {
@@ -42815,7 +42808,7 @@ void  fun_generateWalkersForBuildings()
                       if ( !fun_buildingHasWalkerOfType(i, Walker_Charioteer, 0)
                         && sub_4898D0(buildings[i].x, building__07_y[128 * i]) )
                       {
-                        if ( building_12_walkerServiceAccess[64 * i] <= 50
+                        if ( buildings[i].walkerServiceAccess <= 50
                           || (signed int)(unsigned __int8)building_65_house_bathhouse_dock_numships_entert_days[128 * i] <= 0 )
                           fun_generateLaborSeeker(i);
                         hippodromeEmployment = fun_getPercentage(
@@ -42903,7 +42896,7 @@ void  fun_generateWalkersForBuildings()
                     }
                     break;
                   case B_Colosseum:
-                    if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                    if ( buildings[i].walkerServiceAccess <= 0 )
                       building_7f_byte_94BDBF[128 * i] = 2;
                     if ( !fun_buildingHasWalkerOfType(i, Walker_Gladiator, Walker_LionTamer)
                       && fun_determineAccessRoad(
@@ -42911,7 +42904,7 @@ void  fun_generateWalkersForBuildings()
                            building__07_y[128 * i],
                            (unsigned __int8)building_03_size[128 * i]) )
                     {
-                      if ( building_12_walkerServiceAccess[64 * i] <= 50
+                      if ( buildings[i].walkerServiceAccess <= 50
                         || (signed int)(unsigned __int8)building_65_house_bathhouse_dock_numships_entert_days[128 * i] <= 0
                         && (signed int)(unsigned __int8)building_66_house_hospital_entert_days2[128 * i] <= 0 )
                         fun_generateLaborSeeker(i);
@@ -42986,14 +42979,14 @@ void  fun_generateWalkersForBuildings()
                     break;
                   case B_Market:
                     sub_463C80(i);
-                    if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                    if ( buildings[i].walkerServiceAccess <= 0 )
                       building_7f_byte_94BDBF[128 * i] = 2;
                     if ( fun_determineAccessRoad(
                            buildings[i].x,
                            building__07_y[128 * i],
                            (unsigned __int8)building_03_size[128 * i]) )
                     {
-                      if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                      if ( buildings[i].walkerServiceAccess <= 50 )
                         fun_generateLaborSeeker(i);
                       marketEmployment = fun_getPercentage(
                                            building_38_num_workers[64 * i],
@@ -43049,7 +43042,7 @@ void  fun_generateWalkersForBuildings()
                       if ( building_24_laborSeekerId[64 * i] )
                       {
                         v92 = building_24_laborSeekerId[64 * i];
-                        if ( (unsigned __int8)walker_state[128 * v92] != 1
+                        if ( walkers[v92].state != 1
                           || walkers[v92].type != Walker_MarketBuyer
                           && walkers[v92].type != 5 )
                           building_24_laborSeekerId[64 * i] = 0;
@@ -43079,20 +43072,20 @@ void  fun_generateWalkersForBuildings()
                                  building__07_y[128 * v87],
                                  (unsigned __int8)building_03_size[128 * v87]) )
                           {
-                            walker_destination_x[128 * v91] = walkerGridX;
+                            walkers[v91].destination_x = walkerGridX;
                             walker_destination_y[128 * v91] = walkerGridY;
                           }
                           else
                           {
                             if ( fun_determineAccessRoad(buildings[v87].x, building__07_y[128 * v87], 3) )
                             {
-                              walker_destination_x[128 * v91] = walkerGridX;
+                              walkers[v91].destination_x = walkerGridX;
                               walker_destination_y[128 * v91] = walkerGridY;
                             }
                             else
                             {
                               walkers[v91].actionState = -110;
-                              walker_destination_x[128 * v91] = walker_x[128 * v91];
+                              walkers[v91].destination_x = walkers[v91].x;
                               walker_destination_y[128 * v91] = walkers[v91].y;
                             }
                           }
@@ -43102,7 +43095,7 @@ void  fun_generateWalkersForBuildings()
                     break;
                   case B_Bathhouse:
                     sub_4639D0(i);
-                    if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                    if ( buildings[i].walkerServiceAccess <= 0 )
                       building_7f_byte_94BDBF[128 * i] = 2;
                     if ( !building_2d_house_hasFountain[128 * i] )
                       building_7f_byte_94BDBF[128 * i] = 2;
@@ -43113,7 +43106,7 @@ void  fun_generateWalkersForBuildings()
                            (unsigned __int8)building_03_size[128 * i])
                       && building_2d_house_hasFountain[128 * i] )
                     {
-                      if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                      if ( buildings[i].walkerServiceAccess <= 50 )
                         fun_generateLaborSeeker(i);
                       bathhouseEmployment = fun_getPercentage(
                                               building_38_num_workers[64 * i],
@@ -43173,7 +43166,7 @@ void  fun_generateWalkersForBuildings()
                       switch ( building_0a_type[64 * i] )
                       {
                         case B_School:
-                          if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                          if ( buildings[i].walkerServiceAccess <= 0 )
                             building_7f_byte_94BDBF[128 * i] = 2;
                           if ( !fun_buildingHasWalkerOfType(i, Walker_SchoolChild, 0)
                             && fun_determineAccessRoad(
@@ -43181,7 +43174,7 @@ void  fun_generateWalkersForBuildings()
                                  building__07_y[128 * i],
                                  (unsigned __int8)building_03_size[128 * i]) )
                           {
-                            if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                            if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
                             schoolEmployment = fun_getPercentage(
                                                  building_38_num_workers[64 * i],
@@ -43264,7 +43257,7 @@ void  fun_generateWalkersForBuildings()
                           }
                           break;
                         case B_Library:
-                          if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                          if ( buildings[i].walkerServiceAccess <= 0 )
                             building_7f_byte_94BDBF[128 * i] = 2;
                           if ( !fun_buildingHasWalkerOfType(i, Walker_Librarian, 0)
                             && fun_determineAccessRoad(
@@ -43272,7 +43265,7 @@ void  fun_generateWalkersForBuildings()
                                  building__07_y[128 * i],
                                  (unsigned __int8)building_03_size[128 * i]) )
                           {
-                            if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                            if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
                             libraryEmployment = fun_getPercentage(
                                                   building_38_num_workers[64 * i],
@@ -43326,7 +43319,7 @@ void  fun_generateWalkersForBuildings()
                           }
                           break;
                         case B_Academy:
-                          if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                          if ( buildings[i].walkerServiceAccess <= 0 )
                             building_7f_byte_94BDBF[128 * i] = 2;
                           if ( !fun_buildingHasWalkerOfType(i, Walker_Teacher, 0)
                             && fun_determineAccessRoad(
@@ -43334,7 +43327,7 @@ void  fun_generateWalkersForBuildings()
                                  building__07_y[128 * i],
                                  (unsigned __int8)building_03_size[128 * i]) )
                           {
-                            if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                            if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
                             academyEmployment = fun_getPercentage(
                                                   building_38_num_workers[64 * i],
@@ -43383,7 +43376,7 @@ void  fun_generateWalkersForBuildings()
                           }
                           break;
                         case B_Barber:
-                          if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                          if ( buildings[i].walkerServiceAccess <= 0 )
                             building_7f_byte_94BDBF[128 * i] = 2;
                           if ( !fun_buildingHasWalkerOfType(i, Walker_Barber, 0)
                             && fun_determineAccessRoad(
@@ -43391,7 +43384,7 @@ void  fun_generateWalkersForBuildings()
                                  building__07_y[128 * i],
                                  (unsigned __int8)building_03_size[128 * i]) )
                           {
-                            if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                            if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
                             barberEmployment = fun_getPercentage(
                                                  building_38_num_workers[64 * i],
@@ -43445,7 +43438,7 @@ void  fun_generateWalkersForBuildings()
                           }
                           break;
                         case B_Doctor:
-                          if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                          if ( buildings[i].walkerServiceAccess <= 0 )
                             building_7f_byte_94BDBF[128 * i] = 2;
                           if ( !fun_buildingHasWalkerOfType(i, 33, 0)
                             && fun_determineAccessRoad(
@@ -43453,7 +43446,7 @@ void  fun_generateWalkersForBuildings()
                                  building__07_y[128 * i],
                                  (unsigned __int8)building_03_size[128 * i]) )
                           {
-                            if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                            if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
                             doctorEmployment = fun_getPercentage(
                                                  building_38_num_workers[64 * i],
@@ -43507,7 +43500,7 @@ void  fun_generateWalkersForBuildings()
                           }
                           break;
                         case B_Hospital:
-                          if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                          if ( buildings[i].walkerServiceAccess <= 0 )
                             building_7f_byte_94BDBF[128 * i] = 2;
                           if ( !fun_buildingHasWalkerOfType(i, 34, 0)
                             && fun_determineAccessRoad(
@@ -43515,7 +43508,7 @@ void  fun_generateWalkersForBuildings()
                                  building__07_y[128 * i],
                                  (unsigned __int8)building_03_size[128 * i]) )
                           {
-                            if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                            if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
                             hospitalEmployment = fun_getPercentage(
                                                    building_38_num_workers[64 * i],
@@ -43599,14 +43592,14 @@ void  fun_generateWalkersForBuildings()
                           }
                           break;
                         case B_Dock:
-                          if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                          if ( buildings[i].walkerServiceAccess <= 0 )
                             building_7f_byte_94BDBF[128 * i] = 2;
                           if ( fun_determineAccessRoad(
                                  buildings[i].x,
                                  building__07_y[128 * i],
                                  (unsigned __int8)building_03_size[128 * i]) )
                           {
-                            if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                            if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
                             dockEmployment = fun_getPercentage(
                                                building_38_num_workers[64 * i],
@@ -43666,7 +43659,7 @@ void  fun_generateWalkersForBuildings()
                               {
                                 if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * i] + 2 * m) )
                                 {
-                                  walker_state[128 * *(__int16 *)((char *)&building_6c_word_94BDAC[64 * i] + 2 * m)] = 2;
+                                  walkers[*(__int16 *)((char *)&building_6c_word_94BDAC[64 * i] + 2 * m)].state = 2;
                                   goto LABEL_4;
                                 }
                               }
@@ -43674,12 +43667,12 @@ void  fun_generateWalkersForBuildings()
                           }
                           break;
                         case B_Wharf:
-                          if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                          if ( buildings[i].walkerServiceAccess <= 0 )
                             building_7f_byte_94BDBF[128 * i] = 2;
                           if ( building_72_wharf_hasBoat_house_evolveStatusDesir[64 * i] )
                           {
                             v94 = building_72_wharf_hasBoat_house_evolveStatusDesir[64 * i];
-                            if ( (unsigned __int8)walker_state[128 * v94] != 1
+                            if ( walkers[v94].state != 1
                               || walkers[v94].type != 25 )
                               building_72_wharf_hasBoat_house_evolveStatusDesir[64 * i] = 0;
                           }
@@ -43688,7 +43681,7 @@ void  fun_generateWalkersForBuildings()
                                  building__07_y[128 * i],
                                  (unsigned __int8)building_03_size[128 * i]) )
                           {
-                            if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                            if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
                             if ( !fun_buildingHasWalkerOfType(i, 4, 0) )
                             {
@@ -43708,14 +43701,14 @@ void  fun_generateWalkersForBuildings()
                           }
                           break;
                         case B_Shipyard:
-                          if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                          if ( buildings[i].walkerServiceAccess <= 0 )
                             building_7f_byte_94BDBF[128 * i] = 2;
                           if ( fun_determineAccessRoad(
                                  buildings[i].x,
                                  building__07_y[128 * i],
                                  (unsigned __int8)building_03_size[128 * i]) )
                           {
-                            if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                            if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
                             if ( !fun_buildingHasWalkerOfType(i, 25, 0) )
                             {
@@ -43834,14 +43827,14 @@ void  fun_generateWalkersForBuildings()
                           sub_4BB790(i);
                           break;
                         case B_Barracks:
-                          if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                          if ( buildings[i].walkerServiceAccess <= 0 )
                             building_7f_byte_94BDBF[128 * i] = 2;
                           if ( fun_determineAccessRoad(
                                  buildings[i].x,
                                  building__07_y[128 * i],
                                  (unsigned __int8)building_03_size[128 * i]) )
                           {
-                            if ( building_12_walkerServiceAccess[64 * i] <= 100 )
+                            if ( buildings[i].walkerServiceAccess <= 100 )
                               fun_generateLaborSeeker(i);
                             v56 = fun_getPercentage(
                                     building_38_num_workers[64 * i],
@@ -43891,14 +43884,14 @@ void  fun_generateWalkersForBuildings()
                           }
                           break;
                         case B_MilitaryAcademy:
-                          if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                          if ( buildings[i].walkerServiceAccess <= 0 )
                             building_7f_byte_94BDBF[128 * i] = 2;
                           if ( fun_determineAccessRoad(
                                  buildings[i].x,
                                  building__07_y[128 * i],
                                  (unsigned __int8)building_03_size[128 * i]) )
                           {
-                            if ( building_12_walkerServiceAccess[64 * i] <= 100 )
+                            if ( buildings[i].walkerServiceAccess <= 100 )
                               fun_generateLaborSeeker(i);
                           }
                           break;
@@ -43906,7 +43899,7 @@ void  fun_generateWalkersForBuildings()
                     }
                     else                        // small or large temple
                     {
-                      if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                      if ( buildings[i].walkerServiceAccess <= 0 )
                         building_7f_byte_94BDBF[128 * i] = 2;
                       if ( !fun_buildingHasWalkerOfType(i, 27, 0)
                         && fun_determineAccessRoad(
@@ -43914,7 +43907,7 @@ void  fun_generateWalkersForBuildings()
                              building__07_y[128 * i],
                              (unsigned __int8)building_03_size[128 * i]) )
                       {
-                        if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                        if ( buildings[i].walkerServiceAccess <= 50 )
                           fun_generateLaborSeeker(i);
                         templeEmployment = fun_getPercentage(
                                              building_38_num_workers[64 * i],
@@ -43981,7 +43974,7 @@ void  fun_generateWalkersForBuildings()
               {
                 if ( building_0a_type[64 * i] == B_SenateUpgraded )
                   sub_463DB0(i);
-                if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+                if ( buildings[i].walkerServiceAccess <= 0 )
                   building_7f_byte_94BDBF[128 * i] = 2;
                 if ( !fun_buildingHasWalkerOfType(i, 7, 0)
                   && fun_determineAccessRoad(
@@ -43989,7 +43982,7 @@ void  fun_generateWalkersForBuildings()
                        building__07_y[128 * i],
                        (unsigned __int8)building_03_size[128 * i]) )
                 {
-                  if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+                  if ( buildings[i].walkerServiceAccess <= 50 )
                     fun_generateLaborSeeker(i);
                   taxCollectorEmployment = fun_getPercentage(
                                              building_38_num_workers[64 * i],
@@ -44041,14 +44034,14 @@ void  fun_generateWalkersForBuildings()
         }
         else
         {
-          if ( building_12_walkerServiceAccess[64 * i] <= 0 )
+          if ( buildings[i].walkerServiceAccess <= 0 )
             building_7f_byte_94BDBF[128 * i] = 2;
           if ( fun_determineAccessRoad(
                  buildings[i].x,
                  building__07_y[128 * i],
                  (unsigned __int8)building_03_size[128 * i]) )
           {
-            if ( building_12_walkerServiceAccess[64 * i] <= 50 )
+            if ( buildings[i].walkerServiceAccess <= 50 )
               fun_generateLaborSeeker(i);
             if ( !fun_buildingHasWalkerOfType(i, 4, 0) )
             {
@@ -44102,7 +44095,7 @@ signed int  fun_buildingHasWalkerOfType(int buildingId, int walkerType1, int wal
   if ( building_22_walkerId[64 * buildingId] > 0 )
   {
     walkerId = building_22_walkerId[64 * buildingId];
-    if ( walker_state[128 * walkerId] )
+    if ( walkers[walkerId].state )
     {
       if ( walkers[walkerId].type == walkerType1
         || walkers[walkerId].type == walkerType2 )
@@ -44148,7 +44141,7 @@ void  fun_generateLaborSeeker(int buildingId)
     if ( building_24_laborSeekerId[64 * buildingId] )
     {
       seekerId = building_24_laborSeekerId[64 * buildingId];
-      if ( !walker_state[128 * seekerId] )
+      if ( !walkers[seekerId].state )
         building_24_laborSeekerId[64 * buildingId] = 0;
       if ( walkers[seekerId].type != Walker_LaborSeeker )
         building_24_laborSeekerId[64 * buildingId] = 0;
@@ -44737,7 +44730,7 @@ void  fun_countBuildingTypes()
       v1 = building_26_immigrantId[64 * k];
       if ( building_26_immigrantId[64 * k] )
       {
-        if ( (unsigned __int8)walker_state[128 * v1] != 1 || word_7FA38E[64 * v1] != k )
+        if ( walkers[v1].state != 1 || word_7FA38E[64 * v1] != k )
           building_26_immigrantId[64 * k] = 0;
       }
       if ( v0 )
@@ -45903,13 +45896,13 @@ void  fun_generateRioter(int buildingId)
       word_7FA366[64 * walkerId] = 4 * i + 10;
       if ( v4 )
       {
-        walker_destination_x[128 * walkerId] = walkerGridX;
+        walkers[walkerId].destination_x = walkerGridX;
         walker_destination_y[128 * walkerId] = walkerGridY;
         word_7FA38E[64 * walkerId] = v4;
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
     }
     sub_46E3D0(buildingId, 0);
@@ -60783,7 +60776,7 @@ signed int  sub_48A590(int a1)
     {
       if ( scn_fish_x[j] > 0 )
       {
-        v5 = fun_getDistanceMaximum(walker_x[128 * a1], walkers[a1].y, scn_fish_x[j], scn_fish_y[j]);
+        v5 = fun_getDistanceMaximum(walkers[a1].x, walkers[a1].y, scn_fish_x[j], scn_fish_y[j]);
         if ( v5 < v4 )
         {
           v4 = v5;
@@ -60830,7 +60823,7 @@ signed int  sub_48A6F0(int a1)
   {
     for ( i = 1; i <= 5; ++i )
     {
-      v2 = walker_x[128 * a1];
+      v2 = walkers[a1].x;
       v3 = walkers[a1].y;
       v6 = i + v2;
       v5 = i + v3;
@@ -60895,7 +60888,7 @@ signed int  sub_48A900(int a1)
   {
     for ( i = 1; i <= 5; ++i )
     {
-      v3 = walker_x[128 * a1];
+      v3 = walkers[a1].x;
       v4 = walkers[a1].y;
       v11 = i + v3;
       v10 = i + v4;
@@ -64546,12 +64539,12 @@ void  sub_492870()
     --city_inform[ciid].dword_654468;
   for ( walkerId = 1; walkerId < 1000; ++walkerId )
   {
-    if ( walker_state[128 * walkerId] )
+    if ( walkers[walkerId].state )
     {
       if ( word_7FA3B2[64 * walkerId] )
       {
         v0 = word_7FA3B2[64 * walkerId];
-        if ( (unsigned __int8)walker_state[128 * v0] != 1 )
+        if ( walkers[v0].state != 1 )
           word_7FA3B2[64 * walkerId] = 0;
         if ( word_7FA3B0[64 * v0] != walkerId )
           word_7FA3B2[64 * walkerId] = 0;
@@ -64560,7 +64553,7 @@ void  sub_492870()
       ((void (__fastcall *)(int, _DWORD))walker_callbacks[walkers[walkerId].type])(
         walkerId << 7,
         walkers[walkerId].type);
-      if ( (unsigned __int8)walker_state[128 * walkerId] == 2 )
+      if ( (unsigned __int8)walkers[walkerId].state == 2 )
         fun_deleteWalker(walkerId);
     }
   }
@@ -64608,13 +64601,13 @@ void  fun_walker_immigrant()
                  2) )
           {
             walkers[walkerId].actionState = 2;
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             word_7FA374[64 * walkerId] = 0;
           }
           else
           {
-            walker_state[128 * walkerId] = 2;
+            walkers[walkerId].state = 2;
           }
         }
         break;
@@ -64629,17 +64622,17 @@ void  fun_walker_immigrant()
           case 10:
             building_26_immigrantId[64 * buildingId] = 0;
             building_1a_word_94BD5A[64 * buildingId] = 0;
-            walker_state[128 * walkerId] = 2;
+            walkers[walkerId].state = 2;
             break;
           case 8:
             walkers[walkerId].actionState = 3;
-            walker_destination_x[128 * walkerId] = buildings[buildingId].x;
+            walkers[walkerId].destination_x = buildings[buildingId].x;
             walker_destination_y[128 * walkerId] = building__07_y[128 * buildingId];
             sub_4B6B70(
               walkerId,
               walkers[walkerId].tilePosition_y,
               walkers[walkerId].tilePosition_x,
-              15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+              15 * (unsigned __int8)walkers[walkerId].destination_x,
               15 * (unsigned __int8)walker_destination_y[128 * walkerId],
               0);
             word_7FA374[64 * walkerId] = 0;
@@ -64651,7 +64644,7 @@ void  fun_walker_immigrant()
         byte_7FA395[128 * walkerId] = 1;
         if ( sub_4B66E0(walkerId, 1) == 1 )
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           v1 = model_houses_numPeople[20 * building_0c_level_resourceId[64 * buildingId]];
           if ( building_04_house_isMerged[128 * buildingId] )
             v1 *= 4;
@@ -64694,7 +64687,7 @@ void  fun_walker_immigrant()
   }
   else
   {
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   }
 }
 
@@ -64719,16 +64712,16 @@ void  fun_walker_emigrant()
       ++word_7FA366[64 * walkerId];
       if ( word_7FA366[64 * walkerId] >= 5 )
       {
-        if ( !sub_489070(walker_x[128 * walkerId], walkers[walkerId].y, 1, 5) )
-          walker_state[128 * walkerId] = 2;
+        if ( !sub_489070(walkers[walkerId].x, walkers[walkerId].y, 1, 5) )
+          walkers[walkerId].state = 2;
         walkers[walkerId].actionState = 5;
-        walker_destination_x[128 * walkerId] = walkerGridX;
+        walkers[walkerId].destination_x = walkerGridX;
         walker_destination_y[128 * walkerId] = walkerGridY;
         sub_4B6B70(
           walkerId,
           walkers[walkerId].tilePosition_y,
           walkers[walkerId].tilePosition_x,
-          15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+          15 * (unsigned __int8)walkers[walkerId].destination_x,
           15 * (unsigned __int8)walker_destination_y[128 * walkerId],
           0);
         word_7FA374[64 * walkerId] = 0;
@@ -64740,10 +64733,10 @@ void  fun_walker_emigrant()
       if ( sub_4B66E0(walkerId, 1) == 1 )
       {
         walkers[walkerId].actionState = 6;
-        walker_destination_x[128 * walkerId] = city_inform[ciid].entry_x;
+        walkers[walkerId].destination_x = city_inform[ciid].entry_x;
         walker_destination_y[128 * walkerId] = city_inform[ciid].entry_y;
         word_7FA374[64 * walkerId] = 0;
-        walker_progressOnTile[128 * walkerId] = 15;
+        walkers[walkerId].progressOnTile = 15;
       }
       if ( byte_7FA370[128 * walkerId] )
         byte_7FA395[128 * walkerId] = 1;
@@ -64757,11 +64750,11 @@ void  fun_walker_emigrant()
       if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
         if ( walkers[walkerId].direction == 8 )
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
       break;
   }
@@ -64808,7 +64801,7 @@ void  fun_walker_homeless()
       ++word_7FA366[64 * walkerId];
       if ( word_7FA366[64 * walkerId] > 51 )
       {
-        v2 = sub_454D40(walker_x[128 * walkerId], walkers[walkerId].y);
+        v2 = sub_454D40(walkers[walkerId].x, walkers[walkerId].y);
         if ( v2 )
         {
           if ( sub_489070(
@@ -64820,19 +64813,19 @@ void  fun_walker_homeless()
             building_26_immigrantId[64 * v2] = walkerId;
             walker_migrantDestinationHome[64 * walkerId] = v2;
             walkers[walkerId].actionState = 8;
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             word_7FA374[64 * walkerId] = 0;
           }
           else
           {
-            walker_state[128 * walkerId] = 2;
+            walkers[walkerId].state = 2;
           }
         }
         else
         {
           walkers[walkerId].actionState = 10;
-          walker_destination_x[128 * walkerId] = city_inform[ciid].exit_x;
+          walkers[walkerId].destination_x = city_inform[ciid].exit_x;
           walker_destination_y[128 * walkerId] = city_inform[ciid].exit_y;
           word_7FA374[64 * walkerId] = 0;
           word_7FA366[64 * walkerId] = 0;
@@ -64848,13 +64841,13 @@ void  fun_walker_homeless()
         if ( walkers[walkerId].direction == 8 )
         {
           walkers[walkerId].actionState = 9;
-          walker_destination_x[128 * walkerId] = buildings[v3].x;
+          walkers[walkerId].destination_x = buildings[v3].x;
           walker_destination_y[128 * walkerId] = building__07_y[128 * v3];
           sub_4B6B70(
             walkerId,
             walkers[walkerId].tilePosition_y,
             walkers[walkerId].tilePosition_x,
-            15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+            15 * (unsigned __int8)walkers[walkerId].destination_x,
             15 * (unsigned __int8)walker_destination_y[128 * walkerId],
             0);
           word_7FA374[64 * walkerId] = 0;
@@ -64863,7 +64856,7 @@ void  fun_walker_homeless()
       else
       {
         building_26_immigrantId[64 * v3] = 0;
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
       break;
     case 0xA:
@@ -64871,20 +64864,20 @@ void  fun_walker_homeless()
       switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       ++word_7FA366[64 * walkerId];
       if ( word_7FA366[64 * walkerId] > 30 )
       {
         word_7FA366[64 * walkerId] = 0;
-        v4 = sub_454D40(walker_x[128 * walkerId], walkers[walkerId].y);
+        v4 = sub_454D40(walkers[walkerId].x, walkers[walkerId].y);
         if ( v4 > 0 )
         {
           if ( sub_489070(
@@ -64896,7 +64889,7 @@ void  fun_walker_homeless()
             building_26_immigrantId[64 * v4] = walkerId;
             walker_migrantDestinationHome[64 * walkerId] = v4;
             walkers[walkerId].actionState = 8;
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             word_7FA374[64 * walkerId] = 0;
             fun_removeDestinationPathForWalker(walkerId);
@@ -64910,7 +64903,7 @@ void  fun_walker_homeless()
       byte_7FA395[128 * walkerId] = 1;
       if ( sub_4B66E0(walkerId, 1) == 1 )
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
         if ( v5 )
         {
           if ( building_0a_type[64 * v5] >= 10 )
@@ -64980,16 +64973,16 @@ void  fun_walker_cartpusher()
       word_7FA346[64 * walkerId] += fun_getResourceGraphicIdOffset((unsigned __int8)byte_7FA34B[128 * walkerId], 1);
       v10 = walkers[walkerId].buildingId;
       if ( grid_groundType[v1] < 0 || grid_groundType[v1] > 2 )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       if ( buildings[v10].inUse != 1 || building_22_walkerId[64 * v10] != walkerId )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       ++word_7FA366[64 * walkerId];
       if ( word_7FA366[64 * walkerId] > 30 )
       {
         dword_862D40 = 0;
         v2 = sub_458E80(
                0,
-               walker_x[128 * walkerId],
+               walkers[walkerId].x,
                walkers[walkerId].y,
                (unsigned __int8)building_3b_industry_outputGood[128 * v10],
                building_1a_word_94BD5A[64 * v10],
@@ -65002,14 +64995,14 @@ void  fun_walker_cartpusher()
           word_7FA38E[64 * walkerId] = v2;
           walkers[walkerId].actionState = 21;
           word_7FA366[64 * walkerId] = 0;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
         }
         else
         {
           v3 = sub_45C100(
                  0,
-                 walker_x[128 * walkerId],
+                 walkers[walkerId].x,
                  walkers[walkerId].y,
                  (unsigned __int8)building_3b_industry_outputGood[128 * v10],
                  building_1a_word_94BD5A[64 * v10],
@@ -65019,13 +65012,13 @@ void  fun_walker_cartpusher()
             word_7FA38E[64 * walkerId] = v3;
             walkers[walkerId].actionState = 22;
             word_7FA366[64 * walkerId] = 0;
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
           }
           else
           {
             v4 = sub_45E100(
-                   walker_x[128 * walkerId],
+                   walkers[walkerId].x,
                    walkers[walkerId].y,
                    (unsigned __int8)building_3b_industry_outputGood[128 * v10],
                    building_1a_word_94BD5A[64 * v10],
@@ -65035,14 +65028,14 @@ void  fun_walker_cartpusher()
               word_7FA38E[64 * walkerId] = v4;
               walkers[walkerId].actionState = 23;
               word_7FA366[64 * walkerId] = 0;
-              walker_destination_x[128 * walkerId] = walkerGridX;
+              walkers[walkerId].destination_x = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
             }
             else
             {
               v5 = sub_458E80(
                      0,
-                     walker_x[128 * walkerId],
+                     walkers[walkerId].x,
                      walkers[walkerId].y,
                      (unsigned __int8)building_3b_industry_outputGood[128 * v10],
                      building_1a_word_94BD5A[64 * v10],
@@ -65052,14 +65045,14 @@ void  fun_walker_cartpusher()
                 word_7FA38E[64 * walkerId] = v5;
                 walkers[walkerId].actionState = 21;
                 word_7FA366[64 * walkerId] = 0;
-                walker_destination_x[128 * walkerId] = walkerGridX;
+                walkers[walkerId].destination_x = walkerGridX;
                 walker_destination_y[128 * walkerId] = walkerGridY;
               }
               else
               {
                 v6 = sub_45C100(
                        1,
-                       walker_x[128 * walkerId],
+                       walkers[walkerId].x,
                        walkers[walkerId].y,
                        (unsigned __int8)building_3b_industry_outputGood[128 * v10],
                        building_1a_word_94BD5A[64 * v10],
@@ -65069,7 +65062,7 @@ void  fun_walker_cartpusher()
                   word_7FA38E[64 * walkerId] = v6;
                   walkers[walkerId].actionState = 22;
                   word_7FA366[64 * walkerId] = 0;
-                  walker_destination_x[128 * walkerId] = walkerGridX;
+                  walkers[walkerId].destination_x = walkerGridX;
                   walker_destination_y[128 * walkerId] = walkerGridY;
                 }
                 else
@@ -65103,11 +65096,11 @@ void  fun_walker_cartpusher()
           word_7FA366[64 * walkerId] = 0;
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       if ( buildings[word_7FA38E[64 * walkerId]].inUse != 1 )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       break;
     case 0x16:
       word_7FA346[64 * walkerId] = word_6E6C72 + 8 * (unsigned __int8)byte_7FA34B[128 * walkerId];
@@ -65130,7 +65123,7 @@ void  fun_walker_cartpusher()
           break;
       }
       if ( buildings[word_7FA38E[64 * walkerId]].inUse != 1 )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       break;
     case 0x17:
       word_7FA346[64 * walkerId] = word_6E6C72 + 8 * (unsigned __int8)byte_7FA34B[128 * walkerId];
@@ -65148,7 +65141,7 @@ void  fun_walker_cartpusher()
           word_7FA366[64 * walkerId] = 0;
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -65163,7 +65156,7 @@ void  fun_walker_cartpusher()
         {
           walkers[walkerId].actionState = 27;
           word_7FA366[64 * walkerId] = 0;
-          walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+          walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         }
         else
@@ -65184,14 +65177,14 @@ void  fun_walker_cartpusher()
         {
           walkers[walkerId].actionState = 27;
           word_7FA366[64 * walkerId] = 0;
-          walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+          walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         }
         else
         {
           v7 = sub_45C100(
                  0,
-                 walker_x[128 * walkerId],
+                 walkers[walkerId].x,
                  walkers[walkerId].y,
                  (unsigned __int8)building_3b_industry_outputGood[128 * v11],
                  building_1a_word_94BD5A[64 * v11],
@@ -65201,14 +65194,14 @@ void  fun_walker_cartpusher()
             word_7FA38E[64 * walkerId] = v7;
             walkers[walkerId].actionState = 22;
             word_7FA366[64 * walkerId] = 0;
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
           }
           else
           {
             v8 = sub_458E80(
                    0,
-                   walker_x[128 * walkerId],
+                   walkers[walkerId].x,
                    walkers[walkerId].y,
                    (unsigned __int8)building_3b_industry_outputGood[128 * v11],
                    building_1a_word_94BD5A[64 * v11],
@@ -65218,14 +65211,14 @@ void  fun_walker_cartpusher()
               word_7FA38E[64 * walkerId] = v8;
               walkers[walkerId].actionState = 21;
               word_7FA366[64 * walkerId] = 0;
-              walker_destination_x[128 * walkerId] = walkerGridX;
+              walkers[walkerId].destination_x = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
             }
             else
             {
               v9 = sub_45C100(
                      1,
-                     walker_x[128 * walkerId],
+                     walkers[walkerId].x,
                      walkers[walkerId].y,
                      (unsigned __int8)building_3b_industry_outputGood[128 * v11],
                      building_1a_word_94BD5A[64 * v11],
@@ -65235,7 +65228,7 @@ void  fun_walker_cartpusher()
                 word_7FA38E[64 * walkerId] = v9;
                 walkers[walkerId].actionState = 22;
                 word_7FA366[64 * walkerId] = 0;
-                walker_destination_x[128 * walkerId] = walkerGridX;
+                walkers[walkerId].destination_x = walkerGridX;
                 walker_destination_y[128 * walkerId] = walkerGridY;
               }
               else
@@ -65255,7 +65248,7 @@ void  fun_walker_cartpusher()
         sub_45E740(word_7FA38E[64 * walkerId]);
         walkers[walkerId].actionState = 27;
         word_7FA366[64 * walkerId] = 0;
-        walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+        walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
       }
       byte_7FA341[128 * walkerId] = 0;
@@ -65267,13 +65260,13 @@ void  fun_walker_cartpusher()
       {
         case 8:
           walkers[walkerId].actionState = 20;
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -65309,7 +65302,7 @@ void  fun_walker_laborSeeker()
   word_7FA372[64 * walkerId] = 384;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_24_laborSeekerId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -65325,12 +65318,12 @@ void  fun_walker_laborSeeker()
 void  fun_walker_explosion()
 {
   walkers[walkerId].byte_7FA34C = 1;
-  ++walker_progressOnTile[128 * walkerId];
-  if ( walker_progressOnTile[128 * walkerId] > 44 )
-    walker_state[128 * walkerId] = 2;
+  ++walkers[walkerId].progressOnTile;
+  if ( walkers[walkerId].progressOnTile > 44 )
+    walkers[walkerId].state = 2;
   sub_4B66E0(walkerId, (unsigned __int8)byte_7FA389[128 * walkerId]);
-  if ( walker_progressOnTile[128 * walkerId] < 48 )
-    walkers[walkerId].word_7FA344 = LOWORD(dword_5FA2A8[walker_progressOnTile[128 * walkerId] / 2]) + word_6E6C7C;
+  if ( walkers[walkerId].progressOnTile < 48 )
+    walkers[walkerId].word_7FA344 = LOWORD(dword_5FA2A8[walkers[walkerId].progressOnTile / 2]) + word_6E6C7C;
   else
     walkers[walkerId].word_7FA344 = word_6E6C7C + 7;
 }
@@ -65344,7 +65337,7 @@ void  fun_walker_taxCollector()
   word_7FA372[64 * walkerId] = 512;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_22_walkerId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -65369,20 +65362,20 @@ void  fun_walker_taxCollector()
                2) )
         {
           walkers[walkerId].actionState = 41;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           sub_4B6B70(
             walkerId,
             walkers[walkerId].tilePosition_y,
             walkers[walkerId].tilePosition_x,
-            15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+            15 * (unsigned __int8)walkers[walkerId].destination_x,
             15 * (unsigned __int8)walker_destination_y[128 * walkerId],
             0);
           word_7FA374[64 * walkerId] = 0;
         }
         else
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
       }
       break;
@@ -65393,7 +65386,7 @@ void  fun_walker_taxCollector()
       {
         if ( grid_buildingIds[walkers[walkerId].gridOffset] == v0 )
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
         else
         {
@@ -65415,12 +65408,12 @@ void  fun_walker_taxCollector()
                2) )
         {
           walkers[walkerId].actionState = 43;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
         }
         else
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
       }
       sub_4B3F00(walkerId, 1);
@@ -65432,13 +65425,13 @@ void  fun_walker_taxCollector()
         if ( walkers[walkerId].direction == 8 )
         {
           walkers[walkerId].actionState = 41;
-          walker_destination_x[128 * walkerId] = buildings[v0].x;
+          walkers[walkerId].destination_x = buildings[v0].x;
           walker_destination_y[128 * walkerId] = building__07_y[128 * v0];
           sub_4B6B70(
             walkerId,
             walkers[walkerId].tilePosition_y,
             walkers[walkerId].tilePosition_x,
-            15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+            15 * (unsigned __int8)walkers[walkerId].destination_x,
             15 * (unsigned __int8)walker_destination_y[128 * walkerId],
             0);
           word_7FA374[64 * walkerId] = 0;
@@ -65446,7 +65439,7 @@ void  fun_walker_taxCollector()
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
       break;
   }
@@ -65467,7 +65460,7 @@ void  fun_walker_engineer()
   word_7FA372[64 * walkerId] = 640;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_22_walkerId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -65492,20 +65485,20 @@ void  fun_walker_engineer()
                2) )
         {
           walkers[walkerId].actionState = 61;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           sub_4B6B70(
             walkerId,
             walkers[walkerId].tilePosition_y,
             walkers[walkerId].tilePosition_x,
-            15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+            15 * (unsigned __int8)walkers[walkerId].destination_x,
             15 * (unsigned __int8)walker_destination_y[128 * walkerId],
             0);
           word_7FA374[64 * walkerId] = 0;
         }
         else
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
       }
       break;
@@ -65516,7 +65509,7 @@ void  fun_walker_engineer()
       {
         if ( grid_buildingIds[walkers[walkerId].gridOffset] == v0 )
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
         else
         {
@@ -65538,12 +65531,12 @@ void  fun_walker_engineer()
                2) )
         {
           walkers[walkerId].actionState = 63;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
         }
         else
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
       }
       sub_4B3F00(walkerId, 1);
@@ -65555,13 +65548,13 @@ void  fun_walker_engineer()
         if ( walkers[walkerId].direction == 8 )
         {
           walkers[walkerId].actionState = 61;
-          walker_destination_x[128 * walkerId] = buildings[v0].x;
+          walkers[walkerId].destination_x = buildings[v0].x;
           walker_destination_y[128 * walkerId] = building__07_y[128 * v0];
           sub_4B6B70(
             walkerId,
             walkers[walkerId].tilePosition_y,
             walkers[walkerId].tilePosition_x,
-            15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+            15 * (unsigned __int8)walkers[walkerId].destination_x,
             15 * (unsigned __int8)walker_destination_y[128 * walkerId],
             0);
           word_7FA374[64 * walkerId] = 0;
@@ -65569,7 +65562,7 @@ void  fun_walker_engineer()
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
       break;
   }
@@ -65624,7 +65617,7 @@ void  fun_walker_warehouseman()
     case 50:
       v19 = walkers[walkerId].buildingId;
       if ( buildings[v19].inUse != 1 || building_22_walkerId[64 * v19] != walkerId )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       ++word_7FA366[64 * walkerId];
       if ( word_7FA366[64 * walkerId] > 2 )
       {
@@ -65634,7 +65627,7 @@ void  fun_walker_warehouseman()
           {
             v6 = sub_45C100(
                    0,
-                   walker_x[128 * walkerId],
+                   walkers[walkerId].x,
                    walkers[walkerId].y,
                    (unsigned __int8)byte_7FA34B[128 * walkerId],
                    building_1a_word_94BD5A[64 * v19],
@@ -65644,7 +65637,7 @@ void  fun_walker_warehouseman()
               word_7FA38E[64 * walkerId] = v6;
               walkers[walkerId].actionState = 51;
               word_7FA366[64 * walkerId] = 0;
-              walker_destination_x[128 * walkerId] = walkerGridX;
+              walkers[walkerId].destination_x = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
               sub_45D7B0(ciid, v19, (unsigned __int8)byte_7FA34B[128 * walkerId], 100);
             }
@@ -65652,7 +65645,7 @@ void  fun_walker_warehouseman()
             {
               v7 = sub_458E80(
                      0,
-                     walker_x[128 * walkerId],
+                     walkers[walkerId].x,
                      walkers[walkerId].y,
                      (unsigned __int8)byte_7FA34B[128 * walkerId],
                      building_1a_word_94BD5A[64 * v19],
@@ -65662,7 +65655,7 @@ void  fun_walker_warehouseman()
                 word_7FA38E[64 * walkerId] = v7;
                 walkers[walkerId].actionState = 51;
                 word_7FA366[64 * walkerId] = 0;
-                walker_destination_x[128 * walkerId] = walkerGridX;
+                walkers[walkerId].destination_x = walkerGridX;
                 walker_destination_y[128 * walkerId] = walkerGridY;
                 sub_45D7B0(ciid, v19, (unsigned __int8)byte_7FA34B[128 * walkerId], 100);
               }
@@ -65670,7 +65663,7 @@ void  fun_walker_warehouseman()
               {
                 v8 = sub_45C100(
                        1,
-                       walker_x[128 * walkerId],
+                       walkers[walkerId].x,
                        walkers[walkerId].y,
                        (unsigned __int8)byte_7FA34B[128 * walkerId],
                        building_1a_word_94BD5A[64 * v19],
@@ -65680,13 +65673,13 @@ void  fun_walker_warehouseman()
                   word_7FA38E[64 * walkerId] = v8;
                   walkers[walkerId].actionState = 51;
                   word_7FA366[64 * walkerId] = 0;
-                  walker_destination_x[128 * walkerId] = walkerGridX;
+                  walkers[walkerId].destination_x = walkerGridX;
                   walker_destination_y[128 * walkerId] = walkerGridY;
                   sub_45D7B0(ciid, v19, (unsigned __int8)byte_7FA34B[128 * walkerId], 100);
                 }
                 else
                 {
-                  walker_state[128 * walkerId] = 2;
+                  walkers[walkerId].state = 2;
                 }
               }
             }
@@ -65700,12 +65693,12 @@ void  fun_walker_warehouseman()
               word_7FA38E[64 * walkerId] = v5;
               walkers[walkerId].actionState = 54;
               word_7FA366[64 * walkerId] = 0;
-              walker_destination_x[128 * walkerId] = walkerGridX;
+              walkers[walkerId].destination_x = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
             }
             else
             {
-              walker_state[128 * walkerId] = 2;
+              walkers[walkerId].state = 2;
             }
           }
         }
@@ -65714,7 +65707,7 @@ void  fun_walker_warehouseman()
           if ( byte_7FA34B[128 * walkerId] )
           {
             v10 = sub_45E600(
-                    walker_x[128 * walkerId],
+                    walkers[walkerId].x,
                     walkers[walkerId].y,
                     (unsigned __int8)byte_7FA34B[128 * walkerId],
                     v0);
@@ -65723,13 +65716,13 @@ void  fun_walker_warehouseman()
               word_7FA38E[64 * walkerId] = v10;
               walkers[walkerId].actionState = 51;
               word_7FA366[64 * walkerId] = 0;
-              walker_destination_x[128 * walkerId] = walkerGridX;
+              walkers[walkerId].destination_x = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
             }
             else
             {
               v11 = sub_45E100(
-                      walker_x[128 * walkerId],
+                      walkers[walkerId].x,
                       walkers[walkerId].y,
                       (unsigned __int8)byte_7FA34B[128 * walkerId],
                       building_1a_word_94BD5A[64 * v19],
@@ -65739,14 +65732,14 @@ void  fun_walker_warehouseman()
                 word_7FA38E[64 * walkerId] = v11;
                 walkers[walkerId].actionState = 51;
                 word_7FA366[64 * walkerId] = 0;
-                walker_destination_x[128 * walkerId] = walkerGridX;
+                walkers[walkerId].destination_x = walkerGridX;
                 walker_destination_y[128 * walkerId] = walkerGridY;
               }
               else
               {
                 v12 = sub_45C100(
                         0,
-                        walker_x[128 * walkerId],
+                        walkers[walkerId].x,
                         walkers[walkerId].y,
                         (unsigned __int8)byte_7FA34B[128 * walkerId],
                         building_1a_word_94BD5A[64 * v19],
@@ -65756,13 +65749,13 @@ void  fun_walker_warehouseman()
                   word_7FA38E[64 * walkerId] = v12;
                   walkers[walkerId].actionState = 51;
                   word_7FA366[64 * walkerId] = 0;
-                  walker_destination_x[128 * walkerId] = walkerGridX;
+                  walkers[walkerId].destination_x = walkerGridX;
                   walker_destination_y[128 * walkerId] = walkerGridY;
                 }
                 else
                 {
                   v13 = sub_45C460(
-                          walker_x[128 * walkerId],
+                          walkers[walkerId].x,
                           walkers[walkerId].y,
                           (unsigned __int8)byte_7FA34B[128 * walkerId],
                           building_1a_word_94BD5A[64 * v19],
@@ -65772,14 +65765,14 @@ void  fun_walker_warehouseman()
                     word_7FA38E[64 * walkerId] = v13;
                     walkers[walkerId].actionState = 51;
                     word_7FA366[64 * walkerId] = 0;
-                    walker_destination_x[128 * walkerId] = walkerGridX;
+                    walkers[walkerId].destination_x = walkerGridX;
                     walker_destination_y[128 * walkerId] = walkerGridY;
                   }
                   else
                   {
                     v14 = sub_458E80(
                             v19,
-                            walker_x[128 * walkerId],
+                            walkers[walkerId].x,
                             walkers[walkerId].y,
                             (unsigned __int8)byte_7FA34B[128 * walkerId],
                             building_1a_word_94BD5A[64 * v19],
@@ -65788,21 +65781,21 @@ void  fun_walker_warehouseman()
                     {
                       if ( v14 == v19 )
                       {
-                        walker_state[128 * walkerId] = 2;
+                        walkers[walkerId].state = 2;
                       }
                       else
                       {
                         word_7FA38E[64 * walkerId] = v14;
                         walkers[walkerId].actionState = 51;
                         word_7FA366[64 * walkerId] = 0;
-                        walker_destination_x[128 * walkerId] = walkerGridX;
+                        walkers[walkerId].destination_x = walkerGridX;
                         walker_destination_y[128 * walkerId] = walkerGridY;
                       }
                     }
                     else
                     {
                       v15 = sub_45E390(
-                              walker_x[128 * walkerId],
+                              walkers[walkerId].x,
                               walkers[walkerId].y,
                               (unsigned __int8)byte_7FA34B[128 * walkerId],
                               building_1a_word_94BD5A[64 * v19],
@@ -65812,26 +65805,26 @@ void  fun_walker_warehouseman()
                         word_7FA38E[64 * walkerId] = v15;
                         walkers[walkerId].actionState = 51;
                         word_7FA366[64 * walkerId] = 0;
-                        walker_destination_x[128 * walkerId] = walkerGridX;
+                        walkers[walkerId].destination_x = walkerGridX;
                         walker_destination_y[128 * walkerId] = walkerGridY;
                       }
                       else
                       {
-                        walker_state[128 * walkerId] = 2;
+                        walkers[walkerId].state = 2;
                       }
                     }
                   }
                 }
               }
             }
-            if ( (unsigned __int8)walker_state[128 * walkerId] != 2 )
+            if ( (unsigned __int8)walkers[walkerId].state != 2 )
               v1 = fun_removeGoodFromWarehouse(
                      ciid,
                      walkers[walkerId].buildingId,
                      (unsigned __int8)byte_7FA34B[128 * walkerId],
                      1);
             if ( v1 )
-              walker_state[128 * walkerId] = 2;
+              walkers[walkerId].state = 2;
           }
           else
           {
@@ -65842,13 +65835,13 @@ void  fun_walker_warehouseman()
               word_7FA38E[64 * walkerId] = v9;
               walkers[walkerId].actionState = 57;
               word_7FA366[64 * walkerId] = 0;
-              walker_destination_x[128 * walkerId] = walkerGridX;
+              walkers[walkerId].destination_x = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
               byte_7FA3A2[128 * walkerId] = 3;
             }
             else
             {
-              walker_state[128 * walkerId] = 2;
+              walkers[walkerId].state = 2;
             }
           }
         }
@@ -65876,7 +65869,7 @@ void  fun_walker_warehouseman()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -65905,7 +65898,7 @@ void  fun_walker_warehouseman()
         }
         walkers[walkerId].actionState = 53;
         word_7FA366[64 * walkerId] = 0;
-        walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+        walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
       }
       byte_7FA341[128 * walkerId] = 0;
@@ -65916,13 +65909,13 @@ void  fun_walker_warehouseman()
       switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -65938,7 +65931,7 @@ void  fun_walker_warehouseman()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -65952,7 +65945,7 @@ void  fun_walker_warehouseman()
         byte_7FA34B[128 * walkerId] = dword_94B3B0;
         walkers[walkerId].actionState = 56;
         word_7FA366[64 * walkerId] = 0;
-        walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+        walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         fun_removeDestinationPathForWalker(walkerId);
       }
@@ -65996,13 +65989,13 @@ void  fun_walker_warehouseman()
         case 8:
           for ( i = 0; i < (unsigned __int8)byte_7FA3A3[128 * walkerId]; ++i )
             sub_45D3D0(v21, (unsigned __int8)byte_7FA34B[128 * walkerId], 0);
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -66019,7 +66012,7 @@ void  fun_walker_warehouseman()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -66038,7 +66031,7 @@ void  fun_walker_warehouseman()
         byte_7FA34B[128 * walkerId] = walker_itemCollecting[128 * walkerId];
         walkers[walkerId].actionState = 59;
         word_7FA366[64 * walkerId] = 0;
-        walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+        walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         fun_removeDestinationPathForWalker(walkerId);
       }
@@ -66086,13 +66079,13 @@ void  fun_walker_warehouseman()
         case 8:
           for ( k = 0; k < (unsigned __int8)byte_7FA3A3[128 * walkerId]; ++k )
             fun_addGoodToWarehouse(ciid, v22, (unsigned __int8)byte_7FA34B[128 * walkerId]);
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -66134,7 +66127,7 @@ void  fun_walker_prefect()
   word_7FA372[64 * walkerId] = 640;
   v4 = walkers[walkerId].buildingId;
   if ( buildings[v4].inUse != 1 || building_22_walkerId[64 * v4] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -66161,20 +66154,20 @@ void  fun_walker_prefect()
                2) )
         {
           walkers[walkerId].actionState = 71;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           sub_4B6B70(
             walkerId,
             walkers[walkerId].tilePosition_y,
             walkers[walkerId].tilePosition_x,
-            15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+            15 * (unsigned __int8)walkers[walkerId].destination_x,
             15 * (unsigned __int8)walker_destination_y[128 * walkerId],
             0);
           word_7FA374[64 * walkerId] = 0;
         }
         else
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
       }
       break;
@@ -66185,7 +66178,7 @@ void  fun_walker_prefect()
       {
         if ( grid_buildingIds[walkers[walkerId].gridOffset] == v4 )
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
         else
         {
@@ -66207,13 +66200,13 @@ void  fun_walker_prefect()
                2) )
         {
           walkers[walkerId].actionState = 73;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           fun_removeDestinationPathForWalker(walkerId);
         }
         else
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
       }
       sub_4B3F00(walkerId, 1);
@@ -66225,13 +66218,13 @@ void  fun_walker_prefect()
         if ( walkers[walkerId].direction == 8 )
         {
           walkers[walkerId].actionState = 71;
-          walker_destination_x[128 * walkerId] = buildings[v4].x;
+          walkers[walkerId].destination_x = buildings[v4].x;
           walker_destination_y[128 * walkerId] = building__07_y[128 * v4];
           sub_4B6B70(
             walkerId,
             walkers[walkerId].tilePosition_y,
             walkers[walkerId].tilePosition_x,
-            15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+            15 * (unsigned __int8)walkers[walkerId].destination_x,
             15 * (unsigned __int8)walker_destination_y[128 * walkerId],
             0);
           word_7FA374[64 * walkerId] = 0;
@@ -66239,7 +66232,7 @@ void  fun_walker_prefect()
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
       break;
     case 0x4A:
@@ -66257,13 +66250,13 @@ void  fun_walker_prefect()
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
       break;
     case 0x4B:
       v3 = word_7FA38E[64 * walkerId];
       v2 = fun_getDistanceMaximum(
-             walker_x[128 * walkerId],
+             walkers[walkerId].x,
              walkers[walkerId].y,
              buildings[v3].x,
              building__07_y[128 * v3]);
@@ -66291,7 +66284,7 @@ void  fun_walker_prefect()
         word_7FA366[64 * walkerId] = 1;
       }
       byte_7FA353[128 * walkerId] = fun_walkerGetSimpleDestinationDirection(
-                                      walker_x[128 * walkerId],
+                                      walkers[walkerId].x,
                                       walkers[walkerId].y,
                                       buildings[v3].x,
                                       building__07_y[128 * v3]);
@@ -66310,13 +66303,13 @@ void  fun_walker_prefect()
                  2) )
           {
             walkers[walkerId].actionState = 73;
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             fun_removeDestinationPathForWalker(walkerId);
           }
           else
           {
-            walker_state[128 * walkerId] = 2;
+            walkers[walkerId].state = 2;
           }
         }
       }
@@ -66332,14 +66325,14 @@ void  fun_walker_prefect()
                2) )
         {
           walkers[walkerId].actionState = 73;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           fun_removeDestinationPathForWalker(walkerId);
           word_7FA374[64 * walkerId] = 0;
         }
         else
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
       }
       fun_walkerWalkTicks(walkerId, 1);
@@ -66348,14 +66341,14 @@ void  fun_walker_prefect()
         if ( walkers[walkerId].direction == 8 )
         {
           v0 = word_7FA3B0[64 * walkerId];
-          walker_destination_x[128 * walkerId] = walker_x[128 * v0];
+          walkers[walkerId].destination_x = walkers[v0].x;
           walker_destination_y[128 * walkerId] = walkers[v0].y;
           fun_removeDestinationPathForWalker(walkerId);
         }
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
       break;
   }
@@ -66446,14 +66439,14 @@ signed int  sub_499FE0(int a1)
         ++byte_7FA39B[128 * a1];
         if ( (signed int)(unsigned __int8)byte_7FA39B[128 * a1] >= 20 )
         {
-          v2 = sub_4680A0(walker_x[128 * a1], walkers[a1].y);
+          v2 = sub_4680A0(walkers[a1].x, walkers[a1].y);
           if ( v2 > 0 )
           {
             if ( dword_94A2F8 <= 25 )
             {
               byte_7FA39B[128 * a1] = 0;
               walkers[a1].actionState = 74;
-              walker_destination_x[128 * a1] = building_20_byte_94BD60[128 * v2];
+              walkers[a1].destination_x = building_20_byte_94BD60[128 * v2];
               walker_destination_y[128 * a1] = building_21_byte_94BD61[128 * v2];
               word_7FA38E[64 * a1] = v2;
               fun_removeDestinationPathForWalker(a1);
@@ -66522,14 +66515,14 @@ signed int  sub_49A250(int a1)
         if ( (signed int)(unsigned __int8)byte_7FA3AE[128 * a1] >= 10 )
         {
           byte_7FA3AE[128 * a1] = 0;
-          v2 = sub_49A510(walker_x[128 * a1], walkers[a1].y);
+          v2 = sub_49A510(walkers[a1].x, walkers[a1].y);
           if ( v2 > 0 )
           {
             if ( dword_7FA2A4 <= 30 )
             {
               byte_7FA3AE[128 * a1] = 0;
               walkers[a1].actionState = 76;
-              walker_destination_x[128 * a1] = walker_x[128 * v2];
+              walkers[a1].destination_x = walkers[v2].x;
               walker_destination_y[128 * a1] = walkers[v2].y;
               word_7FA3B0[64 * a1] = v2;
               word_7FA3B2[64 * v2] = a1;
@@ -66560,16 +66553,7 @@ signed int  sub_49A250(int a1)
   }
   return result;
 }
-// 40141A: using guessed type _DWORD  sub_40141A(_DWORD, _DWORD);
-// 654468: using guessed type int dword_654468[];
-// 7FA2A4: using guessed type int dword_7FA2A4;
-// 7FA3B0: using guessed type __int16 word_7FA3B0[];
-// 7FA3B2: using guessed type __int16 word_7FA3B2[];
-// 7FA3B4: using guessed type __int16 word_7FA3B4[];
-// 7FA3B6: using guessed type __int16 word_7FA3B6[];
-// 819848: using guessed type int dword_819848;
 
-//----- (0049A510) --------------------------------------------------------
 signed int  sub_49A510(int a1, int a2)
 {
   signed int v3; // [sp+4Ch] [bp-Ch]@1
@@ -66580,17 +66564,17 @@ signed int  sub_49A510(int a1, int a2)
   dword_7FA2A4 = 10000;
   for ( i = 1; i < 1000; ++i )
   {
-    if ( (unsigned __int8)walker_state[128 * i] == 1 && !word_7FA3B2[64 * i] )
+    if ( walkers[i].state == 1 && !word_7FA3B2[64 * i] )
     {
       if ( walkers[i].type== 24 )
       {
-        v4 = fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walkers[i].y);
+        v4 = fun_getDistanceMaximum(a1, a2, walkers[i].x, walkers[i].y);
       }
       else
       {
         if ( walkers[i].type== 54 )
         {
-          v4 = fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walkers[i].y);
+          v4 = fun_getDistanceMaximum(a1, a2, walkers[i].x, walkers[i].y);
         }
         else
         {
@@ -66601,16 +66585,16 @@ signed int  sub_49A510(int a1, int a2)
             {
               if ( walkers[i].type!= 69 )
                 continue;
-              v4 = 4 * fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walkers[i].y);
+              v4 = 4 * fun_getDistanceMaximum(a1, a2, walkers[i].x, walkers[i].y);
             }
             else
             {
-              v4 = 3 * fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walkers[i].y);
+              v4 = 3 * fun_getDistanceMaximum(a1, a2, walkers[i].x, walkers[i].y);
             }
           }
           else
           {
-            v4 = fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walkers[i].y);
+            v4 = fun_getDistanceMaximum(a1, a2, walkers[i].x, walkers[i].y);
           }
         }
       }
@@ -66682,17 +66666,17 @@ void  fun_walker_soldier()
       word_7FA366[64 * walkerId] = 0;
       byte_7FA393[128 * walkerId] = 1;
       byte_7FA341[128 * walkerId] = 0;
-      if ( walker_x[128 * walkerId] != (unsigned __int8)byte_7FA362[128 * walkerId]
+      if ( walkers[walkerId].x != (unsigned __int8)byte_7FA362[128 * walkerId]
         || walkers[walkerId].y != (unsigned __int8)byte_7FA363[128 * walkerId] )
         walkers[walkerId].actionState = 81;
       break;
     case 81:
       word_7FA366[64 * walkerId] = 0;
       byte_7FA393[128 * walkerId] = 1;
-      walker_destination_x[128 * walkerId] = byte_7FA362[128 * walkerId];
+      walkers[walkerId].destination_x = byte_7FA362[128 * walkerId];
       walker_destination_y[128 * walkerId] = byte_7FA363[128 * walkerId];
       word_7FA35E[64 * walkerId] = 162 * (unsigned __int8)walker_destination_y[128 * walkerId]
-                                 + (unsigned __int8)walker_destination_x[128 * walkerId]
+                                 + (unsigned __int8)walkers[walkerId].destination_x
                                  + (_WORD)setting_map_startGridOffset;
       fun_walkerWalkTicks(walkerId, v5);
       switch ( walkers[walkerId].direction )
@@ -66704,17 +66688,17 @@ void  fun_walker_soldier()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
     case 148:
       word_7FA366[64 * walkerId] = 0;
       byte_7FA393[128 * walkerId] = 1;
-      walker_destination_x[128 * walkerId] = byte_7FA362[128 * walkerId];
+      walkers[walkerId].destination_x = byte_7FA362[128 * walkerId];
       walker_destination_y[128 * walkerId] = byte_7FA363[128 * walkerId];
       word_7FA35E[64 * walkerId] = 162 * (unsigned __int8)walker_destination_y[128 * walkerId]
-                                 + (unsigned __int8)walker_destination_x[128 * walkerId]
+                                 + (unsigned __int8)walkers[walkerId].destination_x
                                  + (_WORD)setting_map_startGridOffset;
       fun_walkerWalkTicks(walkerId, v5);
       switch ( walkers[walkerId].direction )
@@ -66726,31 +66710,31 @@ void  fun_walker_soldier()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
     case 82:
       byte_7FA393[128 * walkerId] = 1;
-      walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+      walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
       walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
       fun_walkerWalkTicks(walkerId, v5);
       switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
     case 83:
       byte_7FA393[128 * walkerId] = 0;
-      walker_destination_x[128 * walkerId] = *((_BYTE *)&dword_5F3CB0[32 * formation_layout[64 * v4]]
+      walkers[walkerId].destination_x = *((_BYTE *)&dword_5F3CB0[32 * formation_layout[64 * v4]]
                                              + 8 * (unsigned __int8)byte_7FA392[128 * walkerId])
                                            + formation_standardX[128 * v4];
       walker_destination_y[128 * walkerId] = *((_BYTE *)&dword_5F3CB4[32 * formation_layout[64 * v4]]
@@ -66758,11 +66742,11 @@ void  fun_walker_soldier()
                                            + formation_standardY[128 * v4];
       if ( walkers[walkerId].inUse )
       {
-        walker_destination_x[128 * walkerId] += stru_5F20FE[walkers[walkerId].inUse].x;
+        walkers[walkerId].destination_x += stru_5F20FE[walkers[walkerId].inUse].x;
         walker_destination_y[128 * walkerId] += stru_5F20FE[walkers[walkerId].inUse].y;
       }
       word_7FA35E[64 * walkerId] = 162 * (unsigned __int8)walker_destination_y[128 * walkerId]
-                                 + (unsigned __int8)walker_destination_x[128 * walkerId]
+                                 + (unsigned __int8)walkers[walkerId].destination_x
                                  + (_WORD)setting_map_startGridOffset;
       fun_walkerWalkTicks(walkerId, v5);
       switch ( walkers[walkerId].direction )
@@ -66777,7 +66761,7 @@ void  fun_walker_soldier()
         case 10:
           ++walkers[walkerId].inUse;
           if ( walkers[walkerId].inUse > 168 )
-            walker_state[128 * walkerId] = 2;
+            walkers[walkerId].state = 2;
           byte_7FA341[128 * walkerId] = 0;
           break;
       }
@@ -66786,7 +66770,7 @@ void  fun_walker_soldier()
       byte_7FA393[128 * walkerId] = 0;
       byte_7FA341[128 * walkerId] = 0;
       sub_4B8B80(walkerId);
-      walker_destination_x[128 * walkerId] = *((_BYTE *)&dword_5F3CB0[32 * formation_layout[64 * v4]]
+      walkers[walkerId].destination_x = *((_BYTE *)&dword_5F3CB0[32 * formation_layout[64 * v4]]
                                              + 8 * (unsigned __int8)byte_7FA392[128 * walkerId])
                                            + formation_standardX[128 * v4];
       walker_destination_y[128 * walkerId] = *((_BYTE *)&dword_5F3CB4[32 * formation_layout[64 * v4]]
@@ -66794,10 +66778,10 @@ void  fun_walker_soldier()
                                            + formation_standardY[128 * v4];
       if ( walkers[walkerId].inUse )
       {
-        walker_destination_x[128 * walkerId] += stru_5F20FE[ walkers[walkerId].inUse ].x;
+        walkers[walkerId].destination_x += stru_5F20FE[ walkers[walkerId].inUse ].x;
         walker_destination_y[128 * walkerId] += stru_5F20FE[ walkers[walkerId].inUse ].y;
       }
-      if ( walker_x[128 * walkerId] != (unsigned __int8)walker_destination_x[128 * walkerId]
+      if ( walkers[walkerId].x != (unsigned __int8)walkers[walkerId].destination_x
         || walkers[walkerId].y != (unsigned __int8)walker_destination_y[128 * walkerId] )
       {
         if ( formation_54[64 * v4] <= 0 )
@@ -66831,7 +66815,7 @@ void  fun_walker_soldier()
           {
             byte_7FA39A[128 * walkerId] = 1;
             walkers[walkerId].direction = fun_pathing_getDirection8(
-                                                 walker_x[128 * walkerId],
+                                                 walkers[walkerId].x,
                                                  walkers[walkerId].y,
                                                  walkerGridX,
                                                  walkerGridY);
@@ -66845,7 +66829,7 @@ void  fun_walker_soldier()
         {
           if ( (unsigned __int8)byte_7FA39A[128 * walkerId] == 1 )
           {
-            sub_4B75B0(walkerId, walker_x[128 * walkerId], walkers[walkerId].y, walkerGridX, walkerGridY, 60);
+            sub_4B75B0(walkerId, walkers[walkerId].x, walkers[walkerId].y, walkerGridX, walkerGridY, 60);
             formation_54[64 * v4] = 6;
           }
           ++byte_7FA39A[128 * walkerId];
@@ -66857,7 +66841,7 @@ void  fun_walker_soldier()
     case 86:
       byte_7FA393[128 * walkerId] = 0;
       v6 = word_7FA3B0[64 * walkerId];
-      if ( (unsigned __int8)walker_state[128 * v6] != 1 )
+      if ( walkers[v6].state != 1 )
       {
         word_7FA3B0[64 * walkerId] = 0;
         v6 = 0;
@@ -66869,10 +66853,10 @@ void  fun_walker_soldier()
       }
       if ( v6 <= 0 )
       {
-        v6 = sub_4AD800(walker_x[128 * walkerId], walkers[walkerId].y, 20);
+        v6 = sub_4AD800(walkers[walkerId].x, walkers[walkerId].y, 20);
         if ( v6 )
         {
-          walker_destination_x[128 * walkerId] = walker_x[128 * v6];
+          walkers[walkerId].destination_x = walkers[v6].x;
           walker_destination_y[128 * walkerId] = walkers[v6].y;
           word_7FA3B0[64 * walkerId] = v6;
           word_7FA3B2[64 * v6] = walkerId;
@@ -66893,7 +66877,7 @@ void  fun_walker_soldier()
           if ( walkers[walkerId].direction == 8 )
           {
             v0 = word_7FA3B0[64 * walkerId];
-            walker_destination_x[128 * walkerId] = walker_x[128 * v0];
+            walkers[walkerId].destination_x = walkers[v0].x;
             walker_destination_y[128 * walkerId] = walkers[v0].y;
             fun_removeDestinationPathForWalker(walkerId);
           }
@@ -66919,13 +66903,13 @@ void  fun_walker_soldier()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
     case 87:
       byte_7FA393[128 * walkerId] = 0;
-      walker_destination_x[128 * walkerId] = city_inform[ciid].exit_x;
+      walkers[walkerId].destination_x = city_inform[ciid].exit_x;
       walker_destination_y[128 * walkerId] = city_inform[ciid].exit_y;
       fun_walkerWalkTicks(walkerId, v5);
       switch ( walkers[walkerId].direction )
@@ -66938,7 +66922,7 @@ void  fun_walker_soldier()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -66950,10 +66934,10 @@ void  fun_walker_soldier()
       byte_7FA395[128 * walkerId] = 0;
       word_7FA366[64 * walkerId] = 0;
       byte_7FA393[128 * walkerId] = 1;
-      walker_destination_x[128 * walkerId] = byte_7FA362[128 * walkerId];
+      walkers[walkerId].destination_x = byte_7FA362[128 * walkerId];
       walker_destination_y[128 * walkerId] = byte_7FA363[128 * walkerId];
       word_7FA35E[64 * walkerId] = 162 * (unsigned __int8)walker_destination_y[128 * walkerId]
-                                 + (unsigned __int8)walker_destination_x[128 * walkerId]
+                                 + (unsigned __int8)walkers[walkerId].destination_x
                                  + (_WORD)setting_map_startGridOffset;
       fun_walkerWalkTicks(walkerId, v5);
       switch ( walkers[walkerId].direction )
@@ -66965,7 +66949,7 @@ void  fun_walker_soldier()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -67123,24 +67107,24 @@ void  fun_walker_militaryStandard()
   fun_removeWalkerFromTileList(walkerId);
   if ( formation_03_flag[128 * v0] )
   {
-    walker_x[128 * walkerId] = formation_x[128 * v0];
+    walkers[walkerId].x = formation_x[128 * v0];
     walkers[walkerId].y = formation_y[128 * v0];
     walkers[walkerId].gridOffset = 162 * walkers[walkerId].y
-                                     + walker_x[128 * walkerId]
+                                     + walkers[walkerId].x
                                      + (_WORD)setting_map_startGridOffset;
-    walkers[walkerId].tilePosition_y = 15 * walker_x[128 * walkerId];
+    walkers[walkerId].tilePosition_y = 15 * walkers[walkerId].x;
     walkers[walkerId].tilePosition_x = 15 * walkers[walkerId].y;
     walkers[walkerId].tilePosition_y += 7;
     walkers[walkerId].tilePosition_x += 7;
   }
   else
   {
-    walker_x[128 * walkerId] = formation_standardX[128 * v0];
+    walkers[walkerId].x = formation_standardX[128 * v0];
     walkers[walkerId].y = formation_standardY[128 * v0];
     walkers[walkerId].gridOffset = 162 * walkers[walkerId].y
-                                     + walker_x[128 * walkerId]
+                                     + walkers[walkerId].x
                                      + (_WORD)setting_map_startGridOffset;
-    walkers[walkerId].tilePosition_y = 15 * walker_x[128 * walkerId];
+    walkers[walkerId].tilePosition_y = 15 * walkers[walkerId].x;
     walkers[walkerId].tilePosition_x = 15 * walkers[walkerId].y;
     walkers[walkerId].tilePosition_y += 7;
     walkers[walkerId].tilePosition_x += 7;
@@ -67232,20 +67216,20 @@ void  fun_walker_entertainer()
                2) )
         {
           walkers[walkerId].actionState = 91;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           sub_4B6B70(
             walkerId,
             walkers[walkerId].tilePosition_y,
             walkers[walkerId].tilePosition_x,
-            15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+            15 * (unsigned __int8)walkers[walkerId].destination_x,
             15 * (unsigned __int8)walker_destination_y[128 * walkerId],
             0);
           word_7FA374[64 * walkerId] = 0;
         }
         else
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
       }
       break;
@@ -67258,28 +67242,28 @@ void  fun_walker_entertainer()
         {
           case Walker_Actor:
             v2 = fun_determineEntertainerDestination(
-                   walker_x[128 * walkerId],
+                   walkers[walkerId].x,
                    walkers[walkerId].y,
                    B_Theater,
                    B_Amphitheater);
             break;
           case Walker_Gladiator:
             v2 = fun_determineEntertainerDestination(
-                   walker_x[128 * walkerId],
+                   walkers[walkerId].x,
                    walkers[walkerId].y,
                    B_Amphitheater,
                    B_Colosseum);
             break;
           case Walker_LionTamer:
             v2 = fun_determineEntertainerDestination(
-                   walker_x[128 * walkerId],
+                   walkers[walkerId].x,
                    walkers[walkerId].y,
                    B_Colosseum,
                    0);
             break;
           case Walker_Charioteer:
             v2 = fun_determineEntertainerDestination(
-                   walker_x[128 * walkerId],
+                   walkers[walkerId].x,
                    walkers[walkerId].y,
                    B_Hippodrome,
                    0);
@@ -67295,18 +67279,18 @@ void  fun_walker_entertainer()
           {
             word_7FA38E[64 * walkerId] = v2;
             walkers[walkerId].actionState = 92;
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             word_7FA374[64 * walkerId] = 0;
           }
           else
           {
-            walker_state[128 * walkerId] = 2;
+            walkers[walkerId].state = 2;
           }
         }
         else
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
       }
       byte_7FA395[128 * walkerId] = 1;
@@ -67315,19 +67299,19 @@ void  fun_walker_entertainer()
       byte_7FA395[128 * walkerId] = 0;
       ++word_7FA374[64 * walkerId];
       if ( word_7FA374[64 * walkerId] >= 3200 )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       fun_walkerWalkTicks(walkerId, v0);
       switch ( walkers[walkerId].direction )
       {
         case 8:
           sub_466330(walkerId);
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -67343,12 +67327,12 @@ void  fun_walker_entertainer()
                2) )
         {
           walkers[walkerId].actionState = 95;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
         }
         else
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
       }
       sub_4B3F00(walkerId, v0);
@@ -67358,11 +67342,11 @@ void  fun_walker_entertainer()
       if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
         if ( walkers[walkerId].direction == 8 )
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
       break;
   }
@@ -67476,7 +67460,7 @@ void  fun_walker_tradecaravan()
         }
         else
         {
-          v1 = walker_x[128 * walkerId];
+          v1 = walkers[walkerId].x;
           v0 = walkers[walkerId].y;
         }
         v5 = sub_446550(walkerId, v1, v0, walkers[walkerId].tradeCityId, 0);
@@ -67485,7 +67469,7 @@ void  fun_walker_tradecaravan()
           word_7FA38E[64 * walkerId] = v5;
           walkers[walkerId].actionState = 101;
           word_7FA366[64 * walkerId] = 0;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
         }
         else
@@ -67493,7 +67477,7 @@ void  fun_walker_tradecaravan()
           word_7FA366[64 * walkerId] = 0;
           walkers[walkerId].actionState = 103;
           word_7FA366[64 * walkerId] = 0;
-          walker_destination_x[128 * walkerId] = city_inform[ciid].exit_x;
+          walkers[walkerId].destination_x = city_inform[ciid].exit_x;
           walker_destination_y[128 * walkerId] = city_inform[ciid].exit_y;
         }
       }
@@ -67510,12 +67494,12 @@ void  fun_walker_tradecaravan()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           byte_7FA395[128 * walkerId] = 1;
           break;
       }
       if ( buildings[word_7FA38E[64 * walkerId]].inUse != 1 )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       break;
     case 0x66:
       ++word_7FA366[64 * walkerId];
@@ -67583,7 +67567,7 @@ void  fun_walker_tradecaravan()
         {
           v6 = sub_446550(
                  walkerId,
-                 walker_x[128 * walkerId],
+                 walkers[walkerId].x,
                  walkers[walkerId].y,
                  walkers[walkerId].tradeCityId,
                  -1);
@@ -67592,14 +67576,14 @@ void  fun_walker_tradecaravan()
             word_7FA38E[64 * walkerId] = v6;
             walkers[walkerId].actionState = 101;
             word_7FA366[64 * walkerId] = 0;
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
           }
           else
           {
             walkers[walkerId].actionState = 103;
             word_7FA366[64 * walkerId] = 0;
-            walker_destination_x[128 * walkerId] = city_inform[ciid].exit_x;
+            walkers[walkerId].destination_x = city_inform[ciid].exit_x;
             walker_destination_y[128 * walkerId] = city_inform[ciid].exit_y;
           }
         }
@@ -67612,13 +67596,13 @@ void  fun_walker_tradecaravan()
       {
         case 8:
           walkers[walkerId].actionState = 100;
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -67665,7 +67649,7 @@ void  fun_walker_tradeship()
         {
           word_7FA38E[64 * walkerId] = v2;
           walkers[walkerId].actionState = 111;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
         }
         else
@@ -67673,12 +67657,12 @@ void  fun_walker_tradeship()
           if ( sub_48ABC0(/*v0*/) )
           {
             walkers[walkerId].actionState = 113;
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
           }
           else
           {
-            walker_state[128 * walkerId] = 2;
+            walkers[walkerId].state = 2;
           }
         }
         word_7FA366[64 * walkerId] = 0;
@@ -67697,7 +67681,7 @@ void  fun_walker_tradeship()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -67710,7 +67694,7 @@ void  fun_walker_tradeship()
         {
           word_7FA38E[64 * walkerId] = v3;
           walkers[walkerId].actionState = 111;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
         }
         else
@@ -67721,7 +67705,7 @@ void  fun_walker_tradeship()
             if ( sub_48ABC0(/*v1*/) )
             {
               walkers[walkerId].actionState = 113;
-              walker_destination_x[128 * walkerId] = walkerGridX;
+              walkers[walkerId].destination_x = walkerGridX;
               walker_destination_y[128 * walkerId] = walkerGridY;
             }
           }
@@ -67742,7 +67726,7 @@ void  fun_walker_tradeship()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           if ( !dword_65DE30 )
           {
             message_usePopup = 1;
@@ -67755,7 +67739,7 @@ void  fun_walker_tradeship()
       {
         walkers[walkerId].actionState = 115;
         word_7FA366[64 * walkerId] = 0;
-        walker_destination_x[128 * walkerId] = scn_riverEntry_x;
+        walkers[walkerId].destination_x = scn_riverEntry_x;
         walker_destination_y[128 * walkerId] = scn_riverEntry_y;
       }
       break;
@@ -67766,7 +67750,7 @@ void  fun_walker_tradeship()
         byte_7FA3A9[128 * walkerId] = 0;
         walkers[walkerId].actionState = 115;
         word_7FA366[64 * walkerId] = 0;
-        walker_destination_x[128 * walkerId] = scn_riverEntry_x;
+        walkers[walkerId].destination_x = scn_riverEntry_x;
         walker_destination_y[128 * walkerId] = scn_riverEntry_y;
       }
       else
@@ -67776,7 +67760,7 @@ void  fun_walker_tradeship()
           byte_7FA3A9[128 * walkerId] = 0;
           walkers[walkerId].actionState = 115;
           word_7FA366[64 * walkerId] = 0;
-          walker_destination_x[128 * walkerId] = scn_riverEntry_x;
+          walkers[walkerId].destination_x = scn_riverEntry_x;
           walker_destination_y[128 * walkerId] = scn_riverEntry_y;
           building_4a_grow_value_house_foodstocks[64 * v4] = 0;
           building_65_house_bathhouse_dock_numships_entert_days[128 * v4] = 0;
@@ -67810,13 +67794,13 @@ void  fun_walker_tradeship()
       {
         case 8:
           walkers[walkerId].actionState = 110;
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -67844,26 +67828,26 @@ void  fun_walker_tradecaravanDonkey()
   {
     if ( walkers[v0].actionState == 149 )
     {
-      walker_state[128 * walkerId] = 2;
+      walkers[walkerId].state = 2;
     }
     else
     {
-      if ( (unsigned __int8)walker_state[128 * v0] == 1 )
+      if ( walkers[v0].state == 1 )
       {
         if ( walkers[v0].type == 19 || walkers[v0].type == 21 )
           sub_4B4880(walkerId, walker_tradeCaravanNextId[64 * walkerId], 1);
         else
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
     }
   }
   else
   {
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   }
   if ( byte_7FA395[128 * v0] )
     byte_7FA395[128 * walkerId] = 1;
@@ -67883,11 +67867,11 @@ void  fun_walker_protestor()
     byte_7FA341[128 * walkerId] = 0;
   word_7FA346[64 * walkerId] = 0;
   if ( walkers[walkerId].actionState == 149 )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++word_7FA366[64 * walkerId];
   if ( word_7FA366[64 * walkerId] > 200 )
   {
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
     byte_7FA341[128 * walkerId] = 0;
   }
   if ( walkers[walkerId].actionState == 149 )
@@ -67906,11 +67890,11 @@ void  fun_walker_criminal()
     byte_7FA341[128 * walkerId] = 0;
   word_7FA346[64 * walkerId] = 0;
   if ( walkers[walkerId].actionState == 149 )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++word_7FA366[64 * walkerId];
   if ( word_7FA366[64 * walkerId] > 200 )
   {
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
     byte_7FA341[128 * walkerId] = 0;
   }
   if ( walkers[walkerId].actionState == 149 )
@@ -67952,14 +67936,14 @@ void  fun_walker_rioter()
         //v0 = sub_4C1100();
         if ( v0 )
         {
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           word_7FA38E[64 * walkerId] = v0;
           fun_removeDestinationPathForWalker(walkerId);
         }
         else
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
       }
       break;
@@ -67975,14 +67959,14 @@ void  fun_walker_rioter()
           //v1 = sub_4C1100();
           if ( v1 )
           {
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             word_7FA38E[64 * walkerId] = v1;
             fun_removeDestinationPathForWalker(walkerId);
           }
           else
           {
-            walker_state[128 * walkerId] = 2;
+            walkers[walkerId].state = 2;
           }
         }
         else
@@ -68106,14 +68090,14 @@ int  sub_49FFE0(int a1)
                  2) )
           {
             walkers[walkerId].actionState = 126;
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             fun_removeDestinationPathForWalker(walkerId);
             word_7FA374[64 * walkerId] = 0;
           }
           else
           {
-            walker_state[128 * walkerId] = 2;
+            walkers[walkerId].state = 2;
           }
         }
         /*result = */sub_4B3F00(walkerId, a1);
@@ -68129,13 +68113,13 @@ int  sub_49FFE0(int a1)
             if ( walkers[walkerId].direction == 8 )
             {
               result = walkerId << 7;
-              walker_state[128 * walkerId] = 2;
+              walkers[walkerId].state = 2;
             }
           }
           else
           {
             result = walkerId << 7;
-            walker_state[128 * walkerId] = 2;
+            walkers[walkerId].state = 2;
           }
         }
       }
@@ -68153,7 +68137,7 @@ void  fun_walker_fishingBoat()
 
   v3 = walkers[walkerId].buildingId;
   if ( buildings[v3].inUse != 1 )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   if ( walkers[walkerId].actionState != 190 )
   {
     if ( building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v3] != walkerId )
@@ -68164,7 +68148,7 @@ void  fun_walker_fishingBoat()
         walkers[walkerId].buildingId = v3;
         building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v3] = walkerId;
         walkers[walkerId].actionState = -63;
-        walker_destination_x[128 * walkerId] = walkerGridX;
+        walkers[walkerId].destination_x = walkerGridX;
         walker_destination_y[128 * walkerId] = walkerGridY;
         byte_7FA360[128 * walkerId] = walkerGridX;
         byte_7FA361[128 * walkerId] = walkerGridY;
@@ -68172,7 +68156,7 @@ void  fun_walker_fishingBoat()
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
     }
   }
@@ -68196,7 +68180,7 @@ void  fun_walker_fishingBoat()
           walkers[walkerId].buildingId = v2;
           building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v2] = walkerId;
           walkers[walkerId].actionState = -63;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           byte_7FA360[128 * walkerId] = walkerGridX;
           byte_7FA361[128 * walkerId] = walkerGridY;
@@ -68217,7 +68201,7 @@ void  fun_walker_fishingBoat()
         else
         {
           fun_removeDestinationPathForWalker(walkerId);
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           walkers[walkerId].direction = byte_7FA352[128 * walkerId];
         }
@@ -68227,7 +68211,7 @@ void  fun_walker_fishingBoat()
         if ( walkers[walkerId].direction == 9 || walkers[walkerId].direction == 10 )
         {
           walkers[walkerId].actionState = -62;
-          walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+          walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         }
       }
@@ -68238,7 +68222,7 @@ void  fun_walker_fishingBoat()
       {
         word_7FA366[64 * walkerId] = 0;
         walkers[walkerId].actionState = -61;
-        walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+        walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         fun_removeDestinationPathForWalker(walkerId);
       }
@@ -68266,7 +68250,7 @@ void  fun_walker_fishingBoat()
             fun_postMessageToPlayer(118, 0, 0);
             dword_65DE4C[0] = 12;
           }
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -68286,7 +68270,7 @@ void  fun_walker_fishingBoat()
           if ( sub_48A590(walkerId) )
           {
             walkers[walkerId].actionState = -65;
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
             fun_removeDestinationPathForWalker(walkerId);
           }
@@ -68308,7 +68292,7 @@ void  fun_walker_fishingBoat()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -68335,7 +68319,7 @@ void  fun_walker_marketTrader()
   word_7FA372[64 * walkerId] = 384;
   v2 = walkers[walkerId].buildingId;
   if ( buildings[v2].inUse != 1 || building_22_walkerId[64 * v2] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -68367,7 +68351,7 @@ void  fun_walker_priest()
   word_7FA372[64 * walkerId] = 384;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_22_walkerId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -68389,7 +68373,7 @@ void  fun_walker_schoolChild()
   word_7FA372[64 * walkerId] = 96;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_0a_type[64 * v0] != 51 )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -68405,7 +68389,7 @@ void  fun_walker_schoolChild()
       byte_7FA395[128 * walkerId] = 0;
       ++word_7FA374[64 * walkerId];
       if ( word_7FA374[64 * walkerId] >= word_7FA372[64 * walkerId] )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       sub_4B3F00(walkerId, 2);
       break;
   }
@@ -68426,7 +68410,7 @@ void  fun_walker_teacher()
   word_7FA372[64 * walkerId] = 384;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_22_walkerId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -68448,7 +68432,7 @@ void  fun_walker_librarian()
   word_7FA372[64 * walkerId] = 384;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_22_walkerId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -68470,7 +68454,7 @@ void  fun_walker_barber()
   word_7FA372[64 * walkerId] = 384;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_22_walkerId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -68492,7 +68476,7 @@ void  fun_walker_bathhouseWorker()
   word_7FA372[64 * walkerId] = 384;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_22_walkerId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -68514,7 +68498,7 @@ void  fun_walker_doctor()
   word_7FA372[64 * walkerId] = 384;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_22_walkerId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -68536,7 +68520,7 @@ void  fun_walker_surgeon()
   word_7FA372[64 * walkerId] = 384;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_22_walkerId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -68567,7 +68551,7 @@ void  fun_walker_worker()
   word_7FA372[64 * walkerId] = 384;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_22_walkerId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
 }
 // 7FA372: using guessed type __int16 word_7FA372[];
 // 7FA38A: using guessed type __int16 walker_buildingId[];
@@ -68584,27 +68568,27 @@ void  fun_walker_mapFlag()
   switch ( byte_7FA34B[128 * walkerId] )
   {
     case 1:
-      walker_x[128 * walkerId] = map_earthquake_x;
+      walkers[walkerId].x = map_earthquake_x;
       walkers[walkerId].y = map_earthquake_y;
       word_7FA346[64 * walkerId] = word_6E6CC8;
       break;
     case 2:
-      walker_x[128 * walkerId] = LOBYTE(map_entry_x[0]);
+      walkers[walkerId].x = LOBYTE(map_entry_x[0]);
       walkers[walkerId].y = map_entry_y;
       word_7FA346[64 * walkerId] = word_6E6CC8 + 2;
       break;
     case 3:
-      walker_x[128 * walkerId] = map_exit_x;
+      walkers[walkerId].x = map_exit_x;
       walkers[walkerId].y = LOBYTE(map_exit_y[0]);
       word_7FA346[64 * walkerId] = word_6E6CC8 + 3;
       break;
     case 0xC:
-      walker_x[128 * walkerId] = map_riverEntry_x;
+      walkers[walkerId].x = map_riverEntry_x;
       walkers[walkerId].y = map_riverEntry_y;
       word_7FA346[64 * walkerId] = word_6E6CC8 + 4;
       break;
     case 0xD:
-      walker_x[128 * walkerId] = map_riverExit_x;
+      walkers[walkerId].x = map_riverExit_x;
       walkers[walkerId].y = map_riverExit_y;
       word_7FA346[64 * walkerId] = word_6E6CC8 + 5;
       break;
@@ -68615,20 +68599,20 @@ void  fun_walker_mapFlag()
         if ( (signed int)(unsigned __int8)byte_7FA34B[128 * walkerId] < 22
           || (signed int)(unsigned __int8)byte_7FA34B[128 * walkerId] > 25 )
         {
-          walker_x[128 * walkerId] = LOBYTE(map_entry_x[(unsigned __int8)byte_7FA34B[128 * walkerId]]);
+          walkers[walkerId].x = LOBYTE(map_entry_x[(unsigned __int8)byte_7FA34B[128 * walkerId]]);
           walkers[walkerId].y = LOBYTE(map_invasionPoints_x[(unsigned __int8)byte_7FA34B[128 * walkerId] + 4]);
           word_7FA346[64 * walkerId] = word_6E6CC8 + 1;
         }
         else
         {
-          walker_x[128 * walkerId] = byte_9909EC[2 * (unsigned __int8)byte_7FA34B[128 * walkerId]];
+          walkers[walkerId].x = byte_9909EC[2 * (unsigned __int8)byte_7FA34B[128 * walkerId]];
           walkers[walkerId].y = byte_9909F4[2 * (unsigned __int8)byte_7FA34B[128 * walkerId]];
           word_7FA346[64 * walkerId] = word_6E6CAE + 4;
         }
       }
       else
       {
-        walker_x[128 * walkerId] = *((_BYTE *)&map_event_seaTradeProblem
+        walkers[walkerId].x = *((_BYTE *)&map_event_seaTradeProblem
                                    + 2 * (unsigned __int8)byte_7FA34B[128 * walkerId]);
         walkers[walkerId].y = *((_BYTE *)&map_event_contaminatedWater
                                    + 2 * (unsigned __int8)byte_7FA34B[128 * walkerId]);
@@ -68636,10 +68620,10 @@ void  fun_walker_mapFlag()
       }
       break;
   }
-  walkers[walkerId].tilePosition_y = 15 * walker_x[128 * walkerId];
+  walkers[walkerId].tilePosition_y = 15 * walkers[walkerId].x;
   walkers[walkerId].tilePosition_x = 15 * walkers[walkerId].y;
   walkers[walkerId].gridOffset = 162 * walkers[walkerId].y
-                                   + walker_x[128 * walkerId]
+                                   + walkers[walkerId].x
                                    + (_WORD)setting_map_startGridOffset;
   walkers[walkerId].tilePosition_y += 7;
   walkers[walkerId].tilePosition_x += 7;
@@ -68676,12 +68660,12 @@ LABEL_9:
           }
           if ( mode_editor == 1 )
           {
-            walker_destination_x[128 * walkerId] = map_riverExit_x;
+            walkers[walkerId].destination_x = map_riverExit_x;
             walker_destination_y[128 * walkerId] = map_riverExit_y;
           }
           else
           {
-            walker_destination_x[128 * walkerId] = scn_riverExit_x;
+            walkers[walkerId].destination_x = scn_riverExit_x;
             walker_destination_y[128 * walkerId] = scn_riverExit_y;
           }
         }
@@ -68744,18 +68728,18 @@ LABEL_9:
         fun_removeWalkerFromTileList(walkerId);
         if ( mode_editor == 1 )
         {
-          walker_x[128 * walkerId] = map_riverEntry_x;
+          walkers[walkerId].x = map_riverEntry_x;
           walkers[walkerId].y = map_riverEntry_y;
         }
         else
         {
-          walker_x[128 * walkerId] = scn_riverEntry_x;
+          walkers[walkerId].x = scn_riverEntry_x;
           walkers[walkerId].y = scn_riverEntry_y;
         }
         walkers[walkerId].gridOffset = 162 * walkers[walkerId].y
-                                         + walker_x[128 * walkerId]
+                                         + walkers[walkerId].x
                                          + (_WORD)setting_map_startGridOffset;
-        walkers[walkerId].tilePosition_y = 15 * walker_x[128 * walkerId];
+        walkers[walkerId].tilePosition_y = 15 * walkers[walkerId].x;
         walkers[walkerId].tilePosition_x = 15 * walkers[walkerId].y;
         break;
     }
@@ -68825,12 +68809,12 @@ void  fun_walker_docker()
   word_7FA346[64 * walkerId] = 0;
   v5 = walkers[walkerId].buildingId;
   if ( buildings[v5].inUse != 1 )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
 
   if ( building_0a_type[64 * v5] != 75 )
   {
     if ( building_0a_type[64 * v5] != 76 )
-      walker_state[128 * walkerId] = 2;
+      walkers[walkerId].state = 2;
   }
   if ( building_65_house_bathhouse_dock_numships_entert_days[128 * v5] )
     --building_65_house_bathhouse_dock_numships_entert_days[128 * v5];
@@ -68838,7 +68822,7 @@ void  fun_walker_docker()
   {
     v7 = building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v5];
     v0 = (unsigned __int8)byte_7FA3AD[128 * v7];
-    if ( (unsigned __int8)walker_state[128 * v7] == 1 && walkers[v7].type == 20 )
+    if ( walkers[v7].state == 1 && walkers[v7].type == 20 )
     {
       if ( dword_993F60[12 * v0] < 12 && dword_993F64[12 * v0] < 12 )
       {
@@ -68902,7 +68886,7 @@ void  fun_walker_docker()
           v6 = *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v5] + 2 * i);
           if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v5] + 2 * i) )
           {
-            if ( (unsigned __int8)walker_state[128 * v6] == 1 )
+            if ( walkers[v6].state == 1 )
             {
               if ( walkers[v6].actionState == 133 || walkers[v6].actionState == 134 )
               {
@@ -68958,11 +68942,11 @@ void  fun_walker_docker()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       if ( buildings[word_7FA38E[64 * walkerId]].inUse != 1 )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       break;
     case 136:
       word_7FA346[64 * walkerId] = word_6E6C72;
@@ -68976,11 +68960,11 @@ void  fun_walker_docker()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       if ( buildings[word_7FA38E[64 * walkerId]].inUse != 1 )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       break;
     case 137:
       word_7FA346[64 * walkerId] = word_6E6C72 + 8 * (unsigned __int8)byte_7FA34B[128 * walkerId];
@@ -68996,11 +68980,11 @@ void  fun_walker_docker()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       if ( buildings[word_7FA38E[64 * walkerId]].inUse != 1 )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       break;
     case 139:
       word_7FA346[64 * walkerId] = word_6E6C72 + 8 * (unsigned __int8)byte_7FA34B[128 * walkerId];
@@ -69019,7 +69003,7 @@ void  fun_walker_docker()
             (unsigned __int8)byte_7FA34B[128 * walkerId]);
           walkers[walkerId].actionState = -118;
           word_7FA366[64 * walkerId] = 0;
-          walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+          walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
           byte_7FA34B[128 * walkerId] = 0;
           sub_4A4910(v5);
@@ -69028,7 +69012,7 @@ void  fun_walker_docker()
         {
           walkers[walkerId].actionState = -118;
           word_7FA366[64 * walkerId] = 0;
-          walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+          walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         }
         word_7FA366[64 * walkerId] = 0;
@@ -69046,7 +69030,7 @@ void  fun_walker_docker()
       {
         walkers[walkerId].actionState = -118;
         word_7FA366[64 * walkerId] = 0;
-        walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+        walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         word_7FA366[64 * walkerId] = 0;
         if ( fun_exportOneGoodToCity(word_7FA38E[64 * walkerId], (unsigned __int8)byte_7FA34B[128 * walkerId], v3) )
@@ -69076,7 +69060,7 @@ void  fun_walker_docker()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -69129,7 +69113,7 @@ signed int  sub_4A46D0(int a1)
         }
         else
         {
-          v3 = walker_x[128 * walkerId];
+          v3 = walkers[walkerId].x;
           v2 = walkers[walkerId].y;
         }
         v5 = sub_446B50(
@@ -69144,7 +69128,7 @@ signed int  sub_4A46D0(int a1)
           word_7FA38E[64 * walkerId] = v5;
           word_7FA366[64 * walkerId] = 0;
           walkers[walkerId].actionState = -123;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           byte_7FA34B[128 * walkerId] = LOBYTE(city_inform[ciid].dword_6543B8);
           result = 1;
@@ -69193,7 +69177,7 @@ signed int  sub_4A4910(int a1)
         }
         else
         {
-          v3 = walker_x[128 * walkerId];
+          v3 = walkers[walkerId].x;
           v2 = walkers[walkerId].y;
         }
         v5 = sub_447210(
@@ -69208,7 +69192,7 @@ signed int  sub_4A4910(int a1)
           word_7FA38E[64 * walkerId] = v5;
           walkers[walkerId].actionState = -120;
           word_7FA366[64 * walkerId] = 0;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           byte_7FA34B[128 * walkerId] = LOBYTE(city_inform[ciid].dword_6543BC);
           result = 1;
@@ -69261,7 +69245,7 @@ signed int  sub_4A4B50(int a1)
         {
           v2 = *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v4] + 2 * i);
           if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v4] + 2 * i)
-            && (unsigned __int8)walker_state[128 * v2] == 1
+            && walkers[v2].state == 1
             && walkers[v2].actionState != 132 )
             return 0;
         }
@@ -69341,7 +69325,7 @@ signed int  sub_4A4D70(int a1)
       {
         v2 = *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v4] + 2 * i);
         if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v4] + 2 * i)
-          && (unsigned __int8)walker_state[128 * v2] == 1 )
+          && walkers[v2].state == 1 )
         {
           if ( walkers[v2].actionState == 133 )
             return 1;
@@ -69441,7 +69425,7 @@ void  fun_walker_marketBuyer()
   word_7FA372[64 * walkerId] = 800;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_24_laborSeekerId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -69463,15 +69447,15 @@ void  fun_walker_marketBuyer()
           && (unsigned __int8)walker_itemCollecting[128 * walkerId] != 3 )
         {
           if ( !sub_4A5EB0(walkerId, v0, word_7FA38E[64 * walkerId]) )
-            walker_state[128 * walkerId] = 2;
+            walkers[walkerId].state = 2;
         }
         else
         {
           if ( !sub_4A5680(walkerId, v0, word_7FA38E[64 * walkerId]) )
-            walker_state[128 * walkerId] = 2;
+            walkers[walkerId].state = 2;
         }
         walkers[walkerId].actionState = -110;
-        walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+        walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
         walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
       }
       else
@@ -69479,7 +69463,7 @@ void  fun_walker_marketBuyer()
         if ( walkers[walkerId].direction == 9 || walkers[walkerId].direction == 10 )
         {
           walkers[walkerId].actionState = -110;
-          walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+          walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
           fun_removeDestinationPathForWalker(walkerId);
         }
@@ -69490,13 +69474,13 @@ void  fun_walker_marketBuyer()
       switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -69620,55 +69604,55 @@ signed int  sub_4A5680(int a1, int a2, int a3)
   if ( v14 > 0 )
   {
     sub_45D7B0(ciid, a3, v13, 100 * v14);
-    v15 = fun_spawnWalker(ciid, 66, walker_x[128 * a1], walkers[a1].y, 0);
+    v15 = fun_spawnWalker(ciid, 66, walkers[a1].x, walkers[a1].y, 0);
     walker_tradeCaravanNextId[64 * v15] = a1;
     walker_itemCollecting[128 * v15] = walker_itemCollecting[128 * a1];
     walkers[v15].buildingId = walkers[a1].buildingId;
     if ( v14 > 1 )
     {
       v4 = v15;
-      v16 = fun_spawnWalker(ciid, 66, walker_x[128 * a1], walkers[a1].y, 0);
+      v16 = fun_spawnWalker(ciid, 66, walkers[a1].x, walkers[a1].y, 0);
       walker_tradeCaravanNextId[64 * v16] = v4;
       walker_itemCollecting[128 * v16] = walker_itemCollecting[128 * a1];
       walkers[v16].buildingId = walkers[a1].buildingId;
       if ( v14 > 2 )
       {
         v5 = v16;
-        v17 = fun_spawnWalker(ciid, 66, walker_x[128 * a1], walkers[a1].y, 0);
+        v17 = fun_spawnWalker(ciid, 66, walkers[a1].x, walkers[a1].y, 0);
         walker_tradeCaravanNextId[64 * v17] = v5;
         walker_itemCollecting[128 * v17] = walker_itemCollecting[128 * a1];
         walkers[v17].buildingId = walkers[a1].buildingId;
         if ( v14 > 3 )
         {
           v6 = v17;
-          v18 = fun_spawnWalker(ciid, 66, walker_x[128 * a1], walkers[a1].y, 0);
+          v18 = fun_spawnWalker(ciid, 66, walkers[a1].x, walkers[a1].y, 0);
           walker_tradeCaravanNextId[64 * v18] = v6;
           walker_itemCollecting[128 * v18] = walker_itemCollecting[128 * a1];
           walkers[v18].buildingId = walkers[a1].buildingId;
           if ( v14 > 4 )
           {
             v7 = v18;
-            v19 = fun_spawnWalker(ciid, 66, walker_x[128 * a1], walkers[a1].y, 0);
+            v19 = fun_spawnWalker(ciid, 66, walkers[a1].x, walkers[a1].y, 0);
             walker_tradeCaravanNextId[64 * v19] = v7;
             walker_itemCollecting[128 * v19] = walker_itemCollecting[128 * a1];
             walkers[v19].buildingId = walkers[a1].buildingId;
             if ( v14 > 5 )
             {
               v8 = v19;
-              v20 = fun_spawnWalker(ciid, 66, walker_x[128 * a1], walkers[a1].y, 0);
+              v20 = fun_spawnWalker(ciid, 66, walkers[a1].x, walkers[a1].y, 0);
               walker_tradeCaravanNextId[64 * v20] = v8;
               walker_itemCollecting[128 * v20] = walker_itemCollecting[128 * a1];
               walkers[v20].buildingId = walkers[a1].buildingId;
               if ( v14 > 6 )
               {
                 v9 = v20;
-                v21 = fun_spawnWalker(ciid, 66, walker_x[128 * a1], walkers[a1].y, 0);
+                v21 = fun_spawnWalker(ciid, 66, walkers[a1].x, walkers[a1].y, 0);
                 walker_tradeCaravanNextId[64 * v21] = v9;
                 walker_itemCollecting[128 * v21] = walker_itemCollecting[128 * a1];
                 walkers[v21].buildingId = walkers[a1].buildingId;
                 if ( v14 > 7 )
                 {
-                  v10 = fun_spawnWalker(ciid, 66, walker_x[128 * a1], walkers[a1].y, 0);
+                  v10 = fun_spawnWalker(ciid, 66, walkers[a1].x, walkers[a1].y, 0);
                   walker_tradeCaravanNextId[64 * v10] = v21;
                   walker_itemCollecting[128 * v10] = walker_itemCollecting[128 * a1];
                   walkers[v10].buildingId = walkers[a1].buildingId;
@@ -69751,13 +69735,13 @@ signed int  sub_4A5EB0(int a1, int a2, int a3)
   if ( v5 > 0 )
   {
     fun_removeGoodFromWarehouse(ciid, a3, v6, v5);
-    v7 = fun_spawnWalker(ciid, 66, walker_x[128 * a1], walkers[a1].y, 0);
+    v7 = fun_spawnWalker(ciid, 66, walkers[a1].x, walkers[a1].y, 0);
     walker_tradeCaravanNextId[64 * v7] = a1;
     walker_itemCollecting[128 * v7] = walker_itemCollecting[128 * a1];
     walkers[v7].buildingId = walkers[a1].buildingId;
     if ( v5 > 1 )
     {
-      v4 = fun_spawnWalker(ciid, 66, walker_x[128 * a1], walkers[a1].y, 0);
+      v4 = fun_spawnWalker(ciid, 66, walkers[a1].x, walkers[a1].y, 0);
       walker_tradeCaravanNextId[64 * v4] = v7;
       walker_itemCollecting[128 * v4] = walker_itemCollecting[128 * a1];
       walkers[v4].buildingId = walkers[a1].buildingId;
@@ -69781,7 +69765,7 @@ void  fun_walker_patrician()
   walkers[walkerId].byte_7FA34C = 0;
   word_7FA372[64 * walkerId] = 128;
   if ( buildings[walkers[walkerId].buildingId].inUse != 1 )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -69804,7 +69788,7 @@ void  fun_walker_indigenousNative()
   word_7FA372[64 * walkerId] = 800;
   v1 = walkers[walkerId].buildingId;
   if ( buildings[v1].inUse != 1 || building_22_walkerId[64 * v1] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -69840,7 +69824,7 @@ void  fun_walker_indigenousNative()
         if ( city_inform[ciid].dword_6544B8 )
         {
           walkers[walkerId].actionState = -97;
-          walker_destination_x[128 * walkerId] = formation_34[0];
+          walkers[walkerId].destination_x = formation_34[0];
           walker_destination_y[128 * walkerId] = formation_35[0];
           word_7FA38E[64 * walkerId] = formation_36[0];
         }
@@ -69852,7 +69836,7 @@ void  fun_walker_indigenousNative()
                  (unsigned __int8)building_03_size[128 * building_0c_level_resourceId[64 * v1]]) )
           {
             walkers[walkerId].actionState = -100;
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
           }
         }
@@ -69866,21 +69850,21 @@ void  fun_walker_indigenousNative()
         if ( walkers[walkerId].direction == 8 )
         {
           walkers[walkerId].actionState = -99;
-          walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+          walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         }
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
       break;
     case 0x9D:
       fun_walkerWalkTicks(walkerId, 1);
       if ( walkers[walkerId].direction == 9 || walkers[walkerId].direction == 10 )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       if ( walkers[walkerId].direction == 8 )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       break;
   }
   if ( walkers[walkerId].actionState == 150 )
@@ -69952,7 +69936,7 @@ void  fun_walker_towerSentry()
   word_7FA372[64 * walkerId] = 800;
   v1 = walkers[walkerId].buildingId;
   if ( buildings[v1].inUse != 1 || building_22_walkerId[64 * v1] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -69974,7 +69958,7 @@ void  fun_walker_towerSentry()
         if ( sub_4A7760(walkerId) )
         {
           walkers[walkerId].actionState = -85;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           fun_removeDestinationPathForWalker(walkerId);
         }
@@ -69990,12 +69974,12 @@ void  fun_walker_towerSentry()
         if ( walkers[walkerId].direction == 8 )
         {
           fun_removeWalkerFromTileList(walkerId);
-          walker_x[128 * walkerId] = buildings[v1].x;
-          byte_7FA360[128 * walkerId] = walker_x[128 * walkerId];
+          walkers[walkerId].x = buildings[v1].x;
+          byte_7FA360[128 * walkerId] = walkers[walkerId].x;
           walkers[walkerId].y = building__07_y[128 * v1];
           byte_7FA361[128 * walkerId] = walkers[walkerId].y;
           walkers[walkerId].gridOffset = 162 * walkers[walkerId].y
-                                           + walker_x[128 * walkerId]
+                                           + walkers[walkerId].x
                                            + (_WORD)setting_map_startGridOffset;
           sub_4B8A40(walkerId);
           walkers[walkerId].actionState = -86;
@@ -70004,7 +69988,7 @@ void  fun_walker_towerSentry()
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
       break;
     case 171:
@@ -70014,7 +69998,7 @@ void  fun_walker_towerSentry()
         if ( walkers[walkerId].direction == 8 )
         {
           walkers[walkerId].actionState = -83;
-          walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+          walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
           fun_removeDestinationPathForWalker(walkerId);
         }
@@ -70033,7 +70017,7 @@ void  fun_walker_towerSentry()
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
       break;
     case 172:
@@ -70045,17 +70029,17 @@ void  fun_walker_towerSentry()
         if ( sub_4ADB30(walkerId, 10) )
         {
           walkers[walkerId].direction = fun_pathing_getDirection8(
-                                               walker_x[128 * walkerId],
+                                               walkers[walkerId].x,
                                                walkers[walkerId].y,
                                                walkerGridX,
                                                walkerGridY);
           byte_7FA39B[128 * walkerId] = 0;
-          sub_4B75B0(walkerId, walker_x[128 * walkerId], walkers[walkerId].y, walkerGridX, walkerGridY, 60);
+          sub_4B75B0(walkerId, walkers[walkerId].x, walkers[walkerId].y, walkerGridX, walkerGridY, 60);
         }
         else
         {
           walkers[walkerId].actionState = -83;
-          walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+          walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
           fun_removeDestinationPathForWalker(walkerId);
         }
@@ -70065,7 +70049,7 @@ void  fun_walker_towerSentry()
   v0 = walkers[walkerId].gridOffset;
   if ( grid_terrain[v0] & T_Wall )
   {
-    byte_7FA3A6[128 * walkerId] = 18;
+    walkers[walkerId].byte_7FA3A6 = 18;
   }
   else
   {
@@ -70076,7 +70060,7 @@ void  fun_walker_towerSentry()
     else
     {
       if ( walkers[walkerId].actionState != 174 )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
     }
   }
   if ( byte_7FA370[128 * walkerId] )
@@ -70209,13 +70193,13 @@ void  sub_4A7A70()
     {
       if ( byte_61AA20[walkers[i].gridOffset] )
       {
-        if ( sub_489500(walker_x[128 * i], walkers[i].y, 1, 2) )
+        if ( sub_489500(walkers[i].x, walkers[i].y, 1, 2) )
         {
           fun_removeDestinationPathForWalker(walkerId);
-          walker_progressOnTile[128 * i] = 15;
-          walker_progressOnTile[128 * i] = 0;
+          walkers[i].progressOnTile = 15;
+          walkers[i].progressOnTile = 0;
           fun_removeWalkerFromTileList(i);
-          walker_x[128 * i] = walkerGridX;
+          walkers[i].x = walkerGridX;
           byte_7FA356[128 * i] = walkerGridX;
           walkers[i].y = walkerGridY;
           byte_7FA357[128 * i] = walkerGridY;
@@ -70224,7 +70208,7 @@ void  sub_4A7A70()
           walkers[i].gridOffset = 162 * walkerGridY + walkerGridX + (_WORD)setting_map_startGridOffset;
           sub_4B8A40(i);
           walkers[walkerId].actionState = -83;
-          walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+          walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
           walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
         }
         else
@@ -70232,11 +70216,11 @@ void  sub_4A7A70()
           walkers[i].actionState = -86;
           fun_removeWalkerFromTileList(i);
           v0 = walkers[i].buildingId;
-          walker_x[128 * i] = buildings[v0].x;
-          byte_7FA360[128 * i] = walker_x[128 * i];
+          walkers[i].x = buildings[v0].x;
+          byte_7FA360[128 * i] = walkers[i].x;
           walkers[i].y = building__07_y[128 * v0];
           byte_7FA361[128 * i] = walkers[i].y;
-          walkers[i].gridOffset = 162 * walkers[i].y + walker_x[128 * i] + (_WORD)setting_map_startGridOffset;
+          walkers[i].gridOffset = 162 * walkers[i].y + walkers[i].x + (_WORD)setting_map_startGridOffset;
           sub_4B8A40(i);
           walkers[i].actionState = -86;
           fun_removeDestinationPathForWalker(i);
@@ -70279,7 +70263,7 @@ signed int  sub_4A7DC0(int a1)
               if ( dword_7FA2A4 <= 10 )
               {
                 walkers[a1].actionState = -84;
-                walker_destination_x[128 * a1] = walker_x[128 * a1];
+                walkers[a1].destination_x = walkers[a1].x;
                 walker_destination_y[128 * a1] = walkers[a1].y;
                 result = 1;
               }
@@ -71443,14 +71427,14 @@ int  sub_4AB8D0()
         //v1 = sub_4C1100();
         if ( v1 )
         {
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
           word_7FA38E[64 * walkerId] = v1;
           fun_removeDestinationPathForWalker(walkerId);
         }
         else
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
       }
       break;
@@ -71621,12 +71605,12 @@ void  sub_4AC350()
       }
       else
       {
-        walker_destination_x[128 * walkerId] = byte_7FA362[128 * walkerId] + formation_34[128 * v3];
+        walkers[walkerId].destination_x = byte_7FA362[128 * walkerId] + formation_34[128 * v3];
         walker_destination_y[128 * walkerId] = byte_7FA363[128 * walkerId] + formation_35[128 * v3];
         if ( (signed int)(unsigned __int8)fun_walkerGetSimpleDestinationDirection(
-                                            walker_x[128 * walkerId],
+                                            walkers[walkerId].x,
                                             walkers[walkerId].y,
-                                            (unsigned __int8)walker_destination_x[128 * walkerId],
+                                            (unsigned __int8)walkers[walkerId].destination_x,
                                             (unsigned __int8)walker_destination_y[128 * walkerId]) < 8 )
           walkers[walkerId].actionState = -103;
       }
@@ -71646,7 +71630,7 @@ void  sub_4AC350()
         {
           byte_7FA39A[128 * walkerId] = 1;
           walkers[walkerId].direction = fun_pathing_getDirection8(
-                                               walker_x[128 * walkerId],
+                                               walkers[walkerId].x,
                                                walkers[walkerId].y,
                                                walkerGridX,
                                                walkerGridY);
@@ -71678,7 +71662,7 @@ void  sub_4AC350()
         }
         if ( (unsigned __int8)byte_7FA39A[128 * walkerId] == 1 )
         {
-          sub_4B75B0(walkerId, walker_x[128 * walkerId], walkers[walkerId].y, walkerGridX, walkerGridY, v2);
+          sub_4B75B0(walkerId, walkers[walkerId].x, walkers[walkerId].y, walkerGridX, walkerGridY, v2);
           formation_54[64 * v3] = 6;
         }
         if ( v2 == 59 )
@@ -71700,17 +71684,17 @@ void  sub_4AC350()
   {
     if ( walkers[walkerId].actionState == 148 )
     {
-      walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+      walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
       walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
       fun_walkerWalkTicks(walkerId, (unsigned __int8)byte_7FA389[128 * walkerId]);
       if ( walkers[walkerId].direction != 9 && walkers[walkerId].direction != 10 )
       {
         if ( walkers[walkerId].direction == 8 )
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
       }
       else
       {
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
     }
     else
@@ -71726,12 +71710,12 @@ void  sub_4AC350()
         if ( word_7FA366[64 * walkerId] <= 0 )
         {
           word_7FA366[64 * walkerId] = 50;
-          walker_destination_x[128 * walkerId] = byte_7FA362[128 * walkerId] + formation_34[128 * v3];
+          walkers[walkerId].destination_x = byte_7FA362[128 * walkerId] + formation_34[128 * v3];
           walker_destination_y[128 * walkerId] = byte_7FA363[128 * walkerId] + formation_35[128 * v3];
           if ( (unsigned __int8)fun_walkerGetSimpleDestinationDirection(
-                                  walker_x[128 * walkerId],
+                                  walkers[walkerId].x,
                                   walkers[walkerId].y,
-                                  (unsigned __int8)walker_destination_x[128 * walkerId],
+                                  (unsigned __int8)walkers[walkerId].destination_x,
                                   (unsigned __int8)walker_destination_y[128 * walkerId]) == 8 )
           {
             walkers[walkerId].actionState = -105;
@@ -71783,7 +71767,7 @@ void  sub_4AC350()
             }
           }
           v4 = word_7FA3B0[64 * walkerId];
-          if ( (unsigned __int8)walker_state[128 * v4] != 1 )
+          if ( walkers[v4].state != 1 )
           {
             word_7FA3B0[64 * walkerId] = 0;
             v4 = 0;
@@ -71795,10 +71779,10 @@ void  sub_4AC350()
           }
           if ( v4 <= 0 )
           {
-            v4 = sub_4AD320(walker_x[128 * walkerId], walkers[walkerId].y);
+            v4 = sub_4AD320(walkers[walkerId].x, walkers[walkerId].y);
             if ( v4 )
             {
-              walker_destination_x[128 * walkerId] = walker_x[128 * v4];
+              walkers[walkerId].destination_x = walkers[v4].x;
               walker_destination_y[128 * walkerId] = walkers[v4].y;
               word_7FA3B0[64 * walkerId] = v4;
               word_7FA3B2[64 * v4] = walkerId;
@@ -71814,7 +71798,7 @@ void  sub_4AC350()
               if ( walkers[walkerId].direction == 8 )
               {
                 v0 = word_7FA3B0[64 * walkerId];
-                walker_destination_x[128 * walkerId] = walker_x[128 * v0];
+                walkers[walkerId].destination_x = walkers[v0].x;
                 walker_destination_y[128 * walkerId] = walkers[v0].y;
                 fun_removeDestinationPathForWalker(walkerId);
               }
@@ -71848,7 +71832,7 @@ signed int  sub_4AD320(int a1, int a2)
   dword_7FA2A4 = 10000;
   for ( i = 1; i < 1000; ++i )
   {
-    if ( (unsigned __int8)walker_state[128 * i] == 1 )
+    if ( walkers[i].state == 1 )
     {
       if ( walkers[i].actionState != 149 )
       {
@@ -71858,7 +71842,7 @@ signed int  sub_4AD320(int a1, int a2)
           {
             if ( (signed int)walkers[i].type<= 13 )
             {
-              v4 = fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walkers[i].y);
+              v4 = fun_getDistanceMaximum(a1, a2, walkers[i].x, walkers[i].y);
               if ( v4 < dword_7FA2A4 )
               {
                 dword_7FA2A4 = v4;
@@ -71878,7 +71862,7 @@ signed int  sub_4AD320(int a1, int a2)
   {
     for ( j = 1; j < 1000; ++j )
     {
-      if ( (unsigned __int8)walker_state[128 * j] == 1
+      if ( walkers[j].state == 1
         && walkers[j].actionState != 149
         && walkers[j].type >= 11
         && walkers[j].type <= 13 )
@@ -71900,7 +71884,7 @@ signed int  sub_4AD500(int a1, int a2, int a3)
   dword_7FA2A4 = 10000;
   for ( i = 1; i < 1000; ++i )
   {
-    if ( (unsigned __int8)walker_state[128 * i] == 1
+    if ( walkers[i].state == 1
       && walkers[i].actionState != 149
       && walkers[i].type > 0
       && walkers[i].type!= Walker_Explosion
@@ -71915,7 +71899,7 @@ signed int  sub_4AD500(int a1, int a2, int a3)
       {
         if (walkers[i].actionState == 80 )
           continue;
-        v5 = fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walkers[i].y);
+        v5 = fun_getDistanceMaximum(a1, a2, walkers[i].x, walkers[i].y);
         goto LABEL_34;
       }
       if ( (walkers[i].type< (signed int)Walker_IndigenousNative
@@ -71923,7 +71907,7 @@ signed int  sub_4AD500(int a1, int a2, int a3)
         && (walkers[i].type< (signed int)Walker_Shipwreck
          || walkers[i].type> (signed int)Walker_Zebra) )
       {
-        v5 = fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walkers[i].y);
+        v5 = fun_getDistanceMaximum(a1, a2, walkers[i].x, walkers[i].y);
 LABEL_34:
         if ( word_7FA3B2[64 * i] )
           v5 *= 2;
@@ -71962,22 +71946,22 @@ signed int  sub_4AD800(int a1, int a2, int a3)
   dword_7FA2A4 = 10000;
   for ( i = 1; i < 1000; ++i )
   {
-    if ( (unsigned __int8)walker_state[128 * i] == 1 && walkers[i].actionState!= 149 )
+    if ( walkers[i].state == 1 && walkers[i].actionState!= 149 )
     {
       if ( (signed int)walkers[i].type>= 43
         && (signed int)walkers[i].type<= 57 )
       {
-        v5 = fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walkers[i].y);
+        v5 = fun_getDistanceMaximum(a1, a2, walkers[i].x, walkers[i].y);
         goto LABEL_17;
       }
       if ( walkers[i].type== 24 )
       {
-        v5 = fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walkers[i].y);
+        v5 = fun_getDistanceMaximum(a1, a2, walkers[i].x, walkers[i].y);
         goto LABEL_17;
       }
       if ( walkers[i].type== 41 && walkers[i].actionState == 159 )
       {
-        v5 = fun_getDistanceMaximum(a1, a2, walker_x[128 * i], walkers[i].y);
+        v5 = fun_getDistanceMaximum(a1, a2, walkers[i].x, walkers[i].y);
 LABEL_17:
         if ( v5 <= a3 )
         {
@@ -72001,7 +71985,7 @@ LABEL_17:
   {
     for ( j = 1; j < 1000; ++j )
     {
-      if ( (unsigned __int8)walker_state[128 * j] == 1 && walkers[j].actionState != 149 )
+      if ( walkers[j].state == 1 && walkers[j].actionState != 149 )
       {
         if ( walkers[j].type >= 43
           && walkers[j].type <= 57 )
@@ -72026,13 +72010,13 @@ signed int  sub_4ADB30(int a1, int a2)
   int v6; // [sp+58h] [bp-8h]@10
   signed int i; // [sp+5Ch] [bp-4h]@1
 
-  v4 = walker_x[128 * a1];
+  v4 = walkers[a1].x;
   v3 = walkers[a1].y;
   v5 = 0;
   dword_7FA2A4 = a2;
   for ( i = 1; i < 1000; ++i )
   {
-    if ( (unsigned __int8)walker_state[128 * i] == 1 && walkers[i].actionState != 149 )
+    if ( walkers[i].state == 1 && walkers[i].actionState != 149 )
     {
       if ( (signed int)walkers[i].type< 43
         || (signed int)walkers[i].type> 57 )
@@ -72041,34 +72025,34 @@ signed int  sub_4ADB30(int a1, int a2)
         {
           if ( walkers[i].type== 69 )
           {
-            v6 = fun_getDistanceMaximum(v4, v3, walker_x[128 * i], walkers[i].y);
+            v6 = fun_getDistanceMaximum(v4, v3, walkers[i].x, walkers[i].y);
           }
           else
           {
             if ( walkers[i].type== 68 )
             {
-              v6 = fun_getDistanceMaximum(v4, v3, walker_x[128 * i], walkers[i].y);
+              v6 = fun_getDistanceMaximum(v4, v3, walkers[i].x, walkers[i].y);
             }
             else
             {
               if ( walkers[i].type!= 70 )
                 continue;
-              v6 = fun_getDistanceMaximum(v4, v3, walker_x[128 * i], walkers[i].y);
+              v6 = fun_getDistanceMaximum(v4, v3, walkers[i].x, walkers[i].y);
             }
           }
         }
         else
         {
-          v6 = fun_getDistanceMaximum(v4, v3, walker_x[128 * i], walkers[i].y);
+          v6 = fun_getDistanceMaximum(v4, v3, walkers[i].x, walkers[i].y);
         }
       }
       else
       {
-        v6 = fun_getDistanceMaximum(v4, v3, walker_x[128 * i], walkers[i].y);
+        v6 = fun_getDistanceMaximum(v4, v3, walkers[i].x, walkers[i].y);
       }
       if ( v6 < dword_7FA2A4 )
       {
-        if ( sub_4B70B0(v4, v3, walker_x[128 * i], walkers[i].y) )
+        if ( sub_4B70B0(v4, v3, walkers[i].x, walkers[i].y) )
         {
           dword_7FA2A4 = v6;
           v5 = i;
@@ -72078,7 +72062,7 @@ signed int  sub_4ADB30(int a1, int a2)
   }
   if ( v5 )
   {
-    walkerGridX = walker_x[128 * v5];
+    walkerGridX = walkers[v5].x;
     walkerGridY = walkers[v5].y;
     result = v5;
   }
@@ -72098,13 +72082,13 @@ signed int  sub_4ADE90(int a1, int a2, int a3)
   int v7; // [sp+58h] [bp-8h]@46
   signed int i; // [sp+5Ch] [bp-4h]@1
 
-  v5 = walker_x[128 * a1];
+  v5 = walkers[a1].x;
   v4 = walkers[a1].y;
   walkerId = 0;
   dword_7FA2A4 = a2;
   for ( i = 1; i < 1000; ++i )
   {
-    if ( (unsigned __int8)walker_state[128 * i] == 1
+    if ( walkers[i].state == 1
       && walkers[i].actionState != 149
       && walkers[i].type
       && walkers[i].type!= Walker_Explosion
@@ -72128,16 +72112,16 @@ signed int  sub_4ADE90(int a1, int a2, int a3)
       if ( walkers[i].type>= (signed int)Walker_FortJavelin
         && walkers[i].type<= (signed int)Walker_FortLegionary )
       {
-        v7 = fun_getDistanceMaximum(v5, v4, walker_x[128 * i], walkers[i].y);
+        v7 = fun_getDistanceMaximum(v5, v4, walkers[i].x, walkers[i].y);
         goto LABEL_52;
       }
       if ( byte_7FA34D[128 * i] && a3 )
       {
-        v7 = fun_getDistanceMaximum(v5, v4, walker_x[128 * i], walkers[i].y) + 5;
+        v7 = fun_getDistanceMaximum(v5, v4, walkers[i].x, walkers[i].y) + 5;
 LABEL_52:
         if ( v7 < dword_7FA2A4 )
         {
-          if ( sub_4B70B0(v5, v4, walker_x[128 * i], walkers[i].y) )
+          if ( sub_4B70B0(v5, v4, walkers[i].x, walkers[i].y) )
           {
             dword_7FA2A4 = v7;
             walkerId = i;
@@ -72149,7 +72133,7 @@ LABEL_52:
   }
   if ( walkerId )
   {
-    walkerGridX = walker_x[128 * walkerId];
+    walkerGridX = walkers[walkerId].x;
     walkerGridY = walkers[walkerId].y;
     result = walkerId;
   }
@@ -72186,18 +72170,18 @@ void  fun_walker_nativeTrader()
       if ( word_7FA366[64 * walkerId] > 10 )
       {
         word_7FA366[64 * walkerId] = 0;
-        v1 = sub_446550(walkerId, walker_x[128 * walkerId], walkers[walkerId].y, 0, -1);
+        v1 = sub_446550(walkerId, walkers[walkerId].x, walkers[walkerId].y, 0, -1);
         if ( v1 )
         {
           word_7FA38E[64 * walkerId] = v1;
           walkers[walkerId].actionState = -96;
           word_7FA366[64 * walkerId] = 0;
-          walker_destination_x[128 * walkerId] = walkerGridX;
+          walkers[walkerId].destination_x = walkerGridX;
           walker_destination_y[128 * walkerId] = walkerGridY;
         }
         else
         {
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
         }
       }
       byte_7FA341[128 * walkerId] = 0;
@@ -72213,12 +72197,12 @@ void  fun_walker_nativeTrader()
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           byte_7FA395[128 * walkerId] = 1;
           break;
       }
       if ( buildings[word_7FA38E[64 * walkerId]].inUse != 1 )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       break;
     case 0xA3:
       ++word_7FA366[64 * walkerId];
@@ -72233,20 +72217,20 @@ void  fun_walker_nativeTrader()
         }
         else
         {
-          v2 = sub_446550(walkerId, walker_x[128 * walkerId], walkers[walkerId].y, 0, -1);
+          v2 = sub_446550(walkerId, walkers[walkerId].x, walkers[walkerId].y, 0, -1);
           if ( v2 )
           {
             word_7FA38E[64 * walkerId] = v2;
             walkers[walkerId].actionState = -96;
             word_7FA366[64 * walkerId] = 0;
-            walker_destination_x[128 * walkerId] = walkerGridX;
+            walkers[walkerId].destination_x = walkerGridX;
             walker_destination_y[128 * walkerId] = walkerGridY;
           }
           else
           {
             walkers[walkerId].actionState = -95;
             word_7FA366[64 * walkerId] = 0;
-            walker_destination_x[128 * walkerId] = byte_7FA360[128 * walkerId];
+            walkers[walkerId].destination_x = byte_7FA360[128 * walkerId];
             walker_destination_y[128 * walkerId] = byte_7FA361[128 * walkerId];
           }
         }
@@ -72258,13 +72242,13 @@ void  fun_walker_nativeTrader()
       switch ( walkers[walkerId].direction )
       {
         case 8:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
         case 9:
           fun_removeDestinationPathForWalker(walkerId);
           break;
         case 10:
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
           break;
       }
       break;
@@ -72317,9 +72301,9 @@ void  fun_walker_arrow()
   int v6; // [sp+70h] [bp-4h]@3
 
   walkers[walkerId].byte_7FA34C = 1;
-  ++walker_progressOnTile[128 * walkerId];
-  if ( walker_progressOnTile[128 * walkerId] > 120 )
-    walker_state[128 * walkerId] = 2;
+  ++walkers[walkerId].progressOnTile;
+  if ( walkers[walkerId].progressOnTile > 120 )
+    walkers[walkerId].state = 2;
   v6 = sub_4B66E0(walkerId, 4);
   v5 = sub_4B9080(walkerId);
   if ( v5 )
@@ -72351,7 +72335,7 @@ void  fun_walker_arrow()
       sub_4B8080(walkers[v5].type);
       fun_formationDecreaseMoraleAfterComradeDeath(v1);
     }
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
     v0 = walker_formationId[64 * walkers[walkerId].buildingId];
     formation_56[64 * v1] = 6;
     formation_58[64 * v1] = v0;
@@ -72360,7 +72344,7 @@ void  fun_walker_arrow()
   else
   {
     if ( v6 )
-      walker_state[128 * walkerId] = 2;
+      walkers[walkerId].state = 2;
   }
   dword_65DF24 = walkers[walkerId].direction - 2 * setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 0x10 : 0;
@@ -72393,9 +72377,9 @@ int  fun_walker_javelin()
   int v7; // [sp+70h] [bp-4h]@3
 
   walkers[walkerId].byte_7FA34C = 1;
-  ++walker_progressOnTile[128 * walkerId];
-  if ( walker_progressOnTile[128 * walkerId] > 120 )
-    walker_state[128 * walkerId] = 2;
+  ++walkers[walkerId].progressOnTile;
+  if ( walkers[walkerId].progressOnTile > 120 )
+    walkers[walkerId].state = 2;
   v7 = sub_4B66E0(walkerId, 4);
   v6 = sub_4B8F30(walkerId);
   if ( v6 )
@@ -72431,12 +72415,12 @@ int  fun_walker_javelin()
     formation_56[64 * v2] = 6;
     formation_58[64 * v2] = v0;
     fun_sound_playChannel(24);
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   }
   else
   {
     if ( v7 )
-      walker_state[128 * walkerId] = 2;
+      walkers[walkerId].state = 2;
   }
   dword_65DF24 = walkers[walkerId].direction - 2 * setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 0x10 : 0;
@@ -72469,9 +72453,9 @@ void  fun_walker_bolt()
   int v5; // [sp+68h] [bp-4h]@3
 
   walkers[walkerId].byte_7FA34C = 1;
-  ++walker_progressOnTile[128 * walkerId];
-  if ( walker_progressOnTile[128 * walkerId] > 120 )
-    walker_state[128 * walkerId] = 2;
+  ++walkers[walkerId].progressOnTile;
+  if ( walkers[walkerId].progressOnTile > 120 )
+    walkers[walkerId].state = 2;
   v5 = sub_4B66E0(walkerId, 4);
   v4 = sub_4B8F30(walkerId);
   if ( v4 )
@@ -72496,13 +72480,13 @@ void  fun_walker_bolt()
       fun_formationDecreaseMoraleAfterComradeDeath(v3);
     }
     fun_sound_playChannel(15);
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   }
   else
   {
     if ( v5 )
     {
-      walker_state[128 * walkerId] = 2;
+      walkers[walkerId].state = 2;
       fun_sound_playChannel(14);
     }
   }
@@ -72528,43 +72512,43 @@ void  fun_walker_ballista()
   walkers[walkerId].byte_7FA34C = 0;
   byte_7FA395[128 * walkerId] = 1;
   byte_7FA3A5[128 * walkerId] = 10;
-  byte_7FA3A6[128 * walkerId] = 45;
+  walkers[walkerId].byte_7FA3A6 = 45;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_28_towerBallistaId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   if ( building_38_num_workers[64 * v0] <= 0 )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   if ( building_22_walkerId[64 * v0] <= 0 )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   fun_removeWalkerFromTileList(walkerId);
   if ( !setting_map_orientation )
   {
-    walker_x[128 * walkerId] = buildings[v0].x;
+    walkers[walkerId].x = buildings[v0].x;
     walkers[walkerId].y = building__07_y[128 * v0];
   }
   if ( setting_map_orientation == 2 )
   {
-    walker_x[128 * walkerId] = buildings[v0].x + 1;
+    walkers[walkerId].x = buildings[v0].x + 1;
     walkers[walkerId].y = building__07_y[128 * v0];
   }
   if ( setting_map_orientation == 4 )
   {
-    walker_x[128 * walkerId] = buildings[v0].x + 1;
+    walkers[walkerId].x = buildings[v0].x + 1;
     walkers[walkerId].y = building__07_y[128 * v0] + 1;
   }
   if ( setting_map_orientation == 6 )
   {
-    walker_x[128 * walkerId] = buildings[v0].x;
+    walkers[walkerId].x = buildings[v0].x;
     walkers[walkerId].y = building__07_y[128 * v0] + 1;
   }
   walkers[walkerId].gridOffset = 162 * walkers[walkerId].y
-                                   + walker_x[128 * walkerId]
+                                   + walkers[walkerId].x
                                    + (_WORD)setting_map_startGridOffset;
   sub_4B8A40(walkerId);
   switch ( walkers[walkerId].actionState )
   {
     case 0x95:
-      walker_state[128 * walkerId] = 2;
+      walkers[walkerId].state = 2;
       break;
     case 0xB4:
       ++word_7FA366[64 * walkerId];
@@ -72586,12 +72570,12 @@ void  fun_walker_ballista()
         if ( sub_4ADB30(walkerId, 15) )
         {
           walkers[walkerId].direction = fun_pathing_getDirection8(
-                                               walker_x[128 * walkerId],
+                                               walkers[walkerId].x,
                                                walkers[walkerId].y,
                                                walkerGridX,
                                                walkerGridY);
           byte_7FA39B[128 * walkerId] = 0;
-          sub_4B75B0(walkerId, walker_x[128 * walkerId], walkers[walkerId].y, walkerGridX, walkerGridY, 61);
+          sub_4B75B0(walkerId, walkers[walkerId].x, walkers[walkerId].y, walkerGridX, walkerGridY, 61);
           fun_sound_playChannel(13);
         }
         else
@@ -72626,7 +72610,7 @@ void  fun_walker_missionary()
   word_7FA372[64 * walkerId] = 192;
   v0 = walkers[walkerId].buildingId;
   if ( buildings[v0].inUse != 1 || building_22_walkerId[64 * v0] != walkerId )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
@@ -72657,18 +72641,18 @@ void  fun_walker_seagulls()
   {
     if ( sub_4B66E0(walkerId, 1) )
     {
-      ++walker_progressOnTile[128 * walkerId];
-      if ( walker_progressOnTile[128 * walkerId] > 8 )
-        walker_progressOnTile[128 * walkerId] = 0;
-      walker_destination_x[128 * walkerId] = word_5FA4F8[2 * walker_progressOnTile[128 * walkerId]]
+      ++walkers[walkerId].progressOnTile;
+      if ( walkers[walkerId].progressOnTile > 8 )
+        walkers[walkerId].progressOnTile = 0;
+      walkers[walkerId].destination_x = word_5FA4F8[2 * walkers[walkerId].progressOnTile]
                                            + byte_7FA360[128 * walkerId];
-      walker_destination_y[128 * walkerId] = word_5FA4FA[2 * walker_progressOnTile[128 * walkerId]]
+      walker_destination_y[128 * walkerId] = word_5FA4FA[2 * walkers[walkerId].progressOnTile]
                                            + byte_7FA361[128 * walkerId];
       sub_4B6B70(
         walkerId,
         walkers[walkerId].tilePosition_y,
         walkers[walkerId].tilePosition_x,
-        15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+        15 * (unsigned __int8)walkers[walkerId].destination_x,
         15 * (unsigned __int8)walker_destination_y[128 * walkerId],
         0);
     }
@@ -72706,28 +72690,28 @@ void  fun_walker_deliveryBoy()
   {
     if ( walkers[v1].actionState == 149 )
     {
-      walker_state[128 * walkerId] = 2;
+      walkers[walkerId].state = 2;
     }
     else
     {
-      if ( (unsigned __int8)walker_state[128 * v1] == 1 )
+      if ( walkers[v1].state == 1 )
       {
         if ( walkers[v1].type == 39 || walkers[v1].type == 66 )
           sub_4B4880(walkerId, walker_tradeCaravanNextId[64 * walkerId], 1);
         else
-          walker_state[128 * walkerId] = 2;
+          walkers[walkerId].state = 2;
       }
       else
       {
         *(__int16 *)((char *)&building_4c_granary_capacity[64 * v0]
                    + 2 * (unsigned __int8)walker_itemCollecting[128 * walkerId]) += 100;
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       }
     }
   }
   else
   {
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   }
   if ( byte_7FA395[128 * v1] )
     byte_7FA395[128 * walkerId] = 1;
@@ -72765,12 +72749,12 @@ void  fun_walker_shipwreck()
     fun_removeWalkerFromTileList(walkerId);
     if ( sub_48A900(walkerId) )
     {
-      walker_x[128 * walkerId] = walkerGridX;
+      walkers[walkerId].x = walkerGridX;
       walkers[walkerId].y = walkerGridY;
       walkers[walkerId].gridOffset = 162 * walkers[walkerId].y
-                                       + walker_x[128 * walkerId]
+                                       + walkers[walkerId].x
                                        + (_WORD)setting_map_startGridOffset;
-      walkers[walkerId].tilePosition_y = 15 * walker_x[128 * walkerId];
+      walkers[walkerId].tilePosition_y = 15 * walkers[walkerId].x;
       walkers[walkerId].tilePosition_x = 15 * walkers[walkerId].y;
       walkers[walkerId].tilePosition_y += 7;
       walkers[walkerId].tilePosition_x += 7;
@@ -72780,7 +72764,7 @@ void  fun_walker_shipwreck()
   }
   ++word_7FA366[64 * walkerId];
   if ( word_7FA366[64 * walkerId] > 2000 )
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   walkers[walkerId].word_7FA344 = ((signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >> 4) + word_6E6D74;
 }
 
@@ -72811,7 +72795,7 @@ void  fun_walker_sheep()
       {
         word_7FA366[64 * walkerId] = walkerId & 0x1F;
         walkers[walkerId].actionState = -59;
-        walker_destination_x[128 * walkerId] = LOBYTE(dword_5F4130[2 * (unsigned __int8)byte_7FA392[128 * walkerId]])
+        walkers[walkerId].destination_x = LOBYTE(dword_5F4130[2 * (unsigned __int8)byte_7FA392[128 * walkerId]])
                                              + formation_34[128 * v1];
         walker_destination_y[128 * walkerId] = dword_5F4134[8 * (unsigned __int8)byte_7FA392[128 * walkerId]]
                                              + formation_35[128 * v1];
@@ -72892,7 +72876,7 @@ void  fun_walker_wolf()
       {
         word_7FA366[64 * walkerId] = walkerId & 0x1F;
         walkers[walkerId].actionState = -59;
-        walker_destination_x[128 * walkerId] = LOBYTE(dword_5F4130[2 * (unsigned __int8)byte_7FA392[128 * walkerId]])
+        walkers[walkerId].destination_x = LOBYTE(dword_5F4130[2 * (unsigned __int8)byte_7FA392[128 * walkerId]])
                                              + formation_34[128 * v1];
         walker_destination_y[128 * walkerId] = dword_5F4134[8 * (unsigned __int8)byte_7FA392[128 * walkerId]]
                                              + formation_35[128 * v1];
@@ -72912,10 +72896,10 @@ void  fun_walker_wolf()
           word_7FA366[64 * walkerId] = walkerId & 0x1F;
           break;
         case 8:
-          v0 = sub_4AD500(walker_x[128 * walkerId], walkers[walkerId].y, 6);
+          v0 = sub_4AD500(walkers[walkerId].x, walkers[walkerId].y, 6);
           if ( v0 )
           {
-            walker_destination_x[128 * walkerId] = walker_x[128 * v0];
+            walkers[walkerId].destination_x = walkers[v0].x;
             walker_destination_y[128 * walkerId] = walkers[v0].y;
             word_7FA3B0[64 * walkerId] = v0;
             word_7FA3B2[64 * v0] = walkerId;
@@ -72999,7 +72983,7 @@ void  fun_walker_zebra()
       {
         word_7FA366[64 * walkerId] = walkerId & 0x1F;
         walkers[walkerId].actionState = -59;
-        walker_destination_x[128 * walkerId] = LOBYTE(dword_5F4130[2 * (unsigned __int8)byte_7FA392[128 * walkerId]])
+        walkers[walkerId].destination_x = LOBYTE(dword_5F4130[2 * (unsigned __int8)byte_7FA392[128 * walkerId]])
                                              + formation_34[128 * v0];
         walker_destination_y[128 * walkerId] = dword_5F4134[8 * (unsigned __int8)byte_7FA392[128 * walkerId]]
                                              + formation_35[128 * v0];
@@ -73063,9 +73047,9 @@ void  fun_walker_spear()
   int v6; // [sp+70h] [bp-4h]@3
 
   walkers[walkerId].byte_7FA34C = 1;
-  ++walker_progressOnTile[128 * walkerId];
-  if ( walker_progressOnTile[128 * walkerId] > 120 )
-    walker_state[128 * walkerId] = 2;
+  ++walkers[walkerId].progressOnTile;
+  if ( walkers[walkerId].progressOnTile > 120 )
+    walkers[walkerId].state = 2;
   v6 = sub_4B66E0(walkerId, 4);
   v5 = sub_4B9080(walkerId);
   if ( v5 )
@@ -73101,12 +73085,12 @@ void  fun_walker_spear()
     formation_56[64 * v1] = 6;
     formation_58[64 * v1] = v0;
     fun_sound_playChannel(24);
-    walker_state[128 * walkerId] = 2;
+    walkers[walkerId].state = 2;
   }
   else
   {
     if ( v6 )
-      walker_state[128 * walkerId] = 2;
+      walkers[walkerId].state = 2;
   }
   dword_65DF24 = walkers[walkerId].direction - 2 * setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 0x10 : 0;
@@ -73148,9 +73132,9 @@ void  fun_walker_hippodromeHorse()
       break;
     case 0xC9:
       walkers[walkerId].direction = fun_walkerGetSimpleDestinationDirection(
-                                           walker_x[128 * walkerId],
+                                           walkers[walkerId].x,
                                            walkers[walkerId].y,
-                                           (unsigned __int8)walker_destination_x[128 * walkerId],
+                                           (unsigned __int8)walkers[walkerId].destination_x,
                                            (unsigned __int8)walker_destination_y[128 * walkerId]);
       if ( walkers[walkerId].direction == 8 )
       {
@@ -73181,15 +73165,15 @@ void  fun_walker_hippodromeHorse()
         }
         sub_4B2740(walkerId, 1);
         walkers[walkerId].direction = fun_walkerGetSimpleDestinationDirection(
-                                             walker_x[128 * walkerId],
+                                             walkers[walkerId].x,
                                              walkers[walkerId].y,
-                                             (unsigned __int8)walker_destination_x[128 * walkerId],
+                                             (unsigned __int8)walkers[walkerId].destination_x,
                                              (unsigned __int8)walker_destination_y[128 * walkerId]);
         sub_4B6B70(
           walkerId,
           walkers[walkerId].tilePosition_y,
           walkers[walkerId].tilePosition_x,
-          15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+          15 * (unsigned __int8)walkers[walkerId].destination_x,
           15 * (unsigned __int8)walker_destination_y[128 * walkerId],
           0);
       }
@@ -73201,15 +73185,15 @@ void  fun_walker_hippodromeHorse()
       {
         sub_4B2740(walkerId, 2);
         walkers[walkerId].direction = fun_walkerGetSimpleDestinationDirection(
-                                             walker_x[128 * walkerId],
+                                             walkers[walkerId].x,
                                              walkers[walkerId].y,
-                                             (unsigned __int8)walker_destination_x[128 * walkerId],
+                                             (unsigned __int8)walkers[walkerId].destination_x,
                                              (unsigned __int8)walker_destination_y[128 * walkerId]);
         sub_4B6B70(
           walkerId,
           walkers[walkerId].tilePosition_y,
           walkers[walkerId].tilePosition_x,
-          15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+          15 * (unsigned __int8)walkers[walkerId].destination_x,
           15 * (unsigned __int8)walker_destination_y[128 * walkerId],
           0);
       }
@@ -73220,7 +73204,7 @@ void  fun_walker_hippodromeHorse()
         byte_7FA341[128 * walkerId] = 0;
       ++word_7FA366[64 * walkerId];
       if ( word_7FA366[64 * walkerId] > 150 )
-        walker_state[128 * walkerId] = 2;
+        walkers[walkerId].state = 2;
       break;
   }
   dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
@@ -73256,14 +73240,14 @@ void  sub_4B2740(int a1, int a2)
   {
     if ( setting_map_orientation && setting_map_orientation != 6 )
     {
-      walker_destination_x[128 * a1] = LOBYTE(dword_5FA7C8[2 * (unsigned __int8)byte_7FA39B[128 * a1]])
+      walkers[a1].destination_x = LOBYTE(dword_5FA7C8[2 * (unsigned __int8)byte_7FA39B[128 * a1]])
                                      + buildings[v2].x;
       walker_destination_y[128 * a1] = dword_5FA7CC[8 * (unsigned __int8)byte_7FA39B[128 * a1]]
                                      + building__07_y[128 * v2];
     }
     else
     {
-      walker_destination_x[128 * a1] = LOBYTE(dword_5FA718[2 * (unsigned __int8)byte_7FA39B[128 * a1]])
+      walkers[a1].destination_x = LOBYTE(dword_5FA718[2 * (unsigned __int8)byte_7FA39B[128 * a1]])
                                      + buildings[v2].x;
       walker_destination_y[128 * a1] = dword_5FA71C[8 * (unsigned __int8)byte_7FA39B[128 * a1]]
                                      + building__07_y[128 * v2];
@@ -73277,12 +73261,12 @@ void  sub_4B2740(int a1, int a2)
       {
         if ( byte_7FA34B[128 * a1] )
         {
-          walker_destination_x[128 * a1] = buildings[v2].x + 12;
+          walkers[a1].destination_x = buildings[v2].x + 12;
           walker_destination_y[128 * a1] = building__07_y[128 * v2] + 3;
         }
         else
         {
-          walker_destination_x[128 * a1] = buildings[v2].x + 12;
+          walkers[a1].destination_x = buildings[v2].x + 12;
           walker_destination_y[128 * a1] = building__07_y[128 * v2] + 2;
         }
       }
@@ -73290,12 +73274,12 @@ void  sub_4B2740(int a1, int a2)
       {
         if ( byte_7FA34B[128 * a1] )
         {
-          walker_destination_x[128 * a1] = buildings[v2].x + 1;
+          walkers[a1].destination_x = buildings[v2].x + 1;
           walker_destination_y[128 * a1] = building__07_y[128 * v2] + 2;
         }
         else
         {
-          walker_destination_x[128 * a1] = buildings[v2].x + 1;
+          walkers[a1].destination_x = buildings[v2].x + 1;
           walker_destination_y[128 * a1] = building__07_y[128 * v2] + 1;
         }
       }
@@ -73305,18 +73289,18 @@ void  sub_4B2740(int a1, int a2)
       fun_removeWalkerFromTileList(a1);
       if ( setting_map_orientation && setting_map_orientation != 6 )
       {
-        walker_destination_x[128 * a1] = LOBYTE(dword_5FA7C8[2 * (unsigned __int8)byte_7FA39B[128 * a1]])
+        walkers[a1].destination_x = LOBYTE(dword_5FA7C8[2 * (unsigned __int8)byte_7FA39B[128 * a1]])
                                        + buildings[v2].x;
-        walker_x[128 * a1] = walker_destination_x[128 * a1];
+        walkers[a1].x = walkers[a1].destination_x;
         walker_destination_y[128 * a1] = dword_5FA7CC[8 * (unsigned __int8)byte_7FA39B[128 * a1]]
                                        + building__07_y[128 * v2];
         walkers[a1].y = walker_destination_y[128 * a1];
       }
       else
       {
-        walker_destination_x[128 * a1] = LOBYTE(dword_5FA718[2 * (unsigned __int8)byte_7FA39B[128 * a1]])
+        walkers[a1].destination_x = LOBYTE(dword_5FA718[2 * (unsigned __int8)byte_7FA39B[128 * a1]])
                                        + buildings[v2].x;
-        walker_x[128 * a1] = walker_destination_x[128 * a1];
+        walkers[a1].x = walkers[a1].destination_x;
         walker_destination_y[128 * a1] = dword_5FA71C[8 * (unsigned __int8)byte_7FA39B[128 * a1]]
                                        + building__07_y[128 * v2];
         walkers[a1].y = walker_destination_y[128 * a1];
@@ -73326,9 +73310,9 @@ void  sub_4B2740(int a1, int a2)
         ++walkers[a1].y;
         ++walker_destination_y[128 * a1];
       }
-      walkers[a1].tilePosition_y = 15 * walker_x[128 * a1];
+      walkers[a1].tilePosition_y = 15 * walkers[a1].x;
       walkers[a1].tilePosition_x = 15 * walkers[a1].y;
-      walkers[a1].gridOffset = 162 * walkers[a1].y + walker_x[128 * a1] + (_WORD)setting_map_startGridOffset;
+      walkers[a1].gridOffset = 162 * walkers[a1].y + walkers[a1].x + (_WORD)setting_map_startGridOffset;
       sub_4B8A40(a1);
     }
   }
@@ -73342,7 +73326,7 @@ void  sub_4B2CA0()
   {
     for ( i = 1; i < 1000; ++i )
     {
-      if ( (unsigned __int8)walker_state[128 * i] == 1 )
+      if ( walkers[i].state == 1 )
       {
         if ( walkers[i].type== Walker_HippodromeMiniHorses )
         {
@@ -73380,7 +73364,7 @@ void  sub_4B2D50(int a1, int a2)
       else
       {
         v4 = (unsigned __int8)byte_5F60F4[10 * walkers[a2].type];
-        if ( (unsigned __int8)walker_state[128 * a2] == 1 )
+        if ( walkers[a2].state == 1 )
         {
           if ( walkers[a2].actionState == 149 )
           {
@@ -73465,7 +73449,7 @@ void  sub_4B2D50(int a1, int a2)
           word_7FA3BA[64 * a1] = a2;
           byte_7FA3B9[128 * a1] = 1;
           byte_7FA39A[128 * a1] = 12;
-          if ( walker_x[128 * a2] != (unsigned __int8)walker_destination_x[128 * a2]
+          if ( walkers[a2].x != walkers[a2].destination_x
             || walkers[a2].y != (unsigned __int8)walker_destination_y[128 * a2] )
             byte_7FA353[128 * a1] = fun_walkerGetSimpleDestinationDirection(
                                       (unsigned __int8)byte_7FA356[128 * a1],
@@ -73476,7 +73460,7 @@ void  sub_4B2D50(int a1, int a2)
             byte_7FA353[128 * a1] = fun_walkerGetSimpleDestinationDirection(
                                       (unsigned __int8)byte_7FA356[128 * a1],
                                       (unsigned __int8)byte_7FA357[128 * a1],
-                                      walker_x[128 * a2],
+                                      walkers[a2].x,
                                       walkers[a2].y);
           if ( byte_7FA353[128 * a1] >= 8 )
             byte_7FA353[128 * a1] = 0;
@@ -73536,9 +73520,9 @@ void  sub_4B3390(int walkerId)
   int v11; // [sp+68h] [bp-4h]@22
 
   v7 = walker_formationId[64 * walkerId];
-  if ( walker_progressOnTile[128 * walkerId] <= 5 )
+  if ( walkers[walkerId].progressOnTile <= 5 )
   {
-    ++walker_progressOnTile[128 * walkerId];
+    ++walkers[walkerId].progressOnTile;
     fun_walkerAdvanceTick(walkerId);
   }
   if ( !byte_7FA3B9[128 * walkerId] )
@@ -73549,7 +73533,7 @@ void  sub_4B3390(int walkerId)
   if ( (unsigned __int8)byte_7FA3B9[128 * walkerId] == 1 )
   {
     v8 = word_7FA3BE[64 * walkerId];
-    if ( (unsigned __int8)walker_state[128 * v8] != 1 || walkers[v8].actionState == 149 )
+    if ( walkers[v8].state != 1 || walkers[v8].actionState == 149 )
     {
       sub_4B3C20(walkerId);
       return;
@@ -73560,7 +73544,7 @@ void  sub_4B3390(int walkerId)
     if ( (unsigned __int8)byte_7FA3B9[128 * walkerId] == 2 )
     {
       v9 = word_7FA3BE[64 * walkerId];
-      if ( (unsigned __int8)walker_state[128 * v9] != 1 || walkers[v9].actionState == 149 )
+      if ( walkers[v9].state != 1 || walkers[v9].actionState == 149 )
       {
         if ( v9 == word_7FA3BA[64 * walkerId] )
         {
@@ -73572,7 +73556,7 @@ void  sub_4B3390(int walkerId)
             word_7FA3BE[64 * walkerId] = word_7FA3BA[64 * walkerId];
         }
         v10 = word_7FA3BE[64 * walkerId];
-        if ( (unsigned __int8)walker_state[128 * v10] != 1 || walkers[v10].actionState == 149 )
+        if ( walkers[v10].state != 1 || walkers[v10].actionState == 149 )
         {
           sub_4B3C20(walkerId);
           return;
@@ -73746,7 +73730,6 @@ bool  sub_4B3AD0(int a1, int a2)
   return result;
 }
 
-//----- (004B3B80) --------------------------------------------------------
 int  sub_4B3B80(int a1)
 {
   int result; // eax@3
@@ -73759,7 +73742,7 @@ int  sub_4B3B80(int a1)
   {
     word_7FA366[64 * a1] = 127;
     result = a1 << 7;
-    walker_state[128 * a1] = 2;
+    walkers[a1].state = 2;
   }
   return result;
 }
@@ -73783,7 +73766,7 @@ char  fun_roamWalker(int walkerId)
   int buildingId; // [sp+5Ch] [bp-4h]@1
 
   buildingId = walkers[walkerId].buildingId;
-  walker_progressOnTile[128 * walkerId] = 15;
+  walkers[walkerId].progressOnTile = 15;
   byte_7FA376[128 * walkerId] = 0;
   byte_7FA379[128 * walkerId] = -1;
   byte_7FA378[128 * walkerId] = 2;
@@ -73823,7 +73806,7 @@ char  fun_roamWalker(int walkerId)
   v1 = sub_489070(x, y, 1, 6);
   if ( v1 )
   {
-    walker_destination_x[128 * walkerId] = walkerGridX;
+    walkers[walkerId].destination_x = walkerGridX;
     _LOBYTE(v1) = walkerGridY;
     walker_destination_y[128 * walkerId] = walkerGridY;
   }
@@ -73854,14 +73837,14 @@ LABEL_10:
     while ( a2 > 0 )
     {
       --a2;
-      ++walker_progressOnTile[128 * a1];
-      if ( walker_progressOnTile[128 * a1] < 15 )
+      ++walkers[a1].progressOnTile;
+      if ( walkers[a1].progressOnTile < 15 )
       {
         fun_walkerAdvanceTick(a1);
       }
       else
       {
-        walker_progressOnTile[128 * a1] = 15;
+        walkers[a1].progressOnTile = 15;
         v6 = (byte_7FA352[128 * a1] + 4) % 8;
         ++byte_7FA377[128 * a1];
         if ( fun_walkerProvideServiceCoverage(a1) )
@@ -73983,7 +73966,7 @@ LABEL_10:
         }
         ++walker_destinationPathCurrent[64 * a1];
         byte_7FA352[128 * a1] = walkers[a1].direction;
-        walker_progressOnTile[128 * a1] = 0;
+        walkers[a1].progressOnTile = 0;
         sub_4B5BE0(a1);
         fun_walkerAdvanceTick(a1);
       }
@@ -74030,11 +74013,11 @@ int  sub_4B4630(int a1)
   signed int v12; // [sp+68h] [bp-4h]@3
   signed int v13; // [sp+68h] [bp-4h]@11
 
-  v4 = 162 * walkers[a1].y + walker_x[128 * a1] + setting_map_startGridOffset;
+  v4 = 162 * walkers[a1].y + walkers[a1].x + setting_map_startGridOffset;
   result = (unsigned __int8)fun_walkerGetSimpleDestinationDirection(
-                              walker_x[128 * a1],
+                              walkers[a1].x,
                               walkers[a1].y,
-                              (unsigned __int8)walker_destination_x[128 * a1],
+                              (unsigned __int8)walkers[a1].destination_x,
                               (unsigned __int8)walker_destination_y[128 * a1]);
   v11 = result;
   if ( result >= 8 )
@@ -74099,7 +74082,7 @@ int  sub_4B4630(int a1)
 
 void  sub_4B4880(int a1, int a2, int a3)
 {
-  if ( walker_x[128 * a1] == (unsigned __int8)byte_7FA360[128 * a1] )
+  if ( walkers[a1].x == (unsigned __int8)byte_7FA360[128 * a1] )
   {
     if ( walkers[a1].y == (unsigned __int8)byte_7FA361[128 * a1] )
       byte_7FA395[128 * a1] = 1;
@@ -74107,23 +74090,23 @@ void  sub_4B4880(int a1, int a2, int a3)
   while ( a3 > 0 )
   {
     --a3;
-    ++walker_progressOnTile[128 * a1];
-    if ( walker_progressOnTile[128 * a1] < 15 )
+    ++walkers[a1].progressOnTile;
+    if ( walkers[a1].progressOnTile < 15 )
     {
       fun_walkerAdvanceTick(a1);
     }
     else
     {
-      walker_progressOnTile[128 * a1] = 15;
+      walkers[a1].progressOnTile = 15;
       walkers[a1].direction = fun_walkerGetSimpleDestinationDirection(
-                                     walker_x[128 * a1],
+                                     walkers[a1].x,
                                      walkers[a1].y,
                                      (unsigned __int8)byte_7FA356[128 * a2],
                                      (unsigned __int8)byte_7FA357[128 * a2]);
       if ( walkers[a1].direction >= 8 )
         return;
       byte_7FA352[128 * a1] = walkers[a1].direction;
-      walker_progressOnTile[128 * a1] = 0;
+      walkers[a1].progressOnTile = 0;
       sub_4B5BE0(a1);
       fun_walkerAdvanceTick(a1);
     }
@@ -74136,15 +74119,15 @@ void  fun_walkerWalkTicks(int walkerId, int numTicks)
   while ( numTicks > 0 )
   {
     --numTicks;
-    ++walker_progressOnTile[128 * walkerId];
-    if ( walker_progressOnTile[128 * walkerId] < 15 )
+    ++walkers[walkerId].progressOnTile;
+    if ( walkers[walkerId].progressOnTile < 15 )
     {
       fun_walkerAdvanceTick(walkerId);
     }
     else
     {
       fun_walkerProvideServiceCoverage(walkerId);
-      walker_progressOnTile[128 * walkerId] = 15;
+      walkers[walkerId].progressOnTile = 15;
       if ( walker_destinationpathId[64 * walkerId] <= 0 )
         fun_determineDestinationPathForWalker(walkerId);
       fun_walkerGetNextTileDirection(walkerId);
@@ -74153,7 +74136,7 @@ void  fun_walkerWalkTicks(int walkerId, int numTicks)
         break;
       ++walker_destinationPathCurrent[64 * walkerId];
       byte_7FA352[128 * walkerId] = walkers[walkerId].direction;
-      walker_progressOnTile[128 * walkerId] = 0;
+      walkers[walkerId].progressOnTile = 0;
       sub_4B5BE0(walkerId);
       fun_walkerAdvanceTick(walkerId);
     }
@@ -74170,11 +74153,11 @@ void  sub_4B4BC0(int a1, int a2)
   while ( a2 > 0 )
   {
     --a2;
-    ++walker_progressOnTile[128 * a1];
-    if ( walker_progressOnTile[128 * a1] < 15 )
+    ++walkers[a1].progressOnTile;
+    if ( walkers[a1].progressOnTile < 15 )
       fun_walkerAdvanceTick(a1);
     else
-      walker_progressOnTile[128 * a1] = 15;
+      walkers[a1].progressOnTile = 15;
   }
 }
 
@@ -74201,24 +74184,24 @@ void  fun_determineDestinationPathForWalker(int walkerId)
       else
       {
         if ( (unsigned __int8)walker_isBoat[128 * walkerId] == 2 )// flotsam
-          sub_505060(walker_x[128 * walkerId], walkers[walkerId].y);
+          sub_505060(walkers[walkerId].x, walkers[walkerId].y);
         else
-          fun_determineOpenWaterTiles(walker_x[128 * walkerId], walkers[walkerId].y);
+          fun_determineOpenWaterTiles(walkers[walkerId].x, walkers[walkerId].y);
       }
       if ( (unsigned __int8)walker_isBoat[128 * walkerId] == 2 )
         pathLength = fun_determineShortestPathOnWater(
                        destinationPathId,
-                       walker_x[128 * walkerId],
+                       walkers[walkerId].x,
                        walkers[walkerId].y,
-                       (unsigned __int8)walker_destination_x[128 * walkerId],
+                       (unsigned __int8)walkers[walkerId].destination_x,
                        (unsigned __int8)walker_destination_y[128 * walkerId],
                        1);
       else
         pathLength = fun_determineShortestPathOnWater(
                        destinationPathId,
-                       walker_x[128 * walkerId],
+                       walkers[walkerId].x,
                        walkers[walkerId].y,
-                       (unsigned __int8)walker_destination_x[128 * walkerId],
+                       (unsigned __int8)walkers[walkerId].destination_x,
                        (unsigned __int8)walker_destination_y[128 * walkerId],
                        0);
     }
@@ -74228,68 +74211,68 @@ void  fun_determineDestinationPathForWalker(int walkerId)
       {
         case 2:
           v1 = sub_501B60(
-                 walker_x[128 * walkerId],
+                 walkers[walkerId].x,
                  walkers[walkerId].y,
-                 (unsigned __int8)walker_destination_x[128 * walkerId],
+                 (unsigned __int8)walkers[walkerId].destination_x,
                  (unsigned __int8)walker_destination_y[128 * walkerId],
                  word_7FA38E[64 * walkerId],
                  5000);
           if ( !v1 )
             v1 = sub_501B60(
-                   walker_x[128 * walkerId],
+                   walkers[walkerId].x,
                    walkers[walkerId].y,
-                   (unsigned __int8)walker_destination_x[128 * walkerId],
+                   (unsigned __int8)walkers[walkerId].destination_x,
                    (unsigned __int8)walker_destination_y[128 * walkerId],
                    0,
                    25000);
           if ( !v1 )
             v1 = sub_502510(
-                   walker_x[128 * walkerId],
+                   walkers[walkerId].x,
                    walkers[walkerId].y,
-                   (unsigned __int8)walker_destination_x[128 * walkerId],
+                   (unsigned __int8)walkers[walkerId].destination_x,
                    (unsigned __int8)walker_destination_y[128 * walkerId]);
           break;
         case 4:
           v1 = sub_5017A0(
-                 walker_x[128 * walkerId],
+                 walkers[walkerId].x,
                  walkers[walkerId].y,
-                 (unsigned __int8)walker_destination_x[128 * walkerId],
+                 (unsigned __int8)walkers[walkerId].destination_x,
                  (unsigned __int8)walker_destination_y[128 * walkerId]);
           break;
         case 5:
           v1 = sub_501B60(
-                 walker_x[128 * walkerId],
+                 walkers[walkerId].x,
                  walkers[walkerId].y,
-                 (unsigned __int8)walker_destination_x[128 * walkerId],
+                 (unsigned __int8)walkers[walkerId].destination_x,
                  (unsigned __int8)walker_destination_y[128 * walkerId],
                  10000,
                  5000);
           break;
         case 3:
           v1 = fun_canTravelToDestinationOverRoadGarden(
-                 walker_x[128 * walkerId],
+                 walkers[walkerId].x,
                  walkers[walkerId].y,
-                 (unsigned __int8)walker_destination_x[128 * walkerId],
+                 (unsigned __int8)walkers[walkerId].destination_x,
                  (unsigned __int8)walker_destination_y[128 * walkerId]);
           if ( !v1 )
             v1 = sub_501000(
-                   walker_x[128 * walkerId],
+                   walkers[walkerId].x,
                    walkers[walkerId].y,
-                   (unsigned __int8)walker_destination_x[128 * walkerId],
+                   (unsigned __int8)walkers[walkerId].destination_x,
                    (unsigned __int8)walker_destination_y[128 * walkerId]);
           break;
         case 1:
           v1 = fun_canTravelToDestinationOverRoadGarden(
-                 walker_x[128 * walkerId],
+                 walkers[walkerId].x,
                  walkers[walkerId].y,
-                 (unsigned __int8)walker_destination_x[128 * walkerId],
+                 (unsigned __int8)walkers[walkerId].destination_x,
                  (unsigned __int8)walker_destination_y[128 * walkerId]);
           break;
         default:
           v1 = sub_501000(
-                 walker_x[128 * walkerId],
+                 walkers[walkerId].x,
                  walkers[walkerId].y,
-                 (unsigned __int8)walker_destination_x[128 * walkerId],
+                 (unsigned __int8)walkers[walkerId].destination_x,
                  (unsigned __int8)walker_destination_y[128 * walkerId]);
           break;
       }
@@ -74300,17 +74283,17 @@ void  fun_determineDestinationPathForWalker(int walkerId)
           pathLength = fun_determineShortestPathFromDistanceGraph(
                          4,
                          destinationPathId,
-                         walker_x[128 * walkerId],
+                         walkers[walkerId].x,
                          walkers[walkerId].y,
-                         (unsigned __int8)walker_destination_x[128 * walkerId],
+                         (unsigned __int8)walkers[walkerId].destination_x,
                          (unsigned __int8)walker_destination_y[128 * walkerId]);
           if ( pathLength <= 0 )
             pathLength = fun_determineShortestPathFromDistanceGraph(
                            8,
                            destinationPathId,
-                           walker_x[128 * walkerId],
+                           walkers[walkerId].x,
                            walkers[walkerId].y,
-                           (unsigned __int8)walker_destination_x[128 * walkerId],
+                           (unsigned __int8)walkers[walkerId].destination_x,
                            (unsigned __int8)walker_destination_y[128 * walkerId]);
         }
         else
@@ -74318,9 +74301,9 @@ void  fun_determineDestinationPathForWalker(int walkerId)
           pathLength = fun_determineShortestPathFromDistanceGraph(
                          8,
                          destinationPathId,
-                         walker_x[128 * walkerId],
+                         walkers[walkerId].x,
                          walkers[walkerId].y,
-                         (unsigned __int8)walker_destination_x[128 * walkerId],
+                         (unsigned __int8)walkers[walkerId].destination_x,
                          (unsigned __int8)walker_destination_y[128 * walkerId]);
         }
       }
@@ -74389,7 +74372,7 @@ void  fun_garbageCollectDestinationPaths()
     {
       if ( walkerId < 1000 )
       {
-        if ( (unsigned __int8)walker_state[128 * walkerId] != 1 )
+        if ( (unsigned __int8)walkers[walkerId].state != 1 )
           destinationpath_index[i] = 0;
         if ( walker_destinationpathId[64 * walkerId] != i )
           destinationpath_index[i] = 0;
@@ -74435,9 +74418,9 @@ void  fun_walkerGetNextTileDirection(int walkerId)
   else
   {
     walkers[walkerId].direction = fun_walkerGetSimpleDestinationDirection(
-                                         walker_x[128 * walkerId],
+                                         walkers[walkerId].x,
                                          walkers[walkerId].y,
-                                         (unsigned __int8)walker_destination_x[128 * walkerId],
+                                         (unsigned __int8)walkers[walkerId].destination_x,
                                          (unsigned __int8)walker_destination_y[128 * walkerId]);
     if ( walkers[walkerId].direction != 8 )
       walkers[walkerId].direction = 10;
@@ -74573,7 +74556,7 @@ char  sub_4B5BE0(int a1)
   unsigned __int8 v6; // [sp+54h] [bp-8h]@1
   int v7; // [sp+58h] [bp-4h]@10
 
-  v6 = walker_x[128 * a1];
+  v6 = walkers[a1].x;
   v5 = walkers[a1].y;
   fun_removeWalkerFromTileList(a1);
   v1 = walkers[a1].direction;
@@ -74585,16 +74568,16 @@ char  sub_4B5BE0(int a1)
       goto LABEL_10;
     case 1:
       --walkers[a1].y;
-      ++walker_x[128 * a1];
+      ++walkers[a1].x;
       walkers[a1].gridOffset -= 161;
       goto LABEL_10;
     case 2:
-      ++walker_x[128 * a1];
+      ++walkers[a1].x;
       ++walkers[a1].gridOffset;
       goto LABEL_10;
     case 3:
       ++walkers[a1].y;
-      ++walker_x[128 * a1];
+      ++walkers[a1].x;
       walkers[a1].gridOffset += 163;
       goto LABEL_10;
     case 4:
@@ -74603,16 +74586,16 @@ char  sub_4B5BE0(int a1)
       goto LABEL_10;
     case 5:
       ++walkers[a1].y;
-      --walker_x[128 * a1];
+      --walkers[a1].x;
       walkers[a1].gridOffset += 161;
       goto LABEL_10;
     case 6:
-      --walker_x[128 * a1];
+      --walkers[a1].x;
       --walkers[a1].gridOffset;
       goto LABEL_10;
     case 7:
       --walkers[a1].y;
-      --walker_x[128 * a1];
+      --walkers[a1].x;
       walkers[a1].gridOffset -= 163;
 LABEL_10:
       sub_4B8A40(a1);
@@ -74728,10 +74711,10 @@ void  fun_walkerAdvanceTick(int walkerId)
     if ( (signed int)(unsigned __int8)byte_7FA3A5[128 * walkerId] > 0 )
     {
       byte_7FA395[128 * walkerId] = 1;
-      if ( (unsigned __int8)byte_7FA3A6[128 * walkerId] < (signed int)(unsigned __int8)byte_7FA3A7[128 * walkerId] )
-        ++byte_7FA3A6[128 * walkerId];
-      if ( (unsigned __int8)byte_7FA3A6[128 * walkerId] > (signed int)(unsigned __int8)byte_7FA3A7[128 * walkerId] )
-        --byte_7FA3A6[128 * walkerId];
+      if ( walkers[walkerId].byte_7FA3A6 < (signed int)(unsigned __int8)byte_7FA3A7[128 * walkerId] )
+        ++walkers[walkerId].byte_7FA3A6;
+      if ( walkers[walkerId].byte_7FA3A6 > (signed int)(unsigned __int8)byte_7FA3A7[128 * walkerId] )
+        --walkers[walkerId].byte_7FA3A6;
     }
     else
     {
@@ -74740,8 +74723,8 @@ void  fun_walkerAdvanceTick(int walkerId)
   }
   else
   {
-    if ( byte_7FA3A6[128 * walkerId] )
-      --byte_7FA3A6[128 * walkerId];
+    if ( walkers[walkerId].byte_7FA3A6 )
+      --walkers[walkerId].byte_7FA3A6;
   }
 }
 
@@ -74750,11 +74733,11 @@ void  unused_4B6590(int a1, int a2)
   fun_removeWalkerFromTileList(a1);
   walkers[a1].direction = walkers[a2].direction;
   byte_7FA352[128 * a1] = byte_7FA352[128 * a2];
-  walker_progressOnTile[128 * a1] = walker_progressOnTile[128 * a2];
+  walkers[a1].progressOnTile = walkers[a2].progressOnTile;
   walkers[a1].actionState = walkers[a2].actionState;
   walkers[a1].tilePosition_y = walkers[a2].tilePosition_y;
   walkers[a1].tilePosition_x = walkers[a2].tilePosition_x;
-  walker_x[128 * a1] = walker_x[128 * a2];
+  walkers[a1].x = walkers[a2].x;
   walkers[a1].y = walkers[a2].y;
   walkers[a1].gridOffset = walkers[a2].gridOffset;
   sub_4B8A40(a1);
@@ -74770,10 +74753,10 @@ int  sub_4B66E0(int a1, int a2)
   fun_removeWalkerFromTileList(a1);
   for ( i = 0; i < a2; ++i )
   {
-    if ( (signed int)(unsigned __int8)byte_7FA358[128 * a1] <= 0 )
-      byte_7FA358[128 * a1] = 0;
+    if ( walkers[a1].byte_7FA358 <= 0 )
+      walkers[a1].byte_7FA358 = 0;
     else
-      --byte_7FA358[128 * a1];
+      --walkers[a1].byte_7FA358;
     if ( word_7FA384[64 * a1] + word_7FA382[64 * a1] <= 0 )
     {
       v4 = 1;
@@ -74799,9 +74782,9 @@ int  sub_4B66E0(int a1, int a2)
       }
     }
   }
-  walker_x[128 * a1] = walkers[a1].tilePosition_y / 15;
+  walkers[a1].x = walkers[a1].tilePosition_y / 15;
   walkers[a1].y = walkers[a1].tilePosition_x / 15;
-  walkers[a1].gridOffset = 162 * walkers[a1].y + walker_x[128 * a1] + (_WORD)setting_map_startGridOffset;
+  walkers[a1].gridOffset = 162 * walkers[a1].y + walkers[a1].x + (_WORD)setting_map_startGridOffset;
   v2 = grid_terrain[walkers[a1].gridOffset];
   if ( v2 & 8 )
   {
@@ -75026,7 +75009,7 @@ signed int  sub_4B70B0(int a1, int a2, int a3, int a4)
           }
         }
       }
-      walker_x[0] = walkers[0].tilePosition_y / 15;
+      walkers[0].x = walkers[0].tilePosition_y / 15;
       walkers[0].y = walkers[0].tilePosition_x / 15;
       if ( v6 )
       {
@@ -75035,7 +75018,7 @@ LABEL_4:
         ++v9;
         continue;
       }
-      v7 = 162 * walkers[0].y + walker_x[0] + setting_map_startGridOffset;
+      v7 = 162 * walkers[0].y + walkers[0].x + setting_map_startGridOffset;
       if ( grid_terrain[v7] & 0xC001 )
       {
         result = 0;
@@ -75079,13 +75062,13 @@ signed int  fun_createDustCloud(__int16 x, __int16 y, int size)
     {
       walkers[v6].tilePosition_y += v4;
       walkers[v6].tilePosition_x += v4;
-      walker_destination_x[128 * v6] += dustcloud_x[8 * i];
+      walkers[v6].destination_x += dustcloud_x[8 * i];
       walker_destination_y[128 * v6] += dustcloud_y[8 * i];
       sub_4B6B70(
         v6,
         walkers[v6].tilePosition_y,
         walkers[v6].tilePosition_x,
-        v4 + 15 * (unsigned __int8)walker_destination_x[128 * v6],
+        v4 + 15 * (unsigned __int8)walkers[v6].destination_x,
         v4 + 15 * (unsigned __int8)walker_destination_y[128 * v6],
         0);
       byte_7FA389[128 * v6] = dustcloud_byte_5FA928[4 * i];
@@ -75102,17 +75085,17 @@ int  sub_4B75B0(__int16 a1, __int16 x, __int16 y, char a4, char a5, int walkerTy
   if ( v7 )
   {
     if ( walkerType == 61 )
-      byte_7FA358[128 * v7] = 60;
+      walkers[v7].byte_7FA358 = 60;
     else
-      byte_7FA358[128 * v7] = 10;
+      walkers[v7].byte_7FA358 = 10;
     walkers[v7].buildingId = a1;
-    walker_destination_x[128 * v7] = a4;
+    walkers[v7].destination_x = a4;
     walker_destination_y[128 * v7] = a5;
     sub_4B6B70(
       v7,
       walkers[v7].tilePosition_y,
       walkers[v7].tilePosition_x,
-      15 * (unsigned __int8)walker_destination_x[128 * v7],
+      15 * (unsigned __int8)walkers[v7].destination_x,
       15 * (unsigned __int8)walker_destination_y[128 * v7],
       1);
   }
@@ -75127,7 +75110,7 @@ bool  sub_4B76D0(int a1)
   v2 = word_7FA3B0[64 * a1];
   if ( v2 > 0 )
   {
-    if ( (unsigned __int8)walker_state[128 * v2] == 1 )
+    if ( walkers[v2].state == 1 )
     {
       if ( walkers[v2].actionState == 149 )
         result = 0;
@@ -75152,7 +75135,7 @@ void  fun_neptuneSinkAllShips()
 
   for ( i = 1; i < 1000; ++i )
   {
-    if ( (unsigned __int8)walker_state[128 * i] == 1 )
+    if ( walkers[i].state == 1 )
     {
       if ( walkers[i].type== Walker_TradeShip )
       {
@@ -75194,10 +75177,10 @@ int  fun_spawnWalker(char a1, int type, __int16 x, __int16 y, char a5)
   {
     if ( walkerId >= 1000 )
       return 0;
-    if ( !walker_state[128 * walkerId] )
+    if ( !walkers[walkerId].state )
       break;
   }
-  walker_state[128 * walkerId] = 1;
+  walkers[walkerId].state = 1;
   byte_7FA34F[128 * walkerId] = a1;
   walkers[walkerId].type = type;
   walkers[walkerId].byte_7FA34C = 0;
@@ -75205,17 +75188,17 @@ int  fun_spawnWalker(char a1, int type, __int16 x, __int16 y, char a5)
   word_7FA3B4[64 * walkerId] = dword_607FC8++;
   walkers[walkerId].direction = a5;
   byte_7FA360[128 * walkerId] = x;
-  walker_destination_x[128 * walkerId] = x;
+  walkers[walkerId].destination_x = x;
   byte_7FA356[128 * walkerId] = x;
-  walker_x[128 * walkerId] = x;
+  walkers[walkerId].x = x;
   byte_7FA361[128 * walkerId] = y;
   walker_destination_y[128 * walkerId] = y;
   byte_7FA357[128 * walkerId] = y;
   walkers[walkerId].y = y;
   walkers[walkerId].gridOffset = 162 * y + x + setting_map_startGridOffset;
-  walkers[walkerId].tilePosition_y = 15 * walker_x[128 * walkerId];
+  walkers[walkerId].tilePosition_y = 15 * walkers[walkerId].x;
   walkers[walkerId].tilePosition_x = 15 * walkers[walkerId].y;
-  walker_progressOnTile[128 * walkerId] = 15;
+  walkers[walkerId].progressOnTile = 15;
   byte_7FA3AC[128 * walkerId] = random_7f_1 & 3;
   byte_7FA3AA[128 * walkerId] = byte_7FA3AC[128 * walkerId];
   fun_generateWalkerName(walkerId);
@@ -75815,21 +75798,21 @@ signed int  fun_hasEnemyNear(signed int xMin, signed int yMin, signed int xMax, 
 
   for ( i = 1; i < 1000; ++i )
   {
-    if ( (unsigned __int8)walker_state[128 * i] == 1
+    if ( walkers[i].state == 1
       && walkers[i].type>= (signed int)Walker_Enemy43
       && walkers[i].type<= (signed int)Walker_Enemy57 )
     {
-      if ( walker_x[128 * i] <= xMin )
-        v7 = xMin - walker_x[128 * i];
+      if ( walkers[i].x <= xMin )
+        v7 = xMin - walkers[i].x;
       else
-        v7 = walker_x[128 * i] - xMin;
+        v7 = walkers[i].x - xMin;
       if ( walkers[i].y <= yMin )
         v5 = yMin - walkers[i].y;
       else
         v5 = walkers[i].y - yMin;
       if ( v7 <= 12 && v5 <= 12 )
         return 1;
-      v8 = walker_x[128 * i] <= xMax ? xMax - walker_x[128 * i] : walker_x[128 * i] - xMax;
+      v8 = walkers[i].x <= xMax ? xMax - walkers[i].x : walkers[i].x - xMax;
       v6 = walkers[i].y <= yMax ? yMax - walkers[i].y : walkers[i].y - yMax;
       if ( v8 <= 12 && v6 <= 12 )
         return 1;
@@ -76427,10 +76410,10 @@ signed int  fun_generateSoldierFromBarracks(int buildingId)
              (unsigned __int8)building_03_size[128 * v7]) )
       {
         walkers[v9].actionState = 85;
-        walker_destination_x[128 * v9] = walkerGridX;
+        walkers[v9].destination_x = walkerGridX;
         walker_destination_y[128 * v9] = walkerGridY;
         word_7FA35E[64 * v9] = 162 * (unsigned __int8)walker_destination_y[128 * v9]
-                             + (unsigned __int8)walker_destination_x[128 * v9]
+                             + walkers[v9].destination_x
                              + (_WORD)setting_map_startGridOffset;
       }
       else
@@ -76485,8 +76468,8 @@ signed int  fun_generateTowerSentryFromBarracks(int buildingId)
             buildings[i].x,
             building__07_y[128 * i],
             (unsigned __int8)building_03_size[128 * i]) )
-      walker_state[128 * v3] = 2;
-    walker_destination_x[128 * v3] = walkerGridX;
+      walkers[v3].state = 2;
+    walkers[v3].destination_x = walkerGridX;
     walker_destination_y[128 * v3] = walkerGridY;
     building_22_walkerId[64 * i] = v3;
     walkers[v3].buildingId = i;
@@ -76505,14 +76488,14 @@ void  fun_removeTowerSentry(int x, int y)
 
   for ( i = 0; i < 1000; ++i )
   {
-    if ( (unsigned __int8)walker_state[128 * i] == 1 )
+    if ( walkers[i].state == 1 )
     {
       if ( walkers[i].type== Walker_TowerSentry )
       {
         if ( walkers[i].actionState != 149 )
         {
-          if ( fun_getDistanceMaximum(walker_x[128 * i], walkers[i].y, x, y) <= 1 )
-            walker_state[128 * i] = 2;
+          if ( fun_getDistanceMaximum(walkers[i].x, walkers[i].y, x, y) <= 1 )
+            walkers[i].state = 2;
         }
       }
     }
@@ -76661,9 +76644,9 @@ void  fun_calculateFortTotals()
       {
         if ( formation_walkerIds[64 * formationId] )
         {
-          if ( (unsigned __int8)walker_state[128 * v0] == 1 )
+          if ( walkers[v0].state == 1 )
           {
-            formation_fortX[128 * formationId] = walker_x[128 * v0];
+            formation_fortX[128 * formationId] = walkers[v0].x;
             formation_fortY[128 * formationId] = walkers[v0].y;
           }
         }
@@ -76714,7 +76697,7 @@ void  sub_4BBC90()
 
   for ( i = 1; i < 1000; ++i )
   {
-    if ( (unsigned __int8)walker_state[128 * i] == 1 )
+    if ( walkers[i].state == 1 )
     {
       if ( walkers[i].type>= (signed int)Walker_FortJavelin )
       {
@@ -77005,7 +76988,7 @@ void  sub_4BC600()
   }
   for ( k = 1; k < 1000; ++k )
   {
-    if ( (unsigned __int8)walker_state[128 * k] != 1 )
+    if ( walkers[k].state != 1 )
       continue;
     if ( walkers[k].type < (signed int)Walker_FortJavelin
       || walkers[k].type > (signed int)Walker_FortLegionary )
@@ -77375,7 +77358,7 @@ void sub_4BD5C0()
               v1 = *(__int16 *)((char *)&formation_walkerIds[64 * i] + 2 * j);
               if ( v1 > 0 )
               {
-                if ( (unsigned __int8)walker_state[128 * v1] == 1 )
+                if ( walkers[v1].state == 1 )
                 {
                   if ( walkers[v1].actionState != 149 )
                     walkers[v1].actionState = 87;
@@ -77412,7 +77395,7 @@ int  sub_4BD8D0()
             v1 = *(__int16 *)((char *)&formation_walkerIds[64 * i] + 2 * j);
             if ( v1 > 0 )
             {
-              if ( (unsigned __int8)walker_state[128 * v1] == 1 )
+              if ( walkers[v1].state == 1 )
               {
                 if ( walkers[v1].actionState!= 149 )
                 {
@@ -77456,7 +77439,7 @@ void  sub_4BDA20(int a1)
             v3 = *(__int16 *)((char *)&formation_walkerIds[64 * i] + 2 * j);
             if ( v3 > 0 )
             {
-              if ( (unsigned __int8)walker_state[128 * v3] == 1 )
+              if ( (unsigned __int8)walkers[v3].state == 1 )
               {
                 if ( walkers[v3].actionState != 149 )
                   ++v2;
@@ -77474,14 +77457,14 @@ void  sub_4BDA20(int a1)
             v4 = *(__int16 *)((char *)&formation_walkerIds[64 * i] + 2 * k);
             if ( v4 > 0 )
             {
-              if ( (unsigned __int8)walker_state[128 * v4] == 1 )
+              if ( walkers[v4].state == 1 )
               {
                 if ( walkers[v4].actionState != 149 )
                 {
                   if ( v1 )
                   {
                     --v1;
-                    walker_state[128 * v4] = 2;
+                    walkers[v4].state = 2;
                   }
                 }
               }
@@ -77587,10 +77570,10 @@ char  unused_4BE060(int a1)
   v3 = formation_walkerIds[64 * a1];
   if ( formation_walkerIds[64 * a1] )
   {
-    v1 = (unsigned __int8)walker_state[128 * v3];
+    v1 = (unsigned __int8)walkers[v3].state;
     if ( v1 == 1 )
     {
-      formation_fortX[128 * a1] = walker_x[128 * v3];
+      formation_fortX[128 * a1] = walkers[v3].x;
       _LOBYTE(v1) = walkers[v3].y;
       formation_fortY[128 * a1] = v1;
     }
@@ -77692,7 +77675,7 @@ void  sub_4BE200()
               if ( walkers[v10].actionState == 150 )
               {
                 v9 = word_7FA3BE[64 * v10];
-                if ( (unsigned __int8)walker_state[128 * v9] == 1 )
+                if ( walkers[v9].state == 1 )
                 {
                   if ( walkers[v9].actionState != 149 )
                   {
@@ -77728,9 +77711,9 @@ void  sub_4BE200()
               v12 = formation_walkerIds[64 * j];
               if ( formation_walkerIds[64 * j] )
               {
-                if ( (unsigned __int8)walker_state[128 * v12] == 1 )
+                if ( walkers[v12].state == 1 )
                 {
-                  formation_fortX[128 * j] = walker_x[128 * v12];
+                  formation_fortX[128 * j] = walkers[v12].x;
                   formation_fortY[128 * j] = walkers[v12].y;
                 }
               }
@@ -78133,9 +78116,9 @@ void  sub_4BF500()
               v7 = formation_walkerIds[64 * i];
               if ( formation_walkerIds[64 * i] )
               {
-                if ( (unsigned __int8)walker_state[128 * v7] == 1 )
+                if ( walkers[v7].state == 1 )
                 {
-                  formation_fortX[128 * i] = walker_x[128 * v7];
+                  formation_fortX[128 * i] = walkers[v7].x;
                   formation_fortY[128 * i] = walkers[v7].y;
                 }
               }
@@ -78182,11 +78165,11 @@ LABEL_50:
                           word_7FA366[64 * v8] = 401;
                           if ( v1 )
                           {
-                            v5 = sub_4AD500(walker_x[128 * v8], walkers[v8].y, 6);
+                            v5 = sub_4AD500(walkers[v8].x, walkers[v8].y, 6);
                             if ( v5 )
                             {
                               walkers[v8].actionState = -57;
-                              walker_destination_x[128 * v8] = walker_x[128 * v5];
+                              walkers[v8].destination_x = walkers[v5].x;
                               walker_destination_y[128 * v8] = walkers[v5].y;
                               word_7FA3B0[64 * v8] = v5;
                               word_7FA3B2[64 * v5] = v8;
@@ -78376,7 +78359,7 @@ void  fun_killEnemiesSpiritOfMars()
     v1 = city_inform[ciid].dword_6544F4;
     for ( i = 1; i < 1000; ++i )
     {
-      if ( (unsigned __int8)walker_state[128 * i] == 1 )
+      if ( walkers[i].state == 1 )
       {
         if ( v1 <= 0 )
           break;
@@ -78415,7 +78398,7 @@ void  unused_4C01E0()
 
   for ( i = 1; i < 1000; ++i )
   {
-    if ( (unsigned __int8)walker_state[128 * i] == 1 )
+    if ( walkers[i].state == 1 )
     {
       if ( (signed int)walkers[i].type< 43
         || (signed int)walkers[i].type> 53 )
@@ -78948,86 +78931,86 @@ signed int  fun_walkerProvideServiceCoverage(int walkerId)
   switch ( walkers[walkerId].type )
   {
     case Walker_LaborSeeker:
-      v2 = fun_walkerProvideLaborSeekerAccess(walker_x[128 * walkerId], walkers[walkerId].y);
+      v2 = fun_walkerProvideLaborSeekerAccess(walkers[walkerId].x, walkers[walkerId].y);
       break;
     case Walker_TaxCollector:
-      v2 = fun_walkerProvideTaxCollectorAccess(walker_x[128 * walkerId], walkers[walkerId].y);
+      v2 = fun_walkerProvideTaxCollectorAccess(walkers[walkerId].x, walkers[walkerId].y);
       walker_maxLevelOrRiskSeen[128 * walkerId] = taxCollectorMaxHousingLevelSeen;
       break;
     case Walker_MarketTrader:
       v2 = fun_walkerProvideMarketGoods(
              walkers[walkerId].buildingId,
-             walker_x[128 * walkerId],
+             walkers[walkerId].x,
              walkers[walkerId].y);
       break;
     case Walker_MarketBuyer:
       v2 = fun_walkerProvideMarketGoods(
              walkers[walkerId].buildingId,
-             walker_x[128 * walkerId],
+             walkers[walkerId].x,
              walkers[walkerId].y);
       break;
     case Walker_BathhouseWorker:
-      v2 = fun_walkerProvideBathhouseAccess(walker_x[128 * walkerId], walkers[walkerId].y);
+      v2 = fun_walkerProvideBathhouseAccess(walkers[walkerId].x, walkers[walkerId].y);
       break;
     case Walker_SchoolChild:
-      v2 = fun_walkerProvideSchoolAccess(walker_x[128 * walkerId], walkers[walkerId].y);
+      v2 = fun_walkerProvideSchoolAccess(walkers[walkerId].x, walkers[walkerId].y);
       break;
     case Walker_Teacher:
-      v2 = fun_walkerProvideAcademyAccess(walker_x[128 * walkerId], walkers[walkerId].y);
+      v2 = fun_walkerProvideAcademyAccess(walkers[walkerId].x, walkers[walkerId].y);
       break;
     case Walker_Librarian:
-      v2 = fun_walkerProvideLibraryAccess(walker_x[128 * walkerId], walkers[walkerId].y);
+      v2 = fun_walkerProvideLibraryAccess(walkers[walkerId].x, walkers[walkerId].y);
       break;
     case Walker_Barber:
-      v2 = fun_walkerProvideBarberAccess(walker_x[128 * walkerId], walkers[walkerId].y);
+      v2 = fun_walkerProvideBarberAccess(walkers[walkerId].x, walkers[walkerId].y);
       break;
     case Walker_Doctor:
-      v2 = fun_walkerProvideClinicAccess(walker_x[128 * walkerId], walkers[walkerId].y);
+      v2 = fun_walkerProvideClinicAccess(walkers[walkerId].x, walkers[walkerId].y);
       break;
     case Walker_Surgeon:
-      v2 = fun_walkerProvideHospitalAccess(walker_x[128 * walkerId], walkers[walkerId].y);
+      v2 = fun_walkerProvideHospitalAccess(walkers[walkerId].x, walkers[walkerId].y);
       break;
     case Walker_Missionary:
-      v2 = fun_walkerProvideMissionaryAccess(walker_x[128 * walkerId], walkers[walkerId].y);
+      v2 = fun_walkerProvideMissionaryAccess(walkers[walkerId].x, walkers[walkerId].y);
       break;
     case Walker_Priest:
       v3 = walkers[walkerId].buildingId;
       switch ( building_0a_type[64 * v3] )
       {
         case B_SmallTempleCeres:
-          v2 = fun_walkerProvideReligionAccess(walker_x[128 * walkerId], walkers[walkerId].y, 0);
+          v2 = fun_walkerProvideReligionAccess(walkers[walkerId].x, walkers[walkerId].y, 0);
           break;
         case B_LargeTempleCeres:
-          v2 = fun_walkerProvideReligionAccess(walker_x[128 * walkerId], walkers[walkerId].y, 0);
+          v2 = fun_walkerProvideReligionAccess(walkers[walkerId].x, walkers[walkerId].y, 0);
           break;
         case B_SmallTempleNeptune:
-          v2 = fun_walkerProvideReligionAccess(walker_x[128 * walkerId], walkers[walkerId].y, 1);
+          v2 = fun_walkerProvideReligionAccess(walkers[walkerId].x, walkers[walkerId].y, 1);
           break;
         case B_LargeTempleNeptune:
-          v2 = fun_walkerProvideReligionAccess(walker_x[128 * walkerId], walkers[walkerId].y, 1);
+          v2 = fun_walkerProvideReligionAccess(walkers[walkerId].x, walkers[walkerId].y, 1);
           break;
         case B_SmallTempleMercury:
-          v2 = fun_walkerProvideReligionAccess(walker_x[128 * walkerId], walkers[walkerId].y, 2);
+          v2 = fun_walkerProvideReligionAccess(walkers[walkerId].x, walkers[walkerId].y, 2);
           break;
         case B_LargeTempleMercury:
-          v2 = fun_walkerProvideReligionAccess(walker_x[128 * walkerId], walkers[walkerId].y, 2);
+          v2 = fun_walkerProvideReligionAccess(walkers[walkerId].x, walkers[walkerId].y, 2);
           break;
         case B_SmallTempleMars:
-          v2 = fun_walkerProvideReligionAccess(walker_x[128 * walkerId], walkers[walkerId].y, 3);
+          v2 = fun_walkerProvideReligionAccess(walkers[walkerId].x, walkers[walkerId].y, 3);
           break;
         case B_LargeTempleMars:
-          v2 = fun_walkerProvideReligionAccess(walker_x[128 * walkerId], walkers[walkerId].y, 3);
+          v2 = fun_walkerProvideReligionAccess(walkers[walkerId].x, walkers[walkerId].y, 3);
           break;
         case B_SmallTempleVenus:
-          v2 = fun_walkerProvideReligionAccess(walker_x[128 * walkerId], walkers[walkerId].y, 4);
+          v2 = fun_walkerProvideReligionAccess(walkers[walkerId].x, walkers[walkerId].y, 4);
           break;
         case B_LargeTempleVenus:
-          v2 = fun_walkerProvideReligionAccess(walker_x[128 * walkerId], walkers[walkerId].y, 4);
+          v2 = fun_walkerProvideReligionAccess(walkers[walkerId].x, walkers[walkerId].y, 4);
           break;
       }
       break;
     case Walker_Engineer:
-      v2 = fun_walkerProvideEngineerCoverage(walker_x[128 * walkerId], walkers[walkerId].y);
+      v2 = fun_walkerProvideEngineerCoverage(walkers[walkerId].x, walkers[walkerId].y);
       if ( *(_DWORD *)&engineerMaxDamageSeen <= (signed int)(unsigned __int8)walker_maxLevelOrRiskSeen[128 * walkerId] )
       {
         if ( (signed int)(unsigned __int8)walker_maxLevelOrRiskSeen[128 * walkerId] <= 10 )
@@ -79041,8 +79024,8 @@ signed int  fun_walkerProvideServiceCoverage(int walkerId)
       }
       break;
     case Walker_Prefect:
-      v2 = fun_walkerProvidePrefectFireCoverage(walker_x[128 * walkerId], walkers[walkerId].y);
-      fun_walkerProvidePrefectCrimeCoverage(walker_x[128 * walkerId], walkers[walkerId].y);
+      v2 = fun_walkerProvidePrefectFireCoverage(walkers[walkerId].x, walkers[walkerId].y);
+      fun_walkerProvidePrefectCrimeCoverage(walkers[walkerId].x, walkers[walkerId].y);
       walker_maxLevelOrRiskSeen[128 * walkerId] = prefectMaxCrimeRiskSeen;
       break;
     case Walker_Rioter:
@@ -79057,16 +79040,16 @@ signed int  fun_walkerProvideServiceCoverage(int walkerId)
         v4 = walkers[walkerId].buildingId;
       if ( building_0a_type[64 * v4] == B_Theater )
       {
-        v2 = fun_walkerProvideTheaterAccess(walker_x[128 * walkerId], walkers[walkerId].y);
+        v2 = fun_walkerProvideTheaterAccess(walkers[walkerId].x, walkers[walkerId].y);
       }
       else
       {
         if ( building_0a_type[64 * v4] == B_Amphitheater )
         {
           if ( building_65_house_bathhouse_dock_numships_entert_days[128 * v4] )
-            v2 = fun_walkerProvideAmphitheaterAccess(walker_x[128 * walkerId], walkers[walkerId].y, 2);
+            v2 = fun_walkerProvideAmphitheaterAccess(walkers[walkerId].x, walkers[walkerId].y, 2);
           else
-            v2 = fun_walkerProvideAmphitheaterAccess(walker_x[128 * walkerId], walkers[walkerId].y, 1);
+            v2 = fun_walkerProvideAmphitheaterAccess(walkers[walkerId].x, walkers[walkerId].y, 1);
         }
       }
       break;
@@ -79079,18 +79062,18 @@ signed int  fun_walkerProvideServiceCoverage(int walkerId)
       if ( building_0a_type[64 * v5] == B_Amphitheater )
       {
         if ( building_66_house_hospital_entert_days2[128 * v5] )
-          v2 = fun_walkerProvideAmphitheaterAccess(walker_x[128 * walkerId], walkers[walkerId].y, 2);
+          v2 = fun_walkerProvideAmphitheaterAccess(walkers[walkerId].x, walkers[walkerId].y, 2);
         else
-          v2 = fun_walkerProvideAmphitheaterAccess(walker_x[128 * walkerId], walkers[walkerId].y, 1);
+          v2 = fun_walkerProvideAmphitheaterAccess(walkers[walkerId].x, walkers[walkerId].y, 1);
       }
       else
       {
         if ( building_0a_type[64 * v5] == B_Colosseum )
         {
           if ( building_65_house_bathhouse_dock_numships_entert_days[128 * v5] )
-            v2 = fun_walkerProvideColosseumAccess(walker_x[128 * walkerId], walkers[walkerId].y, 2);
+            v2 = fun_walkerProvideColosseumAccess(walkers[walkerId].x, walkers[walkerId].y, 2);
           else
-            v2 = fun_walkerProvideColosseumAccess(walker_x[128 * walkerId], walkers[walkerId].y, 1);
+            v2 = fun_walkerProvideColosseumAccess(walkers[walkerId].x, walkers[walkerId].y, 1);
         }
       }
       break;
@@ -79101,35 +79084,24 @@ signed int  fun_walkerProvideServiceCoverage(int walkerId)
       else
         v6 = walkers[walkerId].buildingId;
       if ( building_66_house_hospital_entert_days2[128 * v6] )
-        v2 = fun_walkerProvideColosseumAccess(walker_x[128 * walkerId], walkers[walkerId].y, 2);
+        v2 = fun_walkerProvideColosseumAccess(walkers[walkerId].x, walkers[walkerId].y, 2);
       else
-        v2 = fun_walkerProvideColosseumAccess(walker_x[128 * walkerId], walkers[walkerId].y, 1);
+        v2 = fun_walkerProvideColosseumAccess(walkers[walkerId].x, walkers[walkerId].y, 1);
       break;
     case Walker_Charioteer:
-      v2 = fun_walkerProvideHippodromeAccess(walker_x[128 * walkerId], walkers[walkerId].y);
+      v2 = fun_walkerProvideHippodromeAccess(walkers[walkerId].x, walkers[walkerId].y);
       break;
   }
   v7 = walkers[walkerId].buildingId;
   if ( walkers[walkerId].buildingId )
   {
-    building_12_walkerServiceAccess[64 * v7] += v2;
-    if ( building_12_walkerServiceAccess[64 * v7] > 300 )
-      building_12_walkerServiceAccess[64 * v7] = 300;
+    buildings[v7].walkerServiceAccess += v2;
+    if ( buildings[v7].walkerServiceAccess > 300 )
+      buildings[v7].walkerServiceAccess = 300;
   }
   return 0;
 }
-// 4026D5: using guessed type _DWORD  sub_4026D5(_DWORD);
-// 402D42: using guessed type _DWORD  fun_walkerProvideBathhouseAccess(_DWORD, _DWORD);
-// 403044: using guessed type _DWORD  fun_walkerProvideTaxCollectorAccess(_DWORD, _DWORD);
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 89AA7C: using guessed type char engineerMaxDamageSeen;
-// 8A7890: using guessed type int prefectMaxCrimeRiskSeen;
-// 8E7B30: using guessed type int taxCollectorMaxHousingLevelSeen;
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD52: using guessed type __int16 building_12_walkerServiceAccess[];
 
-//----- (004C2450) --------------------------------------------------------
 void  fun_generateMapFlagWalkers()
 {
   fun_clearWalkers();
@@ -79161,7 +79133,6 @@ void  fun_generateMapFlagWalkers()
   byte_7FA34B[128 * fun_spawnWalker(1, 36, -1, -1, 0)] = 25;
 }
 
-//----- (004C28A0) --------------------------------------------------------
 void  fun_createFishHerdFlotsamWalkers(__int16 riverEntryX, __int16 riverEntryY, int createFlotsam)
 {
   int v3; // eax@7
@@ -79187,12 +79158,12 @@ void  fun_createFishHerdFlotsamWalkers(__int16 riverEntryX, __int16 riverEntryY,
         fun_generateRandomness();
         v3 = fun_spawnWalker(1, Walker_FishGulls, scn_fish_x[i], scn_fish_y[i], 0);
         byte_7FA341[128 * v3] = random_7f_1 & 0x1F;
-        walker_progressOnTile[128 * v3] = random_7f_1 & 7;
+        walkers[v3].progressOnTile = random_7f_1 & 7;
         sub_4B6B70(
           walkerId,
           walkers[walkerId].tilePosition_y,
           walkers[walkerId].tilePosition_x,
-          15 * (unsigned __int8)walker_destination_x[128 * walkerId],
+          15 * (unsigned __int8)walkers[walkerId].destination_x,
           15 * (unsigned __int8)walker_destination_y[128 * walkerId],
           0);
       }
@@ -79269,7 +79240,7 @@ void  fun_createFishHerdFlotsamWalkers(__int16 riverEntryX, __int16 riverEntryY,
     {
       for ( m = 1; m < 1000; ++m )
       {
-        if ( walker_state[128 * m] )
+        if ( walkers[m].state )
         {
           if ( walkers[m].type == Walker_Flotsam )
             fun_deleteWalker(m);
@@ -81706,8 +81677,8 @@ signed int  fun_getOverlayTooltipText()
       }
       break;
     case Overlay_Workers:
-      v6 = fun_getPercentage(building_12_walkerServiceAccess[64 * v3], 300);
-      if ( building_12_walkerServiceAccess[64 * v3] > 0 )
+      v6 = fun_getPercentage(buildings[v3].walkerServiceAccess, 300);
+      if ( buildings[v3].walkerServiceAccess > 0 )
       {
         if ( v6 > 20 )
         {
@@ -95008,7 +94979,7 @@ signed int  sub_4E6EC0()
               {
                 if ( v15 <= 0 )
                   break;
-                if ( (unsigned __int8)walker_state[128 * v15] != 2 )
+                if ( walkers[v15].state != 2 )
                 {
                   if ( walkers[v15].actionState != 149 )
                   {
@@ -96922,11 +96893,11 @@ void  fun_drawRightClickWorkerInfo(int a1)
   {
     if ( city_inform[ciid].population > 0 )
     {
-      if ( building_12_walkerServiceAccess[64 * currentlySelectedBuilding] > 0 )
+      if ( buildings[currentlySelectedBuilding].walkerServiceAccess > 0 )
       {
-        if ( building_12_walkerServiceAccess[64 * currentlySelectedBuilding] >= 40 )
+        if ( buildings[currentlySelectedBuilding].walkerServiceAccess >= 40 )
         {
-          if( city_inform[ciid].labor_category_priority[ building_3a_laborCategory[128 * currentlySelectedBuilding] ].workersAllocated > 0 )
+          if( city_inform[ciid].labor_category_priority[ buildings[currentlySelectedBuilding].laborCategory ].workersAllocated > 0 )
             v1 = 19;                            // too few people allocated
           else
             v1 = 18;                            // no people allocated
@@ -96952,7 +96923,7 @@ void  fun_drawRightClickWorkerInfo(int a1)
   }
   if ( !v1 )
   {
-    if ( building_12_walkerServiceAccess[64 * currentlySelectedBuilding] < 40 )
+    if ( buildings[currentlySelectedBuilding].walkerServiceAccess < 40 )
       v1 = 20;                                  // warning poor access to employees
   }
   fun_drawGraphic(word_6E6CBC + 14, rightclickInfoDialog_x + 40, a1 + 6);
@@ -100082,7 +100053,7 @@ void  fun_showBuildingInfoWarehouse()
     5);
   fun_drawRightClickWorkerInfo(rightclickInfoDialog_y + 173);
   v10 = building_22_walkerId[64 * currentlySelectedBuilding];
-  if ( building_22_walkerId[64 * currentlySelectedBuilding] && (unsigned __int8)walker_state[128 * v10] == 1 )
+  if ( building_22_walkerId[64 * currentlySelectedBuilding] && walkers[v10].state == 1 )
   {
     if ( walkers[v10].actionState != 53
       && walkers[v10].actionState != 56
@@ -100090,7 +100061,7 @@ void  fun_showBuildingInfoWarehouse()
     {
       if ( building_22_walkerId[64 * currentlySelectedBuilding] )
       {
-        if ( (unsigned __int8)walker_state[128 * v10] == 1 )
+        if ( walkers[v10].state == 1 )
         {
           v6 = rightclickInfoDialog_y + 220;
           v7 = rightclickInfoDialog_x + 32;
@@ -100112,7 +100083,7 @@ void  fun_showBuildingInfoWarehouse()
     {
       if ( building_22_walkerId[64 * currentlySelectedBuilding] )
       {
-        if ( (unsigned __int8)walker_state[128 * v10] == 1 )
+        if ( walkers[v10].state == 1 )
         {
           v2 = rightclickInfoDialog_y + 220;
           v3 = rightclickInfoDialog_x + 32;
@@ -117851,7 +117822,7 @@ void  fun_drawDebugInfoBuildings()
       }
       fun_drawNumber(buildings[v3].house_population, 64, " = pop", 8, v5 + 84, 27, 16122);
       fun_drawNumber(building_34_industry_unitsStored[64 * v3], 64, " = goods", 100, v5 + 84, 27, 16122);
-      fun_drawNumber(building_12_walkerServiceAccess[64 * v3], 64, " = acc", 8, v5 + 96, 27, 16122);
+      fun_drawNumber(buildings[v3].walkerServiceAccess, 64, " = acc", 8, v5 + 96, 27, 16122);
       fun_drawNumber(building_14_word_94BD54[64 * v3], 64, " = rel", 100, v5 + 96, 27, 16122);
       fun_drawNumber(building_26_immigrantId[64 * v3], 64, " = immigrant", 8, v5 + 108, 27, 16122);
       if ( building_24_laborSeekerId[64 * v3] )
@@ -118077,7 +118048,7 @@ void  fun_drawDebugInfoFigures()
     fun_drawTextCentered("Figure info (F1)", 0, v6 + 6, 192, graphic_font + 134, -1);
     if ( dword_608098 )
     {
-      if ( (unsigned __int8)walker_state[128 * dword_608098] == 1 )
+      if ( walkers[dword_608098].state == 1 )
         v5 = 16122;
       else
         v5 = -2048;
@@ -118087,7 +118058,7 @@ void  fun_drawDebugInfoFigures()
       fun_drawNumber(walkers[dword_608098].tilePosition_y, 64, ",", 8, v6 + 48, 27, 16122);
       fun_drawNumber(walkers[dword_608098].tilePosition_x, 64, "x,y", text_xoffset + 8, v6 + 48, 27, 16122);
       text_xoffset = 0;
-      fun_drawNumber(walker_x[128 * dword_608098], 64, ",", 100, v6 + 48, 27, 16122);
+      fun_drawNumber(walkers[dword_608098].x, 64, ",", 100, v6 + 48, 27, 16122);
       fun_drawNumber(walkers[dword_608098].y, 64, " map x,y", text_xoffset + 100, v6 + 48, 27, 16122);
       text_xoffset = 0;
       v1 = walkers[dword_608098].tilePosition_y;
@@ -118124,7 +118095,7 @@ void  fun_drawDebugInfoFigures()
       v3 = 0;
       for ( i = 1; i < 1000; ++i )
       {
-        if ( (unsigned __int8)walker_state[128 * i] == 1 )
+        if ( walkers[i].state == 1 )
         {
           if ( walkers[i].type== 38 )
             ++v3;
@@ -119527,7 +119498,7 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
                                       || walkers[walkerId].actionState == 23 )
                                     {
                                       if ( fun_getDistanceMaximum(
-                                             (unsigned __int8)walker_destination_x[128 * walkerId],
+                                             (unsigned __int8)walkers[walkerId].destination_x,
                                              (unsigned __int8)walker_destination_y[128 * walkerId],
                                              (unsigned __int8)byte_7FA360[128 * walkerId],
                                              (unsigned __int8)byte_7FA361[128 * walkerId]) >= 25 )
@@ -119539,7 +119510,7 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
                                   if ( walkers[walkerId].actionState == 51 )
                                   {
                                     if ( fun_getDistanceMaximum(
-                                           (unsigned __int8)walker_destination_x[128 * walkerId],
+                                           (unsigned __int8)walkers[walkerId].destination_x,
                                            (unsigned __int8)walker_destination_y[128 * walkerId],
                                            (unsigned __int8)byte_7FA360[128 * walkerId],
                                            (unsigned __int8)byte_7FA361[128 * walkerId]) >= 25 )
@@ -119780,7 +119751,7 @@ void  fun_determineWalkerSoundPhrase(int walkerId)
                                                           || walkers[walkerId].actionState == 136 )
                                                         {
                                                           if ( fun_getDistanceMaximum(
-                                                                 (unsigned __int8)walker_destination_x[128 * walkerId],
+                                                                 (unsigned __int8)walkers[walkerId].destination_x,
                                                                  (unsigned __int8)walker_destination_y[128 * walkerId],
                                                                  (unsigned __int8)byte_7FA360[128 * walkerId],
                                                                  (unsigned __int8)byte_7FA361[128 * walkerId]) >= 25 )

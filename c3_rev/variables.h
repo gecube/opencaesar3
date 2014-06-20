@@ -27,7 +27,7 @@ static short building_0a_type[__TD_TR]; // weak
 static short building_0c_level_resourceId[__TD_TR]; // weak
 static char building_0e_byte_94BD4E[__TD_TR]; // weak
 static short building_10_placedSequenceNumber[__TD_TR]; // weak
-static short building_12_walkerServiceAccess[__TD_TR]; // weak
+
 static short building_14_word_94BD54[__TD_TR]; // weak
 
 static short building_18_house_roomForPeople[__TD_TR]; // weak
@@ -49,7 +49,7 @@ static short building_32_warehouse_nextStorage[__TD_TR]; // weak
 static short building_34_industry_unitsStored[__TD_TR]; // weak
 static char building_37_house_hasWell[__TD_TR]; // weak
 static short building_38_num_workers[__TD_TR]; // weak
-static char building_3a_laborCategory[__TD_TR]; // weak
+
 static char building_3b_industry_outputGood[__TD_TR]; // weak
 static char building_3c_hasRoadAccess[__TD_TR]; // weak
 static char building_3d_byte_94BD7D[__TD_TR]; // weak
@@ -1085,19 +1085,29 @@ struct Walker
 {
   int gridOffset;
   char inUse;
-  __int16 nextIdOnSameTile;
+  short nextIdOnSameTile;
   unsigned char actionState;
   int tradeCityId;
   int direction;
   int buildingId;
 
   unsigned char y;
+  unsigned char x;
+
+  int progressOnTile;
 
   int tilePosition_y;
   int tilePosition_x;
+
+  int destination_x;
+
   int type;
   int word_7FA344;
   char byte_7FA34C;
+  char byte_7FA358;
+  char byte_7FA3A6;
+
+  int state;
 };
 
 static Walker walkers[1000];
@@ -1111,6 +1121,8 @@ struct Building
  int house_crimeRisk;
  int houseSize;
  int house_population;
+ int walkerServiceAccess;
+ int laborCategory;
 };
 
 static Building buildings[2000];
