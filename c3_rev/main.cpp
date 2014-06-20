@@ -3835,7 +3835,7 @@ void  sub_451770();
 void  sub_451AB0();
 void  fun_ceresWitherCrops(int bigCurse);
 void  sub_451E30();
-bool  sub_451F80(int a1);
+bool  gStockCapacity(int a1);
 void  sub_4520A0(int a1);
 int  fun_marketDetermineDestinationGranaryWarehouse(int buildingId);
 signed int  sub_452DD0(int a1);
@@ -4539,7 +4539,7 @@ void  unused_4D1240();
 int  unused_4D12E0(int a1);
 int  fun_adjustWithPercentage(int value, int percentage); // idb
 int  unused_adjustWithPromille(int value, int promille); // idb
-int  fun_getPercentage(int value, signed int max); // idb
+int  getPercentage(int value, signed int max); // idb
 int  unused_divideAndRoundUp(signed int value, signed int divisor); // idb
 int  unused_4D15D0(int a1, int *a2, int a3, int a4);
 int  fun_getDistanceXplusY(int x1, int y1, int x2, int y2); // idb
@@ -5400,7 +5400,7 @@ signed int  fun_dialogFile_handleScrollbarClick()
               v3 = mouseclick_y - (screen_640x480_y + 145);
               if ( mouseclick_y - (screen_640x480_y + 145) > 130 )
                 v3 = 130;
-              v1 = fun_getPercentage(v3, 130);
+              v1 = getPercentage(v3, 130);
               filelist_scrollPosition = fun_adjustWithPercentage(v2, v1);
               window_redrawRequest = 1;
               result = 1;
@@ -5998,7 +5998,7 @@ signed int  fun_dialogCckSelection_scrollbarClick()
               v3 = mouseclick_y - (screen_640x480_y + 245);
               if ( mouseclick_y - (screen_640x480_y + 245) > 164 )
                 v3 = 164;
-              v1 = fun_getPercentage(v3, 164);
+              v1 = getPercentage(v3, 164);
               filelist_scrollPosition = fun_adjustWithPercentage(v2, v1);
               window_redrawRequest = 2;
               result = 1;
@@ -7875,7 +7875,7 @@ void  fun_buildingInfo_storage_toggleGood()
   int index; // [sp+54h] [bp-4h]@2
 
   storageId = buildings[currentlySelectedBuilding].d7d_storageId;
-  if ( building_0a_type[64 * currentlySelectedBuilding] == B_Warehouse )
+  if ( buildings[currentlySelectedBuilding].type == B_Warehouse )
     index = goodlist_indexToResourceId[currentButton_parameter];
   else
     index = foodlist_indexToResourceId[currentButton_parameter];
@@ -11403,13 +11403,11 @@ void  sub_412320()
     v0 += 20;
   }
 }
-// 608008: using guessed type int time_current;
 
-//----- (004123D0) --------------------------------------------------------
 int  fun_getBuildingAnimationIndex(int a1, int a2)
 {
   int result; // eax@3
-  int v3; // [sp+4Ch] [bp-10h]@52
+  int foodStockFullPercent; // [sp+4Ch] [bp-10h]@52
   int v4; // [sp+50h] [bp-Ch]@1
   signed int v5; // [sp+54h] [bp-8h]@1
   int v6; // [sp+54h] [bp-8h]@53
@@ -11419,38 +11417,38 @@ int  fun_getBuildingAnimationIndex(int a1, int a2)
   v8 = 0;
   v5 = (unsigned __int8)grid_animation[a2];
   v4 = grid_buildingIds[a2];
-  if ( building_0a_type[64 * v4] == B_Fountain )
+  if ( buildings[v4].type == B_Fountain )
   {
     if ( building_38_num_workers[64 * v4] <= 0 )
       return 0;
     if ( !building_2d_house_hasFountain[128 * v4] )
       return 0;
   }
-  if ( building_0a_type[64 * v4] == B_Reservoir && !building_2d_house_hasFountain[128 * v4] )
+  if ( buildings[v4].type == B_Reservoir && !building_2d_house_hasFountain[128 * v4] )
     return 0;
-  if ( building_0a_type[64 * v4] >= (signed int)B_WineWorkshop
-    && building_0a_type[64 * v4] <= (signed int)B_PotteryWorkshop )
+  if ( buildings[v4].type >= (signed int)B_WineWorkshop
+    && buildings[v4].type <= (signed int)B_PotteryWorkshop )
   {
     if ( building_34_industry_unitsStored[64 * v4] <= 0 )
       return 0;
     if ( building_38_num_workers[64 * v4] <= 0 )
       return 0;
   }
-  if ( (building_0a_type[64 * v4] == B_Prefecture || building_0a_type[64 * v4] == B_EngineersPost)
+  if ( (buildings[v4].type == B_Prefecture || buildings[v4].type == B_EngineersPost)
     && building_38_num_workers[64 * v4] <= 0 )
     return 0;
-  if ( building_0a_type[64 * v4] == B_Market && building_38_num_workers[64 * v4] <= 0 )
+  if ( buildings[v4].type == B_Market && building_38_num_workers[64 * v4] <= 0 )
     return 0;
-  if ( building_0a_type[64 * v4] == B_Warehouse
-    && (signed int)building_38_num_workers[64 * v4] < model_buildings_laborers[8 * building_0a_type[64 * v4]] )
+  if ( buildings[v4].type == B_Warehouse
+    && (signed int)building_38_num_workers[64 * v4] < model_buildings_laborers[8 * buildings[v4].type] )
     return 0;
-  if ( building_0a_type[64 * v4] == B_Dock
+  if ( buildings[v4].type == B_Dock
     && (signed int)(unsigned __int8)building_65_house_bathhouse_dock_numships_entert_days[128 * v4] <= 0 )
   {
     grid_animation[a2] = 1;
     return 1;
   }
-  if ( building_0a_type[64 * v4] == B_MarbleQuarry )
+  if ( buildings[v4].type == B_MarbleQuarry )
   {
     if ( building_38_num_workers[64 * v4] <= 0 )
     {
@@ -11460,10 +11458,10 @@ int  fun_getBuildingAnimationIndex(int a1, int a2)
   }
   else
   {
-    if ( building_0a_type[64 * v4] >= 107 && building_0a_type[64 * v4] <= 109 && building_38_num_workers[64 * v4] <= 0 )
+    if ( buildings[v4].type >= 107 && buildings[v4].type <= 109 && building_38_num_workers[64 * v4] <= 0 )
       return 0;
   }
-  if ( building_0a_type[64 * v4] == 34 )
+  if ( buildings[v4].type == 34 )
   {
     if ( building_38_num_workers[64 * v4] <= 0 )
     {
@@ -11473,29 +11471,29 @@ int  fun_getBuildingAnimationIndex(int a1, int a2)
   }
   else
   {
-    if ( building_0a_type[64 * v4] != 32
-      && building_0a_type[64 * v4] >= 30
-      && building_0a_type[64 * v4] <= 37
+    if ( buildings[v4].type != 32
+      && buildings[v4].type >= 30
+      && buildings[v4].type <= 37
       && building_38_num_workers[64 * v4] <= 0 )
       return 0;
   }
-  if ( building_0a_type[64 * v4] != 71
-    || (signed int)building_38_num_workers[64 * v4] >= model_buildings_laborers[8 * building_0a_type[64 * v4]] )
+  if ( buildings[v4].type != 71
+    || (signed int)building_38_num_workers[64 * v4] >= model_buildings_laborers[8 * buildings[v4].type] )
   {
     if ( byte_9DA640[c3_sg2[a1].unknown_3A] )
     {
-      if ( building_0a_type[64 * v4] == B_WineWorkshop )
+      if ( buildings[v4].type == B_WineWorkshop )
       {
-        v3 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * v4], 400);
-        if ( v3 > 0 )
+        foodStockFullPercent = getPercentage(buildings[v4].grow_value_house_foodstocks[0], 400);
+        if ( foodStockFullPercent > 0 )
         {
-          if ( v3 >= 4 )
+          if ( foodStockFullPercent >= 4 )
           {
-            if ( v3 >= 8 )
+            if ( foodStockFullPercent >= 8 )
             {
-              if ( v3 >= 12 )
+              if ( foodStockFullPercent >= 12 )
               {
-                if ( v3 >= 96 )
+                if ( foodStockFullPercent >= 96 )
                 {
                   if ( v5 >= 9 )
                   {
@@ -16005,7 +16003,7 @@ LRESULT __stdcall fun_wndproc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
                   if ( window_id == 9 )
                   {
                     dword_607F8C = currentlySelectedBuilding
-                                && building_0a_type[64 * currentlySelectedBuilding] == B_Well;
+                                && buildings[currentlySelectedBuilding].type == B_Well;
                   }
                   else
                   {
@@ -16513,10 +16511,10 @@ void  sub_41C000(int buildingId, int a2)
 
   if ( buildings[buildingId].inUse == 1 )
   {
-    v2 = dword_5EA654[building_0a_type[64 * buildingId]];
+    v2 = dword_5EA654[buildings[buildingId].type];
     if ( v2 > 0 )
     {
-      switch ( building_0a_type[64 * buildingId] )
+      switch ( buildings[buildingId].type )
       {
         case B_Theater:
           if ( city_inform[ciid].imperialArmyComing > 0 || building_38_num_workers[64 * buildingId] <= 0 )
@@ -16531,7 +16529,7 @@ void  sub_41C000(int buildingId, int a2)
             return;
           break;
         default:
-          if ( building_0a_type[64 * buildingId] == B_Hippodrome
+          if ( buildings[buildingId].type == B_Hippodrome
             && (city_inform[ciid].imperialArmyComing > 0 || building_38_num_workers[64 * buildingId] <= 0) )
             return;
           break;
@@ -16543,14 +16541,7 @@ void  sub_41C000(int buildingId, int a2)
     }
   }
 }
-// 654554: using guessed type int cityinfo_imperialArmyComing[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 9D82E0: using guessed type int dword_9D82E0[];
-// 9D82E4: using guessed type int dword_9D82E4[];
-// 9D82EC: using guessed type int dword_9D82EC[];
 
-//----- (0041C210) --------------------------------------------------------
 void  sub_41C210()
 {
   signed int v0; // [sp+4Ch] [bp-18h]@34
@@ -23662,7 +23653,7 @@ void  sub_42E7A0()
                   v3 = grid_bitfields[dword_9D4B4C];
                   if ( grid_terrain[dword_9D4B4C] & T_Garden )
                   {
-                    building_0a_type[0] = 39;
+                    buildings[0].type = 39;
                     sub_41C000(0, 2);
                   }
                   if ( v3 & 0x10 )
@@ -24025,7 +24016,7 @@ void  fun_drawBuildingOnWaterOverlayPipes(int a1, int a2)
           }
         }
         graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-        switch ( building_0a_type[64 * v4] )
+        switch ( buildings[v4].type )
         {
           case 90:
             fun_drawGraphic(graphic_currentGraphicId, a1 + iso_tile_width + 2, a2 - iso_tile_height);
@@ -24138,7 +24129,7 @@ void  fun_drawBuildingOnWaterOverlay(int x, int y)
     if ( grid_buildingIds[dword_9D4B4C] )
     {
       graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-      switch ( building_0a_type[64 * buildingId] )
+      switch ( buildings[buildingId].type )
       {
         case B_Reservoir:
           fun_drawBuilding(graphic_currentGraphicId, x + iso_tile_width + 2, y - iso_tile_height);
@@ -24311,7 +24302,7 @@ void  fun_drawBuildingOnNativeOverlay(int a1, int a2)
     if ( v2 > 0 )
     {
       graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-      switch ( building_0a_type[64 * v2] )
+      switch ( buildings[v2].type )
       {
         case B_NativeHut:
           fun_drawBuilding(graphic_currentGraphicId, a1, a2);
@@ -24351,19 +24342,19 @@ void  fun_drawBuildingWithOverlay(int buildingId, int xOffset, int yOffset, int 
           switch ( currentOverlay )
           {
             case Overlay_Damage:
-              if ( building_0a_type[64 * buildingId] == B_EngineersPost )
+              if ( buildings[buildingId].type == B_EngineersPost )
                 graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
               break;
             case Overlay_Barber:
-              if ( building_0a_type[64 * buildingId] == B_Barber )
+              if ( buildings[buildingId].type == B_Barber )
                 graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
               break;
             case Overlay_Clinic:
-              if ( building_0a_type[64 * buildingId] == B_Doctor )
+              if ( buildings[buildingId].type == B_Doctor )
                 graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
               break;
             case Overlay_Native:
-              if ( building_0a_type[64 * buildingId] == B_NativeHut )
+              if ( buildings[buildingId].type == B_NativeHut )
               {
                 graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
                 graphicOffset = 0;
@@ -24377,44 +24368,44 @@ void  fun_drawBuildingWithOverlay(int buildingId, int xOffset, int yOffset, int 
         }
         else
         {
-          if ( building_0a_type[64 * buildingId] == B_Prefecture )
+          if ( buildings[buildingId].type == B_Prefecture )
             graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-          if ( building_0a_type[64 * buildingId] == B_BurningRuin )
+          if ( buildings[buildingId].type == B_BurningRuin )
             graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
         }
         graphic_currentGraphicId += graphicOffset;
         fun_drawGraphic(graphic_currentGraphicId, xOffset, yOffset);
         break;
       case 2:
-        if ( currentOverlay != Overlay_Entertainment || building_0a_type[64 * buildingId] != B_Theater )
+        if ( currentOverlay != Overlay_Entertainment || buildings[buildingId].type != B_Theater )
         {
           if ( currentOverlay != Overlay_Education
-            || building_0a_type[64 * buildingId] != 51 && building_0a_type[64 * buildingId] != B_Library )
+            || buildings[buildingId].type != 51 && buildings[buildingId].type != B_Library )
           {
-            if ( currentOverlay != Overlay_Theater || building_0a_type[64 * buildingId] != B_Theater )
+            if ( currentOverlay != Overlay_Theater || buildings[buildingId].type != B_Theater )
             {
               if ( currentOverlay != Overlay_FoodStocks
-                || building_0a_type[64 * buildingId] != B_Market && building_0a_type[64 * buildingId] != B_Wharf )
+                || buildings[buildingId].type != B_Market && buildings[buildingId].type != B_Wharf )
               {
                 if ( currentOverlay != Overlay_Religion
-                  || building_0a_type[64 * buildingId] != B_Oracle
-                  && building_0a_type[64 * buildingId] != B_SmallTempleCeres
-                  && building_0a_type[64 * buildingId] != B_SmallTempleNeptune
-                  && building_0a_type[64 * buildingId] != B_SmallTempleMercury
-                  && building_0a_type[64 * buildingId] != B_SmallTempleMars
-                  && building_0a_type[64 * buildingId] != B_SmallTempleVenus )
+                  || buildings[buildingId].type != B_Oracle
+                  && buildings[buildingId].type != B_SmallTempleCeres
+                  && buildings[buildingId].type != B_SmallTempleNeptune
+                  && buildings[buildingId].type != B_SmallTempleMercury
+                  && buildings[buildingId].type != B_SmallTempleMars
+                  && buildings[buildingId].type != B_SmallTempleVenus )
                 {
-                  if ( currentOverlay != Overlay_School || building_0a_type[64 * buildingId] != B_School )
+                  if ( currentOverlay != Overlay_School || buildings[buildingId].type != B_School )
                   {
-                    if ( currentOverlay != Overlay_Library || building_0a_type[64 * buildingId] != B_Library )
+                    if ( currentOverlay != Overlay_Library || buildings[buildingId].type != B_Library )
                     {
-                      if ( currentOverlay != Overlay_Bathhouse || building_0a_type[64 * buildingId] != B_Bathhouse )
+                      if ( currentOverlay != Overlay_Bathhouse || buildings[buildingId].type != B_Bathhouse )
                       {
-                        if ( currentOverlay != Overlay_TaxIncome || building_0a_type[64 * buildingId] != B_Forum )
+                        if ( currentOverlay != Overlay_TaxIncome || buildings[buildingId].type != B_Forum )
                         {
                           if ( currentOverlay != Overlay_Native
-                            || building_0a_type[64 * buildingId] != 89
-                            && building_0a_type[64 * buildingId] != B_MissionPost )
+                            || buildings[buildingId].type != 89
+                            && buildings[buildingId].type != B_MissionPost )
                           {
                             if ( currentOverlay == Overlay_Problems && building_7f_byte_94BDBF[128 * buildingId] )
                             {
@@ -24529,42 +24520,42 @@ void  fun_drawBuildingWithOverlay(int buildingId, int xOffset, int yOffset, int 
         break;
       case 3:
         if ( currentOverlay != Overlay_Entertainment
-          || building_0a_type[64 * buildingId] != B_Amphitheater
-          && building_0a_type[64 * buildingId] != B_GladiatorSchool
-          && building_0a_type[64 * buildingId] != B_LionHouse
-          && building_0a_type[64 * buildingId] != B_ActorColony
-          && building_0a_type[64 * buildingId] != B_ChariotMaker )
+          || buildings[buildingId].type != B_Amphitheater
+          && buildings[buildingId].type != B_GladiatorSchool
+          && buildings[buildingId].type != B_LionHouse
+          && buildings[buildingId].type != B_ActorColony
+          && buildings[buildingId].type != B_ChariotMaker )
         {
-          if ( currentOverlay != Overlay_Education || building_0a_type[64 * buildingId] != B_Academy )
+          if ( currentOverlay != Overlay_Education || buildings[buildingId].type != B_Academy )
           {
-            if ( currentOverlay != Overlay_Theater || building_0a_type[64 * buildingId] != B_ActorColony )
+            if ( currentOverlay != Overlay_Theater || buildings[buildingId].type != B_ActorColony )
             {
               if ( currentOverlay != Overlay_Amphiheater
-                || building_0a_type[64 * buildingId] != B_Amphitheater
-                && building_0a_type[64 * buildingId] != B_GladiatorSchool
-                && building_0a_type[64 * buildingId] != B_ActorColony )
+                || buildings[buildingId].type != B_Amphitheater
+                && buildings[buildingId].type != B_GladiatorSchool
+                && buildings[buildingId].type != B_ActorColony )
               {
                 if ( currentOverlay != Overlay_Colosseum
-                  || building_0a_type[64 * buildingId] != B_GladiatorSchool
-                  && building_0a_type[64 * buildingId] != B_LionHouse )
+                  || buildings[buildingId].type != B_GladiatorSchool
+                  && buildings[buildingId].type != B_LionHouse )
                 {
-                  if ( currentOverlay != Overlay_Hippodrome || building_0a_type[64 * buildingId] != B_ChariotMaker )
+                  if ( currentOverlay != Overlay_Hippodrome || buildings[buildingId].type != B_ChariotMaker )
                   {
                     if ( currentOverlay != Overlay_Religion
-                      || building_0a_type[64 * buildingId] != B_LargeTempleCeres
-                      && building_0a_type[64 * buildingId] != B_LargeTempleNeptune
-                      && building_0a_type[64 * buildingId] != B_LargeTempleMercury
-                      && building_0a_type[64 * buildingId] != B_LargeTempleMars
-                      && building_0a_type[64 * buildingId] != B_LargeTempleVenus )
+                      || buildings[buildingId].type != B_LargeTempleCeres
+                      && buildings[buildingId].type != B_LargeTempleNeptune
+                      && buildings[buildingId].type != B_LargeTempleMercury
+                      && buildings[buildingId].type != B_LargeTempleMars
+                      && buildings[buildingId].type != B_LargeTempleVenus )
                     {
-                      if ( currentOverlay != Overlay_Academy || building_0a_type[64 * buildingId] != B_Academy )
+                      if ( currentOverlay != Overlay_Academy || buildings[buildingId].type != B_Academy )
                       {
-                        if ( currentOverlay != Overlay_Hospital || building_0a_type[64 * buildingId] != B_Hospital )
+                        if ( currentOverlay != Overlay_Hospital || buildings[buildingId].type != B_Hospital )
                         {
                           if ( currentOverlay == Overlay_Problems && building_7f_byte_94BDBF[128 * buildingId] )
                           {
-                            if ( building_0a_type[64 * buildingId] < (signed int)B_WheatFarm
-                              || building_0a_type[64 * buildingId] > (signed int)B_PigFarm )
+                            if ( buildings[buildingId].type < (signed int)B_WheatFarm
+                              || buildings[buildingId].type > (signed int)B_PigFarm )
                             {
                               graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
                               fun_drawGraphic(
@@ -24615,10 +24606,10 @@ void  fun_drawBuildingWithOverlay(int buildingId, int xOffset, int yOffset, int 
                           }
                           else
                           {
-                            if ( currentOverlay != Overlay_FoodStocks || building_0a_type[64 * buildingId] != 71 )
+                            if ( currentOverlay != Overlay_FoodStocks || buildings[buildingId].type != 71 )
                             {
-                              if ( building_0a_type[64 * buildingId] < 100
-                                || building_0a_type[64 * buildingId] > 105
+                              if ( buildings[buildingId].type < 100
+                                || buildings[buildingId].type > 105
                                 || ((v6 = (unsigned __int8)grid_edge[dword_9D4B4C], setting_map_orientation) || v6 == 80)
                                 && (setting_map_orientation != 2 || v6 == 64)
                                 && (setting_map_orientation != 4 || v6 == 66)
@@ -24724,13 +24715,13 @@ void  fun_drawBuildingWithOverlay(int buildingId, int xOffset, int yOffset, int 
         break;
       case 5:
         if ( currentOverlay != Overlay_Entertainment
-          || building_0a_type[64 * buildingId] != B_Hippodrome && building_0a_type[64 * buildingId] != B_Colosseum )
+          || buildings[buildingId].type != B_Hippodrome && buildings[buildingId].type != B_Colosseum )
         {
-          if ( currentOverlay != Overlay_Colosseum || building_0a_type[64 * buildingId] != B_Colosseum )
+          if ( currentOverlay != Overlay_Colosseum || buildings[buildingId].type != B_Colosseum )
           {
-            if ( currentOverlay != Overlay_Hippodrome || building_0a_type[64 * buildingId] != B_Hippodrome )
+            if ( currentOverlay != Overlay_Hippodrome || buildings[buildingId].type != B_Hippodrome )
             {
-              if ( currentOverlay != Overlay_TaxIncome || building_0a_type[64 * buildingId] != B_SenateUpgraded )
+              if ( currentOverlay != Overlay_TaxIncome || buildings[buildingId].type != B_SenateUpgraded )
               {
                 if ( currentOverlay == Overlay_Problems && building_7f_byte_94BDBF[128 * buildingId] )
                 {
@@ -25066,13 +25057,13 @@ void  fun_drawBuildingOnFireOverlay(int buildingId, int a2, int a3)
   int v3; // [sp+4Ch] [bp-8h]@9
 
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * buildingId] == B_Prefecture )
+  if ( buildings[buildingId].type == B_Prefecture )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2, a3);
   }
   else
   {
-    if ( building_0a_type[64 * buildingId] == B_BurningRuin )
+    if ( buildings[buildingId].type == B_BurningRuin )
     {
       fun_drawBuilding(graphic_currentGraphicId, a2, a3);
     }
@@ -25080,8 +25071,8 @@ void  fun_drawBuildingOnFireOverlay(int buildingId, int a2, int a3)
     {
       if ( building_40_fireRisk[64 * buildingId] > 0 )
       {
-        if ( building_0a_type[64 * buildingId] < (signed int)B_WheatFarm
-          || building_0a_type[64 * buildingId] > (signed int)B_PigFarm
+        if ( buildings[buildingId].type < (signed int)B_WheatFarm
+          || buildings[buildingId].type > (signed int)B_PigFarm
           || ((v3 = (unsigned __int8)grid_edge[dword_9D4B4C], setting_map_orientation) || v3 == 80)
           && (setting_map_orientation != 2 || v3 == 64)
           && (setting_map_orientation != 4 || v3 == 66)
@@ -25097,7 +25088,7 @@ void  fun_drawBuildingOnDamageOverlay(int a1, int a2, int a3)
   int v3; // [sp+4Ch] [bp-8h]@7
 
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * a1] == B_EngineersPost )
+  if ( buildings[a1].type == B_EngineersPost )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2, a3);
   }
@@ -25105,8 +25096,8 @@ void  fun_drawBuildingOnDamageOverlay(int a1, int a2, int a3)
   {
     if ( building_3e_damageRisk[64 * a1] > 0 )
     {
-      if ( building_0a_type[64 * a1] < (signed int)B_WheatFarm
-        || building_0a_type[64 * a1] > (signed int)B_PigFarm
+      if ( buildings[a1].type < (signed int)B_WheatFarm
+        || buildings[a1].type > (signed int)B_PigFarm
         || ((v3 = (unsigned __int8)grid_edge[dword_9D4B4C], setting_map_orientation) || v3 == 80)
         && (setting_map_orientation != 2 || v3 == 64)
         && (setting_map_orientation != 4 || v3 == 66)
@@ -25121,13 +25112,13 @@ void  fun_drawBuildingOnCrimeOverlay(int a1, int a2, int a3)
   signed int v3; // [sp+4Ch] [bp-4h]@9
 
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * a1] == B_Prefecture )
+  if ( buildings[a1].type == B_Prefecture )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2, a3);
   }
   else
   {
-    if ( building_0a_type[64 * a1] == B_BurningRuin )
+    if ( buildings[a1].type == B_BurningRuin )
     {
       fun_drawBuilding(graphic_currentGraphicId, a2, a3);
     }
@@ -25179,7 +25170,7 @@ void  fun_drawBuildingOnCrimeOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnEntertainmentOverlay(int a1, int a2, int a3)
 {
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  switch ( building_0a_type[64 * a1] )
+  switch ( buildings[a1].type )
   {
     case B_Amphitheater:
       fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_width + 2, a3 - iso_tile_height);
@@ -25220,17 +25211,17 @@ void  fun_drawBuildingOnEducationOverlay(int a1, int a2, int a3)
   signed int v3; // [sp+4Ch] [bp-4h]@12
 
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * a1] == B_Academy )
+  if ( buildings[a1].type == B_Academy )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_width + 2, a3 - iso_tile_height);
     return;
   }
-  if ( building_0a_type[64 * a1] == B_School )
+  if ( buildings[a1].type == B_School )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_half_width + 1, a3 - iso_tile_half_height);
     return;
   }
-  if ( building_0a_type[64 * a1] == B_Library )
+  if ( buildings[a1].type == B_Library )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_half_width + 1, a3 - iso_tile_half_height);
     return;
@@ -25261,13 +25252,13 @@ void  fun_drawBuildingOnEducationOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnTheaterOverlay(int a1, int a2, int a3)
 {
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * a1] == B_Theater )
+  if ( buildings[a1].type == B_Theater )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_half_width + 1, a3 - iso_tile_half_height);
   }
   else
   {
-    if ( building_0a_type[64 * a1] == B_ActorColony )
+    if ( buildings[a1].type == B_ActorColony )
     {
       fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_width + 2, a3 - iso_tile_height);
     }
@@ -25285,7 +25276,7 @@ void  fun_drawBuildingOnTheaterOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnAmphitheaterOverlay(int a1, int a2, int a3)
 {
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  switch ( building_0a_type[64 * a1] )
+  switch ( buildings[a1].type )
   {
     case B_Amphitheater:
       fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_width + 2, a3 - iso_tile_height);
@@ -25309,7 +25300,7 @@ void  fun_drawBuildingOnAmphitheaterOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnColosseumOverlay(int a1, int a2, int a3)
 {
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  switch ( building_0a_type[64 * a1] )
+  switch ( buildings[a1].type )
   {
     case B_Colosseum:
       fun_drawBuilding(graphic_currentGraphicId, a2 + dword_9A0514 + 4, a3 - dword_9A049C);
@@ -25333,13 +25324,13 @@ void  fun_drawBuildingOnColosseumOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnHippodromeOverlay(int a1, int a2, int a3)
 {
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * a1] == B_Hippodrome )
+  if ( buildings[a1].type == B_Hippodrome )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2 + dword_9A0514 + 4, a3 - dword_9A049C);
   }
   else
   {
-    if ( building_0a_type[64 * a1] == B_ChariotMaker )
+    if ( buildings[a1].type == B_ChariotMaker )
     {
       fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_width + 2, a3 - iso_tile_height);
     }
@@ -25357,13 +25348,13 @@ void  fun_drawBuildingOnHippodromeOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnFoodStocksOverlay(int a1, int a2, int a3)
 {
   int v3; // [sp+4Ch] [bp-14h]@15
-  int v4; // [sp+50h] [bp-10h]@11
-  signed int v5; // [sp+54h] [bp-Ch]@9
+  int houseFoodCount; // [sp+50h] [bp-10h]@11
+  signed int foodTypesCount; // [sp+54h] [bp-Ch]@9
   signed int i; // [sp+58h] [bp-8h]@11
   signed int v7; // [sp+5Ch] [bp-4h]@20
 
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  switch ( building_0a_type[64 * a1] )
+  switch ( buildings[a1].type )
   {
     case B_Market:
       fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_half_width + 1, a3 - iso_tile_half_height);
@@ -25377,16 +25368,19 @@ void  fun_drawBuildingOnFoodStocksOverlay(int a1, int a2, int a3)
     default:
       if ( buildings[a1].houseSize )
       {
-        v5 = model_houses_foodtypes[20 * building_0c_level_resourceId[64 * a1]];
-        if ( v5 )
-          v5 = buildings[a1].house_population;
-        v4 = 0;
+        foodTypesCount = model_houses[ buildings[a1].level_resourceId ].foodtypes;
+        if ( foodTypesCount )
+          foodTypesCount = buildings[a1].house_population;
+
+        houseFoodCount = 0;
         for ( i = 0; i < 4; ++i )
-          v4 += *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i);
-        if ( v5 )
-          v3 = fun_getPercentage(v4, v5);
+          houseFoodCount += buildings[a1].grow_value_house_foodstocks[i];
+
+        if ( foodTypesCount )
+          v3 = getPercentage(houseFoodCount, foodTypesCount);
         else
           v3 = 400;
+
         if ( v3 <= 200 )
         {
           if ( v3 < 100 )
@@ -25410,7 +25404,7 @@ void  fun_drawBuildingOnFoodStocksOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnBathhouseOverlay(int a1, int a2, int a3)
 {
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * a1] == B_Bathhouse )
+  if ( buildings[a1].type == B_Bathhouse )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_half_width + 1, a3 - iso_tile_half_height);
   }
@@ -25431,7 +25425,7 @@ void  fun_drawBuildingOnBathhouseOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnReligionOverlay(int a1, int a2, int a3)
 {
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  switch ( building_0a_type[64 * a1] )
+  switch ( buildings[a1].type )
   {
     case B_Oracle:
       fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_half_width + 1, a3 - iso_tile_half_height);
@@ -25479,7 +25473,7 @@ void  fun_drawBuildingOnReligionOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnSchoolOverlay(int a1, int a2, int a3)
 {
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * a1] == B_School )
+  if ( buildings[a1].type == B_School )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_half_width + 1, a3 - iso_tile_half_height);
   }
@@ -25496,7 +25490,7 @@ void  fun_drawBuildingOnSchoolOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnLibraryOverlay(int a1, int a2, int a3)
 {
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * a1] == B_Library )
+  if ( buildings[a1].type == B_Library )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_half_width + 1, a3 - iso_tile_half_height);
   }
@@ -25513,7 +25507,7 @@ void  fun_drawBuildingOnLibraryOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnAcademyOverlay(int a1, int a2, int a3)
 {
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * a1] == B_Academy )
+  if ( buildings[a1].type == B_Academy )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_width + 2, a3 - iso_tile_height);
   }
@@ -25530,7 +25524,7 @@ void  fun_drawBuildingOnAcademyOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnBarberOverlay(int a1, int a2, int a3)
 {
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * a1] == B_Barber )
+  if ( buildings[a1].type == B_Barber )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2, a3);
   }
@@ -25547,7 +25541,7 @@ void  fun_drawBuildingOnBarberOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnClinicOverlay(int a1, int a2, int a3)
 {
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * a1] == B_Doctor )
+  if ( buildings[a1].type == B_Doctor )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2, a3);
   }
@@ -25564,7 +25558,7 @@ void  fun_drawBuildingOnClinicOverlay(int a1, int a2, int a3)
 void  fun_drawBuildingOnHospitalOverlay(int a1, int a2, int a3)
 {
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * a1] == B_Hospital )
+  if ( buildings[a1].type == B_Hospital )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_width + 2, a3 - iso_tile_height);
   }
@@ -25583,13 +25577,13 @@ void  fun_drawBuildingOnTaxIncomeOverlay(int a1, int a2, int a3)
   signed int v3; // [sp+4Ch] [bp-8h]@7
 
   graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
-  if ( building_0a_type[64 * a1] == B_SenateUpgraded )
+  if ( buildings[a1].type == B_SenateUpgraded )
   {
     fun_drawBuilding(graphic_currentGraphicId, a2 + dword_9A0514 + 4, a3 - dword_9A049C);
   }
   else
   {
-    if ( building_0a_type[64 * a1] == B_Forum )
+    if ( buildings[a1].type == B_Forum )
     {
       fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_half_width + 1, a3 - iso_tile_half_height);
     }
@@ -25617,13 +25611,13 @@ void  fun_drawBuildingOnProblemsOverlay(int a1, int a2, int a3)
   v3 = 0;
   if ( !buildings[a1].houseSize )
   {
-    if ( building_0a_type[64 * a1] != B_Fountain && building_0a_type[64 * a1] != B_Bathhouse )
+    if ( buildings[a1].type != B_Fountain && buildings[a1].type != B_Bathhouse )
     {
-      if ( building_0a_type[64 * a1] < (signed int)B_WheatFarm || building_0a_type[64 * a1] > (signed int)B_ClayPit )
+      if ( buildings[a1].type < (signed int)B_WheatFarm || buildings[a1].type > (signed int)B_ClayPit )
       {
-        if ( building_0a_type[64 * a1] >= (signed int)B_OilWorkshop )
+        if ( buildings[a1].type >= (signed int)B_OilWorkshop )
         {
-          if ( building_0a_type[64 * a1] <= (signed int)B_PotteryWorkshop )
+          if ( buildings[a1].type <= (signed int)B_PotteryWorkshop )
           {
             v7 = building_22_walkerId[64 * a1];
             if ( building_22_walkerId[64 * a1]
@@ -25660,9 +25654,9 @@ void  fun_drawBuildingOnProblemsOverlay(int a1, int a2, int a3)
     }
     if ( (signed int)(unsigned __int8)building_7f_byte_94BDBF[128 * a1] > 0 )
     {
-      if ( building_0a_type[64 * a1] < (signed int)B_WheatFarm || building_0a_type[64 * a1] > (signed int)B_PigFarm )
+      if ( buildings[a1].type < (signed int)B_WheatFarm || buildings[a1].type > (signed int)B_PigFarm )
       {
-        if ( building_0a_type[64 * a1] == B_Granary )
+        if ( buildings[a1].type == B_Granary )
         {
           fun_drawGraphic(
             graphic_granary + 1,
@@ -25683,7 +25677,7 @@ void  fun_drawBuildingOnProblemsOverlay(int a1, int a2, int a3)
               fun_drawGraphic(graphic_granary + 5, a2 + 118, a3 - 61);
           }
         }
-        if ( building_0a_type[64 * a1] == 72 )
+        if ( buildings[a1].type == 72 )
           fun_drawGraphic(word_6E6C54 + 17, a2 - 4, a3 - 42);
         v5 = grid_bitfields[dword_9D4B4C] & 0xF;
         graphic_currentGraphicId = grid_graphicIds[dword_9D4B4C];
@@ -25759,7 +25753,7 @@ void  fun_drawBuildingOnWorkersOverlay(int buildingId, int a2, int a3)
   {
     if ( buildings[buildingId].walkerServiceAccess > 0 )
     {
-      v3 = fun_getPercentage(buildings[buildingId].walkerServiceAccess, 300) / 10;
+      v3 = getPercentage(buildings[buildingId].walkerServiceAccess, 300) / 10;
       fun_drawOverlayColumn(v3, a2, a3, 0);
     }
   }
@@ -25892,7 +25886,7 @@ void  fun_drawExtraBuildingImages(int a1)
                   {
                     fun_drawBuilding(graphic_currentGraphicId, v18, v16);
                   }
-                  if ( building_0a_type[64 * v9] == B_SenateUpgraded )
+                  if ( buildings[v9].type == B_SenateUpgraded )
                   {
                     graphic_currentGraphicId = word_6E6C2C;
                     fun_drawGraphic(
@@ -25922,35 +25916,35 @@ void  fun_drawExtraBuildingImages(int a1)
                     if ( city_inform[ciid].unemploymentForSenateDrawing > 20 )
                       fun_drawGraphic(graphic_homeless + 106, v18 + 66, v16 + 20);
                   }
-                  if ( building_0a_type[64 * v9] == B_Amphitheater )
+                  if ( buildings[v9].type == B_Amphitheater )
                   {
                     if ( building_38_num_workers[64 * v9] > 0 )
                       fun_drawGraphic(word_6E6D30, v18 + 36, v16 - 47);
                   }
-                  if ( building_0a_type[64 * v9] == B_Theater )
+                  if ( buildings[v9].type == B_Theater )
                   {
                     if ( building_38_num_workers[64 * v9] > 0 )
                       fun_drawGraphic(word_6E6D2E, v18 + 34, v16 - 22);
                   }
-                  if ( building_0a_type[64 * v9] == B_Hippodrome )
+                  if ( buildings[v9].type == B_Hippodrome )
                   {
                     if ( building_38_num_workers[64 * sub_4789E0(v9)] > 0 )
                     {
                       if ( city_inform[ciid].dword_654624 )
                       {
-                        if ( building_0c_level_resourceId[64 * v9] || city_inform[ciid].population <= 2000 )
+                        if ( buildings[v9].level_resourceId || city_inform[ciid].population <= 2000 )
                         {
-                          if ( building_0c_level_resourceId[64 * v9] != 1 || city_inform[ciid].population <= 100 )
+                          if ( buildings[v9].level_resourceId != 1 || city_inform[ciid].population <= 100 )
                           {
-                            if ( building_0c_level_resourceId[64 * v9] != 2 || city_inform[ciid].population <= 1000 )
+                            if ( buildings[v9].level_resourceId != 2 || city_inform[ciid].population <= 1000 )
                             {
-                              if ( building_0c_level_resourceId[64 * v9] != 3
+                              if ( buildings[v9].level_resourceId != 3
                                 || city_inform[ciid].population <= 2000 )
                               {
-                                if ( building_0c_level_resourceId[64 * v9] != 4
+                                if ( buildings[v9].level_resourceId != 4
                                   || city_inform[ciid].population <= 100 )
                                 {
-                                  if ( building_0c_level_resourceId[64 * v9] == 5 )
+                                  if ( buildings[v9].level_resourceId == 5 )
                                   {
                                     if ( city_inform[ciid].population > 1000 )
                                     {
@@ -26093,32 +26087,32 @@ void  fun_drawExtraBuildingImages(int a1)
                       }
                     }
                   }
-                  if ( building_0a_type[64 * v9] == B_Colosseum )
+                  if ( buildings[v9].type == B_Colosseum )
                   {
                     if ( building_38_num_workers[64 * v9] > 0 )
                       fun_drawGraphic(word_6E6D32, v18 + 70, v16 - 90);
                   }
-                  if ( building_0a_type[64 * v9] == B_WineWorkshop )
+                  if ( buildings[v9].type == B_WineWorkshop )
                   {
                     if ( building_34_industry_unitsStored[64 * v9] >= 2 || building_69_house_mercury[128 * v9] )
                       fun_drawGraphic(word_6E6C28, v18 + 45, v16 + 23);
                   }
-                  if ( building_0a_type[64 * v9] == B_OilWorkshop )
+                  if ( buildings[v9].type == B_OilWorkshop )
                   {
                     if ( building_34_industry_unitsStored[64 * v9] >= 2 || building_69_house_mercury[128 * v9] )
                       fun_drawGraphic(word_6E6C28 + 1, v18 + 35, v16 + 15);
                   }
-                  if ( building_0a_type[64 * v9] == B_WeaponsWorkshop )
+                  if ( buildings[v9].type == B_WeaponsWorkshop )
                   {
                     if ( building_34_industry_unitsStored[64 * v9] >= 2 || building_69_house_mercury[128 * v9] )
                       fun_drawGraphic(word_6E6C28 + 3, v18 + 46, v16 + 24);
                   }
-                  if ( building_0a_type[64 * v9] == B_FurnitureWorkshop )
+                  if ( buildings[v9].type == B_FurnitureWorkshop )
                   {
                     if ( building_34_industry_unitsStored[64 * v9] >= 2 || building_69_house_mercury[128 * v9] )
                       fun_drawGraphic(word_6E6C28 + 2, v18 + 48, v16 + 19);
                   }
-                  if ( building_0a_type[64 * v9] == B_PotteryWorkshop )
+                  if ( buildings[v9].type == B_PotteryWorkshop )
                   {
                     if ( building_34_industry_unitsStored[64 * v9] >= 2 || building_69_house_mercury[128 * v9] )
                       fun_drawGraphic(word_6E6C28 + 4, v18 + 47, v16 + 24);
@@ -26187,7 +26181,7 @@ void  fun_drawExtraBuildingImages(int a1)
                       if ( building_7b_byte_94BDBB[128 * v10] )
                         drawGraphic_colorMask = -1949;
                     }
-                    if ( building_0a_type[64 * v10] == B_Dock )
+                    if ( buildings[v10].type == B_Dock )
                     {
                       v3 = sub_4A4F80(v10);
                       if ( v3 > 0 )
@@ -26227,13 +26221,13 @@ void  fun_drawExtraBuildingImages(int a1)
                       }
                       v14 = grid_graphicIds[dword_9D4B4C];
                     }
-                    if ( building_0a_type[64 * v10] == B_Warehouse )
+                    if ( buildings[v10].type == B_Warehouse )
                     {
                       fun_drawGraphic(word_6E6C54 + 17, v22 - 4, v16 - 42);
                       if ( v10 == city_inform[ciid].tradeCenterId )
                         fun_drawGraphic(word_6E6D8C, v22 + 19, v16 - 56);
                     }
-                    if ( building_0a_type[64 * v10] == B_Granary )
+                    if ( buildings[v10].type == B_Granary )
                     {
                       fun_drawGraphic(
                         graphic_granary + 1,
@@ -26250,20 +26244,20 @@ void  fun_drawExtraBuildingImages(int a1)
                           fun_drawGraphic(graphic_granary + 5, v22 + 117, v16 - 62);
                       }
                     }
-                    if ( building_0a_type[64 * v10] == B_BurningRuin )
+                    if ( buildings[v10].type == B_BurningRuin )
                     {
                       if ( building_79_byte_94BDB9[128 * v10] )
                         fun_drawGraphic(word_6E6D76, v22 + 18, v16 - 32);
                     }
                     v13 = fun_getBuildingAnimationIndex(v14, dword_9D4B4C);
-                    if ( building_0a_type[64 * v10] != B_Hippodrome )
+                    if ( buildings[v10].type != B_Hippodrome )
                     {
                       if ( v13 > 0 )
                       {
                         if ( v13 > c3_sg2[v14].unknown_1E )
                           v13 = c3_sg2[v14].unknown_1E;
                         v8 = grid_bitfields[dword_9D4B4C] & 0xF;
-                        if ( building_0a_type[64 * v10] == B_Granary )
+                        if ( buildings[v10].type == B_Granary )
                         {
                           fun_drawGraphic(v14 + v13 + 5, v22 + 77, v16 - 49);
                         }
@@ -26326,11 +26320,11 @@ void  fun_drawExtraBuildingImages(int a1)
                   {
                     v5 = grid_edge[dword_9D4B4C];
                     v11 = grid_buildingIds[dword_9D4B4C];
-                    if ( building_0a_type[64 * v11] == B_FortGround__ )
+                    if ( buildings[v11].type == B_FortGround__ )
                     {
                       if ( v5 & 0x40 )
                       {
-                        switch ( building_0c_level_resourceId[64 * v11] )
+                        switch ( buildings[v11].level_resourceId )
                         {
                           case 13:
                             fun_drawGraphic(word_6E6C34 + 4, v22 + 81, v16 + 5);
@@ -26346,7 +26340,7 @@ void  fun_drawExtraBuildingImages(int a1)
                     }
                     else
                     {
-                      if ( building_0a_type[64 * v11] == B_Gatehouse )
+                      if ( buildings[v11].type == B_Gatehouse )
                       {
                         v4 = 0;
                         v6 = v5 & 0x3F;
@@ -26378,7 +26372,7 @@ void  fun_drawExtraBuildingImages(int a1)
                         }
                         if ( v4 )
                         {
-                          if ( building_0c_level_resourceId[64 * v11] == 1 )
+                          if ( buildings[v11].level_resourceId == 1 )
                           {
                             if ( setting_map_orientation && setting_map_orientation != 4 )
                               fun_drawGraphic(word_6E6DA0 + 1, v22 - 18, v16 - 81);
@@ -26387,7 +26381,7 @@ void  fun_drawExtraBuildingImages(int a1)
                           }
                           else
                           {
-                            if ( building_0c_level_resourceId[64 * v11] == 2 )
+                            if ( buildings[v11].level_resourceId == 2 )
                             {
                               if ( setting_map_orientation && setting_map_orientation != 4 )
                                 fun_drawGraphic(word_6E6DA0, v22 - 22, v16 - 80);
@@ -26678,7 +26672,7 @@ void  fun_drawWalker(int walkerId, int a2, int a3, int a4)
               if ( walkers[walkerId].type != Walker_Actor
                 || (walkers[walkerId].actionState != 94
                  && walkers[walkerId].actionState != 95 ? (v7 = word_7FA38E[64 * walkerId]) : (v7 = walkers[walkerId].buildingId),
-                    building_0a_type[64 * v7] != B_Theater) )
+                    buildings[v7].type != B_Theater) )
                 return;
               break;
             case Overlay_Amphiheater:
@@ -26689,7 +26683,7 @@ void  fun_drawWalker(int walkerId, int a2, int a3, int a4)
                   v8 = word_7FA38E[64 * walkerId];
                 else
                   v8 = walkers[walkerId].buildingId;
-                if ( building_0a_type[64 * v8] != B_Amphitheater )
+                if ( buildings[v8].type != B_Amphitheater )
                   return;
               }
               else
@@ -26697,7 +26691,7 @@ void  fun_drawWalker(int walkerId, int a2, int a3, int a4)
                 if ( walkers[walkerId].type != Walker_Gladiator
                   || (walkers[walkerId].actionState != 94
                    && walkers[walkerId].actionState != 95 ? (v9 = word_7FA38E[64 * walkerId]) : (v9 = walkers[walkerId].buildingId),
-                      building_0a_type[64 * v9] != B_Amphitheater) )
+                      buildings[v9].type != B_Amphitheater) )
                   return;
               }
               break;
@@ -26709,7 +26703,7 @@ void  fun_drawWalker(int walkerId, int a2, int a3, int a4)
                   v10 = word_7FA38E[64 * walkerId];
                 else
                   v10 = walkers[walkerId].buildingId;
-                if ( building_0a_type[64 * v10] != B_Colosseum )
+                if ( buildings[v10].type != B_Colosseum )
                   return;
               }
               else
@@ -27249,7 +27243,7 @@ void  sub_437E20(int a1)
                   {
                     if ( grid_edge[dword_9D4B4C] & 0x40 )
                     {
-                      if ( building_0a_type[64 * grid_buildingIds[dword_9D4B4C]] == 32 )
+                      if ( buildings[grid_buildingIds[dword_9D4B4C]].type == 32 )
                       {
                         v1 = grid_bitfields[dword_9D4B4C] & 0xF;
                         if ( grid_bitfields[dword_9D4B4C] & 0xF )
@@ -27585,22 +27579,22 @@ void  sub_4384F0()
                     switch ( currentOverlay )
                     {
                       case 9:
-                        if ( building_0a_type[64 * v2] == 81 )
+                        if ( buildings[v2].type == 81 )
                           v9 = 1;
                         break;
                       case 25:
-                        if ( building_0a_type[64 * v2] == 71 || building_0a_type[64 * v2] == 70 )
+                        if ( buildings[v2].type == 71 || buildings[v2].type == 70 )
                           v9 = 1;
                         break;
                       case 2:
-                        if ( building_0a_type[64 * v2] == 90 || building_0a_type[64 * v2] == 91 )
+                        if ( buildings[v2].type == 90 || buildings[v2].type == 91 )
                           v9 = 1;
                         break;
                     }
                   }
                   else
                   {
-                    if ( building_0a_type[64 * v2] == 55 || building_0a_type[64 * v2] == 99 )
+                    if ( buildings[v2].type == 55 || buildings[v2].type == 99 )
                       v9 = 1;
                   }
                 }
@@ -27609,7 +27603,7 @@ void  sub_4384F0()
                 {
                   if ( grid_edge[dword_9D4B4C] & 0x40 )
                   {
-                    if ( building_0a_type[64 * v2] == 71 )
+                    if ( buildings[v2].type == 71 )
                     {
                       fun_drawGraphic(
                         graphic_granary + 1,
@@ -30026,7 +30020,7 @@ void  fun_drawMinimap(int in_x, int in_y, signed int a3, int a4)
                 {
                   v15 = grid_edge[dword_9D4B4C];
                   v14 = grid_buildingIds[dword_9D4B4C];
-                  if ( building_0a_type[64 * v14] == B_FortGround )
+                  if ( buildings[v14].type == B_FortGround )
                     v12 = 0;
                 }
                 walkerColor = fun_minimapGetWalkerColor(grid_walkerIds[dword_9D4B4C]);
@@ -30061,7 +30055,7 @@ void  fun_drawMinimap(int in_x, int in_y, signed int a3, int a4)
                       }
                       else
                       {
-                        if ( building_0a_type[64 * v14] == B_Reservoir )
+                        if ( buildings[v14].type == B_Reservoir )
                           v13 = word_6E6CDE - 1;
                         else
                           v13 = word_6E6CDA;
@@ -33182,7 +33176,7 @@ signed int  sub_446550(int a1, int a2, int a3, int a4, int a5)
   {
     if ( buildings[j].inUse == 1 )
     {
-      if ( building_0a_type[64 * j] == 72 )
+      if ( buildings[j].type == 72 )
       {
         if ( building_3c_hasRoadAccess[128 * j] )
         {
@@ -33205,7 +33199,7 @@ signed int  sub_446550(int a1, int a2, int a3, int a4, int a5)
               v18 = building_32_warehouse_nextStorage[64 * v18];
               if ( v18 )
               {
-                if ( dword_993F20[building_0c_level_resourceId[64 * v18]] )
+                if ( dword_993F20[buildings[v18].level_resourceId] )
                   v10 -= 4;
               }
               if ( v7 )
@@ -33228,15 +33222,15 @@ signed int  sub_446550(int a1, int a2, int a3, int a4, int a5)
                     }
                     if ( storages[v6].resourceState[city_inform[ciid].dword_654220] != 1 )
                     {
-                      if ( !building_0c_level_resourceId[64 * v18] )
+                      if ( !buildings[v18].level_resourceId )
                         v10 -= 16;
                       if ( v18 )
                       {
-                        if ( dword_995220[building_0c_level_resourceId[64 * v18]] )
+                        if ( dword_995220[buildings[v18].level_resourceId] )
                         {
                           if ( building_34_industry_unitsStored[64 * v18] < 4 )
                           {
-                            if ( building_0c_level_resourceId[64 * v18] == city_inform[ciid].dword_654220 )
+                            if ( buildings[v18].level_resourceId == city_inform[ciid].dword_654220 )
                               v10 -= 8;
                           }
                         }
@@ -33321,7 +33315,7 @@ signed int  sub_446B50(int a1, int a2, int a3, int a4, int a5)
   {
     if ( buildings[k].inUse == 1 )
     {
-      if ( building_0a_type[64 * k] == 72 )
+      if ( buildings[k].type == 72 )
       {
         if ( building_3c_hasRoadAccess[128 * k] )
         {
@@ -33339,11 +33333,11 @@ signed int  sub_446B50(int a1, int a2, int a3, int a4, int a5)
                   for ( l = 0; l < 8; ++l )
                   {
                     v14 = building_32_warehouse_nextStorage[64 * v14];
-                    if ( !building_0c_level_resourceId[64 * v14] )
+                    if ( !buildings[v14].level_resourceId )
                       v9 -= 8;
                     if ( v14 )
                     {
-                      if ( building_0c_level_resourceId[64 * v14] == city_inform[ciid].dword_6543B8 )
+                      if ( buildings[v14].level_resourceId == city_inform[ciid].dword_6543B8 )
                       {
                         if ( building_34_industry_unitsStored[64 * v14] < 4 )
                           v9 -= 4;
@@ -33396,7 +33390,7 @@ signed int  fun_importOneGoodFromCity(int buildingId, int resourceId, int cityId
   int buildingId2; // [sp+5Ch] [bp+8h]@15
 
   mainBuildingId = buildingId;
-  if ( building_0a_type[64 * buildingId] == B_Warehouse )
+  if ( buildings[buildingId].type == B_Warehouse )
   {
     for ( i = 0; i < 8; ++i )
     {
@@ -33404,7 +33398,7 @@ signed int  fun_importOneGoodFromCity(int buildingId, int resourceId, int cityId
       if ( buildingId > 0
         && building_34_industry_unitsStored[64 * buildingId]
         && building_34_industry_unitsStored[64 * buildingId] < 4
-        && building_0c_level_resourceId[64 * buildingId] == resourceId )
+        && buildings[buildingId].level_resourceId == resourceId )
       {
         ++*(int *)((char *)&tradedSoFar[16 * (unsigned __int8)trade_routeId[66 * cityId]] + 4 * resourceId);
         fun_importGoodAndAddToWarehouse(ciid, buildingId, resourceId);
@@ -33467,7 +33461,7 @@ signed int  sub_447210(int a1, int a2, int a3, int a4, int a5)
   {
     if ( buildings[k].inUse == 1 )
     {
-      if ( building_0a_type[64 * k] == 72 )
+      if ( buildings[k].type == 72 )
       {
         if ( building_3c_hasRoadAccess[128 * k] )
         {
@@ -33482,7 +33476,7 @@ signed int  sub_447210(int a1, int a2, int a3, int a4, int a5)
                 v13 = building_32_warehouse_nextStorage[64 * v13];
                 if ( v13 )
                 {
-                  if ( building_0c_level_resourceId[64 * v13] == city_inform[ciid].dword_6543BC )
+                  if ( buildings[v13].level_resourceId == city_inform[ciid].dword_6543BC )
                   {
                     if ( building_34_industry_unitsStored[64 * v13] > 0 )
                       --v8;
@@ -33531,7 +33525,7 @@ signed int  fun_exportOneGoodToCity(int buildingId, int resourceId, int cityId)
   int v5; // [sp+50h] [bp-8h]@16
   signed int i; // [sp+54h] [bp-4h]@3
 
-  if ( building_0a_type[64 * buildingId] == B_Warehouse )
+  if ( buildings[buildingId].type == B_Warehouse )
   {
     for ( i = 0; ; ++i )
     {
@@ -33541,7 +33535,7 @@ signed int  fun_exportOneGoodToCity(int buildingId, int resourceId, int cityId)
       if ( buildingId > 0 )
       {
         if ( building_34_industry_unitsStored[64 * buildingId] > 0
-          && building_0c_level_resourceId[64 * buildingId] == resourceId )
+          && buildings[buildingId].level_resourceId == resourceId )
           break;
       }
     }
@@ -33549,7 +33543,7 @@ signed int  fun_exportOneGoodToCity(int buildingId, int resourceId, int cityId)
     --city_inform[ciid].resourceInStock[resourceId];
     --building_34_industry_unitsStored[64 * buildingId];
     if ( building_34_industry_unitsStored[64 * buildingId] <= 0 )
-      building_0c_level_resourceId[64 * buildingId] = 0;
+      buildings[buildingId].level_resourceId = 0;
     city_inform[ciid].treasury += tradeprices_sell[2 * resourceId];
     city_inform[ciid].finance_exports_thisyear += tradeprices_sell[2 * resourceId];
     ++*(int *)((char *)&tradedSoFar[16 * (unsigned __int8)trade_routeId[66 * cityId]] + 4 * resourceId);
@@ -33955,7 +33949,7 @@ signed int  sub_448D50()
   else
   {
     v1 = 1;
-    v3 = fun_getPercentage(
+    v3 = getPercentage(
            city_inform[ciid].byte_654582 - (unsigned __int8)city_inform[ciid].byte_654581,
            city_inform[ciid].byte_654582);
     if ( v3 >= 10 )
@@ -35427,9 +35421,9 @@ void  sub_44BE70()
       }
       else
       {
-        if ( building_0a_type[64 * i] == B_Tower )
+        if ( buildings[i].type == B_Tower )
           v0 = 1;
-        if ( building_0a_type[64 * i] == B_Gatehouse )
+        if ( buildings[i].type == B_Gatehouse )
           v0 = 1;
         sub_480FC0(i, buildings[i].x, building__07_y[128 * i]);
         v1 = 1;
@@ -35454,13 +35448,13 @@ void  fun_evolveDevolveHouses()
   {
     if ( buildings[buildingId].inUse == 1 )
     {
-      if ( building_0a_type[64 * buildingId] >= (signed int)B_HouseVacantLot )
+      if ( buildings[buildingId].type >= (signed int)B_HouseVacantLot )
       {
-        if ( building_0a_type[64 * buildingId] <= (signed int)B_HouseLuxuryPalace )
+        if ( buildings[buildingId].type <= (signed int)B_HouseLuxuryPalace )
         {
           sub_46A900(buildingId);
           houseEvolve_status = 0;
-          (*(&houseEvolveCheckFuncs + building_0a_type[64 * buildingId]))();
+          (*(&houseEvolveCheckFuncs + buildings[buildingId].type))();
           if ( !game_weeks )
             fun_houseConsumeGoods(buildingId);
           if ( game_weeks == 7 )
@@ -36334,7 +36328,7 @@ signed int  fun_preventHouseEvolution()
     }
     else
     {
-      fun_evolveHouseTo(buildingId, building_0a_type[64 * buildingId]);
+      fun_evolveHouseTo(buildingId, buildings[buildingId].type);
       result = 1;
     }
   }
@@ -36408,10 +36402,7 @@ void  fun_calculateBuildingDesirability()
     }
   }
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
 
-//----- (0044E070) --------------------------------------------------------
 bool  fun_checkEvolveDesirability(int buildingId)
 {
   bool v2; // [sp+4Ch] [bp-14h]@4
@@ -36419,25 +36410,23 @@ bool  fun_checkEvolveDesirability(int buildingId)
   int evolveDes; // [sp+54h] [bp-Ch]@1
   signed int housingType; // [sp+5Ch] [bp-4h]@1
 
-  housingType = building_0c_level_resourceId[64 * buildingId];
-  evolveDes = model_houses_des_evolve[20 * housingType];
+  housingType = buildings[buildingId].level_resourceId;
+  evolveDes = model_houses[housingType].des_evolve;
   if ( housingType >= 19 )
     evolveDes = 1000;
+
   currentDes = building_7a_desirability[128 * buildingId];
-  if ( currentDes > model_houses_des_devolve[20 * housingType] )
+
+  if ( currentDes > model_houses[housingType].des_evolve )
     v2 = currentDes >= evolveDes;
   else
     v2 = -1;
+
   _HIBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = v2;
 
   return v2;
 }
-// 607754: using guessed type int model_houses_des_devolve[];
-// 607758: using guessed type int model_houses_des_evolve[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044E130) --------------------------------------------------------
 signed int  fun_houseHasGoodsAndServicesForLevel(int buildingId, int forUpgrade)
 {
   signed int result; // eax@5
@@ -36456,20 +36445,20 @@ signed int  fun_houseHasGoodsAndServicesForLevel(int buildingId, int forUpgrade)
   int water; // [sp+80h] [bp-8h]@3
   int type; // [sp+84h] [bp-4h]@1
 
-  type = building_0c_level_resourceId[64 * buildingId];
+  type = buildings[buildingId].level_resourceId;
   if ( forUpgrade )
     ++type;
-  water = model_houses_water[20 * type];
-  education = model_houses_education[20 * type];
-  religion = model_houses_religion[20 * type];
-  barber = model_houses_barber[20 * type];
-  bathhouse = model_houses_bathhouse[20 * type];
-  health = model_houses_health[20 * type];
-  foodtypes = model_houses_foodtypes[20 * type];
-  pottery = model_houses_pottery[20 * type];
-  oil = model_houses_oil[20 * type];
-  furniture = model_houses_furniture[20 * type];
-  wine = model_houses_wine[20 * type];
+  water = model_houses[type].water;
+  education = model_houses[type].education;
+  religion = model_houses[type].religion;
+  barber = model_houses[type].barber;
+  bathhouse = model_houses[type].bathhouse;
+  health = model_houses[type].health;
+  foodtypes = model_houses[type].foodtypes;
+  pottery = model_houses[type].pottery;
+  oil = model_houses[type].oil;
+  furniture = model_houses[type].furniture;
+  wine = model_houses[type].wine;
   if ( !building_2d_house_hasFountain[128 * buildingId] )
   {
     if ( water >= 2 )
@@ -36483,7 +36472,7 @@ signed int  fun_houseHasGoodsAndServicesForLevel(int buildingId, int forUpgrade)
       return 0;
     }
   }
-  if ( model_houses_entertainment[20 * type] <= building_6e_house_entertainment[128 * buildingId] )
+  if ( model_houses[type].entertainment <= building_6e_house_entertainment[128 * buildingId] )
   {
     if ( education <= building_6f_house_education[128 * buildingId] )
     {
@@ -36532,12 +36521,14 @@ signed int  fun_houseHasGoodsAndServicesForLevel(int buildingId, int forUpgrade)
           {
             if ( health >= 1 )
               ++city_inform[ciid].serviceClinicRequired;
+
             numFoods = 0;
             for ( i = 0; i < 4; ++i )
             {
-              if ( *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * buildingId] + 2 * i) )
+              if ( buildings[buildingId].grow_value_house_foodstocks[i] )
                 ++numFoods;
             }
+
             if ( foodtypes <= numFoods )
             {
               if ( pottery <= building_58_house_pottery[64 * buildingId] )
@@ -36648,11 +36639,11 @@ void  fun_houseConsumeGoods(int buildingId)
   signed int oil; // [sp+54h] [bp-Ch]@1
   signed int pottery; // [sp+58h] [bp-8h]@1
 
-  level = building_0c_level_resourceId[64 * buildingId];
-  pottery = model_houses_pottery[20 * level];
-  oil = model_houses_oil[20 * level];
-  furniture = model_houses_furniture[20 * level];
-  wine = model_houses_wine[20 * level];
+  level = buildings[buildingId].level_resourceId;
+  pottery = model_houses[level].pottery;
+  oil = model_houses[level].oil;
+  furniture = model_houses[level].furniture;
+  wine = model_houses[level].wine;
   if ( pottery > 0 )
   {
     if ( pottery <= building_58_house_pottery[64 * buildingId] )
@@ -36861,7 +36852,7 @@ void  fun_gatherEntertainmentInfo()
   {
     if ( buildings[i].inUse == 1 )
     {
-      switch ( building_0a_type[64 * i] )
+      switch ( buildings[i].type )
       {
         case B_Theater:
           if ( building_65_house_bathhouse_dock_numships_entert_days[128 * i] )
@@ -36942,7 +36933,7 @@ void  sub_450F10()
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( building_0a_type[64 * i] == B_Well )
+      if ( buildings[i].type == B_Well )
       {
         word_949F00[dword_98BF38++] = i;
         if ( dword_98BF38 >= 500 )
@@ -37011,7 +37002,7 @@ void  fun_recalculateReservoirAndFountainAccess()
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( building_0a_type[64 * i] == B_Reservoir )
+      if ( buildings[i].type == B_Reservoir )
       {
         gametick_tmpBuildingList[gametick_tmpBuildingList_size++] = i;
         if ( fun_mapAreaContainsTerrain(buildings[i].x - 1, building__07_y[128 * i] - 1, 5, T_Water) )
@@ -37048,7 +37039,7 @@ void  fun_recalculateReservoirAndFountainAccess()
   {
     if ( buildings[k].inUse == 1 )
     {
-      if ( building_0a_type[64 * k] == B_Fountain )
+      if ( buildings[k].type == B_Fountain )
       {
         offset = building_08_gridOffset[64 * k];
         if ( grid_desirability[offset] <= 60 )
@@ -37123,7 +37114,7 @@ void  sub_4516B0()
   {
     if ( buildings[i].inUse )
     {
-      if ( building_0a_type[64 * i] != 59 )
+      if ( buildings[i].type != 59 )
       {
         if ( buildings[i].walkerServiceAccess <= 1 )
           buildings[i].walkerServiceAccess = 0;
@@ -37150,7 +37141,7 @@ void  sub_451770()
         {
           if ( building_38_num_workers[64 * i] > 0 )
           {
-            if ( !building_0c_level_resourceId[64 * i] || building_34_industry_unitsStored[64 * i] > 0 )
+            if ( !buildings[i].level_resourceId || building_34_industry_unitsStored[64 * i] > 0 )
             {
               if ( building_6b_house_venus[128 * i] )
               {
@@ -37160,30 +37151,32 @@ void  sub_451770()
               {
                 if ( building_67_house_ceres[128 * i] )
                   --building_67_house_ceres[128 * i];
-                if ( building_0a_type[64 * i] == B_MarbleQuarry )
-                  building_4a_grow_value_house_foodstocks[64 * i] += building_38_num_workers[64 * i] / 2;
+
+                if ( buildings[i].type == B_MarbleQuarry )
+                  buildings[i].grow_value_house_foodstocks[0] += building_38_num_workers[64 * i] / 2;
                 else
-                  building_4a_grow_value_house_foodstocks[64 * i] += building_38_num_workers[64 * i];
+                  buildings[i].grow_value_house_foodstocks[0] += building_38_num_workers[64 * i];
+
                 if ( building_67_house_ceres[128 * i] )
                 {
-                  if ( building_0a_type[64 * i] <= (signed int)B_PigFarm )
-                    building_4a_grow_value_house_foodstocks[64 * i] += building_38_num_workers[64 * i];
+                  if ( buildings[i].type <= (signed int)B_PigFarm )
+                    buildings[i].grow_value_house_foodstocks[0] += building_38_num_workers[64 * i];
                 }
-                if ( building_0c_level_resourceId[64 * i] )
+                if ( buildings[i].level_resourceId )
                   v0 = 400;
                 else
                   v0 = 200;
-                if ( building_4a_grow_value_house_foodstocks[64 * i] > v0 )
-                  building_4a_grow_value_house_foodstocks[64 * i] = v0;
-                if ( building_0a_type[64 * i] >= (signed int)B_WheatFarm )
+                if ( buildings[i].grow_value_house_foodstocks[0] > v0 )
+                  buildings[i].grow_value_house_foodstocks[0] = v0;
+                if ( buildings[i].type >= (signed int)B_WheatFarm )
                 {
-                  if ( building_0a_type[64 * i] <= (signed int)B_PigFarm )
+                  if ( buildings[i].type <= (signed int)B_PigFarm )
                     sub_480460(
                       i,
                       buildings[i].x,
                       building__07_y[128 * i],
                       5 * ((unsigned __int8)building_3b_industry_outputGood[128 * i] - 1) + graphic_nativeCrops,
-                      building_4a_grow_value_house_foodstocks[64 * i]);
+                      buildings[i].grow_value_house_foodstocks[0]);
                 }
               }
             }
@@ -37219,21 +37212,21 @@ void  sub_451AB0()
           {
             if ( building_38_num_workers[64 * i] > 0 )
             {
-              if ( building_0a_type[64 * i] == B_WheatFarm )
+              if ( buildings[i].type == B_WheatFarm )
               {
                 if ( !building_6b_house_venus[128 * i] )
                 {
-                  building_4a_grow_value_house_foodstocks[64 * i] += building_38_num_workers[64 * i];
+                  buildings[i].grow_value_house_foodstocks[0] += building_38_num_workers[64 * i];
                   if ( building_67_house_ceres[128 * i] )
-                    building_4a_grow_value_house_foodstocks[64 * i] += building_38_num_workers[64 * i];
-                  if ( building_4a_grow_value_house_foodstocks[64 * i] > 200 )
-                    building_4a_grow_value_house_foodstocks[64 * i] = 200;
+                    buildings[i].grow_value_house_foodstocks[0] += building_38_num_workers[64 * i];
+                  if ( buildings[i].grow_value_house_foodstocks[0] > 200 )
+                    buildings[i].grow_value_house_foodstocks[0] = 200;
                   sub_480460(
                     i,
                     buildings[i].x,
                     building__07_y[128 * i],
                     5 * ((unsigned __int8)building_3b_industry_outputGood[128 * i] - 1) + graphic_nativeCrops,
-                    building_4a_grow_value_house_foodstocks[64 * i]);
+                    buildings[i].grow_value_house_foodstocks[0]);
                 }
               }
             }
@@ -37262,11 +37255,11 @@ void  fun_ceresWitherCrops(int bigCurse)
     {
       if ( building_3b_industry_outputGood[128 * i] )
       {
-        if ( building_0a_type[64 * i] >= (signed int)B_WheatFarm )
+        if ( buildings[i].type >= (signed int)B_WheatFarm )
         {
-          if ( building_0a_type[64 * i] <= (signed int)B_PigFarm )
+          if ( buildings[i].type <= (signed int)B_PigFarm )
           {
-            building_4a_grow_value_house_foodstocks[64 * i] = 0;
+            buildings[i].grow_value_house_foodstocks[0] = 0;
             building_67_house_ceres[128 * i] = 0;
             if ( bigCurse == 1 )
               building_6b_house_venus[128 * i] = 48;
@@ -37277,7 +37270,7 @@ void  fun_ceresWitherCrops(int bigCurse)
               buildings[i].x,
               building__07_y[128 * i],
               5 * ((unsigned __int8)building_3b_industry_outputGood[128 * i] - 1) + graphic_nativeCrops,
-              building_4a_grow_value_house_foodstocks[64 * i]);
+              buildings[i].grow_value_house_foodstocks[0]);
           }
         }
       }
@@ -37300,11 +37293,11 @@ void  sub_451E30()
     {
       if ( building_3b_industry_outputGood[128 * i] )
       {
-        if ( building_0a_type[64 * i] >= (signed int)B_WheatFarm )
+        if ( buildings[i].type >= (signed int)B_WheatFarm )
         {
-          if ( building_0a_type[64 * i] <= (signed int)B_PigFarm )
+          if ( buildings[i].type <= (signed int)B_PigFarm )
           {
-            building_4a_grow_value_house_foodstocks[64 * i] = 200;
+            buildings[i].grow_value_house_foodstocks[0] = 200;
             building_6b_house_venus[128 * i] = 0;
             building_67_house_ceres[128 * i] = 16;
             sub_480460(
@@ -37312,34 +37305,31 @@ void  sub_451E30()
               buildings[i].x,
               building__07_y[128 * i],
               5 * ((unsigned __int8)building_3b_industry_outputGood[128 * i] - 1) + graphic_nativeCrops,
-              building_4a_grow_value_house_foodstocks[64 * i]);
+              buildings[i].grow_value_house_foodstocks[0]);
           }
         }
       }
     }
   }
 }
-// 401AE1: using guessed type _DWORD  sub_401AE1(__int16, _DWORD, _DWORD, _DWORD, _DWORD);
-// 6E6C78: using guessed type __int16 graphic_nativeCrops;
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
 
-//----- (00451F80) --------------------------------------------------------
-bool  sub_451F80(int a1)
+bool  gStockCapacity(int a1)
 {
   signed int v2; // [sp+50h] [bp-8h]@2
 
-  if ( building_0c_level_resourceId[64 * a1] )
+  if ( buildings[a1].level_resourceId > 0 )
     v2 = 400;
   else
     v2 = 200;
-  return building_4a_grow_value_house_foodstocks[64 * a1] >= v2;
+
+  return buildings[a1].grow_value_house_foodstocks[0] >= v2;
 }
 
 void  sub_4520A0(int a1)
 {
-  building_4a_grow_value_house_foodstocks[64 * a1] = 0;
-  if ( building_0c_level_resourceId[64 * a1] )
+  buildings[a1].grow_value_house_foodstocks[0] = 0;
+
+  if ( buildings[a1].level_resourceId )
   {
     if ( building_34_industry_unitsStored[64 * a1] )
     {
@@ -37348,13 +37338,14 @@ void  sub_4520A0(int a1)
       --building_34_industry_unitsStored[64 * a1];
     }
   }
-  if ( building_0a_type[64 * a1] <= (signed int)B_PigFarm )
+
+  if ( buildings[a1].type <= (signed int)B_PigFarm )
     sub_480460(
       a1,
       buildings[a1].x,
       building__07_y[128 * a1],
       5 * ((unsigned __int8)building_3b_industry_outputGood[128 * a1] - 1) + graphic_nativeCrops,
-      building_4a_grow_value_house_foodstocks[64 * a1]);
+      buildings[a1].grow_value_house_foodstocks[0]);
 }
 
 int  fun_marketDetermineDestinationGranaryWarehouse(int buildingId)
@@ -37381,7 +37372,7 @@ int  fun_marketDetermineDestinationGranaryWarehouse(int buildingId)
   {
     if ( buildings[j].inUse == 1 )
     {
-      if ( building_0a_type[64 * j] == B_Granary )
+      if ( buildings[j].type == B_Granary )
       {
         if ( !scn_romeSuppliesWheat )
         {
@@ -37442,7 +37433,7 @@ int  fun_marketDetermineDestinationGranaryWarehouse(int buildingId)
       }
       else
       {
-        if ( building_0a_type[64 * j] == B_Warehouse )
+        if ( buildings[j].type == B_Warehouse )
         {
           if ( building_3c_hasRoadAccess[128 * j] )
           {
@@ -37763,7 +37754,7 @@ signed int  sub_452DD0(int a1)
   v2 = 0;
   if ( a1 > 0 )
   {
-    if ( building_0a_type[64 * a1] == B_Market )
+    if ( buildings[a1].type == B_Market )
     {
       if ( building_4c_granary_capacity[64 * a1] > 0 )
         v2 = building_4c_granary_capacity[64 * a1];
@@ -37801,7 +37792,7 @@ signed int  sub_452ED0(int a1)
   v2 = 0;
   if ( a1 > 0 )
   {
-    if ( building_0a_type[64 * a1] == B_Market )
+    if ( buildings[a1].type == B_Market )
     {
       if ( building_54_house_oil[64 * a1] > 0 )
         v2 = building_54_house_oil[64 * a1];
@@ -37841,7 +37832,7 @@ void  sub_452FD0()
     {
       if ( !buildings[i].houseSize )
       {
-        if ( building_0a_type[64 * i] == B_Dock )
+        if ( buildings[i].type == B_Dock )
         {
           if ( fun_isAdjacentToOpenWater(buildings[i].x, building__07_y[128 * i], 3) )
             building_2d_house_hasFountain[128 * i] = 1;
@@ -37944,7 +37935,7 @@ void  sub_453140()
       }
       else
       {
-        switch ( building_0a_type[64 * i] )
+        switch ( buildings[i].type )
         {
           case B_Warehouse:
             if ( !city_inform[ciid].tradeCenterId )
@@ -38127,9 +38118,7 @@ void  fun_getListOfAllHouses()
     }
   }
 }
-// 98C01C: using guessed type int gametick_tmpBuildingList_size;
 
-//----- (00453D20) --------------------------------------------------------
 void  fun_gameTick22_updatePopulationInHouses()
 {
   int maxPop; // [sp+4Ch] [bp-10h]@8
@@ -38147,9 +38136,10 @@ void  fun_gameTick22_updatePopulationInHouses()
     if ( building_1a_word_94BD5A[64 * buildingId] > 0 )
     {
       if ( building_04_house_isMerged[128 * buildingId] )
-        maxPop = 4 * model_houses_numPeople[20 * building_0c_level_resourceId[64 * buildingId]];
+        maxPop = 4 * model_houses[buildings[buildingId].level_resourceId].numPeople;
       else
-        maxPop = model_houses_numPeople[20 * building_0c_level_resourceId[64 * buildingId]];
+        maxPop = model_houses[buildings[buildingId].level_resourceId].numPeople;
+
       city_inform[ciid].populationRoomForMax += maxPop;
       city_inform[ciid].populationCanImmigrate += maxPop - buildings[buildingId].house_population;
       building_18_house_roomForPeople[64 * buildingId] = maxPop - buildings[buildingId].house_population;
@@ -38341,13 +38331,13 @@ void  fun_calculateNumberOfWorkers()
     buildingId = gametick_tmpBuildingList[gametick_tmpBuildingList_ctr++];
     if ( buildings[buildingId].house_population > 0 )
     {
-      if ( building_0c_level_resourceId[64 * buildingId] < 12 )
+      if ( buildings[buildingId].level_resourceId < 12 )
         numPlebs += buildings[buildingId].house_population;
       else
         numPats += buildings[buildingId].house_population;
     }
   }
-  city_inform[ciid].percentagePlebs = fun_getPercentage(numPlebs, numPlebs + numPats);
+  city_inform[ciid].percentagePlebs = getPercentage(numPlebs, numPlebs + numPats);
   city_inform[ciid].numPeopleOfWorkingAgeMen = fun_getNumPeopleOfWorkingAge();
   city_inform[ciid].numPeopleOfWorkingAgeMen = fun_adjustWithPercentage(
                                                      city_inform[ciid].numPeopleOfWorkingAgeMen,
@@ -38474,7 +38464,7 @@ void  fun_emigratePeople(int emigrantsToGo)
       buildingId = gametick_tmpBuildingList[gametick_tmpBuildingList_ctr++];
       if ( buildings[buildingId].house_population > 0 )
       {
-        if ( building_0c_level_resourceId[64 * buildingId] == i )
+        if ( buildings[buildingId].level_resourceId == i )
         {
           if ( buildings[buildingId].house_population >= 4 )
             numEmigrantsThisHouse = 4;
@@ -38593,7 +38583,8 @@ int  fun_addBirthsToHouses(int ciid, int a2)
           if ( buildings[buildingId].house_population > 0 )
           {
             city_inform[ciid].lastBirthHouseBuildingId = buildingId;
-            maxPeople = model_houses_numPeople[20 * building_0c_level_resourceId[64 * buildingId]];
+            maxPeople = model_houses[buildings[buildingId].level_resourceId].numPeople;
+
             if ( building_04_house_isMerged[128 * buildingId] )
               maxPeople *= 4;
             if ( maxPeople - buildings[buildingId].house_population > 0 )
@@ -38669,13 +38660,13 @@ int  fun_calculatePeopleInHousingTypes(int ciid)
             {
               pop =buildings[i].house_population;
               totalPop +=buildings[i].house_population;
-              if ( building_0c_level_resourceId[64 * i] <= 1 )
+              if ( buildings[i].level_resourceId <= 1 )
                 city_inform[ciid].peopleInTents += pop;
-              if ( building_0c_level_resourceId[64 * i] <= 3 )
+              if ( buildings[i].level_resourceId <= 3 )
                 city_inform[ciid].peopleInTentsAndShacks += pop;
-              if ( building_0c_level_resourceId[64 * i] >= 10 )
+              if ( buildings[i].level_resourceId >= 10 )
                 city_inform[ciid].peopleInLargeInsulaAndAbove += pop;
-              if ( building_0c_level_resourceId[64 * i] >= 12 )
+              if ( buildings[i].level_resourceId >= 12 )
                 city_inform[ciid].peopleInVillasAndPalaces += pop;
             }
           }
@@ -38739,7 +38730,7 @@ void  fun_calculateWorkersNeededPerCategory()
   {
     if ( buildings[buildingId].inUse == 1 )
     {
-      category = laborCategoryForBuildingId[building_0a_type[64 * buildingId]];
+      category = laborCategoryForBuildingId[buildings[buildingId].type];
       buildings[buildingId].laborCategory = category;
       if ( category >= 0 )
       {
@@ -38747,7 +38738,7 @@ void  fun_calculateWorkersNeededPerCategory()
           goto LABEL_31;
         if ( category == 6 )
         {
-          if ( (building_0a_type[64 * buildingId] != B_Hippodrome || !building_30_warehouse_prevStorage[64 * buildingId])
+          if ( (buildings[buildingId].type != B_Hippodrome || !building_30_warehouse_prevStorage[64 * buildingId])
             && buildings[buildingId].walkerServiceAccess > 0 )
             goto LABEL_31;
         }
@@ -38765,7 +38756,7 @@ void  fun_calculateWorkersNeededPerCategory()
             if ( !fun_isIndustryForBuildingEnabled(buildingId) && buildings[buildingId].walkerServiceAccess > 0 )
             {
 LABEL_31:
-              city_inform[ciid].labor_category_priority[category].numWorkersNeeded += model_buildings_laborers[8 * building_0a_type[64 * buildingId]];
+              city_inform[ciid].labor_category_priority[category].numWorkersNeeded += model_buildings_laborers[8 * buildings[buildingId].type];
               city_inform[ciid].labor_category_priority[category].relatedToEmployeeAccess += buildings[buildingId].walkerServiceAccess;
               ++city_inform[ciid].labor_category_priority[category].numBuildings;
               continue;
@@ -38781,9 +38772,9 @@ signed int  fun_isIndustryForBuildingEnabled(int buildingId)
 {
   signed int result; // eax@2
 
-  if ( building_0a_type[64 * buildingId] >= (signed int)B_WheatFarm )
+  if ( buildings[buildingId].type >= (signed int)B_WheatFarm )
   {
-    if ( building_0a_type[64 * buildingId] <= (signed int)B_PotteryWorkshop )
+    if ( buildings[buildingId].type <= (signed int)B_PotteryWorkshop )
     {
       if ( city_inform[ciid].industryMothballed[building_3b_industry_outputGood[128 * buildingId]] )
         result = 1;
@@ -38943,7 +38934,7 @@ void  fun_reallocateWorkersPerCategory()
   }
   city_inform[ciid].numUnemployedWorkers = city_inform[ciid].numAvailableWorkers
                                              - city_inform[ciid].numEmployedWorkers;
-  city_inform[ciid].unemploymentPercentage = fun_getPercentage(
+  city_inform[ciid].unemploymentPercentage = getPercentage(
                                                    city_inform[ciid].numUnemployedWorkers,
                                                    city_inform[ciid].numAvailableWorkers);
 }
@@ -38954,13 +38945,13 @@ void  sub_456230()
   int category; // [sp+58h] [bp-8h]@6
   signed int i; // [sp+5Ch] [bp-4h]@1
 
-  v0 = fun_getPercentage(100, city_inform[ciid].labor_categoryWater_priority);
-  fun_getPercentage(100, city_inform[ciid].dword_652AF8 );
+  v0 = getPercentage(100, city_inform[ciid].labor_categoryWater_priority);
+  getPercentage(100, city_inform[ciid].dword_652AF8 );
   for ( i = 1; i < 2000; ++i )
   {
     if ( buildings[i].inUse == 1 )
     {
-      category = laborCategoryForBuildingId[building_0a_type[64 * i]];
+      category = laborCategoryForBuildingId[buildings[i].type];
       if ( category >= 0 )
       {
         if ( category == LaborCategory_Water )
@@ -38971,7 +38962,7 @@ void  sub_456230()
         {
           building_14_word_94BD54[64 * i] = 0;
           if ( buildings[i].walkerServiceAccess )
-            building_14_word_94BD54[64 * i] = fun_getPercentage(
+            building_14_word_94BD54[64 * i] = getPercentage(
                                                 100 * buildings[i].walkerServiceAccess,
                                                 city_inform[ciid].labor_category_priority[category].relatedToEmployeeAccess);
         }
@@ -38996,7 +38987,7 @@ void  sub_4563A0()
   {
     if ( buildings[buildingId].inUse == 1 )
     {
-      v3 = laborCategoryForBuildingId[building_0a_type[64 * buildingId]];
+      v3 = laborCategoryForBuildingId[buildings[buildingId].type];
       if ( v3 >= 0 )
       {
         if ( v3 != 3 )
@@ -39015,20 +39006,20 @@ LABEL_25:
                        city_inform[ciid].labor_category_priority[v3].workersAllocated,
                        building_14_word_94BD54[64 * buildingId])
                    / 100;
-                if ( v1 >= model_buildings_laborers[8 * building_0a_type[64 * buildingId]] )
-                  v1 = model_buildings_laborers[8 * building_0a_type[64 * buildingId]];
+                if ( v1 >= model_buildings_laborers[8 * buildings[buildingId].type] )
+                  v1 = model_buildings_laborers[8 * buildings[buildingId].type];
                 building_38_num_workers[64 * buildingId] = v1;
                 v2[v3] += v1;
               }
               else
               {
                 building_38_num_workers[64 * buildingId] = LOWORD(model_buildings_laborers[8
-                                                                                         * building_0a_type[64 * buildingId]]);
+                                                                                         * buildings[buildingId].type]);
               }
             }
             continue;
           }
-          if ( v3 != 6 || building_0a_type[64 * buildingId] != 32 || !building_30_warehouse_prevStorage[64 * buildingId] )
+          if ( v3 != 6 || buildings[buildingId].type != 32 || !building_30_warehouse_prevStorage[64 * buildingId] )
             goto LABEL_25;
         }
       }
@@ -39052,13 +39043,13 @@ LABEL_25:
     if ( buildingId < 2000 )
     {
       if ( buildings[buildingId].inUse != 1
-        || (v3 = laborCategoryForBuildingId[building_0a_type[64 * buildingId]], v3 < 0)
+        || (v3 = laborCategoryForBuildingId[buildings[buildingId].type], v3 < 0)
         || v3 == 3
         || v3 == 5 )
         goto LABEL_45;
       if ( v3 && v3 != 1 )
       {
-        if ( v3 == 6 && building_0a_type[64 * buildingId] == 32 && building_30_warehouse_prevStorage[64 * buildingId] )
+        if ( v3 == 6 && buildings[buildingId].type == 32 && building_30_warehouse_prevStorage[64 * buildingId] )
           goto LABEL_45;
       }
       else
@@ -39075,9 +39066,9 @@ LABEL_45:
         if ( v2[v3] )
         {
           if ( (signed int)building_38_num_workers[64 * buildingId] < model_buildings_laborers[8
-                                                                                             * building_0a_type[64 * buildingId]] )
+                                                                                             * buildings[buildingId].type] )
           {
-            v0 = model_buildings_laborers[8 * building_0a_type[64 * buildingId]]
+            v0 = model_buildings_laborers[8 * buildings[buildingId].type]
                - building_38_num_workers[64 * buildingId];
             if ( v0 > v2[v3] )
             {
@@ -39087,7 +39078,7 @@ LABEL_45:
             else
             {
               building_38_num_workers[64 * buildingId] = LOWORD(model_buildings_laborers[8
-                                                                                       * building_0a_type[64 * buildingId]]);
+                                                                                       * buildings[buildingId].type]);
               v2[v3] -= v0;
             }
           }
@@ -39108,7 +39099,7 @@ void  sub_456910()
   signed int v4; // [sp+64h] [bp-4h]@4
 
   v2 = 100
-     - fun_getPercentage(
+     - getPercentage(
          city_inform[ciid].labor_categoryWater_workersAllocated,
          city_inform[ciid].labor_categoryWater_numWorkersNeeded );
   v1 = fun_adjustWithPercentage(city_inform[ciid].labor_categoryWater_priority, v2);
@@ -39126,7 +39117,7 @@ void  sub_456910()
       v4 = 1;
     if ( buildings[v4].inUse == 1 )
     {
-      if ( laborCategoryForBuildingId[building_0a_type[64 * v4]] == 3 )
+      if ( laborCategoryForBuildingId[buildings[v4].type] == 3 )
       {
         building_38_num_workers[64 * v4] = 0;
         if ( building_14_word_94BD54[64 * v4] > 0 )
@@ -39152,7 +39143,7 @@ void  sub_456910()
           }
           else
           {
-            building_38_num_workers[64 * v4] = LOWORD(model_buildings_laborers[8 * building_0a_type[64 * v4]]);
+            building_38_num_workers[64 * v4] = LOWORD(model_buildings_laborers[8 * buildings[v4].type]);
           }
         }
       }
@@ -39184,7 +39175,6 @@ void  fun_decayService_taxCollector()
   }
 }
 
-//----- (00456C10) --------------------------------------------------------
 void  fun_collectMonthlyTaxes()
 {
   int collectedPatricians; // eax@29
@@ -39205,6 +39195,7 @@ void  fun_collectMonthlyTaxes()
   city_inform[ciid].collectedTaxFromPlebs = 0;
   city_inform[ciid].uncollectedTaxFromPatricians = 0;
   city_inform[ciid].collectedTaxFromPatricians = 0;
+
   for ( i = 0; i < 20; ++i )
     city_inform[ciid].societyGraph[i] = 0;
 
@@ -39214,11 +39205,12 @@ void  fun_collectMonthlyTaxes()
     {
       if ( buildings[j].houseSize )
       {
-        isPatrician = building_0c_level_resourceId[64 * j] >= 12;
+        isPatrician = buildings[j].level_resourceId >= 12;
         trm = fun_adjustWithPercentage(
-                model_houses_tax[20 * building_0c_level_resourceId[64 * j]],
+                model_houses[buildings[j].level_resourceId].tax,
                 difficulty_moneypct[setting_difficulty]);
-        city_inform[ciid].societyGraph[ building_0c_level_resourceId[64 * j]] += buildings[j].house_population;
+
+        city_inform[ciid].societyGraph[ buildings[j].level_resourceId] += buildings[j].house_population;
         if ( building_46_house_taxcollector[128 * j] )
         {
           if ( isPatrician )
@@ -39263,15 +39255,15 @@ void  fun_collectMonthlyTaxes()
                                                            city_inform[ciid].uncollectedTaxFromPlebs / 2,
                                                            city_inform[ciid].taxrate);
   city_inform[ciid].treasury += totalCollectedTax;
-  city_inform[ciid].percentagePlebsRegisteredForTax = fun_getPercentage(
+  city_inform[ciid].percentagePlebsRegisteredForTax = getPercentage(
                                                             city_inform[ciid].numPlebsTaxed,
                                                             city_inform[ciid].numPlebsNotTaxed
                                                           + city_inform[ciid].numPlebsTaxed);
-  city_inform[ciid].percentagePatriciansRegisteredForTax = fun_getPercentage(
+  city_inform[ciid].percentagePatriciansRegisteredForTax = getPercentage(
                                                                  city_inform[ciid].numPatriciansTaxed,
                                                                  city_inform[ciid].numPatriciansNotTaxed
                                                                + city_inform[ciid].numPatriciansTaxed);
-  city_inform[ciid].percentageRegisteredForTax = fun_getPercentage(
+  city_inform[ciid].percentageRegisteredForTax = getPercentage(
                                                        city_inform[ciid].numPlebsTaxed
                                                      + city_inform[ciid].numPatriciansTaxed,
                                                        city_inform[ciid].numPlebsNotTaxed
@@ -39296,9 +39288,9 @@ void  fun_updateFinanceTaxes()
     {
       if ( buildings[i].houseSize )
       {
-        v3 = building_0c_level_resourceId[64 * i] >= 12;
+        v3 = buildings[i].level_resourceId >= 12;
         v2 = fun_adjustWithPercentage(
-               model_houses_tax[20 * building_0c_level_resourceId[64 * i]],
+               model_houses[buildings[i].level_resourceId].tax,
                difficulty_moneypct[setting_difficulty]);
         if ( building_46_house_taxcollector[128 * i] )
         {
@@ -39678,7 +39670,7 @@ void  sub_458B40(int ciid)
   {
     if ( buildings[j].inUse == 1 )
     {
-      if ( building_0a_type[64 * j] == B_Warehouse )
+      if ( buildings[j].type == B_Warehouse )
       {
         building_3c_hasRoadAccess[128 * j] = 0;
         if ( fun_determineAccessRoad(
@@ -39700,17 +39692,17 @@ void  sub_458B40(int ciid)
   {
     if ( buildings[k].inUse == 1 )
     {
-      if ( building_0a_type[64 * k] == B_WarehouseSpace )
+      if ( buildings[k].type == B_WarehouseSpace )
       {
         v2 = sub_4789E0(k);
         if ( building_3c_hasRoadAccess[128 * v2] )
         {
           building_3c_hasRoadAccess[128 * k] = building_3c_hasRoadAccess[128 * v2];
-          if ( building_0c_level_resourceId[64 * k] )
+          if ( buildings[k].level_resourceId )
           {
             v1 = building_34_industry_unitsStored[64 * k];
-            city_inform[ciid].resourceAmountExported[ building_0c_level_resourceId[64 * k]] += 4 - v1;
-            city_inform[ciid].resourceInStock[ building_0c_level_resourceId[64 * k]] += v1;
+            city_inform[ciid].resourceAmountExported[ buildings[k].level_resourceId] += 4 - v1;
+            city_inform[ciid].resourceInStock[ buildings[k].level_resourceId] += v1;
           }
           else
           {
@@ -39738,7 +39730,7 @@ signed int  sub_458E80(int a1, int a2, int a3, int a4, int a5, int a6)
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( building_0a_type[64 * i] == 73 )
+      if ( buildings[i].type == 73 )
       {
         if ( building_3c_hasRoadAccess[128 * i] )
         {
@@ -39754,13 +39746,13 @@ signed int  sub_458E80(int a1, int a2, int a3, int a4, int a5, int a6)
                 {
                   if ( !storages[v7].emptyAll )
                   {
-                    if ( fun_getPercentage(
+                    if ( getPercentage(
                            building_38_num_workers[64 * v11],
-                           model_buildings_laborers[8 * building_0a_type[64 * v11]]) >= 100 )
+                           model_buildings_laborers[8 * buildings[v11].type]) >= 100 )
                     {
-                      if ( building_0c_level_resourceId[64 * i] )
+                      if ( buildings[i].level_resourceId )
                       {
-                        if ( building_0c_level_resourceId[64 * i] != a4 || building_34_industry_unitsStored[64 * i] >= 4 )
+                        if ( buildings[i].level_resourceId != a4 || building_34_industry_unitsStored[64 * i] >= 4 )
                           v10 = 0;
                         else
                           v10 = sub_45C3E0(
@@ -39826,14 +39818,14 @@ signed int  fun_addGoodToWarehouse(int ciid, int buildingId, int resourceId)
   v4 = 0;
   if ( buildingId > 0 )
   {
-    if ( building_0c_level_resourceId[64 * buildingId] )
+    if ( buildings[buildingId].level_resourceId )
     {
-      if ( building_0c_level_resourceId[64 * buildingId] != resourceId )
+      if ( buildings[buildingId].level_resourceId != resourceId )
         v4 = 1;
     }
     if ( building_34_industry_unitsStored[64 * buildingId] >= 4 )
       v4 = 1;
-    if ( building_0a_type[64 * buildingId] == B_Warehouse )
+    if ( buildings[buildingId].type == B_Warehouse )
       v4 = 1;
     if ( !v4 )
       goto LABEL_31;
@@ -39845,8 +39837,8 @@ signed int  fun_addGoodToWarehouse(int ciid, int buildingId, int resourceId)
         buildingId = building_32_warehouse_nextStorage[64 * buildingId];
         if ( buildingId <= 0 )
           return 0;
-        if ( building_0c_level_resourceId[64 * buildingId]
-          && building_0c_level_resourceId[64 * buildingId] != resourceId
+        if ( buildings[buildingId].level_resourceId
+          && buildings[buildingId].level_resourceId != resourceId
           || building_34_industry_unitsStored[64 * buildingId] >= 4 )
           continue;
       }
@@ -39861,7 +39853,7 @@ signed int  fun_addGoodToWarehouse(int ciid, int buildingId, int resourceId)
 LABEL_31:
       --city_inform[ciid].resourceAmountExported[ resourceId ];
       ++city_inform[ciid].resourceInStock[ resourceId];
-      building_0c_level_resourceId[64 * buildingId] = resourceId;
+      buildings[buildingId].level_resourceId = resourceId;
       ++building_34_industry_unitsStored[64 * buildingId];
       if ( city_inform[ciid].stock_pottery >= 1 )
       {
@@ -39906,7 +39898,7 @@ void  fun_refundGoods(int ciid, int resourceId, int amount)
       buildingId = 1;
     if ( buildings[buildingId].inUse == 1 )
     {
-      if ( building_0a_type[64 * buildingId] == B_Warehouse )
+      if ( buildings[buildingId].type == B_Warehouse )
       {
         city_inform[ciid].warehouse_nextTakeGoods = buildingId;
         while ( amount && fun_addGoodToWarehouse(ciid, buildingId, resourceId) )
@@ -39932,7 +39924,7 @@ int  fun_removeGoodsFromCityStorage(int ciid, int goodId, int amount)
       buildingId = 1;
     if ( buildings[buildingId].inUse == 1 )
     {
-      if ( building_0a_type[64 * buildingId] == B_Warehouse )
+      if ( buildings[buildingId].type == B_Warehouse )
       {
         if ( storages[buildings[buildingId].d7d_storageId].resourceState[goodId] != 2 )
         {
@@ -39949,7 +39941,7 @@ int  fun_removeGoodsFromCityStorage(int ciid, int goodId, int amount)
       buildingId = 1;
     if ( buildings[buildingId].inUse == 1 )
     {
-      if ( building_0a_type[64 * buildingId] == B_Warehouse )
+      if ( buildings[buildingId].type == B_Warehouse )
       {
         city_inform[ciid].warehouse_nextTakeGoods = buildingId;
         amount = fun_removeGoodFromWarehouse(ciid, buildingId, goodId, amount);
@@ -39966,7 +39958,7 @@ signed int  fun_removeGoodFromWarehouse(int ciid, int buildingId, int resourceId
   int v6; // [sp+50h] [bp-8h]@17
   signed int i; // [sp+54h] [bp-4h]@3
 
-  if ( building_0a_type[64 * buildingId] == B_Warehouse )
+  if ( buildings[buildingId].type == B_Warehouse )
   {
     for ( i = 0; i < 8; ++i )
     {
@@ -39975,7 +39967,7 @@ signed int  fun_removeGoodFromWarehouse(int ciid, int buildingId, int resourceId
       buildingId = building_32_warehouse_nextStorage[64 * buildingId];
       if ( buildingId > 0 )
       {
-        if ( building_0c_level_resourceId[64 * buildingId] == resourceId )
+        if ( buildings[buildingId].level_resourceId == resourceId )
         {
           if ( building_34_industry_unitsStored[64 * buildingId] > 0 )
           {
@@ -39992,7 +39984,7 @@ signed int  fun_removeGoodFromWarehouse(int ciid, int buildingId, int resourceId
               city_inform[ciid].resourceInStock[ resourceId] -= building_34_industry_unitsStored[64 * buildingId];
               amount -= building_34_industry_unitsStored[64 * buildingId];
               building_34_industry_unitsStored[64 * buildingId] = 0;
-              building_0c_level_resourceId[64 * buildingId] = 0;
+              buildings[buildingId].level_resourceId = 0;
             }
             v6 = building_08_gridOffset[64 * buildingId];
             if ( building_34_industry_unitsStored[64 * buildingId] <= 0 )
@@ -40035,7 +40027,7 @@ void  fun_removeGoodsFromWarehouseForMercury(int buildingId, signed int amount)
   int v4; // [sp+54h] [bp-8h]@12
   signed int i; // [sp+58h] [bp-4h]@3
 
-  if ( building_0a_type[64 * buildingId] == B_Warehouse )
+  if ( buildings[buildingId].type == B_Warehouse )
   {
     for ( i = 0; i < 8 && amount > 0; ++i )
     {
@@ -40044,7 +40036,7 @@ void  fun_removeGoodsFromWarehouseForMercury(int buildingId, signed int amount)
       {
         if ( building_34_industry_unitsStored[64 * buildingId] > 0 )
         {
-          v4 = building_0c_level_resourceId[64 * buildingId];
+          v4 = buildings[buildingId].level_resourceId;
           if ( building_34_industry_unitsStored[64 * buildingId] > amount )
           {
             city_inform[ciid].resourceAmountExported[ v4] += amount;
@@ -40058,7 +40050,7 @@ void  fun_removeGoodsFromWarehouseForMercury(int buildingId, signed int amount)
             city_inform[ciid].resourceInStock[v4] -= building_34_industry_unitsStored[64 * buildingId];
             amount -= building_34_industry_unitsStored[64 * buildingId];
             building_34_industry_unitsStored[64 * buildingId] = 0;
-            building_0c_level_resourceId[64 * buildingId] = 0;
+            buildings[buildingId].level_resourceId = 0;
           }
           v3 = building_08_gridOffset[64 * buildingId];
           if ( building_34_industry_unitsStored[64 * buildingId] <= 0 )
@@ -40096,7 +40088,7 @@ signed int  sub_459DD0(int a1, int a2)
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( building_0a_type[64 * i] == 72 )
+      if ( buildings[i].type == 72 )
       {
         if ( i != a1 )
         {
@@ -40110,7 +40102,7 @@ signed int  sub_459DD0(int a1, int a2)
             {
               if ( building_34_industry_unitsStored[64 * v9] > 0 )
               {
-                if ( building_0c_level_resourceId[64 * v9] == a2 )
+                if ( buildings[v9].level_resourceId == a2 )
                   v8 += building_34_industry_unitsStored[64 * v9];
               }
             }
@@ -40176,7 +40168,7 @@ signed int  sub_45A040(int a1)
   signed int v21; // [sp+6Ch] [bp-4h]@98
 
   v2 = buildings[a1].d7d_storageId;
-  if ( fun_getPercentage(building_38_num_workers[64 * a1], model_buildings_laborers[8 * building_0a_type[64 * a1]]) >= 50 )
+  if ( getPercentage(building_38_num_workers[64 * a1], model_buildings_laborers[8 * buildings[a1].type]) >= 50 )
   {
     for ( i = 1; i < 16; ++i )
     {
@@ -40193,7 +40185,7 @@ signed int  sub_45A040(int a1)
             {
               if ( building_34_industry_unitsStored[64 * v5] > 0 )
               {
-                if ( building_0c_level_resourceId[64 * v5] == i )
+                if ( buildings[v5].level_resourceId == i )
                   v4 += building_34_industry_unitsStored[64 * v5];
               }
             }
@@ -40207,7 +40199,7 @@ signed int  sub_45A040(int a1)
             {
               if ( building_34_industry_unitsStored[64 * v6] <= 0 )
                 v3 += 4;
-              if ( building_0c_level_resourceId[64 * v6] == i )
+              if ( buildings[v6].level_resourceId == i )
                 v3 += 4 - building_34_industry_unitsStored[64 * v6];
             }
           }
@@ -40230,8 +40222,8 @@ signed int  sub_45A040(int a1)
         v7 = building_32_warehouse_nextStorage[64 * v7];
         if ( v7 > 0
           && building_34_industry_unitsStored[64 * v7] > 0
-          && !city_inform[ciid].resourceStockpile[ building_0c_level_resourceId[64 * v7] ]
-          && building_0c_level_resourceId[64 * v7] == 13 )
+          && !city_inform[ciid].resourceStockpile[ buildings[v7].level_resourceId ]
+          && buildings[v7].level_resourceId == 13 )
           return 13;
       }
     }
@@ -40243,9 +40235,9 @@ signed int  sub_45A040(int a1)
       {
         if ( building_34_industry_unitsStored[64 * v8] > 0 )
         {
-          if ( !city_inform[ciid].resourceStockpile[ building_0c_level_resourceId[64 * v8] ] )
+          if ( !city_inform[ciid].resourceStockpile[ buildings[v8].level_resourceId ] )
           {
-            switch ( building_0c_level_resourceId[64 * v8] )
+            switch ( buildings[v8].level_resourceId )
             {
               case 4:
                 v20 = 1;
@@ -40260,11 +40252,11 @@ signed int  sub_45A040(int a1)
                 v20 = 4;
                 break;
               default:
-                v20 = building_0c_level_resourceId[64 * v8] == 11 ? 5 : 0;
+                v20 = buildings[v8].level_resourceId == 11 ? 5 : 0;
                 break;
             }
             if ( v20 > 0 && city_inform[ciid].x_cityinfo_dword_652900[v20] > 0 )
-              return building_0c_level_resourceId[64 * v8];
+              return buildings[v8].level_resourceId;
           }
         }
       }
@@ -40277,13 +40269,13 @@ signed int  sub_45A040(int a1)
         v9 = building_32_warehouse_nextStorage[64 * v9];
         if ( v9 > 0
           && building_34_industry_unitsStored[64 * v9] > 0
-          && !city_inform[ciid].resourceStockpile[ building_0c_level_resourceId[64 * v9] ]
-          && building_0c_level_resourceId[64 * v9] != 4
-          && building_0c_level_resourceId[64 * v9] != 5
-          && building_0c_level_resourceId[64 * v9] >= 1
-          && building_0c_level_resourceId[64 * v9] <= 6
-          && dword_98C040[building_0c_level_resourceId[64 * v9]] > 0 )
-          return building_0c_level_resourceId[64 * v9];
+          && !city_inform[ciid].resourceStockpile[ buildings[v9].level_resourceId ]
+          && buildings[v9].level_resourceId != 4
+          && buildings[v9].level_resourceId != 5
+          && buildings[v9].level_resourceId >= 1
+          && buildings[v9].level_resourceId <= 6
+          && dword_98C040[buildings[v9].level_resourceId] > 0 )
+          return buildings[v9].level_resourceId;
       }
     }
     if ( sub_45D000() )
@@ -40300,13 +40292,13 @@ signed int  sub_45A040(int a1)
         v10 = building_32_warehouse_nextStorage[64 * v10];
         if ( v10 > 0
           && building_34_industry_unitsStored[64 * v10] > 0
-          && !city_inform[ciid].resourceStockpile[ building_0c_level_resourceId[64 * v10] ]
-          && building_0c_level_resourceId[64 * v10] != 4
-          && building_0c_level_resourceId[64 * v10] != 5
-          && building_0c_level_resourceId[64 * v10] >= 1
-          && building_0c_level_resourceId[64 * v10] <= 6
-          && dword_94BCC0[building_0c_level_resourceId[64 * v10]] > 0 )
-          return building_0c_level_resourceId[64 * v10];
+          && !city_inform[ciid].resourceStockpile[ buildings[v10].level_resourceId ]
+          && buildings[v10].level_resourceId != 4
+          && buildings[v10].level_resourceId != 5
+          && buildings[v10].level_resourceId >= 1
+          && buildings[v10].level_resourceId <= 6
+          && dword_94BCC0[buildings[v10].level_resourceId] > 0 )
+          return buildings[v10].level_resourceId;
       }
     }
     if ( storages[v2].emptyAll )
@@ -40316,7 +40308,7 @@ signed int  sub_45A040(int a1)
       {
         v11 = building_32_warehouse_nextStorage[64 * v11];
         if ( v11 > 0 && building_34_industry_unitsStored[64 * v11] > 0 )
-          return building_0c_level_resourceId[64 * v11];
+          return buildings[v11].level_resourceId;
       }
       result = -1;
     }
@@ -40339,7 +40331,7 @@ signed int  sub_45A8D0(int a1)
   signed int i; // [sp+54h] [bp-4h]@4
 
   v2 = buildings[a1].d7d_storageId;
-  if ( fun_getPercentage(building_38_num_workers[64 * a1], model_buildings_laborers[8 * building_0a_type[64 * a1]]) >= 50 )
+  if ( getPercentage(building_38_num_workers[64 * a1], model_buildings_laborers[8 * buildings[a1].type]) >= 50 )
   {
     if ( storages[v2].emptyAll )
     {
@@ -40392,21 +40384,13 @@ signed int  sub_45A8D0(int a1)
   }
   return result;
 }
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8C: using guessed type __int16 building_4c_granary_capacity[];
-// 98BF84: using guessed type int dword_98BF84;
-// 98BF88: using guessed type int dword_98BF88;
-// 98BF8C: using guessed type int dword_98BF8C;
-// 98BF98: using guessed type int dword_98BF98;
 
-//----- (0045AA70) --------------------------------------------------------
 signed int  sub_45AA70(int a1, int a2, int a3, int a4)
 {
   signed int result; // eax@2
   signed int i; // [sp+4Ch] [bp-4h]@5
 
-  if ( building_0a_type[64 * a3] == 72 )
+  if ( buildings[a3].type == 72 )
   {
     if ( (signed int)(unsigned __int8)byte_7FA39F[128 * a1] < 8 )
     {
@@ -40415,7 +40399,7 @@ signed int  sub_45AA70(int a1, int a2, int a3, int a4)
         a3 = building_32_warehouse_nextStorage[64 * a3];
         if ( a3 > 0
           && building_34_industry_unitsStored[64 * a3] > 0
-          && fun_canExportGoodToCity(a2, a4, building_0c_level_resourceId[64 * a3]) )
+          && fun_canExportGoodToCity(a2, a4, buildings[a3].level_resourceId) )
           return 1;
       }
       result = 0;
@@ -40431,12 +40415,7 @@ signed int  sub_45AA70(int a1, int a2, int a3, int a4)
   }
   return result;
 }
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD72: using guessed type __int16 building_32_warehouse_nextStorage[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
 
-//----- (0045AB50) --------------------------------------------------------
 int  sub_45AB50(int a1, int a2, int a3)
 {
   int result; // eax@1
@@ -40446,7 +40425,7 @@ int  sub_45AB50(int a1, int a2, int a3)
   signed int i; // [sp+58h] [bp-4h]@3
 
   result = a2 << 7;
-  if ( building_0a_type[64 * a2] == 72 )
+  if ( buildings[a2].type == 72 )
   {
     for ( i = 0; i < 8; ++i )
     {
@@ -40457,15 +40436,15 @@ int  sub_45AB50(int a1, int a2, int a3)
         result = building_34_industry_unitsStored[64 * a2];
         if ( result > 0 )
         {
-          result = fun_canExportGoodToCity(a1, a3, building_0c_level_resourceId[64 * a2]);
+          result = fun_canExportGoodToCity(a1, a3, buildings[a2].level_resourceId);
           if ( result )
           {
-            v6 = building_0c_level_resourceId[64 * a2];
-            ++city_inform[2 * a1].resourceAmountExported[building_0c_level_resourceId[64 * a2]];
-            --city_inform[2 * a1].resourceInStock[ building_0c_level_resourceId[64 * a2]];
+            v6 = buildings[a2].level_resourceId;
+            ++city_inform[2 * a1].resourceAmountExported[buildings[a2].level_resourceId];
+            --city_inform[2 * a1].resourceInStock[ buildings[a2].level_resourceId];
             --building_34_industry_unitsStored[64 * a2];
             if ( building_34_industry_unitsStored[64 * a2] <= 0 )
-              building_0c_level_resourceId[64 * a2] = 0;
+              buildings[a2].level_resourceId = 0;
             city_inform[a1].treasury += tradeprices_sell[2 * v6];
             city_inform[a1].finance_exports_thisyear += tradeprices_sell[2 * v6];
             if ( city_inform[ciid].dword_6544F0 )
@@ -40477,9 +40456,9 @@ int  sub_45AB50(int a1, int a2, int a3)
             if ( building_34_industry_unitsStored[64 * a2] <= 0 )
               _LOWORD(v4) = graphic_emptyWarehouseTile;
             else
-              v4 = fun_getResourceGraphicIdOffset(building_0c_level_resourceId[64 * a2], 0)
+              v4 = fun_getResourceGraphicIdOffset(buildings[a2].level_resourceId, 0)
                  + word_6E6C58
-                 + 4 * building_0c_level_resourceId[64 * a2]
+                 + 4 * buildings[a2].level_resourceId
                  - 4
                  + building_34_industry_unitsStored[64 * a2]
                  - 1;
@@ -40508,9 +40487,9 @@ signed int  sub_45AEB0(int a1, int a2, int a3, int a4)
   signed int j; // [sp+5Ch] [bp-4h]@19
   signed int k; // [sp+5Ch] [bp-4h]@31
 
-  if ( building_0a_type[64 * a3] == 72 )
+  if ( buildings[a3].type == 72 )
   {
-    fun_getPercentage(building_38_num_workers[64 * a3], model_buildings_laborers[8 * building_0a_type[64 * a3]]);
+    getPercentage(building_38_num_workers[64 * a3], model_buildings_laborers[8 * buildings[a3].type]);
     if ( (signed int)(unsigned __int8)byte_7FA3A3[128 * a1] < 8 )
     {
       v6 = buildings[a3].d7d_storageId;
@@ -40557,7 +40536,7 @@ LABEL_46:
               {
                 if ( !building_34_industry_unitsStored[64 * a3] )
                   return 1;
-                if ( fun_canImportGoodFromCity(a2, a4, building_0c_level_resourceId[64 * a3]) )
+                if ( fun_canImportGoodFromCity(a2, a4, buildings[a3].level_resourceId) )
                   return 1;
               }
             }
@@ -40607,7 +40586,7 @@ int  sub_45B220(int a1, int a2, int a3)
   int v12; // [sp+68h] [bp+Ch]@41
 
   v4 = a2;
-  if ( building_0a_type[64 * a2] == 72 )
+  if ( buildings[a2].type == 72 )
   {
     for ( i = 1; i <= 15 && !fun_canImportGoodFromCity(a1, a3, city_inform[a1].dword_654220); ++i )
     {
@@ -40623,7 +40602,7 @@ int  sub_45B220(int a1, int a2, int a3)
         if ( a2 > 0
           && building_34_industry_unitsStored[64 * a2]
           && building_34_industry_unitsStored[64 * a2] < 4
-          && building_0c_level_resourceId[64 * a2] == city_inform[a1].dword_654220 )
+          && buildings[a2].level_resourceId == city_inform[a1].dword_654220 )
         {
           fun_importGoodAndAddToWarehouse(a1, a2, city_inform[a1].dword_654220);
           v5 = city_inform[a1].dword_654220++;
@@ -40658,7 +40637,7 @@ int  sub_45B220(int a1, int a2, int a3)
             v12 = building_32_warehouse_nextStorage[64 * v12];
             if ( v12 > 0
               && building_34_industry_unitsStored[64 * v12] < 4
-              && building_0c_level_resourceId[64 * v12] == city_inform[a1].dword_654224 )
+              && buildings[v12].level_resourceId == city_inform[a1].dword_654224 )
             {
               fun_importGoodAndAddToWarehouse(a1, v12, city_inform[a1].dword_654224);
               return city_inform[a1].dword_654224;
@@ -40685,7 +40664,7 @@ void  fun_importGoodAndAddToWarehouse(int ciid, int buildingId, int resourceId)
   --city_inform[ciid].resourceAmountExported[ resourceId];
   ++city_inform[ciid].resourceInStock[resourceId];
   ++building_34_industry_unitsStored[64 * buildingId];
-  building_0c_level_resourceId[64 * buildingId] = resourceId;
+  buildings[buildingId].level_resourceId = resourceId;
   city_inform[ciid].treasury -= tradeprices_buy[2 * resourceId];
   city_inform[ciid].finance_imports_thisyear += tradeprices_buy[2 * resourceId];
   grid_graphicIds[building_08_gridOffset[64 * buildingId]] = fun_getResourceGraphicIdOffset(resourceId, 0)
@@ -40708,9 +40687,9 @@ int  fun_getGoodAmountStoredInWarehouse(int buildingId, int good)
     buildingId = building_32_warehouse_nextStorage[64 * buildingId];
     if ( buildingId <= 0 )
       return 0;
-    if ( building_0c_level_resourceId[64 * buildingId] )
+    if ( buildings[buildingId].level_resourceId )
     {
-      if ( building_0c_level_resourceId[64 * buildingId] == good )
+      if ( buildings[buildingId].level_resourceId == good )
         units += building_34_industry_unitsStored[64 * buildingId];
     }
     ++tiles;
@@ -40737,7 +40716,7 @@ signed int  sub_45B920(int a1)
     a1 = building_32_warehouse_nextStorage[64 * a1];
     if ( a1 <= 0 )
       return 0;
-    if ( building_0c_level_resourceId[64 * a1] )
+    if ( buildings[a1].level_resourceId )
       v3 += building_34_industry_unitsStored[64 * a1];
     else
       ++v2;
@@ -40820,7 +40799,7 @@ void  fun_updateAdvisorFoodAndSupplyRomeWheat()
   {
     if ( buildings[j].inUse == 1 )
     {
-      if ( building_0a_type[64 * j] == B_Market )
+      if ( buildings[j].type == B_Market )
       {
         if ( scn_romeSuppliesWheat )
           building_4c_granary_capacity[64 * j] = 200;
@@ -40855,15 +40834,15 @@ void  fun_gatherFoodInformation(int ciid)
   {
     if ( buildings[j].inUse == 1 )
     {
-      if ( building_0a_type[64 * j] == B_Granary )
+      if ( buildings[j].type == B_Granary )
       {
         building_3c_hasRoadAccess[128 * j] = 0;
         if ( fun_granaryHasRoadAccess(buildings[j].x, building__07_y[128 * j]) )
         {
           building_3c_hasRoadAccess[128 * j] = 1;
-          percentageGranaryWorkers = fun_getPercentage(
+          percentageGranaryWorkers = getPercentage(
                                        building_38_num_workers[64 * j],
-                                       model_buildings_laborers[8 * building_0a_type[64 * j]]);
+                                       model_buildings_laborers[8 * buildings[j].type]);
           if ( percentageGranaryWorkers < 100 )
             ++city_inform[ciid].granaries_understaffed;
           if ( percentageGranaryWorkers >= 50 )
@@ -40960,7 +40939,7 @@ int  sub_45C100(int a1, int a2, int a3, signed int a4, int a5, int a6)
             {
               if ( buildings[i].inUse == 1 )
               {
-                if ( building_0a_type[64 * i] == 71 )
+                if ( buildings[i].type == 71 )
                 {
                   if ( building_3c_hasRoadAccess[128 * i] )
                   {
@@ -40968,9 +40947,9 @@ int  sub_45C100(int a1, int a2, int a3, signed int a4, int a5, int a6)
                     {
                       if ( (unsigned __int8)building_0e_byte_94BD4E[128 * i] == a6 )
                       {
-                        if ( fun_getPercentage(
+                        if ( getPercentage(
                                building_38_num_workers[64 * i],
-                               model_buildings_laborers[8 * building_0a_type[64 * i]]) >= 100 )
+                               model_buildings_laborers[8 * buildings[i].type]) >= 100 )
                         {
                           v7 = buildings[i].d7d_storageId;
                           if ( storages[v7].resourceState[a4] != 1 )
@@ -41087,7 +41066,7 @@ signed int  sub_45C460(int a1, int a2, signed int a3, int a4, int a5)
             {
               if ( buildings[i].inUse == 1 )
               {
-                if ( building_0a_type[64 * i] == 71 )
+                if ( buildings[i].type == 71 )
                 {
                   if ( building_3c_hasRoadAccess[128 * i] )
                   {
@@ -41095,9 +41074,9 @@ signed int  sub_45C460(int a1, int a2, signed int a3, int a4, int a5)
                     {
                       if ( (unsigned __int8)building_0e_byte_94BD4E[128 * i] == a5 )
                       {
-                        if ( fun_getPercentage(
+                        if ( getPercentage(
                                building_38_num_workers[64 * i],
-                               model_buildings_laborers[8 * building_0a_type[64 * i]]) >= 100 )
+                               model_buildings_laborers[8 * buildings[i].type]) >= 100 )
                         {
                           v6 = buildings[i].d7d_storageId;
                           if ( storages[v6].resourceState[a3] == 2 )
@@ -41266,7 +41245,7 @@ __int16  sub_45CAF0()
     v0 = buildings[k].inUse;
     if ( v0 == 1 )
     {
-      if ( building_0a_type[64 * k] == 71 )
+      if ( buildings[k].type == 71 )
       {
         _LOWORD(v0) = (_WORD)k << 7;
         if ( building_3c_hasRoadAccess[128 * k] )
@@ -41399,13 +41378,13 @@ signed int  sub_45D000()
     {
       if ( buildings[j].inUse == 1 )
       {
-        if ( building_0a_type[64 * j] == 71 )
+        if ( buildings[j].type == 71 )
         {
           if ( building_3c_hasRoadAccess[128 * j] )
           {
-            if ( fun_getPercentage(
+            if ( getPercentage(
                    building_38_num_workers[64 * j],
-                   model_buildings_laborers[8 * building_0a_type[64 * j]]) >= 100 )
+                   model_buildings_laborers[8 * buildings[j].type]) >= 100 )
             {
               v2 = buildings[j].d7d_storageId;
               if ( building_4c_granary_capacity[64 * j] >= 1200 )
@@ -41460,13 +41439,13 @@ signed int  sub_45D1F0()
     {
       if ( buildings[j].inUse == 1 )
       {
-        if ( building_0a_type[64 * j] == 71 )
+        if ( buildings[j].type == 71 )
         {
           if ( building_3c_hasRoadAccess[128 * j] )
           {
-            if ( fun_getPercentage(
+            if ( getPercentage(
                    building_38_num_workers[64 * j],
-                   model_buildings_laborers[8 * building_0a_type[64 * j]]) >= 100 )
+                   model_buildings_laborers[8 * buildings[j].type]) >= 100 )
             {
               v2 = buildings[j].d7d_storageId;
               if ( building_4c_granary_capacity[64 * j] > 100 )
@@ -41499,7 +41478,7 @@ signed int  sub_45D3D0(int a1, signed int a2, int a3)
 
   if ( a1 > 0 )
   {
-    if ( building_0a_type[64 * a1] == 71 )
+    if ( buildings[a1].type == 71 )
     {
       if ( a2 <= 6 )
       {
@@ -41581,7 +41560,7 @@ int  sub_45D620(int a1, signed int a2)
 
   if ( a1 > 0 )
   {
-    if ( building_0a_type[64 * a1] == 71 )
+    if ( buildings[a1].type == 71 )
     {
       if ( a2 <= 6 )
       {
@@ -41621,15 +41600,16 @@ int  sub_45D6A0(int a1, int a2, int a3)
   signed int v6; // [sp+54h] [bp-4h]@1
 
   v4 = a3;
-  v6 = city_inform[ciid].word_6527E4[ a2];
+  v6 = city_inform[ciid].word_6527E4[a2];
   for ( i = 1; i < 2000 && a3 > 0; ++i )
   {
     ++v6;
     if ( v6 >= 2000 )
       v6 = 1;
+
     if ( buildings[v6].inUse == 1 )
     {
-      if ( building_0a_type[64 * v6] == 71 )
+      if ( buildings[v6].type == 71 )
       {
         city_inform[ciid].word_6527E4[ a2] = v6;
         a3 = sub_45D7B0(a1, v6, a2, a3);
@@ -41705,7 +41685,7 @@ void  sub_45DAE0()
 {
   int v0; // [sp+4Ch] [bp-14h]@1
   signed int v1; // [sp+50h] [bp-10h]@8
-  signed int v2; // [sp+54h] [bp-Ch]@8
+  signed int foodTypesCount; // [sp+54h] [bp-Ch]@8
   signed int j; // [sp+58h] [bp-8h]@14
   signed int i; // [sp+5Ch] [bp-4h]@1
 
@@ -41719,44 +41699,47 @@ void  sub_45DAE0()
     {
       if ( buildings[i].houseSize )
       {
-        v2 = model_houses_foodtypes[20 * building_0c_level_resourceId[64 * i]];
+        foodTypesCount = model_houses[buildings[i].level_resourceId].foodtypes;
+
         v1 = fun_adjustWithPercentage(buildings[i].house_population, 50);
-        if ( v2 > 1 )
-          v1 /= v2;
-        _HIBYTE(building_6c_word_94BDAC[64 * i]) = 0;
+
+        if ( foodTypesCount > 1 )
+          v1 /= foodTypesCount;
+
+        _HIBYTE(buildings[i].word_94BDAC) = 0;
         if ( scn_romeSuppliesWheat )
         {
           city_inform[ciid].foodTypesEaten = 1;
           city_inform[ciid].foodTypesEaten = 1;
-          building_4a_grow_value_house_foodstocks[64 * i] = v1;
-          _HIBYTE(building_6c_word_94BDAC[64 * i]) = 1;
+          buildings[i].grow_value_house_foodstocks[0] = v1;
+          _HIBYTE(buildings[i].word_94BDAC) = 1;
         }
         else
         {
-          if ( v2 > 0 )
+          if ( foodTypesCount > 0 )
           {
             for ( j = 0; ; ++j )
             {
               if ( j < 4 )
               {
-                if ( *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * i] + 2 * j) < v1 )
+                if ( *(__int16 *)((char *)&buildings[i].grow_value_house_foodstocks[0] + 2 * j) < v1 )
                 {
-                  if ( *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * i] + 2 * j) )
+                  if ( *(__int16 *)((char *)&buildings[i].grow_value_house_foodstocks[0] + 2 * j) )
                   {
-                    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * i] + 2 * j) = 0;
-                    ++_HIBYTE(building_6c_word_94BDAC[64 * i]);
+                    *(__int16 *)((char *)&buildings[i].grow_value_house_foodstocks[0] + 2 * j) = 0;
+                    ++_HIBYTE(buildings[i].word_94BDAC);
                     v0 += v1;
                   }
                 }
                 else
                 {
-                  *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * i] + 2 * j) -= v1;
-                  ++_HIBYTE(building_6c_word_94BDAC[64 * i]);
+                  *(__int16 *)((char *)&buildings[i].grow_value_house_foodstocks[0] + 2 * j) -= v1;
+                  ++_HIBYTE(buildings[i].word_94BDAC);
                   v0 += v1;
                 }
-                if ( HIBYTE(building_6c_word_94BDAC[64 * i]) > city_inform[ciid].foodTypesEaten )
-                  city_inform[ciid].foodTypesEaten = HIBYTE(building_6c_word_94BDAC[64 * i]);
-                if ( HIBYTE(building_6c_word_94BDAC[64 * i]) < v2 )
+                if ( HIBYTE(buildings[i].word_94BDAC) > city_inform[ciid].foodTypesEaten )
+                  city_inform[ciid].foodTypesEaten = HIBYTE(buildings[i].word_94BDAC);
+                if ( HIBYTE(buildings[i].word_94BDAC) < foodTypesCount )
                   continue;
               }
               break;
@@ -41798,9 +41781,9 @@ void  sub_45DEC0(int a1)
   {
     if ( buildings[j].inUse == 1 )
     {
-      if ( building_0a_type[64 * j] >= 110 )
+      if ( buildings[j].type >= 110 )
       {
-        if ( building_0a_type[64 * j] <= 114 )
+        if ( buildings[j].type <= 114 )
         {
           building_3c_hasRoadAccess[128 * j] = 0;
           if ( fun_determineAccessRoad(
@@ -41812,8 +41795,8 @@ void  sub_45DEC0(int a1)
             v1 = 2 - building_34_industry_unitsStored[64 * j];
             if ( v1 < 0 )
               v1 = 0;
-            city_inform[a1].x_cityinfo_dword_652900[ building_0c_level_resourceId[64 * j]] += v1;
-            city_inform[a1].x_cityinfo_dword_6528E8[ building_0c_level_resourceId[64 * j]] += building_34_industry_unitsStored[64 * j];
+            city_inform[a1].x_cityinfo_dword_652900[ buildings[j].level_resourceId] += v1;
+            city_inform[a1].x_cityinfo_dword_6528E8[ buildings[j].level_resourceId] += building_34_industry_unitsStored[64 * j];
           }
         }
       }
@@ -41862,15 +41845,15 @@ signed int  sub_45E100(int a1, int a2, int a3, int a4, int a5)
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( building_0a_type[64 * i] >= 110 )
+      if ( buildings[i].type >= 110 )
       {
-        if ( building_0a_type[64 * i] <= 114 )
+        if ( buildings[i].type <= 114 )
         {
           if ( building_3c_hasRoadAccess[128 * i] )
           {
             if ( building_1a_word_94BD5A[64 * i] > 0 )
             {
-              if ( building_0c_level_resourceId[64 * i] == v6 )
+              if ( buildings[i].level_resourceId == v6 )
               {
                 if ( (unsigned __int8)building_0e_byte_94BD4E[128 * i] == a5 )
                 {
@@ -41947,15 +41930,15 @@ signed int  sub_45E390(int a1, int a2, int a3, int a4, int a5)
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( building_0a_type[64 * i] >= 110 )
+      if ( buildings[i].type >= 110 )
       {
-        if ( building_0a_type[64 * i] <= 114 )
+        if ( buildings[i].type <= 114 )
         {
           if ( building_3c_hasRoadAccess[128 * i] )
           {
             if ( building_1a_word_94BD5A[64 * i] > 0 )
             {
-              if ( building_0c_level_resourceId[64 * i] == v6 )
+              if ( buildings[i].level_resourceId == v6 )
               {
                 if ( (unsigned __int8)building_0e_byte_94BD4E[128 * i] == a5 )
                 {
@@ -42060,8 +42043,8 @@ signed int  sub_45E740(int a1)
 
   if ( a1 > 0 )
   {
-    if ( building_0a_type[64 * a1] >= (signed int)B_WineWorkshop
-      && building_0a_type[64 * a1] <= (signed int)B_PotteryWorkshop )
+    if ( buildings[a1].type >= (signed int)B_WineWorkshop
+      && buildings[a1].type <= (signed int)B_PotteryWorkshop )
     {
       ++building_34_industry_unitsStored[64 * a1];
       result = 1;
@@ -42206,16 +42189,16 @@ void  fun_generateWalkersForBuildings()
   for ( i = 1; i <= buildingId_highestInUse; ++i )
   {
     if ( buildings[i].inUse == 1
-      && building_0a_type[64 * i] != B_WarehouseSpace
-      && (building_0a_type[64 * i] != B_Hippodrome || !building_30_warehouse_prevStorage[64 * i]) )
+      && buildings[i].type != B_WarehouseSpace
+      && (buildings[i].type != B_Hippodrome || !building_30_warehouse_prevStorage[64 * i]) )
     {
       building_7f_byte_94BDBF[128 * i] = 0;
-      if ( building_0a_type[64 * i] < 22 || building_0a_type[64 * i] > (signed int)B_HouseLuxuryPalace )
+      if ( buildings[i].type < 22 || buildings[i].type > (signed int)B_HouseLuxuryPalace )
       {
-        if ( building_0a_type[64 * i] < (signed int)B_WheatFarm
-          || building_0a_type[64 * i] > (signed int)B_PotteryWorkshop )
+        if ( buildings[i].type < (signed int)B_WheatFarm
+          || buildings[i].type > (signed int)B_PotteryWorkshop )
         {
-          switch ( building_0a_type[64 * i] )
+          switch ( buildings[i].type )
           {
             case B_Warehouse:
               if ( buildings[i].walkerServiceAccess <= 0 )
@@ -42316,9 +42299,9 @@ void  fun_generateWalkersForBuildings()
               {
                 if ( buildings[i].walkerServiceAccess <= 100 )
                   fun_generateLaborSeeker(i);
-                engineerEmployment = fun_getPercentage(
+                engineerEmployment = getPercentage(
                                        building_38_num_workers[64 * i],
-                                       model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                       model_buildings_laborers[8 * buildings[i].type]);
                 if ( engineerEmployment < 100 )
                 {
                   if ( engineerEmployment < 75 )
@@ -42377,9 +42360,9 @@ void  fun_generateWalkersForBuildings()
               {
                 if ( buildings[i].walkerServiceAccess <= 100 )
                   fun_generateLaborSeeker(i);
-                prefectEmployment = fun_getPercentage(
+                prefectEmployment = getPercentage(
                                       building_38_num_workers[64 * i],
-                                      model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                      model_buildings_laborers[8 * buildings[i].type]);
                 if ( prefectEmployment < 100 )
                 {
                   if ( prefectEmployment < 75 )
@@ -42423,10 +42406,10 @@ void  fun_generateWalkersForBuildings()
               }
               break;
             default:
-              if ( building_0a_type[64 * i] < (signed int)B_Senate
-                || building_0a_type[64 * i] > (signed int)B_ForumUpgraded )
+              if ( buildings[i].type < (signed int)B_Senate
+                || buildings[i].type > (signed int)B_ForumUpgraded )
               {
-                switch ( building_0a_type[64 * i] )
+                switch ( buildings[i].type )
                 {
                   case B_ActorColony:
                     if ( buildings[i].walkerServiceAccess <= 0 )
@@ -42438,9 +42421,9 @@ void  fun_generateWalkersForBuildings()
                     {
                       if ( buildings[i].walkerServiceAccess <= 50 )
                         fun_generateLaborSeeker(i);
-                      actorColonyEmployment = fun_getPercentage(
+                      actorColonyEmployment = getPercentage(
                                                 building_38_num_workers[64 * i],
-                                                model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                                model_buildings_laborers[8 * buildings[i].type]);
                       if ( actorColonyEmployment < 100 )
                       {
                         if ( actorColonyEmployment < 75 )
@@ -42498,9 +42481,9 @@ void  fun_generateWalkersForBuildings()
                     {
                       if ( buildings[i].walkerServiceAccess <= 50 )
                         fun_generateLaborSeeker(i);
-                      gladiatorSchoolEmployment = fun_getPercentage(
+                      gladiatorSchoolEmployment = getPercentage(
                                                     building_38_num_workers[64 * i],
-                                                    model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                                    model_buildings_laborers[8 * buildings[i].type]);
                       if ( gladiatorSchoolEmployment < 100 )
                       {
                         if ( gladiatorSchoolEmployment < 75 )
@@ -42558,9 +42541,9 @@ void  fun_generateWalkersForBuildings()
                     {
                       if ( buildings[i].walkerServiceAccess <= 50 )
                         fun_generateLaborSeeker(i);
-                      lionHouseEmployment = fun_getPercentage(
+                      lionHouseEmployment = getPercentage(
                                               building_38_num_workers[64 * i],
-                                              model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                              model_buildings_laborers[8 * buildings[i].type]);
                       if ( lionHouseEmployment < 100 )
                       {
                         if ( lionHouseEmployment < 75 )
@@ -42613,9 +42596,9 @@ void  fun_generateWalkersForBuildings()
                     {
                       if ( buildings[i].walkerServiceAccess <= 50 )
                         fun_generateLaborSeeker(i);
-                      chariotMakerEmployment = fun_getPercentage(
+                      chariotMakerEmployment = getPercentage(
                                                  building_38_num_workers[64 * i],
-                                                 model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                                 model_buildings_laborers[8 * buildings[i].type]);
                       if ( chariotMakerEmployment < 100 )
                       {
                         if ( chariotMakerEmployment < 75 )
@@ -42676,9 +42659,9 @@ void  fun_generateWalkersForBuildings()
                         || (signed int)(unsigned __int8)building_65_house_bathhouse_dock_numships_entert_days[128 * i] <= 0
                         && (signed int)(unsigned __int8)building_66_house_hospital_entert_days2[128 * i] <= 0 )
                         fun_generateLaborSeeker(i);
-                      amphitheaterEmployment = fun_getPercentage(
+                      amphitheaterEmployment = getPercentage(
                                                  building_38_num_workers[64 * i],
-                                                 model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                                 model_buildings_laborers[8 * buildings[i].type]);
                       if ( amphitheaterEmployment < 100 )
                       {
                         if ( amphitheaterEmployment < 75 )
@@ -42742,9 +42725,9 @@ void  fun_generateWalkersForBuildings()
                       if ( buildings[i].walkerServiceAccess <= 50
                         || (signed int)(unsigned __int8)building_65_house_bathhouse_dock_numships_entert_days[128 * i] <= 0 )
                         fun_generateLaborSeeker(i);
-                      theaterEmployment = fun_getPercentage(
+                      theaterEmployment = getPercentage(
                                             building_38_num_workers[64 * i],
-                                            model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                            model_buildings_laborers[8 * buildings[i].type]);
                       if ( theaterEmployment < 100 )
                       {
                         if ( theaterEmployment < 75 )
@@ -42811,9 +42794,9 @@ void  fun_generateWalkersForBuildings()
                         if ( buildings[i].walkerServiceAccess <= 50
                           || (signed int)(unsigned __int8)building_65_house_bathhouse_dock_numships_entert_days[128 * i] <= 0 )
                           fun_generateLaborSeeker(i);
-                        hippodromeEmployment = fun_getPercentage(
+                        hippodromeEmployment = getPercentage(
                                                  building_38_num_workers[64 * i],
-                                                 model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                                 model_buildings_laborers[8 * buildings[i].type]);
                         if ( hippodromeEmployment < 100 )
                         {
                           if ( hippodromeEmployment < 75 )
@@ -42908,9 +42891,9 @@ void  fun_generateWalkersForBuildings()
                         || (signed int)(unsigned __int8)building_65_house_bathhouse_dock_numships_entert_days[128 * i] <= 0
                         && (signed int)(unsigned __int8)building_66_house_hospital_entert_days2[128 * i] <= 0 )
                         fun_generateLaborSeeker(i);
-                      colosseumEmployment = fun_getPercentage(
+                      colosseumEmployment = getPercentage(
                                               building_38_num_workers[64 * i],
-                                              model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                              model_buildings_laborers[8 * buildings[i].type]);
                       if ( colosseumEmployment < 100 )
                       {
                         if ( colosseumEmployment < 75 )
@@ -42988,9 +42971,9 @@ void  fun_generateWalkersForBuildings()
                     {
                       if ( buildings[i].walkerServiceAccess <= 50 )
                         fun_generateLaborSeeker(i);
-                      marketEmployment = fun_getPercentage(
+                      marketEmployment = getPercentage(
                                            building_38_num_workers[64 * i],
-                                           model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                           model_buildings_laborers[8 * buildings[i].type]);
                       if ( marketEmployment < 100 )
                       {
                         if ( marketEmployment < 75 )
@@ -43108,9 +43091,9 @@ void  fun_generateWalkersForBuildings()
                     {
                       if ( buildings[i].walkerServiceAccess <= 50 )
                         fun_generateLaborSeeker(i);
-                      bathhouseEmployment = fun_getPercentage(
+                      bathhouseEmployment = getPercentage(
                                               building_38_num_workers[64 * i],
-                                              model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                              model_buildings_laborers[8 * buildings[i].type]);
                       if ( bathhouseEmployment < 100 )
                       {
                         if ( bathhouseEmployment < 75 )
@@ -43160,10 +43143,10 @@ void  fun_generateWalkersForBuildings()
                     }
                     break;
                   default:
-                    if ( building_0a_type[64 * i] < (signed int)B_SmallTempleCeres
-                      || building_0a_type[64 * i] > (signed int)B_LargeTempleVenus )
+                    if ( buildings[i].type < (signed int)B_SmallTempleCeres
+                      || buildings[i].type > (signed int)B_LargeTempleVenus )
                     {
-                      switch ( building_0a_type[64 * i] )
+                      switch ( buildings[i].type )
                       {
                         case B_School:
                           if ( buildings[i].walkerServiceAccess <= 0 )
@@ -43176,9 +43159,9 @@ void  fun_generateWalkersForBuildings()
                           {
                             if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
-                            schoolEmployment = fun_getPercentage(
+                            schoolEmployment = getPercentage(
                                                  building_38_num_workers[64 * i],
-                                                 model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                                 model_buildings_laborers[8 * buildings[i].type]);
                             if ( schoolEmployment < 100 )
                             {
                               if ( schoolEmployment < 75 )
@@ -43267,9 +43250,9 @@ void  fun_generateWalkersForBuildings()
                           {
                             if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
-                            libraryEmployment = fun_getPercentage(
+                            libraryEmployment = getPercentage(
                                                   building_38_num_workers[64 * i],
-                                                  model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                                  model_buildings_laborers[8 * buildings[i].type]);
                             if ( libraryEmployment < 100 )
                             {
                               if ( libraryEmployment < 75 )
@@ -43329,9 +43312,9 @@ void  fun_generateWalkersForBuildings()
                           {
                             if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
-                            academyEmployment = fun_getPercentage(
+                            academyEmployment = getPercentage(
                                                   building_38_num_workers[64 * i],
-                                                  model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                                  model_buildings_laborers[8 * buildings[i].type]);
                             if ( academyEmployment < 100 )
                             {
                               if ( academyEmployment < 75 )
@@ -43386,9 +43369,9 @@ void  fun_generateWalkersForBuildings()
                           {
                             if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
-                            barberEmployment = fun_getPercentage(
+                            barberEmployment = getPercentage(
                                                  building_38_num_workers[64 * i],
-                                                 model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                                 model_buildings_laborers[8 * buildings[i].type]);
                             if ( barberEmployment < 100 )
                             {
                               if ( barberEmployment < 75 )
@@ -43448,9 +43431,9 @@ void  fun_generateWalkersForBuildings()
                           {
                             if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
-                            doctorEmployment = fun_getPercentage(
+                            doctorEmployment = getPercentage(
                                                  building_38_num_workers[64 * i],
-                                                 model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                                 model_buildings_laborers[8 * buildings[i].type]);
                             if ( doctorEmployment < 100 )
                             {
                               if ( doctorEmployment < 75 )
@@ -43510,9 +43493,9 @@ void  fun_generateWalkersForBuildings()
                           {
                             if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
-                            hospitalEmployment = fun_getPercentage(
+                            hospitalEmployment = getPercentage(
                                                    building_38_num_workers[64 * i],
-                                                   model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                                   model_buildings_laborers[8 * buildings[i].type]);
                             if ( hospitalEmployment < 100 )
                             {
                               if ( hospitalEmployment < 75 )
@@ -43601,9 +43584,9 @@ void  fun_generateWalkersForBuildings()
                           {
                             if ( buildings[i].walkerServiceAccess <= 50 )
                               fun_generateLaborSeeker(i);
-                            dockEmployment = fun_getPercentage(
+                            dockEmployment = getPercentage(
                                                building_38_num_workers[64 * i],
-                                               model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                               model_buildings_laborers[8 * buildings[i].type]);
                             if ( dockEmployment > 0 )
                             {
                               if ( dockEmployment >= 50 )
@@ -43626,13 +43609,13 @@ void  fun_generateWalkersForBuildings()
                             v84 = 0;
                             while ( v59 < 3 )
                             {
-                              if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * i] + 2 * v59) )
+                              if ( *(__int16 *)((char *)&buildings[i].word_94BDAC + 2 * v59) )
                               {
-                                if ( walkers[ *(__int16 *)((char *)&building_6c_word_94BDAC[64 * i]
+                                if ( walkers[ *(__int16 *)((char *)&buildings[i].word_94BDAC
                                                                              + 2 * v59)].type == 38 )
                                   ++v84;
                                 else
-                                  *(__int16 *)((char *)&building_6c_word_94BDAC[64 * i] + 2 * v59) = 0;
+                                  *(__int16 *)((char *)&buildings[i].word_94BDAC + 2 * v59) = 0;
                               }
                               ++v59;
                             }
@@ -43645,9 +43628,9 @@ void  fun_generateWalkersForBuildings()
                                 walkers[v93].buildingId = i;
                                 for ( l = 0; l < 3; ++l )
                                 {
-                                  if ( !*(__int16 *)((char *)&building_6c_word_94BDAC[64 * i] + 2 * l) )
+                                  if ( !*(__int16 *)((char *)&buildings[i].word_94BDAC + 2 * l) )
                                   {
-                                    *(__int16 *)((char *)&building_6c_word_94BDAC[64 * i] + 2 * l) = v93;
+                                    *(__int16 *)((char *)&buildings[i].word_94BDAC + 2 * l) = v93;
                                     goto LABEL_4;
                                   }
                                 }
@@ -43657,9 +43640,9 @@ void  fun_generateWalkersForBuildings()
                             {
                               for ( m = 2; m >= 0; --m )
                               {
-                                if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * i] + 2 * m) )
+                                if ( *(__int16 *)((char *)&buildings[i].word_94BDAC + 2 * m) )
                                 {
-                                  walkers[*(__int16 *)((char *)&building_6c_word_94BDAC[64 * i] + 2 * m)].state = 2;
+                                  walkers[*(__int16 *)((char *)&buildings[i].word_94BDAC + 2 * m)].state = 2;
                                   goto LABEL_4;
                                 }
                               }
@@ -43712,9 +43695,9 @@ void  fun_generateWalkersForBuildings()
                               fun_generateLaborSeeker(i);
                             if ( !fun_buildingHasWalkerOfType(i, 25, 0) )
                             {
-                              v55 = fun_getPercentage(
+                              v55 = getPercentage(
                                       building_38_num_workers[64 * i],
-                                      model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                      model_buildings_laborers[8 * buildings[i].type]);
                               if ( v55 < 100 )
                               {
                                 if ( v55 < 75 )
@@ -43724,32 +43707,32 @@ void  fun_generateWalkersForBuildings()
                                     if ( v55 < 25 )
                                     {
                                       if ( v55 <= 0 )
-                                        building_4a_grow_value_house_foodstocks[64 * i] = building_4a_grow_value_house_foodstocks[64 * i];
+                                        buildings[i].grow_value_house_foodstocks[0] = buildings[i].grow_value_house_foodstocks[0];
                                       else
-                                        building_4a_grow_value_house_foodstocks[64 * i] += 2;
+                                        buildings[i].grow_value_house_foodstocks[0] += 2;
                                     }
                                     else
                                     {
-                                      building_4a_grow_value_house_foodstocks[64 * i] += 4;
+                                      buildings[i].grow_value_house_foodstocks[0] += 4;
                                     }
                                   }
                                   else
                                   {
-                                    building_4a_grow_value_house_foodstocks[64 * i] += 6;
+                                    buildings[i].grow_value_house_foodstocks[0] += 6;
                                   }
                                 }
                                 else
                                 {
-                                  building_4a_grow_value_house_foodstocks[64 * i] += 8;
+                                  buildings[i].grow_value_house_foodstocks[0] += 8;
                                 }
                               }
                               else
                               {
-                                building_4a_grow_value_house_foodstocks[64 * i] += 10;
+                                buildings[i].grow_value_house_foodstocks[0] += 10;
                               }
-                              if ( building_4a_grow_value_house_foodstocks[64 * i] >= 160 )
+                              if ( buildings[i].grow_value_house_foodstocks[0] >= 160 )
                               {
-                                building_4a_grow_value_house_foodstocks[64 * i] = 0;
+                                buildings[i].grow_value_house_foodstocks[0] = 0;
                                 if ( sub_489E70(
                                        buildings[i].x,
                                        building__07_y[128 * i],
@@ -43769,7 +43752,7 @@ void  fun_generateWalkersForBuildings()
                                                                           + graphic_nativeBuilding;
                           if ( !fun_buildingHasWalkerOfType(i, 41, 0) )
                           {
-                            if ( building_0c_level_resourceId[64 * i] > 0 )
+                            if ( buildings[i].level_resourceId > 0 )
                             {
                               if ( sub_48A050(
                                      buildings[i].x,
@@ -43836,9 +43819,9 @@ void  fun_generateWalkersForBuildings()
                           {
                             if ( buildings[i].walkerServiceAccess <= 100 )
                               fun_generateLaborSeeker(i);
-                            v56 = fun_getPercentage(
+                            v56 = getPercentage(
                                     building_38_num_workers[64 * i],
-                                    model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                    model_buildings_laborers[8 * buildings[i].type]);
                             if ( v56 < 100 )
                             {
                               if ( v56 < 75 )
@@ -43909,10 +43892,10 @@ void  fun_generateWalkersForBuildings()
                       {
                         if ( buildings[i].walkerServiceAccess <= 50 )
                           fun_generateLaborSeeker(i);
-                        templeEmployment = fun_getPercentage(
+                        templeEmployment = getPercentage(
                                              building_38_num_workers[64 * i],
-                                             model_buildings_laborers[8 * building_0a_type[64 * i]]);
-                        if ( model_buildings_laborers[8 * building_0a_type[64 * i]] > 0 )
+                                             model_buildings_laborers[8 * buildings[i].type]);
+                        if ( model_buildings_laborers[8 * buildings[i].type] > 0 )
                         {
                           if ( templeEmployment < 100 )
                           {
@@ -43972,7 +43955,7 @@ void  fun_generateWalkersForBuildings()
               }
               else                              // senate or forum
               {
-                if ( building_0a_type[64 * i] == B_SenateUpgraded )
+                if ( buildings[i].type == B_SenateUpgraded )
                   sub_463DB0(i);
                 if ( buildings[i].walkerServiceAccess <= 0 )
                   building_7f_byte_94BDBF[128 * i] = 2;
@@ -43984,9 +43967,9 @@ void  fun_generateWalkersForBuildings()
                 {
                   if ( buildings[i].walkerServiceAccess <= 50 )
                     fun_generateLaborSeeker(i);
-                  taxCollectorEmployment = fun_getPercentage(
+                  taxCollectorEmployment = getPercentage(
                                              building_38_num_workers[64 * i],
-                                             model_buildings_laborers[8 * building_0a_type[64 * i]]);
+                                             model_buildings_laborers[8 * buildings[i].type]);
                   if ( taxCollectorEmployment < 100 )
                   {
                     if ( taxCollectorEmployment < 75 )
@@ -44045,7 +44028,7 @@ void  fun_generateWalkersForBuildings()
               fun_generateLaborSeeker(i);
             if ( !fun_buildingHasWalkerOfType(i, 4, 0) )
             {
-              if ( sub_451F80(i) )
+              if ( gStockCapacity(i) )
               {
                 sub_4520A0(i);
                 v1 = fun_spawnWalker(building_01_ciid[128 * i], 4, walkerGridX, walkerGridY, 4);
@@ -44301,13 +44284,13 @@ int  fun_determineEntertainerDestination(int x, int y, int buildingType1, int bu
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( building_0a_type[64 * i] == buildingType1 || building_0a_type[64 * i] == buildingType2 )
+      if ( buildings[i].type == buildingType1 || buildings[i].type == buildingType2 )
       {
         if ( building_1a_word_94BD5A[64 * i] )
         {
           if ( (unsigned __int8)building_0e_byte_94BD4E[128 * i] == v5 )
           {
-            if ( building_0a_type[64 * i] != 32 || !building_30_warehouse_prevStorage[64 * i] )
+            if ( buildings[i].type != 32 || !building_30_warehouse_prevStorage[64 * i] )
             {
               word_949F00[dword_98BF38++] = i;
               if ( dword_98BF38 >= 500 )
@@ -44326,13 +44309,13 @@ int  fun_determineEntertainerDestination(int x, int y, int buildingType1, int bu
     while ( dword_98BF14 < dword_98BF38 )
     {
       v11 = word_949F00[dword_98BF14++];
-      if ( building_0a_type[64 * v11] == buildingType1 )
+      if ( buildings[v11].type == buildingType1 )
       {
         v6 = (unsigned __int8)building_65_house_bathhouse_dock_numships_entert_days[128 * v11];
       }
       else
       {
-        if ( building_0a_type[64 * v11] == buildingType2 )
+        if ( buildings[v11].type == buildingType2 )
           v6 = (unsigned __int8)building_66_house_hospital_entert_days2[128 * v11];
         else
           v6 = 0;
@@ -44449,7 +44432,7 @@ void  fun_countBuildingTypes()
   {
     if ( buildings[k].inUse == 1 && !buildings[k].houseSize )
     {
-      switch ( building_0a_type[64 * k] )
+      switch ( buildings[k].type )
       {
         case B_Theater:
           v0 = 1;
@@ -44714,7 +44697,7 @@ void  fun_countBuildingTypes()
           }
           break;
         default:
-          if ( building_0a_type[64 * k] != B_Dock )
+          if ( buildings[k].type != B_Dock )
             continue;
           if ( building_38_num_workers[64 * k] > 0 )
           {
@@ -44758,9 +44741,9 @@ void  fun_countBuildingTypes()
 
 void  fun_calculateCultureCoverage()
 {
-  pctTheaterCoverage = fun_getPercentage(500 * numWorkingTheaters, city_inform[ciid].population);
-  pctAmphitheaterCoverage = fun_getPercentage(800 * numWorkingAmphitheaters, city_inform[ciid].population);
-  pctColosseumCoverage = fun_getPercentage(1500 * numWorkingColosseums, city_inform[ciid].population);
+  pctTheaterCoverage = getPercentage(500 * numWorkingTheaters, city_inform[ciid].population);
+  pctAmphitheaterCoverage = getPercentage(800 * numWorkingAmphitheaters, city_inform[ciid].population);
+  pctColosseumCoverage = getPercentage(1500 * numWorkingColosseums, city_inform[ciid].population);
   if ( numWorkingHippodromes < 1 )
     pctHippodromeCoverage = 0;
   else
@@ -44771,26 +44754,26 @@ void  fun_calculateCultureCoverage()
     pctAmphitheaterCoverage = 100;
   if ( pctColosseumCoverage > 100 )
     pctColosseumCoverage = 100;
-  pctReligionCoverageCeres = fun_getPercentage(
+  pctReligionCoverageCeres = getPercentage(
                                500 * numOracles + 1500 * numWorkingLargeTemplesCeres + 750 * numWorkingSmallTemplesCeres,
                                city_inform[ciid].population);
-  pctReligionCoverageNeptune = fun_getPercentage(
+  pctReligionCoverageNeptune = getPercentage(
                                  500 * numOracles
                                + 1500 * numWorkingLargeTemplesNeptune
                                + 750 * numWorkingSmallTemplesNeptune,
                                  city_inform[ciid].population);
-  pctReligionCoverageMercury = fun_getPercentage(
+  pctReligionCoverageMercury = getPercentage(
                                  500 * numOracles
                                + 1500 * numWorkingLargeTemplesMercury
                                + 750 * numWorkingSmallTemplesMercury,
                                  city_inform[ciid].population);
-  pctReligionCoverageMars = fun_getPercentage(
+  pctReligionCoverageMars = getPercentage(
                               500 * numOracles + 1500 * numWorkingLargeTemplesMars + 750 * numWorkingSmallTemplesMars,
                               city_inform[ciid].population);
-  pctReligionCoverageVenus = fun_getPercentage(
+  pctReligionCoverageVenus = getPercentage(
                                500 * numOracles + 1500 * numWorkingLargeTemplesVenus + 750 * numWorkingSmallTemplesVenus,
                                city_inform[ciid].population);
-  pctReligionCoverageOracles = fun_getPercentage(500 * numOracles, city_inform[ciid].population);
+  pctReligionCoverageOracles = getPercentage(500 * numOracles, city_inform[ciid].population);
   if ( pctReligionCoverageCeres > 100 )
     pctReligionCoverageCeres = 100;
   if ( pctReligionCoverageNeptune > 100 )
@@ -44811,16 +44794,16 @@ void  fun_calculateCultureCoverage()
   city_inform[ciid].pctReligionCoverage /= 5;
   city_inform[ciid].schoolAgeChildren = fun_getNumberOfSchoolAgeChildren(ciid);
   city_inform[ciid].academyAgeChildren = fun_getNumberOfAcademyAgeChildren(ciid);
-  pctSchoolCoverage = fun_getPercentage(75 * numWorkingSchools, city_inform[ciid].schoolAgeChildren);
-  pctLibraryCoverage = fun_getPercentage(800 * numWorkingLibraries, city_inform[ciid].population);
-  pctAcademyCoverage = fun_getPercentage(100 * numWorkingAcademies, city_inform[ciid].academyAgeChildren);
+  pctSchoolCoverage = getPercentage(75 * numWorkingSchools, city_inform[ciid].schoolAgeChildren);
+  pctLibraryCoverage = getPercentage(800 * numWorkingLibraries, city_inform[ciid].population);
+  pctAcademyCoverage = getPercentage(100 * numWorkingAcademies, city_inform[ciid].academyAgeChildren);
   if ( pctSchoolCoverage > 100 )
     pctSchoolCoverage = 100;
   if ( pctLibraryCoverage > 100 )
     pctLibraryCoverage = 100;
   if ( pctAcademyCoverage > 100 )
     pctAcademyCoverage = 100;
-  pctHospitalCoverage = fun_getPercentage(1000 * numWorkingHospitals, city_inform[ciid].population);
+  pctHospitalCoverage = getPercentage(1000 * numWorkingHospitals, city_inform[ciid].population);
   if ( pctHospitalCoverage > 100 )
     pctHospitalCoverage = 100;
 }
@@ -44891,12 +44874,12 @@ void  fun_distributeTreasuryOverForumsAndSenates()
         building_74_house_taxIncomeThisYear_senateForum_treasureStore[32 * i] = 0;
         if ( building_38_num_workers[64 * i] > 0 )
         {
-          if ( building_0a_type[64 * i] == B_SenateUpgraded )
+          if ( buildings[i].type == B_SenateUpgraded )
           {
             building_74_house_taxIncomeThisYear_senateForum_treasureStore[32 * i] = remainder + 8 * share;
             remainder = 0;
           }
-          switch ( building_0a_type[64 * i] )
+          switch ( buildings[i].type )
           {
             case B_Senate:
               if ( remainder )
@@ -44976,13 +44959,13 @@ void  sub_466330(int a1)
       ++building_67_house_ceres[128 * v1];
       if ( (signed int)(unsigned __int8)building_67_house_ceres[128 * v1] >= 5 )
         building_67_house_ceres[128 * v1] = 0;
-      if ( building_0a_type[64 * v1] == B_Theater )
+      if ( buildings[v1].type == B_Theater )
         building_65_house_bathhouse_dock_numships_entert_days[128 * v1] = 32;
       else
         building_66_house_hospital_entert_days2[128 * v1] = 32;
       break;
     case Walker_Gladiator:
-      if ( building_0a_type[64 * v1] == B_Amphitheater )
+      if ( buildings[v1].type == B_Amphitheater )
         building_65_house_bathhouse_dock_numships_entert_days[128 * v1] = 32;
       else
         building_66_house_hospital_entert_days2[128 * v1] = 32;
@@ -45024,7 +45007,7 @@ void  fun_setAqueductGraphicIdsToWaterFromOffset(int gridOffset)
       {
         newOffset = tile_adjacentGridOffsets[i] + gridOffset;
         buildingId = grid_buildingIds[newOffset];
-        if ( grid_buildingIds[newOffset] && building_0a_type[64 * buildingId] == B_Reservoir )
+        if ( grid_buildingIds[newOffset] && buildings[buildingId].type == B_Reservoir )
         {
           tileOfBuilding = grid_edge[newOffset] & 0x3F;
           if ( grid_edge[newOffset] & 0x3F )    // not top left corner
@@ -45269,7 +45252,7 @@ void  fun_handleFireCollapseEvent()
       {
         if ( !building_44_byte_94BD84[128 * i] )
         {
-          if ( building_0a_type[64 * i] != 32 || !building_30_warehouse_prevStorage[64 * i] )
+          if ( buildings[i].type != 32 || !building_30_warehouse_prevStorage[64 * i] )
           {
             v1 = (i + (unsigned __int8)grid_random[building_08_gridOffset[64 * i]]) & 7;
             if ( v1 == v2 )
@@ -45283,7 +45266,7 @@ void  fun_handleFireCollapseEvent()
             }
             if ( buildings[i].houseSize )
             {
-              if ( building_0c_level_resourceId[64 * i] <= 1 )
+              if ( buildings[i].level_resourceId <= 1 )
                 building_3e_damageRisk[64 * i] = 0;
             }
             if ( building_3e_damageRisk[64 * i] <= 200 )
@@ -45294,9 +45277,9 @@ void  fun_handleFireCollapseEvent()
                 {
                   if (buildings[i].house_population > 0 )
                   {
-                    if ( building_0c_level_resourceId[64 * i] > 3 )
+                    if ( buildings[i].level_resourceId > 3 )
                     {
-                      if ( building_0c_level_resourceId[64 * i] >= 12 )
+                      if ( buildings[i].level_resourceId >= 12 )
                         building_40_fireRisk[64 * i] += 2;
                       else
                         building_40_fireRisk[64 * i] += 5;
@@ -45335,7 +45318,7 @@ void  fun_handleFireCollapseEvent()
                     message_usePopup = 1;
                     dword_65DE84 = 12;
                   }
-                  fun_postMessageToPlayer(12, building_0a_type[64 * i], building_08_gridOffset[64 * i]);
+                  fun_postMessageToPlayer(12, buildings[i].type, building_08_gridOffset[64 * i]);
                   ++dword_65DE24;
                 }
                 else
@@ -45367,7 +45350,7 @@ void  fun_handleFireCollapseEvent()
                   message_usePopup = 1;
                   dword_65DE88[0] = 12;
                 }                               // building collapsed
-                fun_postMessageToPlayer(13, building_0a_type[64 * i], building_08_gridOffset[64 * i]);
+                fun_postMessageToPlayer(13, buildings[i].type, building_08_gridOffset[64 * i]);
                 ++dword_65DE28;
               }
               else
@@ -45459,7 +45442,7 @@ void  fun_destroyBuildingByEnemyAt(int x, int y, int mapOffset)
       (unsigned __int8)building_03_size[128 * buildingId]);
     if ( buildings[buildingId].inUse == 1 )
     {
-      switch ( building_0a_type[64 * buildingId] )
+      switch ( buildings[buildingId].type )
       {
         case B_HouseVacantLot:
           city_inform[ciid].numDestroyedBuildingsByEnemies = city_inform[ciid].numDestroyedBuildingsByEnemies;
@@ -45596,7 +45579,7 @@ void  sub_467C40()
   dword_98BF18 = 0;
   for ( i = 1; i < 2000; ++i )
   {
-    if ( buildings[i].inUse == 1 && building_0a_type[64 * i] == B_BurningRuin )
+    if ( buildings[i].inUse == 1 && buildings[i].type == B_BurningRuin )
     {
       if ( building_42_word_94BD82[64 * i] < 0 )
         building_42_word_94BD82[64 * i] = 0;
@@ -45714,7 +45697,7 @@ int  sub_4680A0(int a1, int a2)
     v7 = word_98C080[dword_98C020++];
     if ( buildings[v7].inUse == 1 )
     {
-      if ( building_0a_type[64 * v7] == 99 )
+      if ( buildings[v7].type == 99 )
       {
         if ( !building_79_byte_94BDB9[128 * v7] )
         {
@@ -45926,7 +45909,7 @@ void  fun_generateRioter(int buildingId)
       message_usePopup = 1;
       dword_65DE80[0] = 12;
     }
-    fun_postMessageToPlayer(11, building_0a_type[64 * buildingId], walkers[walkerId].gridOffset);
+    fun_postMessageToPlayer(11, buildings[buildingId].type, walkers[walkerId].gridOffset);
     ++dword_65DE20[0];
   }
 }
@@ -46004,14 +45987,14 @@ void  fun_removeGoodsFromStorageForMercury(int bigCurse)
     if ( buildings[i].inUse != 1 )
       continue;
     v6 = 0;
-    if ( building_0a_type[64 * i] == B_Warehouse )
+    if ( buildings[i].type == B_Warehouse )
     {
       for ( j = 1; j <= 15; ++j )
         v6 += fun_getGoodAmountStoredInWarehouse(i, j);
     }
     else
     {
-      if ( building_0a_type[64 * i] != B_Granary )
+      if ( buildings[i].type != B_Granary )
         continue;
       for ( k = 1; k <= 6; ++k )
         v6 += sub_45D620(i, k);
@@ -46028,7 +46011,7 @@ void  fun_removeGoodsFromStorageForMercury(int bigCurse)
     if ( bigCurse == 1 )
     {
       dword_65DED0 = 0;
-      fun_postMessageToPlayer(12, building_0a_type[64 * buildingId], building_08_gridOffset[64 * buildingId]);
+      fun_postMessageToPlayer(12, buildings[buildingId].type, building_08_gridOffset[64 * buildingId]);
       sub_46E3D0(buildingId, 0);
       sub_467A70(buildingId, 1);
       fun_sound_playChannel(5);
@@ -46037,13 +46020,13 @@ void  fun_removeGoodsFromStorageForMercury(int bigCurse)
     }
     else
     {
-      if ( building_0a_type[64 * buildingId] == B_Warehouse )
+      if ( buildings[buildingId].type == B_Warehouse )
       {
         fun_removeGoodsFromWarehouseForMercury(buildingId, 16);
       }
       else
       {
-        if ( building_0a_type[64 * buildingId] == B_Granary )
+        if ( buildings[buildingId].type == B_Granary )
         {
           v1 = fun_removeFoodFromGranaryForMercury(buildingId, G_Wheat, 1600);
           v2 = fun_removeFoodFromGranaryForMercury(buildingId, G_Vegetables, v1);
@@ -46079,7 +46062,7 @@ void  sub_468F00()
     if ( buildings[i].inUse == 1 )
     {
       v2 = 0;
-      if ( building_0a_type[64 * i] == 71 )
+      if ( buildings[i].type == 71 )
       {
         for ( j = 1; j <= 6; ++j )
           v2 += sub_45D620(i, j);
@@ -46115,7 +46098,7 @@ int  fun_destroyFirstBuildingOfType(int buildingType)
 
   for ( i = 1; i < 2000; ++i )
   {
-    if ( buildings[i].inUse == 1 && building_0a_type[64 * i] == buildingType )
+    if ( buildings[i].inUse == 1 && buildings[i].type == buildingType )
     {
       gridOffset = building_08_gridOffset[64 * i];
       dword_8E1484 = 0;
@@ -46193,10 +46176,10 @@ int  sub_469320()
         buildings[i].x,
         building__07_y[128 * i],
         (unsigned __int8)building_03_size[128 * i],
-        model_buildings_desirability[8 * building_0a_type[64 * i]],
-        model_buildings_des_step[8 * building_0a_type[64 * i]],
-        model_buildings_des_stepSize[8 * building_0a_type[64 * i]],
-        model_buildings_des_range[8 * building_0a_type[64 * i]]);
+        model_buildings_desirability[8 * buildings[i].type],
+        model_buildings_des_step[8 * buildings[i].type],
+        model_buildings_des_stepSize[8 * buildings[i].type],
+        model_buildings_des_range[8 * buildings[i].type]);
     result = i + 1;
   }
   return result;
@@ -46311,24 +46294,24 @@ signed int  fun_createBuilding(int ciid, int type, int x, int y)
   buildings[buildingId].inUse = 3;
   building_01_ciid[128 * buildingId] = ciid;
   building_02_byte_always0[128 * buildingId] = city_inform[ciid].byte_6500A5_always0;
-  building_0a_type[64 * buildingId] = type;
+  buildings[buildingId].type = type;
   building_03_size[128 * buildingId] = LOBYTE(buildingSizes[4 * type]);
   building_10_placedSequenceNumber[64 * buildingId] = buildingId_placedSequence++;
   buildings[buildingId].house_crimeRisk = 50;
   building_1a_word_94BD5A[64 * buildingId] = 0;
   buildings[buildingId].houseSize = 0;
-  if ( building_0a_type[64 * buildingId] < (signed int)B_HouseVacantLot
-    || building_0a_type[64 * buildingId] > (signed int)B_HouseMediumInsula )
+  if ( buildings[buildingId].type < (signed int)B_HouseVacantLot
+    || buildings[buildingId].type > (signed int)B_HouseMediumInsula )
   {
-    if ( building_0a_type[64 * buildingId] < (signed int)B_HouseLargeInsula
-      || building_0a_type[64 * buildingId] > (signed int)B_HouseMediumVilla )
+    if ( buildings[buildingId].type < (signed int)B_HouseLargeInsula
+      || buildings[buildingId].type > (signed int)B_HouseMediumVilla )
     {
-      if ( building_0a_type[64 * buildingId] < (signed int)B_HouseLargeVilla
-        || building_0a_type[64 * buildingId] > (signed int)B_HouseMediumPalace )
+      if ( buildings[buildingId].type < (signed int)B_HouseLargeVilla
+        || buildings[buildingId].type > (signed int)B_HouseMediumPalace )
       {
-        if ( building_0a_type[64 * buildingId] >= (signed int)B_HouseLargePalace )
+        if ( buildings[buildingId].type >= (signed int)B_HouseLargePalace )
         {
-          if ( building_0a_type[64 * buildingId] <= (signed int)B_HouseLuxuryPalace )
+          if ( buildings[buildingId].type <= (signed int)B_HouseLuxuryPalace )
             buildings[buildingId].houseSize = 4;
         }
       }
@@ -46346,12 +46329,12 @@ signed int  fun_createBuilding(int ciid, int type, int x, int y)
   {
     buildings[buildingId].houseSize = 1;
   }
-  if ( building_0a_type[64 * buildingId] < (signed int)B_HouseVacantLot
-    || building_0a_type[64 * buildingId] > (signed int)B_HouseLuxuryPalace )
-    building_0c_level_resourceId[64 * buildingId] = 0;
+  if ( buildings[buildingId].type < (signed int)B_HouseVacantLot
+    || buildings[buildingId].type > (signed int)B_HouseLuxuryPalace )
+    buildings[buildingId].level_resourceId = 0;
   else
-    building_0c_level_resourceId[64 * buildingId] = type - 10;
-  switch ( building_0a_type[64 * buildingId] )
+    buildings[buildingId].level_resourceId = type - 10;
+  switch ( buildings[buildingId].type )
   {
     case B_WheatFarm:
       building_3b_industry_outputGood[128 * buildingId] = G_Wheat;
@@ -46385,29 +46368,29 @@ signed int  fun_createBuilding(int ciid, int type, int x, int y)
       break;
     case B_WineWorkshop:
       building_3b_industry_outputGood[128 * buildingId] = G_Wine;
-      building_0c_level_resourceId[64 * buildingId] = 2;
+      buildings[buildingId].level_resourceId = 2;
       break;
     case B_OilWorkshop:
       building_3b_industry_outputGood[128 * buildingId] = G_Oil;
-      building_0c_level_resourceId[64 * buildingId] = 1;
+      buildings[buildingId].level_resourceId = 1;
       break;
     case B_WeaponsWorkshop:
       building_3b_industry_outputGood[128 * buildingId] = G_Weapons;
-      building_0c_level_resourceId[64 * buildingId] = 3;
+      buildings[buildingId].level_resourceId = 3;
       break;
     case B_FurnitureWorkshop:
       building_3b_industry_outputGood[128 * buildingId] = G_Furniture;
-      building_0c_level_resourceId[64 * buildingId] = 4;
+      buildings[buildingId].level_resourceId = 4;
       break;
     case B_PotteryWorkshop:
       building_3b_industry_outputGood[128 * buildingId] = G_Pottery;
-      building_0c_level_resourceId[64 * buildingId] = 5;
+      buildings[buildingId].level_resourceId = 5;
       break;
     default:
       building_3b_industry_outputGood[128 * buildingId] = G_None;
       break;
   }
-  if ( building_0a_type[64 * buildingId] == B_Granary )
+  if ( buildings[buildingId].type == B_Granary )
     building_4c_granary_capacity[64 * buildingId] = 2400;
   buildings[buildingId].x = x;
   building__07_y[128 * buildingId] = y;
@@ -46433,7 +46416,7 @@ void  fun_deleteBuildingEvent(int buildingId)
   if ( buildings[buildingId].d7d_storageId )
     storages[buildings[buildingId].d7d_storageId].inUse = 0;
 
-  if ( building_0a_type[64 * buildingId] == B_SenateUpgraded )
+  if ( buildings[buildingId].type == B_SenateUpgraded )
   {
     if ( building_08_gridOffset[64 * buildingId] == city_inform[ciid].word_652822 )
     {
@@ -46443,10 +46426,10 @@ void  fun_deleteBuildingEvent(int buildingId)
       city_inform[ciid].word_6543AE = 0;
     }
   }
-  if ( building_0a_type[64 * buildingId] == B_Dock )
+  if ( buildings[buildingId].type == B_Dock )
     --city_inform[ciid].numWorkingDocks;
 
-  if ( building_0a_type[64 * buildingId] == B_Barracks )
+  if ( buildings[buildingId].type == B_Barracks )
   {
     if ( building_08_gridOffset[64 * buildingId] == city_inform[ciid].word_6543CE )
     {
@@ -46456,7 +46439,7 @@ void  fun_deleteBuildingEvent(int buildingId)
       city_inform[ciid].dword_6543D4 = 0;
     }
   }
-  if ( building_0a_type[64 * buildingId] == B_DistributionCenter_Unused )
+  if ( buildings[buildingId].type == B_DistributionCenter_Unused )
   {
     if ( building_08_gridOffset[64 * buildingId] == city_inform[ciid].word_65451A )
     {
@@ -46466,9 +46449,9 @@ void  fun_deleteBuildingEvent(int buildingId)
       city_inform[ciid].dword_654520 = 0;
     }
   }
-  if ( building_0a_type[64 * buildingId] == B_FortGround__ )
+  if ( buildings[buildingId].type == B_FortGround__ )
     sub_4BD530(building_48_word_94BD88[64 * buildingId]);
-  if ( building_0a_type[64 * buildingId] == B_Hippodrome )
+  if ( buildings[buildingId].type == B_Hippodrome )
     city_inform[ciid].dword_65429C = 0;
 }
 
@@ -46505,7 +46488,7 @@ void  fun_setStorageBuildingIds()
   {
     if ( buildings[j].inUse )
     {
-      if ( building_0a_type[64 * j] == B_Granary || building_0a_type[64 * j] == B_Warehouse )
+      if ( buildings[j].type == B_Granary || buildings[j].type == B_Warehouse )
       {
         if ( buildings[j].d7d_storageId )
         {
@@ -46563,7 +46546,7 @@ int  fun_houseCanExpand(int buildingId, int numTiles)
           {
             if ( buildings[v18].houseSize )
             {
-              if ( building_0c_level_resourceId[64 * v18] <= building_0c_level_resourceId[64 * buildingId] )
+              if ( buildings[v18].level_resourceId <= buildings[buildingId].level_resourceId )
                 ++v3;
             }
           }
@@ -46600,7 +46583,7 @@ int  fun_houseCanExpand(int buildingId, int numTiles)
           {
             if ( buildings[v19].houseSize )
             {
-              if ( building_0c_level_resourceId[64 * v19] <= building_0c_level_resourceId[64 * buildingId] )
+              if ( buildings[v19].level_resourceId <= buildings[buildingId].level_resourceId )
                 ++v4;
             }
           }
@@ -46637,7 +46620,7 @@ int  fun_houseCanExpand(int buildingId, int numTiles)
           {
             if ( buildings[v20].houseSize )
             {
-              if ( building_0c_level_resourceId[64 * v20] <= building_0c_level_resourceId[64 * buildingId] )
+              if ( buildings[v20].level_resourceId <= buildings[buildingId].level_resourceId )
                 ++v5;
             }
           }
@@ -46656,19 +46639,10 @@ int  fun_houseCanExpand(int buildingId, int numTiles)
       return 1;
     }
   }
-  _LOBYTE(building_6c_word_94BDAC[64 * buildingId]) = 1;
+  _LOBYTE(buildings[buildingId].word_94BDAC) = 1;
   return 0;
 }
-// 5F9990: using guessed type int dword_5F9990[];
-// 5F9994: using guessed type int dword_5F9994[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BDAC: using guessed type __int16 building_6c_word_94BDAC[];
-// 98BF08: using guessed type int dword_98BF08;
-// 98BF10: using guessed type int dword_98BF10;
 
-//----- (0046A900) --------------------------------------------------------
 void  sub_46A900(int a1)
 {
   int v1; // ST50_4@1
@@ -46679,7 +46653,7 @@ void  sub_46A900(int a1)
 
   v2 = building_08_gridOffset[64 * a1];
   v1 = 162 * building__07_y[128 * a1] + buildings[a1].x + setting_map_startGridOffset;
-  _LOBYTE(building_6c_word_94BDAC[64 * a1]) = 0;
+  _LOBYTE(buildings[a1].word_94BDAC[0]) = 0;
   if ( v2 != v1 || grid_buildingIds[v2] != a1 )
   {
     ++dword_98C064;
@@ -46756,7 +46730,7 @@ signed int  sub_46AAC0(int buildingId)
             {
               if ( buildings[v8].houseSize )
               {
-                if ( building_0c_level_resourceId[64 * v8] == building_0c_level_resourceId[64 * buildingId] )
+                if ( buildings[v8].level_resourceId == buildings[buildingId].level_resourceId )
                 {
                   if ( !building_04_house_isMerged[128 * v8] )
                     ++v4;
@@ -46873,8 +46847,7 @@ int  sub_46AE00(int buildingId, int a2)
         {
           v4 += buildings[v10].house_population;
           for ( k = 0; k < 8; ++k )
-            *(_DWORD *)&dword_94BC80[2 * k] += *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v10]
-                                                          + 2 * k);
+            *(_DWORD *)&dword_94BC80[2 * k] += buildings[v10].grow_value_house_foodstocks[k];
           buildings[v10].house_population = 0;
           buildings[v10].inUse = 5;
         }
@@ -46889,16 +46862,17 @@ void  sub_46AFA0(int a1, __int16 a2)
   int v2; // ST68_4@4
   signed int i; // [sp+50h] [bp-4h]@1
 
-  building_0a_type[64 * a1] = 20;
-  building_0c_level_resourceId[64 * a1] = 10;
+  buildings[a1].type = 20;
+  buildings[a1].level_resourceId = 10;
   building_03_size[128 * a1] = 2;
   buildings[a1].houseSize = 2;
   buildings[a1].house_population += a2;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) += dword_94BC80[2 * i];
+    buildings[a1].grow_value_house_foodstocks[i] += dword_94BC80[2 * i];
+
   v2 = (grid_random[building_08_gridOffset[64 * a1]] & 1)
-     + dword_5F5E54[building_0c_level_resourceId[64 * a1]]
-     + graphic_id_start[dword_5F5E04[building_0c_level_resourceId[64 * a1]]];
+     + dword_5F5E54[buildings[a1].level_resourceId]
+     + graphic_id_start[dword_5F5E04[buildings[a1].level_resourceId]];
   sub_480FC0(a1, buildings[a1].x, building__07_y[128 * a1]);
   buildings[a1].x = dword_98BF08;
   building__07_y[128 * a1] = dword_98BF10;
@@ -46912,32 +46886,23 @@ void  sub_46AFA0(int a1, __int16 a2)
     v2,
     8);
 }
-// 5F5E54: using guessed type int dword_5F5E54[];
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
-// 98BF08: using guessed type int dword_98BF08;
-// 98BF10: using guessed type int dword_98BF10;
 
-//----- (0046B1F0) --------------------------------------------------------
 void  sub_46B1F0(int a1, __int16 a2)
 {
   int v2; // ST68_4@4
   signed int i; // [sp+50h] [bp-4h]@1
 
-  building_0a_type[64 * a1] = 24;
-  building_0c_level_resourceId[64 * a1] = 14;
+  buildings[a1].type = 24;
+  buildings[a1].level_resourceId = 14;
   building_03_size[128 * a1] = 3;
   buildings[a1].houseSize = 3;
   buildings[a1].house_population += a2;
+
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) += dword_94BC80[2 * i];
-  v2 = dword_5F5E54[building_0c_level_resourceId[64 * a1]]
-     + graphic_id_start[dword_5F5E04[building_0c_level_resourceId[64 * a1]]];
+    buildings[a1].grow_value_house_foodstocks[i] += dword_94BC80[2 * i];
+
+  v2 = dword_5F5E54[buildings[a1].level_resourceId]
+     + graphic_id_start[dword_5F5E04[buildings[a1].level_resourceId]];
   sub_480FC0(a1, buildings[a1].x, building__07_y[128 * a1]);
   buildings[a1].x = dword_98BF08;
   building__07_y[128 * a1] = dword_98BF10;
@@ -46951,32 +46916,22 @@ void  sub_46B1F0(int a1, __int16 a2)
     v2,
     8);
 }
-// 5F5E54: using guessed type int dword_5F5E54[];
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
-// 98BF08: using guessed type int dword_98BF08;
-// 98BF10: using guessed type int dword_98BF10;
 
-//----- (0046B410) --------------------------------------------------------
 void  sub_46B410(int a1, __int16 a2)
 {
   int v2; // ST68_4@4
   signed int i; // [sp+50h] [bp-4h]@1
 
-  building_0a_type[64 * a1] = 28;
-  building_0c_level_resourceId[64 * a1] = 18;
+  buildings[a1].type = 28;
+  buildings[a1].level_resourceId = 18;
   building_03_size[128 * a1] = 4;
   buildings[a1].houseSize = 4;
   buildings[a1].house_population += a2;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) += dword_94BC80[2 * i];
-  v2 = dword_5F5E54[building_0c_level_resourceId[64 * a1]]
-     + graphic_id_start[dword_5F5E04[building_0c_level_resourceId[64 * a1]]];
+    buildings[a1].grow_value_house_foodstocks[i] += dword_94BC80[2 * i];
+
+  v2 = dword_5F5E54[buildings[a1].level_resourceId]
+     + graphic_id_start[dword_5F5E04[buildings[a1].level_resourceId]];
   sub_480FC0(a1, buildings[a1].x, building__07_y[128 * a1]);
   buildings[a1].x = dword_98BF08;
   building__07_y[128 * a1] = dword_98BF10;
@@ -46990,18 +46945,7 @@ void  sub_46B410(int a1, __int16 a2)
     v2,
     8);
 }
-// 5F5E54: using guessed type int dword_5F5E54[];
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
-// 98BF08: using guessed type int dword_98BF08;
-// 98BF10: using guessed type int dword_98BF10;
 
-//----- (0046B630) --------------------------------------------------------
 void  sub_46B630(int a1, __int16 a2)
 {
   int v2; // [sp+4Ch] [bp-8h]@4
@@ -47011,10 +46955,11 @@ void  sub_46B630(int a1, __int16 a2)
   buildings[a1].houseSize = 2;
   buildings[a1].house_population += a2;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) += dword_94BC80[2 * i];
-  v2 = graphic_id_start[dword_5F5E04[building_0c_level_resourceId[64 * a1]]] + 4;
-  if ( dword_5F5E54[building_0c_level_resourceId[64 * a1]] )
-    v2 = graphic_id_start[dword_5F5E04[building_0c_level_resourceId[64 * a1]]] + 5;
+    buildings[a1].grow_value_house_foodstocks[i] += dword_94BC80[2 * i];
+
+  v2 = graphic_id_start[dword_5F5E04[buildings[a1].level_resourceId]] + 4;
+  if ( dword_5F5E54[buildings[a1].level_resourceId] )
+    v2 = graphic_id_start[dword_5F5E04[buildings[a1].level_resourceId]] + 5;
   sub_480FC0(a1, buildings[a1].x, building__07_y[128 * a1]);
   buildings[a1].x = dword_98BF08;
   building__07_y[128 * a1] = dword_98BF10;
@@ -47022,17 +46967,7 @@ void  sub_46B630(int a1, __int16 a2)
   building_04_house_isMerged[128 * a1] = 1;
   fun_putBuildingOnTerrainAndGraphicGrids(a1, buildings[a1].x, building__07_y[128 * a1], 2, 2, v2, 8);
 }
-// 5F5E54: using guessed type int dword_5F5E54[];
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
-// 98BF08: using guessed type int dword_98BF08;
-// 98BF10: using guessed type int dword_98BF10;
 
-//----- (0046B820) --------------------------------------------------------
 void  fun_splitHouse2x2(int buildingId)
 {
   __int64 v1; // qax@3
@@ -47052,9 +46987,9 @@ void  fun_splitHouse2x2(int buildingId)
   pop = buildings[buildingId].house_population;
   for ( i = 0; i < 8; ++i )
   {
-    v1 = *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * buildingId] + 2 * i);
+    v1 = buildings[buildingId].grow_value_house_foodstocks[i];
     v8[i] = ((BYTE4(v1) & 3) + (_DWORD)v1) >> 2;
-    v7[i] = *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * buildingId] + 2 * i) % 4;
+    v7[i] = buildings[buildingId].grow_value_house_foodstocks[i] % 4;
   }
   popPerTile = pop / 4;
   popRemainder = pop % 4;
@@ -47064,12 +46999,12 @@ void  fun_splitHouse2x2(int buildingId)
   building_04_house_isMerged[128 * buildingId] = 0;
   buildings[buildingId].house_population = popRemainder + popPerTile;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * buildingId] + 2 * i) = LOWORD(v7[i])
-                                                                                            + LOWORD(v8[i]);
+    buildings[buildingId].grow_value_house_foodstocks[i] = LOWORD(v7[i]) + LOWORD(v8[i]);
+
   building_1a_word_94BD5A[64 * buildingId] = 0;
-  v12 = dword_5F5E04[building_0c_level_resourceId[64 * buildingId]];
+  v12 = dword_5F5E04[buildings[buildingId].level_resourceId];
   v12 = graphic_id_start[v12];
-  v12 += dword_5F5E54[building_0c_level_resourceId[64 * buildingId]];
+  v12 += dword_5F5E54[buildings[buildingId].level_resourceId];
   fun_putBuildingOnTerrainAndGraphicGrids(
     buildingId,
     buildings[buildingId].x,
@@ -47080,10 +47015,11 @@ void  fun_splitHouse2x2(int buildingId)
     8);
   v6 = buildings[buildingId].x;
   v5 = building__07_y[128 * buildingId];
-  v2 = fun_createBuilding(ciid, building_0a_type[64 * buildingId], v6 + 1, v5);
+  v2 = fun_createBuilding(ciid, buildings[buildingId].type, v6 + 1, v5);
   buildings[v2].house_population = popPerTile;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v2] + 2 * i) = LOWORD(v8[i]);
+    buildings[v2].grow_value_house_foodstocks[i] = LOWORD(v8[i]);
+
   building_1a_word_94BD5A[64 * v2] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v2,
@@ -47093,10 +47029,11 @@ void  fun_splitHouse2x2(int buildingId)
     1,
     (grid_random[building_08_gridOffset[64 * v2]] & 1) + v12,
     8);
-  v3 = fun_createBuilding(ciid, building_0a_type[64 * buildingId], v6, v5 + 1);
+  v3 = fun_createBuilding(ciid, buildings[buildingId].type, v6, v5 + 1);
   buildings[v3].house_population = popPerTile;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v3] + 2 * i) = LOWORD(v8[i]);
+    buildings[v3].grow_value_house_foodstocks[i] = LOWORD(v8[i]);
+
   building_1a_word_94BD5A[64 * v3] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v3,
@@ -47106,10 +47043,10 @@ void  fun_splitHouse2x2(int buildingId)
     1,
     (grid_random[building_08_gridOffset[64 * v3]] & 1) + v12,
     8);
-  v4 = fun_createBuilding(ciid, building_0a_type[64 * buildingId], v6 + 1, v5 + 1);
+  v4 = fun_createBuilding(ciid, buildings[buildingId].type, v6 + 1, v5 + 1);
   buildings[v4].house_population = popPerTile;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v4] + 2 * i) = LOWORD(v8[i]);
+    buildings[v4].grow_value_house_foodstocks[i] = LOWORD(v8[i]);
   building_1a_word_94BD5A[64 * v4] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v4,
@@ -47140,25 +47077,26 @@ void  fun_devolveHouse2x2ToMediumInsula(int a1)
   v11 = buildings[a1].house_population;
   for ( i = 0; i < 8; ++i )
   {
-    v1 = *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i);
+    v1 = buildings[a1].grow_value_house_foodstocks[i];
     v8[i] = ((BYTE4(v1) & 3) + (_DWORD)v1) >> 2;
-    v7[i] = *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) % 4;
+    v7[i] = buildings[a1].grow_value_house_foodstocks[i] % 4;
   }
   v10 = v11 / 4;
   v9 = v11 % 4;
   sub_480FC0(a1, buildings[a1].x, building__07_y[128 * a1]);
-  building_0a_type[64 * a1] = B_HouseMediumInsula;
-  building_0c_level_resourceId[64 * a1] = building_0a_type[64 * a1] - 10;
+  buildings[a1].type = B_HouseMediumInsula;
+  buildings[a1].level_resourceId = buildings[a1].type - 10;
   building_03_size[128 * a1] = 1;
   buildings[a1].houseSize = 1;
   building_04_house_isMerged[128 * a1] = 0;
   buildings[a1].house_population = v9 + v10;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) = LOWORD(v7[i]) + LOWORD(v8[i]);
+    buildings[a1].grow_value_house_foodstocks[i] = LOWORD(v7[i]) + LOWORD(v8[i]);
+
   building_1a_word_94BD5A[64 * a1] = 0;
-  v12 = dword_5F5E04[building_0c_level_resourceId[64 * a1]];
+  v12 = dword_5F5E04[buildings[a1].level_resourceId];
   v12 = graphic_id_start[v12];
-  v12 += dword_5F5E54[building_0c_level_resourceId[64 * a1]];
+  v12 += dword_5F5E54[buildings[a1].level_resourceId];
   fun_putBuildingOnTerrainAndGraphicGrids(
     a1,
     buildings[a1].x,
@@ -47169,10 +47107,11 @@ void  fun_devolveHouse2x2ToMediumInsula(int a1)
     8);
   v6 = buildings[a1].x;
   v5 = building__07_y[128 * a1];
-  v2 = fun_createBuilding(ciid, building_0a_type[64 * a1], v6 + 1, v5);
+  v2 = fun_createBuilding(ciid, buildings[a1].type, v6 + 1, v5);
   buildings[v2].house_population = v10;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v2] + 2 * i) = LOWORD(v8[i]);
+    buildings[v2].grow_value_house_foodstocks[i] = LOWORD(v8[i]);
+
   building_1a_word_94BD5A[64 * v2] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v2,
@@ -47182,10 +47121,11 @@ void  fun_devolveHouse2x2ToMediumInsula(int a1)
     1,
     (grid_random[building_08_gridOffset[64 * v2]] & 1) + v12,
     8);
-  v3 = fun_createBuilding(ciid, building_0a_type[64 * a1], v6, v5 + 1);
+  v3 = fun_createBuilding(ciid, buildings[a1].type, v6, v5 + 1);
   buildings[v3].house_population = v10;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v3] + 2 * i) = LOWORD(v8[i]);
+    buildings[v3].grow_value_house_foodstocks[i] = LOWORD(v8[i]);
+
   building_1a_word_94BD5A[64 * v3] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v3,
@@ -47195,10 +47135,10 @@ void  fun_devolveHouse2x2ToMediumInsula(int a1)
     1,
     (grid_random[building_08_gridOffset[64 * v3]] & 1) + v12,
     8);
-  v4 = fun_createBuilding(ciid, building_0a_type[64 * a1], v6 + 1, v5 + 1);
+  v4 = fun_createBuilding(ciid, buildings[a1].type, v6 + 1, v5 + 1);
   buildings[v4].house_population = v10;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v4] + 2 * i) = LOWORD(v8[i]);
+    buildings[v4].grow_value_house_foodstocks[i] = LOWORD(v8[i]);
   building_1a_word_94BD5A[64 * v4] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v4,
@@ -47209,18 +47149,7 @@ void  fun_devolveHouse2x2ToMediumInsula(int a1)
     (grid_random[building_08_gridOffset[64 * v4]] & 1) + v12,
     8);
 }
-// 5F5E54: using guessed type int dword_5F5E54[];
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
-// 46BDA0: using guessed type int var_34[8];
-// 46BDA0: using guessed type int var_54[8];
 
-//----- (0046C360) --------------------------------------------------------
 void  fun_devolveHouse3x3ToMediumInsula(int a1)
 {
   signed int v1; // [sp+4Ch] [bp-60h]@7
@@ -47244,24 +47173,24 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
   v15 = buildings[a1].house_population;
   for ( i = 0; i < 8; ++i )
   {
-    v12[i] = *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) / 9;
-    v11[i] = *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) % 9;
+    v12[i] = buildings[a1].grow_value_house_foodstocks[i] / 9;
+    v11[i] = buildings[a1].grow_value_house_foodstocks[i] % 9;
   }
   v14 = v15 / 9;
   v13 = v15 % 9;
   sub_480FC0(a1, buildings[a1].x, building__07_y[128 * a1]);
-  building_0a_type[64 * a1] = B_HouseMediumInsula;
-  building_0c_level_resourceId[64 * a1] = building_0a_type[64 * a1] - 10;
+  buildings[a1].type = B_HouseMediumInsula;
+  buildings[a1].level_resourceId = buildings[a1].type - 10;
   building_03_size[128 * a1] = 1;
   buildings[a1].houseSize = 1;
   building_04_house_isMerged[128 * a1] = 0;
   buildings[a1].house_population = v13 + v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) = LOWORD(v11[i]) + LOWORD(v12[i]);
+    buildings[a1].grow_value_house_foodstocks[i] = LOWORD(v11[i]) + LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * a1] = 0;
-  v16 = dword_5F5E04[building_0c_level_resourceId[64 * a1]];
+  v16 = dword_5F5E04[buildings[a1].level_resourceId];
   v16 = graphic_id_start[v16];
-  v16 += dword_5F5E54[building_0c_level_resourceId[64 * a1]];
+  v16 += dword_5F5E54[buildings[a1].level_resourceId];
   fun_putBuildingOnTerrainAndGraphicGrids(
     a1,
     buildings[a1].x,
@@ -47275,7 +47204,8 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
   v1 = fun_createBuilding(ciid, 19, v10 + 1, v9);
   buildings[v1].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v1] + 2 * i) = LOWORD(v12[i]);
+    buildings[v1].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
+
   building_1a_word_94BD5A[64 * v1] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v1,
@@ -47288,7 +47218,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
   v2 = fun_createBuilding(ciid, 19, v10 + 2, v9);
   buildings[v2].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v2] + 2 * i) = LOWORD(v12[i]);
+    buildings[v2].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * v2] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v2,
@@ -47301,7 +47231,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
   v3 = fun_createBuilding(ciid, 19, v10, v9 + 1);
   buildings[v3].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v3] + 2 * i) = LOWORD(v12[i]);
+    buildings[v3].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * v3] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v3,
@@ -47314,7 +47244,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
   v4 = fun_createBuilding(ciid, 19, v10 + 1, v9 + 1);
   buildings[v4].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v4] + 2 * i) = LOWORD(v12[i]);
+    buildings[v4].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * v4] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v4,
@@ -47327,7 +47257,8 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
   v5 = fun_createBuilding(ciid, 19, v10 + 2, v9 + 1);
   buildings[v5].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v5] + 2 * i) = LOWORD(v12[i]);
+    buildings[v5].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
+
   building_1a_word_94BD5A[64 * v5] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v5,
@@ -47340,7 +47271,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
   v6 = fun_createBuilding(ciid, 19, v10, v9 + 2);
   buildings[v6].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v6] + 2 * i) = LOWORD(v12[i]);
+    buildings[v6].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * v6] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v6,
@@ -47353,7 +47284,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
   v7 = fun_createBuilding(ciid, 19, v10 + 1, v9 + 2);
   buildings[v7].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v7] + 2 * i) = LOWORD(v12[i]);
+    buildings[v7].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * v7] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v7,
@@ -47366,7 +47297,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
   v8 = fun_createBuilding(ciid, 19, v10 + 2, v9 + 2);
   buildings[v8].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v8] + 2 * i) = LOWORD(v12[i]);
+    buildings[v8].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * v8] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v8,
@@ -47398,24 +47329,24 @@ void  fun_devolveHouse3x3To2x2(int a1)
   v12 = buildings[a1].house_population;
   for ( i = 0; i < 8; ++i )
   {
-    v9[i] = *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) / 6;
-    v8[i] = *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) % 6;
+    v9[i] = buildings[a1].grow_value_house_foodstocks[i] / 6;
+    v8[i] = buildings[a1].grow_value_house_foodstocks[i] % 6;
   }
   v11 = v12 / 6;
   v10 = v12 % 6;
   sub_480FC0(a1, buildings[a1].x, building__07_y[128 * a1]);
-  building_0a_type[64 * a1] = B_HouseMediumVilla;
-  building_0c_level_resourceId[64 * a1] = building_0a_type[64 * a1] - 10;
+  buildings[a1].type = B_HouseMediumVilla;
+  buildings[a1].level_resourceId = buildings[a1].type - 10;
   building_03_size[128 * a1] = 2;
   buildings[a1].houseSize = 2;
   building_04_house_isMerged[128 * a1] = 0;
   buildings[a1].house_population = v10 + v11;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) = LOWORD(v8[i]) + LOWORD(v9[i]);
+    buildings[a1].grow_value_house_foodstocks[i] = LOWORD(v8[i]) + LOWORD(v9[i]);
   building_1a_word_94BD5A[64 * a1] = 0;
-  v13 = dword_5F5E04[building_0c_level_resourceId[64 * a1]];
+  v13 = dword_5F5E04[buildings[a1].level_resourceId];
   v13 = graphic_id_start[v13];
-  v13 += dword_5F5E54[building_0c_level_resourceId[64 * a1]];
+  v13 += dword_5F5E54[buildings[a1].level_resourceId];
   fun_putBuildingOnTerrainAndGraphicGrids(
     a1,
     buildings[a1].x,
@@ -47428,11 +47359,11 @@ void  fun_devolveHouse3x3To2x2(int a1)
   v6 = building__07_y[128 * a1];
   v13 = dword_5F5E28;
   v13 = graphic_id_start[dword_5F5E28];
-  v13 += dword_5F5E54[building_0c_level_resourceId[64 * a1]];
+  v13 += dword_5F5E54[buildings[a1].level_resourceId];
   v1 = fun_createBuilding(ciid, B_HouseMediumInsula, v7 + 2, v6);
   buildings[v1].house_population = v11;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v1] + 2 * i) = LOWORD(v9[i]);
+    buildings[v1].grow_value_house_foodstocks[i] = LOWORD(v9[i]);
   building_1a_word_94BD5A[64 * v1] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v1,
@@ -47445,7 +47376,7 @@ void  fun_devolveHouse3x3To2x2(int a1)
   v2 = fun_createBuilding(ciid, B_HouseMediumInsula, v7 + 2, v6 + 1);
   buildings[v2].house_population = v11;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v2] + 2 * i) = LOWORD(v9[i]);
+    buildings[v2].grow_value_house_foodstocks[i] = LOWORD(v9[i]);
   building_1a_word_94BD5A[64 * v2] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v2,
@@ -47458,7 +47389,7 @@ void  fun_devolveHouse3x3To2x2(int a1)
   v3 = fun_createBuilding(ciid, B_HouseMediumInsula, v7, v6 + 2);
   buildings[v3].house_population = v11;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v3] + 2 * i) = LOWORD(v9[i]);
+    buildings[v3].grow_value_house_foodstocks[i] = LOWORD(v9[i]);
   building_1a_word_94BD5A[64 * v3] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v3,
@@ -47471,7 +47402,7 @@ void  fun_devolveHouse3x3To2x2(int a1)
   v4 = fun_createBuilding(ciid, B_HouseMediumInsula, v7 + 1, v6 + 2);
   buildings[v4].house_population = v11;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v4] + 2 * i) = LOWORD(v9[i]);
+    buildings[v4].grow_value_house_foodstocks[i] = LOWORD(v9[i]);
   building_1a_word_94BD5A[64 * v4] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v4,
@@ -47484,7 +47415,7 @@ void  fun_devolveHouse3x3To2x2(int a1)
   v5 = fun_createBuilding(ciid, B_HouseMediumInsula, v7 + 2, v6 + 2);
   buildings[v5].house_population = v11;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v5] + 2 * i) = LOWORD(v9[i]);
+    buildings[v5].grow_value_house_foodstocks[i] = LOWORD(v9[i]);
   building_1a_word_94BD5A[64 * v5] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v5,
@@ -47531,25 +47462,25 @@ void  fun_devolveHouse4x4To3x3(int a1)
   v15 = buildings[a1].house_population;
   for ( i = 0; i < 8; ++i )
   {
-    v1 = *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i);
+    v1 = buildings[a1].grow_value_house_foodstocks[i];
     v12[i] = ((BYTE4(v1) & 7) + (_DWORD)v1) >> 3;
-    v11[i] = *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) % 8;
+    v11[i] = buildings[a1].grow_value_house_foodstocks[i] % 8;
   }
   v14 = v15 / 8;
   v13 = v15 % 8;
   sub_480FC0(a1, buildings[a1].x, building__07_y[128 * a1]);
-  building_0a_type[64 * a1] = B_HouseMediumPalace;
-  building_0c_level_resourceId[64 * a1] = building_0a_type[64 * a1] - 10;
+  buildings[a1].type = B_HouseMediumPalace;
+  buildings[a1].level_resourceId = buildings[a1].type - 10;
   building_03_size[128 * a1] = 3;
   buildings[a1].houseSize = 3;
   building_04_house_isMerged[128 * a1] = 0;
   buildings[a1].house_population = v13 + v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * a1] + 2 * i) = LOWORD(v11[i]) + LOWORD(v12[i]);
+    buildings[a1].grow_value_house_foodstocks[i] = LOWORD(v11[i]) + LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * a1] = 0;
-  *(_DWORD *)graphicId = dword_5F5E04[building_0c_level_resourceId[64 * a1]];
+  *(_DWORD *)graphicId = dword_5F5E04[buildings[a1].level_resourceId];
   *(_DWORD *)graphicId = graphic_id_start[*(_DWORD *)graphicId];
-  *(_DWORD *)graphicId += dword_5F5E54[building_0c_level_resourceId[64 * a1]];
+  *(_DWORD *)graphicId += dword_5F5E54[buildings[a1].level_resourceId];
   fun_putBuildingOnTerrainAndGraphicGrids(
     a1,
     buildings[a1].x,
@@ -47562,11 +47493,11 @@ void  fun_devolveHouse4x4To3x3(int a1)
   v9 = building__07_y[128 * a1];
   *(_DWORD *)graphicId = dword_5F5E28;
   *(_DWORD *)graphicId = graphic_id_start[dword_5F5E28];
-  *(_DWORD *)graphicId += dword_5F5E54[building_0c_level_resourceId[64 * a1]];
+  *(_DWORD *)graphicId += dword_5F5E54[buildings[a1].level_resourceId];
   v2 = fun_createBuilding(ciid, B_HouseMediumInsula, v10 + 3, v9);
   buildings[v2].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v2] + 2 * i) = LOWORD(v12[i]);
+    buildings[v2].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * v2] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v2,
@@ -47579,7 +47510,7 @@ void  fun_devolveHouse4x4To3x3(int a1)
   v3 = fun_createBuilding(ciid, B_HouseMediumInsula, v10 + 3, v9 + 1);
   buildings[v3].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v3] + 2 * i) = LOWORD(v12[i]);
+    buildings[v3].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * v3] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v3,
@@ -47592,7 +47523,7 @@ void  fun_devolveHouse4x4To3x3(int a1)
   v4 = fun_createBuilding(ciid, B_HouseMediumInsula, v10 + 3, v9 + 2);
   buildings[v4].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v4] + 2 * i) = LOWORD(v12[i]);
+    buildings[v4].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * v4] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v4,
@@ -47605,7 +47536,7 @@ void  fun_devolveHouse4x4To3x3(int a1)
   v5 = fun_createBuilding(ciid, B_HouseMediumInsula, v10, v9 + 3);
   buildings[v5].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v5] + 2 * i) = LOWORD(v12[i]);
+    buildings[v5].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * v5] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v5,
@@ -47618,7 +47549,7 @@ void  fun_devolveHouse4x4To3x3(int a1)
   v6 = fun_createBuilding(ciid, B_HouseMediumInsula, v10 + 1, v9 + 3);
   buildings[v6].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v6] + 2 * i) = LOWORD(v12[i]);
+    buildings[v6].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * v6] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v6,
@@ -47631,7 +47562,7 @@ void  fun_devolveHouse4x4To3x3(int a1)
   v7 = fun_createBuilding(ciid, B_HouseMediumInsula, v10 + 2, v9 + 3);
   buildings[v7].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v7] + 2 * i) = LOWORD(v12[i]);
+    buildings[v7].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * v7] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v7,
@@ -47644,7 +47575,7 @@ void  fun_devolveHouse4x4To3x3(int a1)
   v8 = fun_createBuilding(ciid, B_HouseMediumInsula, v10 + 3, v9 + 3);
   buildings[v8].house_population = v14;
   for ( i = 0; i < 8; ++i )
-    *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v8] + 2 * i) = LOWORD(v12[i]);
+    buildings[v8].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
   building_1a_word_94BD5A[64 * v8] = 0;
   fun_putBuildingOnTerrainAndGraphicGrids(
     v8,
@@ -47673,19 +47604,19 @@ void  fun_evolveHouseTo(int buildingId, __int16 type)
   int v2; // [sp+4Ch] [bp-8h]@1
   int v3; // [sp+50h] [bp-4h]@2
 
-  building_0a_type[64 * buildingId] = type;
-  building_0c_level_resourceId[64 * buildingId] = type - 10;
-  v2 = dword_5F5D64[building_0c_level_resourceId[64 * buildingId]];
+  buildings[buildingId].type = type;
+  buildings[buildingId].level_resourceId = type - 10;
+  v2 = dword_5F5D64[buildings[buildingId].level_resourceId];
   if ( building_04_house_isMerged[128 * buildingId] )
   {
-    v3 = graphic_id_start[dword_5F5E04[building_0c_level_resourceId[64 * buildingId]]] + 4;
-    if ( dword_5F5E54[building_0c_level_resourceId[64 * buildingId]] )
-      v3 = graphic_id_start[dword_5F5E04[building_0c_level_resourceId[64 * buildingId]]] + 5;
+    v3 = graphic_id_start[dword_5F5E04[buildings[buildingId].level_resourceId]] + 4;
+    if ( dword_5F5E54[buildings[buildingId].level_resourceId] )
+      v3 = graphic_id_start[dword_5F5E04[buildings[buildingId].level_resourceId]] + 5;
   }
   else
   {
-    v3 = dword_5F5E54[building_0c_level_resourceId[64 * buildingId]]
-       + graphic_id_start[dword_5F5E04[building_0c_level_resourceId[64 * buildingId]]];
+    v3 = dword_5F5E54[buildings[buildingId].level_resourceId]
+       + graphic_id_start[dword_5F5E04[buildings[buildingId].level_resourceId]];
     if ( v2 )
       v3 += (v2 - 1) & (unsigned __int8)grid_random[building_08_gridOffset[64 * buildingId]];
   }
@@ -47714,8 +47645,8 @@ void  fun_revertHouseToVacantLot(int buildingId)
   signed int v5; // eax@3
   __int16 v6; // [sp+5Ch] [bp-4h]@1
 
-  building_0a_type[64 * buildingId] = B_HouseVacantLot;
-  building_0c_level_resourceId[64 * buildingId] = building_0a_type[64 * buildingId] - 10;
+  buildings[buildingId].type = B_HouseVacantLot;
+  buildings[buildingId].level_resourceId = buildings[buildingId].type - 10;
   v6 = graphic_housing_vacant;
   if ( building_04_house_isMerged[128 * buildingId] )
   {
@@ -47733,15 +47664,15 @@ void  fun_revertHouseToVacantLot(int buildingId)
       8);
     v1 = buildings[buildingId].x;
     v2 = building__07_y[128 * buildingId];
-    v3 = fun_createBuilding(ciid, building_0a_type[64 * buildingId], v1 + 1, v2);
+    v3 = fun_createBuilding(ciid, buildings[buildingId].type, v1 + 1, v2);
     buildings[v3].house_population = 0;
     building_1a_word_94BD5A[64 * v3] = 0;
     fun_putBuildingOnTerrainAndGraphicGrids(v3, buildings[v3].x, building__07_y[128 * v3], 1, 1, v6, 8);
-    v4 = fun_createBuilding(ciid, building_0a_type[64 * buildingId], v1, v2 + 1);
+    v4 = fun_createBuilding(ciid, buildings[buildingId].type, v1, v2 + 1);
     buildings[v4].house_population = 0;
     building_1a_word_94BD5A[64 * v4] = 0;
     fun_putBuildingOnTerrainAndGraphicGrids(v4, buildings[v4].x, building__07_y[128 * v4], 1, 1, v6, 8);
-    v5 = fun_createBuilding(ciid, building_0a_type[64 * buildingId], v1 + 1, v2 + 1);
+    v5 = fun_createBuilding(ciid, buildings[buildingId].type, v1 + 1, v2 + 1);
     buildings[v5].house_population = 0;
     building_1a_word_94BD5A[64 * v5] = 0;
     fun_putBuildingOnTerrainAndGraphicGrids(v5, buildings[v5].x, building__07_y[128 * v5], 1, 1, v6, 8);
@@ -47790,11 +47721,11 @@ void  sub_46E3D0(int buildingId, char a2)
   building_3b_industry_outputGood[128 * buildingId] = 0;
   building_1a_word_94BD5A[64 * buildingId] = 0;
   fun_deleteBuildingEvent(buildingId);
-  if ( building_0a_type[64 * buildingId] == B_Dock
-    || building_0a_type[64 * buildingId] == B_Wharf
-    || building_0a_type[64 * buildingId] == B_Shipyard )
+  if ( buildings[buildingId].type == B_Dock
+    || buildings[buildingId].type == B_Wharf
+    || buildings[buildingId].type == B_Shipyard )
     watersideBuilding = 1;
-  v7 = buildings[buildingId].houseSize && building_0c_level_resourceId[64 * buildingId] <= 1;
+  v7 = buildings[buildingId].houseSize && buildings[buildingId].level_resourceId <= 1;
   switch ( building_03_size[128 * buildingId] )
   {
     case 2:
@@ -47821,7 +47752,7 @@ void  sub_46E3D0(int buildingId, char a2)
   }
   else
   {
-    building_0a_type[64 * buildingId] = B_BurningRuin;
+    buildings[buildingId].type = B_BurningRuin;
     building_28_towerBallistaId[64 * buildingId] = 0;
     building_74_house_taxIncomeThisYear_senateForum_treasureStore[32 * buildingId] = 0;
     building_42_word_94BD82[64 * buildingId] = (building_45_byte_94BD85[128 * buildingId] & 7) + 1;
@@ -47996,7 +47927,7 @@ LABEL_2:
         switch ( buildingType )
         {
           case B_NativeCrops:
-            building_4a_grow_value_house_foodstocks[64 * v7] = v1;
+            buildings[v7].grow_value_house_foodstocks[0] = v1;
             break;
           case B_NativeMeeting:
             buildings[v7].house_crimeRisk = 100;
@@ -48033,7 +47964,7 @@ LABEL_4:
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( building_0a_type[64 * i] == B_NativeMeeting )
+      if ( buildings[i].type == B_NativeMeeting )
       {
         word_949F00[dword_98BF38++] = i;
         if ( dword_98BF38 >= 500 )
@@ -48047,7 +47978,7 @@ LABEL_4:
     {
       if ( buildings[j].inUse == 1 )
       {
-        if ( building_0a_type[64 * j] == B_NativeHut )
+        if ( buildings[j].type == B_NativeHut )
         {
           v3 = 1000;
           v2 = 0;
@@ -48066,7 +47997,7 @@ LABEL_4:
               v2 = v8;
             }
           }
-          building_0c_level_resourceId[64 * j] = v2;
+          buildings[j].level_resourceId = v2;
         }
       }
     }
@@ -48086,14 +48017,14 @@ void  sub_46F030()
   {
     if ( buildings[i].inUse != 1 )
       continue;
-    if ( building_0a_type[64 * i] == B_NativeHut )
+    if ( buildings[i].type == B_NativeHut )
     {
       v1 = 1;
       v0 = 3;
     }
     else
     {
-      if ( building_0a_type[64 * i] != B_NativeMeeting )
+      if ( buildings[i].type != B_NativeMeeting )
         continue;
       v1 = 2;
       v0 = 6;
@@ -48127,10 +48058,10 @@ void  sub_46F260()
   {
     if ( buildings[i].inUse )
     {
-      switch ( building_0a_type[64 * i] )
+      switch ( buildings[i].type )
       {
         case B_Gatehouse:
-          if ( building_0c_level_resourceId[64 * i] == 1 )
+          if ( buildings[i].level_resourceId == 1 )
           {
             if ( setting_map_orientation && setting_map_orientation != 4 )
               v4 = graphic_tower + 2;
@@ -48152,10 +48083,10 @@ void  sub_46F260()
             (unsigned __int8)building_03_size[128 * i],
             v4,
             -32760);
-          sub_488B70(buildings[i].x, building__07_y[128 * i], building_0c_level_resourceId[64 * i]);
+          sub_488B70(buildings[i].x, building__07_y[128 * i], buildings[i].level_resourceId);
           break;
         case B_TriumphalArch:
-          if ( building_0c_level_resourceId[64 * i] == 1 )
+          if ( buildings[i].level_resourceId == 1 )
           {
             if ( setting_map_orientation && setting_map_orientation != 4 )
               v4 = word_6E6D4A + 2;
@@ -48177,16 +48108,16 @@ void  sub_46F260()
             (unsigned __int8)building_03_size[128 * i],
             v4,
             8);
-          sub_488E00(buildings[i].x, building__07_y[128 * i], building_0c_level_resourceId[64 * i]);
+          sub_488E00(buildings[i].x, building__07_y[128 * i], buildings[i].level_resourceId);
           break;
         case B_Hippodrome:
           if ( setting_map_orientation )
           {
             if ( setting_map_orientation == 4 )
             {
-              if ( building_0c_level_resourceId[64 * i] )
+              if ( buildings[i].level_resourceId )
               {
-                switch ( building_0c_level_resourceId[64 * i] )
+                switch ( buildings[i].level_resourceId )
                 {
                   case 1:
                     v4 = word_6E6D5C + 2;
@@ -48214,9 +48145,9 @@ void  sub_46F260()
             {
               if ( setting_map_orientation == 6 )
               {
-                if ( building_0c_level_resourceId[64 * i] )
+                if ( buildings[i].level_resourceId )
                 {
-                  switch ( building_0c_level_resourceId[64 * i] )
+                  switch ( buildings[i].level_resourceId )
                   {
                     case 1:
                       v4 = word_6E6D5A + 2;
@@ -48242,9 +48173,9 @@ void  sub_46F260()
               }
               else
               {
-                if ( building_0c_level_resourceId[64 * i] )
+                if ( buildings[i].level_resourceId )
                 {
-                  switch ( building_0c_level_resourceId[64 * i] )
+                  switch ( buildings[i].level_resourceId )
                   {
                     case 1:
                       v4 = word_6E6D5A + 2;
@@ -48272,9 +48203,9 @@ void  sub_46F260()
           }
           else
           {
-            if ( building_0c_level_resourceId[64 * i] )
+            if ( buildings[i].level_resourceId )
             {
-              switch ( building_0c_level_resourceId[64 * i] )
+              switch ( buildings[i].level_resourceId )
               {
                 case 1:
                   v4 = word_6E6D5C + 2;
@@ -48664,8 +48595,8 @@ void  fun_updateProsperityRating()
   {
     ++increase;                                 // You pay at least 2 Dn more than Rome's wage
   }
-  poor = fun_getPercentage(city_inform[ciid].peopleInTentsAndShacks, city_inform[ciid].population);
-  rich = fun_getPercentage(city_inform[ciid].peopleInVillasAndPalaces, city_inform[ciid].population);
+  poor = getPercentage(city_inform[ciid].peopleInTentsAndShacks, city_inform[ciid].population);
+  rich = getPercentage(city_inform[ciid].peopleInVillasAndPalaces, city_inform[ciid].population);
   if ( poor > 30 )
     --increase;
   if ( rich > 10 )
@@ -48728,8 +48659,8 @@ void  fun_setProsperityRatingExplanation()
   {
     ++v5;
   }
-  v2 = fun_getPercentage(city_inform[ciid].peopleInTentsAndShacks, city_inform[ciid].population);
-  v1 = fun_getPercentage(city_inform[ciid].peopleInVillasAndPalaces, city_inform[ciid].population);
+  v2 = getPercentage(city_inform[ciid].peopleInTentsAndShacks, city_inform[ciid].population);
+  v1 = getPercentage(city_inform[ciid].peopleInVillasAndPalaces, city_inform[ciid].population);
   if ( v2 > 30 )
     --v5;
 
@@ -48796,23 +48727,7 @@ void  fun_setProsperityRatingExplanation()
     city_inform[ciid].prosperityRatingExplanation = 0;
   }
 }
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 6500C4: using guessed type int cityinfo_population[];
-// 6527A8: using guessed type int cityinfo_peopleInTentsAndShacks[];
-// 6527AC: using guessed type int cityinfo_peopleInVillasAndPalaces[];
-// 652B58: using guessed type int cityinfo_unemploymentPercentage[];
-// 652B68: using guessed type int cityinfo_wagesRome[];
-// 652BE4: using guessed type int cityinfo_finance_construction_lastyear[];
-// 65422C: using guessed type int cityinfo_prosperityRating[];
-// 654248: using guessed type int cityinfo_treasury_lastyear_prosperity[];
-// 6542DC: using guessed type int cityinfo_hippodromeShows[];
-// 654360: using guessed type int cityinfo_prosperityRatingExplanation[];
-// 65440C: using guessed type int cityinfo_tributeNotPaid[];
-// 6544CC: using guessed type int cityinfo_wageTotal_lastyear[];
-// 6545C8: using guessed type int cityinfo_maxProsperity[];
-// 98E880: using guessed type __int16 scn_settings_startYear;
 
-//----- (00470FF0) --------------------------------------------------------
 void  fun_calculateMaxProsperity()
 {
   signed int v0; // [sp+4Ch] [bp-10h]@1
@@ -48828,7 +48743,7 @@ void  fun_calculateMaxProsperity()
     {
       if ( buildings[i].houseSize )
       {
-        v1 += model_houses_prosperity[20 * building_0c_level_resourceId[64 * i]];
+        v1 += model_houses[buildings[i].level_resourceId].prosperity;
         ++v0;
       }
     }
@@ -50305,7 +50220,7 @@ LABEL_390:
         break;
       case B_Gatehouse:
         fun_putBuildingOnTerrainAndGraphicGrids(v37, xPos, yPos, width, width, v27 + graphic_tower, -32760);
-        building_0c_level_resourceId[64 * v37] = v27;
+        buildings[v37].level_resourceId = v27;
         sub_46F260();
         sub_488B70(xPos, yPos, v27);
         sub_47F200(xPos, yPos, 5);
@@ -50314,7 +50229,7 @@ LABEL_390:
         break;
       case B_TriumphalArch:
         fun_putBuildingOnTerrainAndGraphicGrids(v37, xPos, yPos, width, width, word_6E6D4A + v27 - 1, 8);
-        building_0c_level_resourceId[64 * v37] = v27;
+        buildings[v37].level_resourceId = v27;
         sub_46F260();
         sub_488E00(xPos, yPos, v27);
         sub_47F200(xPos, yPos, 5);
@@ -50352,9 +50267,9 @@ LABEL_390:
             case B_Hippodrome:
               city_inform[ciid].dword_65429C = 1;
               if ( setting_map_orientation && setting_map_orientation != 4 )
-                building_0c_level_resourceId[64 * v37] = 3;
+                buildings[v37].level_resourceId = 3;
               else
-                building_0c_level_resourceId[64 * v37] = 0;
+                buildings[v37].level_resourceId = 0;
               building_30_warehouse_prevStorage[64 * v37] = 0;
               v35 = v37;
               if ( setting_map_orientation )
@@ -50380,9 +50295,9 @@ LABEL_390:
               v38 = fun_createBuilding(ciid_, 32, xPos + 5, yPos);
               sub_490DE0(v38);
               if ( setting_map_orientation && setting_map_orientation != 4 )
-                building_0c_level_resourceId[64 * v38] = 4;
+                buildings[v38].level_resourceId = 4;
               else
-                building_0c_level_resourceId[64 * v38] = 1;
+                buildings[v38].level_resourceId = 1;
               building_30_warehouse_prevStorage[64 * v38] = v35;
               building_32_warehouse_nextStorage[64 * v35] = v38;
               building_32_warehouse_nextStorage[64 * v38] = 0;
@@ -50410,9 +50325,9 @@ LABEL_390:
               v39 = fun_createBuilding(ciid_, 32, xPos + 10, yPos);
               sub_490DE0(v39);
               if ( setting_map_orientation && setting_map_orientation != 4 )
-                building_0c_level_resourceId[64 * v39] = 5;
+                buildings[v39].level_resourceId = 5;
               else
-                building_0c_level_resourceId[64 * v39] = 2;
+                buildings[v39].level_resourceId = 2;
               building_30_warehouse_prevStorage[64 * v39] = v36;
               building_32_warehouse_nextStorage[64 * v36] = v39;
               building_32_warehouse_nextStorage[64 * v39] = 0;
@@ -50592,17 +50507,17 @@ LABEL_390:
           building_48_word_94BD88[64 * v37] = formationId;
           if ( buildingId == B_FortLegionaries )
           {
-            building_0c_level_resourceId[64 * v37] = Walker_FortLegionary;
+            buildings[v37].level_resourceId = Walker_FortLegionary;
             formation_walkerType[64 * formationId] = Walker_FortLegionary;
           }
           if ( buildingId == B_FortJavelin )
           {
-            building_0c_level_resourceId[64 * v37] = Walker_FortJavelin;
+            buildings[v37].level_resourceId = Walker_FortJavelin;
             formation_walkerType[64 * formationId] = Walker_FortJavelin;
           }
           if ( buildingId == B_FortMounted )
           {
-            building_0c_level_resourceId[64 * v37] = Walker_FortMounted;
+            buildings[v37].level_resourceId = Walker_FortMounted;
             formation_walkerType[64 * formationId] = Walker_FortMounted;
           }
           v9 = fun_createBuilding(ciid_, B_FortGround, xPos + 3, yPos - 1);
@@ -50776,7 +50691,7 @@ void  sub_476EB0(int a1, int a2, int a3, int x, int y)
         terrain = grid_terrain[walkerBaseGridOffset];
         if ( grid_buildingIds[walkerBaseGridOffset] )
         {
-          if ( building_0a_type[64 * buildingId] == B_FortGround__ || building_0a_type[64 * buildingId] == B_FortGround )
+          if ( buildings[buildingId].type == B_FortGround__ || buildings[buildingId].type == B_FortGround )
             askConfirmationFort = 1;
         }
         if ( grid_animation[walkerBaseGridOffset] )
@@ -50883,21 +50798,21 @@ void  sub_4771D0(int a2, int a3, int a4, int a5, int a6)
           v10 = grid_buildingIds[walkerBaseGridOffset];
           if ( grid_buildingIds[walkerBaseGridOffset] )
           {
-            if ( building_0a_type[64 * v10] != B_BurningRuin )
+            if ( buildings[v10].type != B_BurningRuin )
             {
-              if ( building_0a_type[64 * v10] != B_NativeHut )
+              if ( buildings[v10].type != B_NativeHut )
               {
-                if ( building_0a_type[64 * v10] != B_NativeMeeting )
+                if ( buildings[v10].type != B_NativeMeeting )
                 {
-                  if ( building_0a_type[64 * v10] != B_NativeCrops )
+                  if ( buildings[v10].type != B_NativeCrops )
                   {
                     if ( buildings[v10].inUse != 6 )
                     {
-                      if ( building_0a_type[64 * v10] != B_FortGround__ && building_0a_type[64 * v10] != B_FortGround
+                      if ( buildings[v10].type != B_FortGround__ && buildings[v10].type != B_FortGround
                         || a2
                         || deleteFort_confirmed == 1 )
                       {
-                        if ( building_0a_type[64 * v10] == B_FortGround__ || building_0a_type[64 * v10] == B_FortGround )
+                        if ( buildings[v10].type == B_FortGround__ || buildings[v10].type == B_FortGround )
                         {
                           if ( !a2 )
                           {
@@ -55495,49 +55410,23 @@ int  sub_480460(__int16 a1, int a2, int a3, int a4, signed int a5)
   }
   return result;
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 5F325C: using guessed type char byte_5F325C;
-// 5F3284: using guessed type char byte_5F3284;
-// 5F329C: using guessed type char byte_5F329C;
-// 5F32A4: using guessed type char byte_5F32A4;
-// 5F32AC: using guessed type char byte_5F32AC;
-// 65DEF8: using guessed type int mapOrientation;
-// 6E6BFA: using guessed type __int16 graphic_farm;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8B48A8: using guessed type __int16 word_8B48A8[];
-// 8B48AA: using guessed type __int16 word_8B48AA[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E146C: using guessed type int dword_8E146C;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 8F6428: using guessed type __int16 word_8F6428[];
-// 8F642A: using guessed type __int16 word_8F642A[];
-// 9096A8: using guessed type __int16 grid_terrain_xPlusTwo_yPlusOne[];
-// 9097E8: using guessed type __int16 word_9097E8[];
-// 9097EA: using guessed type __int16 word_9097EA[];
 
-//----- (00480C60) --------------------------------------------------------
 int  sub_480C60(int a1)
 {
   int result; // eax@3
   int v2; // [sp+4Ch] [bp-4h]@1
 
   v2 = building_08_gridOffset[64 * a1];
-  ++building_4a_grow_value_house_foodstocks[64 * a1];
-  if ( building_4a_grow_value_house_foodstocks[64 * a1] >= 5 )
-    building_4a_grow_value_house_foodstocks[64 * a1] = 0;
+  ++buildings[a1].grow_value_house_foodstocks[0];
+
+  if ( buildings[a1].grow_value_house_foodstocks[0] >= 5 )
+    buildings[a1].grow_value_house_foodstocks[0] = 0;
+
   result = v2;
-  grid_graphicIds[v2] = building_4a_grow_value_house_foodstocks[64 * a1] + graphic_nativeCrops;
+  grid_graphicIds[v2] = buildings[a1].grow_value_house_foodstocks[0] + graphic_nativeCrops;
   return result;
 }
-// 6E6C78: using guessed type __int16 graphic_nativeCrops;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
 
-//----- (00480D00) --------------------------------------------------------
 void  fun_collapseBuildingToRubble(int buildingId, int x, int y, int width, int height)
 {
   __int16 v5; // cx@19
@@ -55565,8 +55454,8 @@ void  fun_collapseBuildingToRubble(int buildingId, int x, int y, int width, int 
               {
                 if ( buildingId )
                 {
-                  if ( building_0a_type[64 * buildingId] != B_BurningRuin )
-                    rubble_originalBuildingType[mapOffset] = LOBYTE(building_0a_type[64 * buildingId]);
+                  if ( buildings[buildingId].type != B_BurningRuin )
+                    rubble_originalBuildingType[mapOffset] = LOBYTE(buildings[buildingId].type);
                 }
                 grid_bitfields[mapOffset] &= 0xEFu;
                 grid_bitfields[mapOffset] &= 0xF0u;
@@ -55645,9 +55534,9 @@ void  sub_480FC0(int a1, int a2, int a3)
           {
             if ( a1 )
             {
-              if ( building_0a_type[64 * a1] >= 100 )
+              if ( buildings[a1].type >= 100 )
               {
-                if ( building_0a_type[64 * a1] <= 105 )
+                if ( buildings[a1].type <= 105 )
                 {
                   dword_8B45E4 = 3;
                   dword_8B4608 = 3;
@@ -55663,8 +55552,8 @@ void  sub_480FC0(int a1, int a2, int a3)
                 {
                   if ( a1 )
                   {
-                    if ( building_0a_type[64 * a1] != 99 )
-                      rubble_originalBuildingType[v6] = LOBYTE(building_0a_type[64 * a1]);
+                    if ( buildings[a1].type != 99 )
+                      rubble_originalBuildingType[v6] = LOBYTE(buildings[a1].type);
                   }
                   grid_bitfields[v6] &= 0xEFu;
                   grid_bitfields[v6] &= 0xF0u;
@@ -57329,13 +57218,13 @@ signed int  sub_4840B0(int a1)
   if ( v5 & 8 )
   {
     v11 = word_8F605C[a1];
-    if ( building_0a_type[64 * v11] == B_Gatehouse )
+    if ( buildings[v11].type == B_Gatehouse )
     {
-      dword_8A11C0[0] = building_0c_level_resourceId[64 * v11] == 1;
+      dword_8A11C0[0] = buildings[v11].level_resourceId == 1;
     }
     else
     {
-      if ( building_0a_type[64 * v11] == B_Granary )
+      if ( buildings[v11].type == B_Granary )
       {
         if ( !grid_groundType_162[a1] )
           dword_8A11C0[0] = 1;
@@ -57346,13 +57235,13 @@ signed int  sub_4840B0(int a1)
   if ( v6 & 8 )
   {
     v12 = word_8F61A2[a1];
-    if ( building_0a_type[64 * v12] == B_Gatehouse )
+    if ( buildings[v12].type == B_Gatehouse )
     {
-      dword_8A11C8 = building_0c_level_resourceId[64 * v12] == 2;
+      dword_8A11C8 = buildings[v12].level_resourceId == 2;
     }
     else
     {
-      if ( building_0a_type[64 * v12] == B_Granary )
+      if ( buildings[v12].type == B_Granary )
       {
         if ( !grid_groundType1[a1] )
           dword_8A11C8 = 1;
@@ -57363,13 +57252,13 @@ signed int  sub_4840B0(int a1)
   if ( v7 & 8 )
   {
     v13 = word_8F62E4[a1];
-    if ( building_0a_type[64 * v13] == B_Gatehouse )
+    if ( buildings[v13].type == B_Gatehouse )
     {
-      dword_8A11D0 = building_0c_level_resourceId[64 * v13] == 1;
+      dword_8A11D0 = buildings[v13].level_resourceId == 1;
     }
     else
     {
-      if ( building_0a_type[64 * v13] == B_Granary )
+      if ( buildings[v13].type == B_Granary )
       {
         if ( !grid_groundType162[a1] )
           dword_8A11D0 = 1;
@@ -57380,13 +57269,13 @@ signed int  sub_4840B0(int a1)
   if ( v8 & 8 )
   {
     v14 = word_8F619E[a1];
-    if ( building_0a_type[64 * v14] == B_Gatehouse )
+    if ( buildings[v14].type == B_Gatehouse )
     {
-      dword_8A11D8 = building_0c_level_resourceId[64 * v14] == 2;
+      dword_8A11D8 = buildings[v14].level_resourceId == 2;
     }
     else
     {
-      if ( building_0a_type[64 * v14] == B_Granary )
+      if ( buildings[v14].type == B_Granary )
       {
         if ( !grid_groundType_1[a1] )
           dword_8A11D8 = 1;
@@ -57404,28 +57293,12 @@ signed int  sub_4840B0(int a1)
     ++v10;
   if ( v10 == 4 )
   {
-    if ( building_0a_type[64 * grid_buildingIds[a1]] == B_Granary )
+    if ( buildings[grid_buildingIds[a1]].type == B_Granary )
       v10 = 2;
   }
   return v10;
 }
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8A11C8: using guessed type int dword_8A11C8;
-// 8A11D0: using guessed type int dword_8A11D0;
-// 8A11D8: using guessed type int dword_8A11D8;
-// 8F605C: using guessed type __int16 word_8F605C[];
-// 8F619E: using guessed type __int16 word_8F619E[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 8F61A2: using guessed type __int16 word_8F61A2[];
-// 8F62E4: using guessed type __int16 word_8F62E4[];
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
 
-//----- (00484470) --------------------------------------------------------
 signed int  sub_484470(int a1)
 {
   __int16 v1; // ax@1
@@ -57450,13 +57323,13 @@ signed int  sub_484470(int a1)
   if ( v1 & 8 )
   {
     v7 = word_8F605C[a1];
-    if ( building_0a_type[64 * v7] == B_Gatehouse )
+    if ( buildings[v7].type == B_Gatehouse )
     {
       dword_8A11C0[0] = 0;
     }
     else
     {
-      if ( building_0a_type[64 * v7] == B_Granary )
+      if ( buildings[v7].type == B_Granary )
       {
         if ( !grid_groundType_162[a1] )
           dword_8A11C0[0] = 1;
@@ -57467,13 +57340,13 @@ signed int  sub_484470(int a1)
   if ( v2 & 8 )
   {
     v8 = word_8F61A2[a1];
-    if ( building_0a_type[64 * v8] == B_Gatehouse )
+    if ( buildings[v8].type == B_Gatehouse )
     {
       dword_8A11C8 = 0;
     }
     else
     {
-      if ( building_0a_type[64 * v8] == B_Granary )
+      if ( buildings[v8].type == B_Granary )
       {
         if ( !grid_groundType1[a1] )
           dword_8A11C8 = 1;
@@ -57484,13 +57357,13 @@ signed int  sub_484470(int a1)
   if ( v3 & 8 )
   {
     v9 = word_8F62E4[a1];
-    if ( building_0a_type[64 * v9] == B_Gatehouse )
+    if ( buildings[v9].type == B_Gatehouse )
     {
       dword_8A11D0 = 0;
     }
     else
     {
-      if ( building_0a_type[64 * v9] == B_Granary )
+      if ( buildings[v9].type == B_Granary )
       {
         if ( !grid_groundType162[a1] )
           dword_8A11D0 = 1;
@@ -57501,13 +57374,13 @@ signed int  sub_484470(int a1)
   if ( v4 & 8 )
   {
     v10 = word_8F619E[a1];
-    if ( building_0a_type[64 * v10] == B_Gatehouse )
+    if ( buildings[v10].type == B_Gatehouse )
     {
       dword_8A11D8 = 0;
     }
     else
     {
-      if ( building_0a_type[64 * v10] == B_Granary )
+      if ( buildings[v10].type == B_Granary )
       {
         if ( !grid_groundType_1[a1] )
           dword_8A11D8 = 1;
@@ -57579,18 +57452,7 @@ int  sub_4847A0(int a1)
   }
   return v2;
 }
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8A11C4: using guessed type int dword_8A11C4;
-// 8A11CC: using guessed type int dword_8A11CC;
-// 8A11D4: using guessed type int dword_8A11D4;
-// 8A11DC: using guessed type int dword_8A11DC;
-// 8A11E0: using guessed type int dword_8A11E0[];
-// 8C7A10: using guessed type int dword_8C7A10;
-// 90941A: using guessed type __int16 grid_terrain_xMinusOne_yMinusOne[];
-// 9096A2: using guessed type __int16 grid_terrain_xMinusOne_yPlusOne[];
-// 9096A6: using guessed type __int16 grid_terrain_xPlusOne_yPlusOne[];
 
-//----- (00484900) --------------------------------------------------------
 void  sub_484900()
 {
   int v0; // [sp+4Ch] [bp-4h]@2
@@ -57601,57 +57463,41 @@ void  sub_484900()
   if ( grid_terrain_x_yMinusOne[walkerBaseGridOffset] & 0x8000 )
   {
     v0 = word_8F605C[walkerBaseGridOffset];
-    if ( building_0a_type[64 * v0] == 58 )
+    if ( buildings[v0].type == 58 )
     {
-      if ( building_0c_level_resourceId[64 * v0] == 1 )
+      if ( buildings[v0].level_resourceId == 1 )
         dword_8A11C0[0] = 1;
     }
   }
   if ( grid_terrain_xPlusOne_y[walkerBaseGridOffset] & 0x8000 )
   {
     v1 = word_8F61A2[walkerBaseGridOffset];
-    if ( building_0a_type[64 * v1] == 58 )
+    if ( buildings[v1].type == 58 )
     {
-      if ( building_0c_level_resourceId[64 * v1] == 2 )
+      if ( buildings[v1].level_resourceId == 2 )
         dword_8A11C8 = 1;
     }
   }
   if ( grid_terrain_x_yPlusOne[walkerBaseGridOffset] & 0x8000 )
   {
     v2 = word_8F62E4[walkerBaseGridOffset];
-    if ( building_0a_type[64 * v2] == 58 )
+    if ( buildings[v2].type == 58 )
     {
-      if ( building_0c_level_resourceId[64 * v2] == 1 )
+      if ( buildings[v2].level_resourceId == 1 )
         dword_8A11D0 = 1;
     }
   }
   if ( grid_terrain_xMinusOne_y[walkerBaseGridOffset] & 0x8000 )
   {
     v3 = word_8F619E[walkerBaseGridOffset];
-    if ( building_0a_type[64 * v3] == 58 )
+    if ( buildings[v3].type == 58 )
     {
-      if ( building_0c_level_resourceId[64 * v3] == 2 )
+      if ( buildings[v3].level_resourceId == 2 )
         dword_8A11D8 = 1;
     }
   }
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8A11C8: using guessed type int dword_8A11C8;
-// 8A11D0: using guessed type int dword_8A11D0;
-// 8A11D8: using guessed type int dword_8A11D8;
-// 8F605C: using guessed type __int16 word_8F605C[];
-// 8F619E: using guessed type __int16 word_8F619E[];
-// 8F61A2: using guessed type __int16 word_8F61A2[];
-// 8F62E4: using guessed type __int16 word_8F62E4[];
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
 
-//----- (00484AD0) --------------------------------------------------------
 int  sub_484AD0(int gridOffset)
 {
   int result; // eax@2
@@ -57662,10 +57508,7 @@ int  sub_484AD0(int gridOffset)
     result = 0;
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
 
-//----- (00484B20) --------------------------------------------------------
 signed int  sub_484B20(int a1, int a2)
 {
   signed int v3; // [sp+4Ch] [bp-4h]@1
@@ -58103,7 +57946,7 @@ int  sub_485A80()
   v5 = grid_terrain_x_yMinusOne[walkerBaseGridOffset];
   if ( v5 & 8 )
   {
-    if ( building_0a_type[64 * word_8F605C[walkerBaseGridOffset]] == 90 )
+    if ( buildings[word_8F605C[walkerBaseGridOffset]].type == 90 )
     {
       if ( (byte_8C129E[walkerBaseGridOffset] & 0x3F) == 17 )
         dword_8A11C0[0] = 1;
@@ -58112,7 +57955,7 @@ int  sub_485A80()
   v6 = grid_terrain_xPlusOne_y[walkerBaseGridOffset];
   if ( v6 & 8 )
   {
-    if ( building_0a_type[64 * word_8F61A2[walkerBaseGridOffset]] == 90 )
+    if ( buildings[word_8F61A2[walkerBaseGridOffset]].type == 90 )
     {
       if ( (byte_8C1341[walkerBaseGridOffset] & 0x3F) == 8 )
         dword_8A11C8 = 1;
@@ -58121,7 +57964,7 @@ int  sub_485A80()
   v7 = grid_terrain_x_yPlusOne[walkerBaseGridOffset];
   if ( v7 & 8 )
   {
-    if ( building_0a_type[64 * word_8F62E4[walkerBaseGridOffset]] == 90 )
+    if ( buildings[word_8F62E4[walkerBaseGridOffset]].type == 90 )
     {
       if ( (byte_8C13E2[walkerBaseGridOffset] & 0x3F) == 1 )
         dword_8A11D0 = 1;
@@ -58132,7 +57975,7 @@ int  sub_485A80()
   if ( v9 & 8 )
   {
     result = word_8F619E[walkerBaseGridOffset] << 7;
-    if ( *(__int16 *)((char *)building_0a_type + result) == 90 )
+    if ( buildings[result].type == 90 )
     {
       if ( (byte_8C133F[walkerBaseGridOffset] & 0x3F) == 10 )
         dword_8A11D8 = 1;
@@ -58639,7 +58482,7 @@ signed int  sub_486AF0(int a1)
   int v4; // [sp+58h] [bp-4h]@1
 
   v4 = grid_buildingIds[a1];
-  if ( grid_buildingIds[a1] && building_0a_type[64 * v4] == 90 )
+  if ( grid_buildingIds[a1] && buildings[v4].type == 90 )
   {
     for ( i = 0; i < 3; ++i )
     {
@@ -60258,12 +60101,7 @@ signed int  sub_489570(int a1, int a2, int a3, int a4)
   }
   return 0;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (00489700) --------------------------------------------------------
 signed int  fun_determineAccessRoad(int x, int y, int size)
 {
   __int16 v3; // dx@6
@@ -60286,7 +60124,7 @@ signed int  fun_determineAccessRoad(int x, int y, int size)
     if ( !v11 )
       break;
     v3 = grid_terrain[v11 + v12];
-    if ( !(v3 & T_Building) || building_0a_type[64 * grid_buildingIds[v11 + v12]] != B_Gatehouse )
+    if ( !(v3 & T_Building) || buildings[grid_buildingIds[v11 + v12]].type != B_Gatehouse )
     {
       v4 = grid_terrain[v11 + v12];
       if ( v4 & T_Road )
@@ -60361,7 +60199,7 @@ signed int  sub_4898D0(int a1, int a2)
     if ( !v21 )
       break;
     v2 = grid_terrain[v21 + v26];
-    if ( !(v2 & 8) || building_0a_type[64 * grid_buildingIds[v21 + v26]] != 58 )
+    if ( !(v2 & 8) || buildings[grid_buildingIds[v21 + v26]].type != 58 )
     {
       v3 = grid_terrain[v21 + v26];
       if ( v3 & 0x40 )
@@ -60393,7 +60231,7 @@ signed int  sub_4898D0(int a1, int a2)
       break;
     v23 = v22 + 5;
     v4 = grid_terrain[v23 + v26];
-    if ( !(v4 & 8) || building_0a_type[64 * grid_buildingIds[v23 + v26]] != 58 )
+    if ( !(v4 & 8) || buildings[grid_buildingIds[v23 + v26]].type != 58 )
     {
       v5 = grid_terrain[v23 + v26];
       if ( v5 & 0x40 )
@@ -60425,7 +60263,7 @@ signed int  sub_4898D0(int a1, int a2)
       break;
     v25 = v24 + 10;
     v6 = grid_terrain[v25 + v26];
-    if ( !(v6 & 8) || building_0a_type[64 * grid_buildingIds[v25 + v26]] != 58 )
+    if ( !(v6 & 8) || buildings[grid_buildingIds[v25 + v26]].type != 58 )
     {
       v7 = grid_terrain[v25 + v26];
       if ( v7 & 0x40 )
@@ -60698,7 +60536,7 @@ signed int  sub_48A390(int a1)
   v2 = 0;
   for ( i = 1; i < 2000; ++i )
   {
-    if ( buildings[i].inUse == 1 && building_0a_type[64 * i] == 76 )
+    if ( buildings[i].inUse == 1 && buildings[i].type == 76 )
     {
       if ( !building_72_wharf_hasBoat_house_evolveStatusDesir[64 * i] )
       {
@@ -62327,13 +62165,13 @@ signed int  sub_48DAA0(int x, int y, int size, int range)
       buildingId = grid_buildingIds[walkerBaseGridOffset];
       if ( buildingId > 0 )
       {
-        if ( building_0a_type[64 * buildingId] != B_MissionPost )
+        if ( buildings[buildingId].type != B_MissionPost )
         {
-          if ( building_0a_type[64 * buildingId] != B_NativeHut )
+          if ( buildings[buildingId].type != B_NativeHut )
           {
-            if ( building_0a_type[64 * buildingId] != B_NativeMeeting )
+            if ( buildings[buildingId].type != B_NativeMeeting )
             {
-              if ( building_0a_type[64 * buildingId] != B_NativeCrops )
+              if ( buildings[buildingId].type != B_NativeCrops )
               {
                 if ( !result )
                   result = 1;
@@ -62391,7 +62229,7 @@ int  fun_walkerProvideEngineerCoverage(int x, int y)
       buildingId = grid_buildingIds[walkerBaseGridOffset];
       if ( grid_buildingIds[walkerBaseGridOffset] )
       {
-        if ( building_0a_type[64 * buildingId] == B_Hippodrome )
+        if ( buildings[buildingId].type == B_Hippodrome )
           buildingId = sub_4789E0(buildingId);
         if ( (signed int)building_3e_damageRisk[64 * buildingId] > *(_DWORD *)&engineerMaxDamageSeen )
           *(_DWORD *)&engineerMaxDamageSeen = building_3e_damageRisk[64 * buildingId];
@@ -62458,7 +62296,7 @@ int  fun_walkerProvidePrefectFireCoverage(int x, int y)
       v6 = grid_buildingIds[walkerBaseGridOffset];
       if ( grid_buildingIds[walkerBaseGridOffset] )
       {
-        if ( building_0a_type[64 * v6] == B_Hippodrome )
+        if ( buildings[v6].type == B_Hippodrome )
           v6 = sub_4789E0(v6);
         if ( building_40_fireRisk[64 * v6] > prefectMaxFireRiskSeen )
           prefectMaxFireRiskSeen = building_40_fireRisk[64 * v6];
@@ -62817,38 +62655,38 @@ int  fun_walkerProvideMarketGoods(int buildingId, int x, int y)
       if ( houseId > 0 && buildings[houseId].houseSize && buildings[houseId].house_population > 0 )
       {
         ++homesSeen;
-        houseNextLevel = building_0c_level_resourceId[64 * houseId];
+        houseNextLevel = buildings[houseId].level_resourceId;
         if ( houseNextLevel < 19 )
           ++houseNextLevel;
         v12 = 4 * building_1c_house_maxPopEver[64 * houseId];
         v11 = 0;
         for ( i = 0; i < 4; ++i )
         {
-          if ( *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * houseId] + 2 * i) >= v12 )
+          if ( buildings[houseId].grow_value_house_foodstocks[i] >= v12 )
             ++v11;
         }
-        if ( model_houses_foodtypes[20 * houseNextLevel] > v11 )
+        if ( model_houses[houseNextLevel].foodtypes > v11 )
         {
           for ( j = 0; j < 4; ++j )
           {
-            if ( *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * houseId] + 2 * j) < v12 )
+            if ( buildings[houseId].grow_value_house_foodstocks[j] < v12 )
             {
               if ( *(__int16 *)((char *)&building_4c_granary_capacity[64 * buildingId] + 2 * j) >= v12 )
               {
-                *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * houseId] + 2 * j) += v12;
+                buildings[houseId].grow_value_house_foodstocks[j] += v12;
                 *(__int16 *)((char *)&building_4c_granary_capacity[64 * buildingId] + 2 * j) -= v12;
                 break;
               }
               if ( *(__int16 *)((char *)&building_4c_granary_capacity[64 * buildingId] + 2 * j) )
               {
-                *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * houseId] + 2 * j) += *(__int16 *)((char *)&building_4c_granary_capacity[64 * buildingId] + 2 * j);
+                buildings[houseId].grow_value_house_foodstocks[j] += *(__int16 *)((char *)&building_4c_granary_capacity[64 * buildingId] + 2 * j);
                 *(__int16 *)((char *)&building_4c_granary_capacity[64 * buildingId] + 2 * j) = 0;
                 break;
               }
             }
           }
         }
-        pottery = model_houses_pottery[20 * houseNextLevel];
+        pottery = model_houses[houseNextLevel].pottery;
         if ( pottery )
         {
           building_5c_house_amphiGlad_colo[64 * buildingId] = 10;
@@ -62870,7 +62708,7 @@ int  fun_walkerProvideMarketGoods(int buildingId, int x, int y)
             }
           }
         }
-        furniture = model_houses_furniture[20 * houseNextLevel];
+        furniture = model_houses[houseNextLevel].furniture;
         if ( furniture )
         {
           building_5e_house_coloLion_hippo[64 * buildingId] = 10;
@@ -62892,7 +62730,7 @@ int  fun_walkerProvideMarketGoods(int buildingId, int x, int y)
             }
           }
         }
-        oil = model_houses_oil[20 * houseNextLevel];
+        oil = model_houses[houseNextLevel].oil;
         if ( oil )
         {
           building_60_house_school_library[64 * buildingId] = 10;
@@ -62914,7 +62752,7 @@ int  fun_walkerProvideMarketGoods(int buildingId, int x, int y)
             }
           }
         }
-        wine = model_houses_wine[20 * houseNextLevel];
+        wine = model_houses[houseNextLevel].wine;
         if ( wine )
         {
           building_62_house_academy_barber[64 * buildingId] = 10;
@@ -63479,13 +63317,13 @@ signed int  fun_walkerProvideMissionaryAccess(int x, int y)
       v5 = grid_buildingIds[walkerBaseGridOffset];
       if ( v5 > 0 )
       {
-        if ( building_0a_type[64 * v5] == B_NativeHut )
+        if ( buildings[v5].type == B_NativeHut )
         {
           buildings[v5].house_crimeRisk = 0;
         }
         else
         {
-          if ( building_0a_type[64 * v5] == B_NativeMeeting )
+          if ( buildings[v5].type == B_NativeMeeting )
             buildings[v5].house_crimeRisk = 0;
         }
       }
@@ -63596,8 +63434,8 @@ int  fun_walkerProvideTaxCollectorAccess(int x, int y)
         {
           if ( buildings[v6].house_population > 0 )
           {
-            if ( model_houses_tax[20 * building_0c_level_resourceId[64 * v6]] > taxCollectorMaxHousingLevelSeen )
-              taxCollectorMaxHousingLevelSeen = model_houses_tax[20 * building_0c_level_resourceId[64 * v6]];
+            if ( model_houses[buildings[v6].level_resourceId].tax > taxCollectorMaxHousingLevelSeen )
+              taxCollectorMaxHousingLevelSeen = model_houses[buildings[v6].level_resourceId].tax;
             building_46_house_taxcollector[128 * v6] = 50;
             ++v3;
           }
@@ -63611,16 +63449,7 @@ int  fun_walkerProvideTaxCollectorAccess(int x, int y)
   }
   return v3;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E7B30: using guessed type int taxCollectorMaxHousingLevelSeen;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
 
-//----- (00490850) --------------------------------------------------------
 void  sub_490850(char *buffer, int numItems)
 {
   signed int j; // [sp+50h] [bp-8h]@3
@@ -63922,9 +63751,9 @@ void  fun_performUndo()
                   if ( word_89AAA0[j] )
                   {
                     v1 = word_89AAA0[j];
-                    if ( building_0a_type[64 * v1] >= (signed int)B_LargeTempleCeres
-                      && building_0a_type[64 * v1] <= (signed int)B_LargeTempleVenus
-                      || building_0a_type[64 * v1] == B_Oracle )
+                    if ( buildings[v1].type >= (signed int)B_LargeTempleCeres
+                      && buildings[v1].type <= (signed int)B_LargeTempleVenus
+                      || buildings[v1].type == B_Oracle )
                       fun_refundGoods(ciid, G_Marble, 2);
                     buildings[v1].inUse = 2;
                   }
@@ -64006,7 +63835,7 @@ void  sub_4915A0(int a1)
 
   if ( a1 > 0 )
   {
-    switch ( building_0a_type[64 * a1] )
+    switch ( buildings[a1].type )
     {
       case 100:
         sub_480460(a1, buildings[a1].x, building__07_y[128 * a1], graphic_nativeCrops, 0);
@@ -64027,11 +63856,11 @@ void  sub_4915A0(int a1)
         sub_480460(a1, buildings[a1].x, building__07_y[128 * a1], graphic_nativeCrops + 25, 0);
         break;
       default:
-        v1 = buildingSizes[4 * building_0a_type[64 * a1]];
+        v1 = buildingSizes[4 * buildings[a1].type];
         fun_putBuildingOnTerrainAndGraphicGrids(a1, buildings[a1].x, building__07_y[128 * a1], v1, v1, 0, 0);
         break;
     }
-    if ( building_0a_type[64 * a1] == 76 )
+    if ( buildings[a1].type == 76 )
       building_72_wharf_hasBoat_house_evolveStatusDesir[64 * a1] = 0;
     buildings[a1].inUse = 1;
   }
@@ -64106,7 +63935,7 @@ void  sub_4918A0()
                 window_redrawRequest = 1;
                 return;
               }
-              if ( building_0a_type[64 * v0] != word_8EE1EA[64 * j] )
+              if ( buildings[v0].type != word_8EE1EA[64 * j] )
               {
                 dword_8E1484 = 0;
                 window_redrawRequest = 1;
@@ -64645,7 +64474,7 @@ void  fun_walker_immigrant()
         if ( sub_4B66E0(walkerId, 1) == 1 )
         {
           walkers[walkerId].state = 2;
-          v1 = model_houses_numPeople[20 * building_0c_level_resourceId[64 * buildingId]];
+          v1 = model_houses[buildings[buildingId].level_resourceId].numPeople;
           if ( building_04_house_isMerged[128 * buildingId] )
             v1 *= 4;
           v0 = v1 - buildings[buildingId].house_population;
@@ -64778,7 +64607,7 @@ void  fun_walker_emigrant()
 void  fun_walker_homeless()
 {
   int v0; // [sp+4Ch] [bp-10h]@41
-  int v1; // [sp+50h] [bp-Ch]@39
+  int housePeopleNumber; // [sp+50h] [bp-Ch]@39
   int v2; // [sp+58h] [bp-4h]@9
   int v3; // [sp+58h] [bp-4h]@16
   int v4; // [sp+58h] [bp-4h]@30
@@ -64906,14 +64735,15 @@ void  fun_walker_homeless()
         walkers[walkerId].state = 2;
         if ( v5 )
         {
-          if ( building_0a_type[64 * v5] >= 10 )
+          if ( buildings[v5].type >= 10 )
           {
-            if ( building_0a_type[64 * v5] <= 29 )
+            if ( buildings[v5].type <= 29 )
             {
-              v1 = model_houses_numPeople[20 * building_0c_level_resourceId[64 * v5]];
+              housePeopleNumber = model_houses[buildings[v5].level_resourceId].numPeople;
               if ( building_04_house_isMerged[128 * v5] )
-                v1 *= 4;
-              v0 = v1 - buildings[v5].house_population;
+                housePeopleNumber *= 4;
+
+              v0 = housePeopleNumber - buildings[v5].house_population;
               if ( v0 < 0 )
                 v0 = 0;
               if ( v0 < (unsigned __int8)walker_migrantNumPeopleCarried[128 * walkerId] )
@@ -64921,7 +64751,7 @@ void  fun_walker_homeless()
               if ( !buildings[v5].house_population )
                 fun_evolveHouseTo(v5, 10);
               buildings[v5].house_population += (unsigned __int8)walker_migrantNumPeopleCarried[128 * walkerId];
-              building_18_house_roomForPeople[64 * v5] = v1 - buildings[v5].house_population;
+              building_18_house_roomForPeople[64 * v5] = housePeopleNumber - buildings[v5].house_population;
               sub_4E3920(ciid, (unsigned __int8)walker_migrantNumPeopleCarried[128 * walkerId]);
               building_26_immigrantId[64 * v5] = 0;
             }
@@ -65621,7 +65451,7 @@ void  fun_walker_warehouseman()
       ++word_7FA366[64 * walkerId];
       if ( word_7FA366[64 * walkerId] > 2 )
       {
-        if ( building_0a_type[64 * v19] == 71 )
+        if ( buildings[v19].type == 71 )
         {
           if ( byte_7FA34B[128 * walkerId] )
           {
@@ -65878,7 +65708,7 @@ void  fun_walker_warehouseman()
       ++word_7FA366[64 * walkerId];
       if ( word_7FA366[64 * walkerId] > 4 )
       {
-        switch ( building_0a_type[64 * v16] )
+        switch ( buildings[v16].type )
         {
           case 71:
             sub_45D3D0(v16, (unsigned __int8)byte_7FA34B[128 * walkerId], 0);
@@ -66262,7 +66092,7 @@ void  fun_walker_prefect()
              building__07_y[128 * v3]);
       if ( buildings[v3].inUse == 1 )
       {
-        if ( building_0a_type[64 * v3] == 99 )
+        if ( buildings[v3].type == 99 )
         {
           if ( v2 < 2 )
           {
@@ -67762,7 +67592,7 @@ void  fun_walker_tradeship()
           word_7FA366[64 * walkerId] = 0;
           walkers[walkerId].destination_x = scn_riverEntry_x;
           walker_destination_y[128 * walkerId] = scn_riverEntry_y;
-          building_4a_grow_value_house_foodstocks[64 * v4] = 0;
+          buildings[v4].grow_value_house_foodstocks[0] = 0;
           building_65_house_bathhouse_dock_numships_entert_days[128 * v4] = 0;
         }
       }
@@ -68036,12 +67866,12 @@ signed int  sub_49FDE0(int walkerId)
     v3 = grid_buildingIds[v1];
     if ( grid_buildingIds[v1] )
     {
-      if ( (!buildings[v3].houseSize || building_0c_level_resourceId[64 * v3] > 5)
-        && building_0a_type[64 * v3] != B_WarehouseSpace
-        && building_0a_type[64 * v3] != B_Warehouse
-        && building_0a_type[64 * v3] != B_FortGround
-        && building_0a_type[64 * v3] != B_FortGround__
-        && building_0a_type[64 * v3] != B_BurningRuin )
+      if ( (!buildings[v3].houseSize || buildings[v3].level_resourceId > 5)
+        && buildings[v3].type != B_WarehouseSpace
+        && buildings[v3].type != B_Warehouse
+        && buildings[v3].type != B_FortGround
+        && buildings[v3].type != B_FortGround__
+        && buildings[v3].type != B_BurningRuin )
         break;
     }
   }
@@ -68049,7 +67879,7 @@ signed int  sub_49FDE0(int walkerId)
     dword_65DED0 = 0;
   else
     dword_659C14 = time_current;
-  fun_postMessageToPlayer(14, building_0a_type[64 * v3], walkers[walkerId].gridOffset);
+  fun_postMessageToPlayer(14, buildings[v3].type, walkers[walkerId].gridOffset);
   ++dword_65DE2C;
   sub_46E3D0(v3, 0);
   walkers[walkerId].actionState = 120;
@@ -68255,9 +68085,9 @@ void  fun_walker_fishingBoat()
       }
       break;
     case 0xC2:
-      v1 = fun_getPercentage(
+      v1 = getPercentage(
              building_38_num_workers[64 * v3],
-             model_buildings_laborers[8 * building_0a_type[64 * v3]]);
+             model_buildings_laborers[8 * buildings[v3].type]);
       v0 = 5 * (102 - v1);
       if ( building_58_house_pottery[64 * v3] > 0 )
         v1 = 0;
@@ -68372,7 +68202,7 @@ void  fun_walker_schoolChild()
   walkers[walkerId].byte_7FA34C = 0;
   word_7FA372[64 * walkerId] = 96;
   v0 = walkers[walkerId].buildingId;
-  if ( buildings[v0].inUse != 1 || building_0a_type[64 * v0] != 51 )
+  if ( buildings[v0].inUse != 1 || buildings[v0].type != 51 )
     walkers[walkerId].state = 2;
   ++byte_7FA341[128 * walkerId];
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
@@ -68811,9 +68641,9 @@ void  fun_walker_docker()
   if ( buildings[v5].inUse != 1 )
     walkers[walkerId].state = 2;
 
-  if ( building_0a_type[64 * v5] != 75 )
+  if ( buildings[v5].type != 75 )
   {
-    if ( building_0a_type[64 * v5] != 76 )
+    if ( buildings[v5].type != 76 )
       walkers[walkerId].state = 2;
   }
   if ( building_65_house_bathhouse_dock_numships_entert_days[128 * v5] )
@@ -68858,12 +68688,12 @@ void  fun_walker_docker()
     case 133:
       word_7FA346[64 * walkerId] = 0;
       byte_7FA341[128 * walkerId] = 0;
-      if ( building_4a_grow_value_house_foodstocks[64 * v5] <= 0 )
+      if ( buildings[v5].grow_value_house_foodstocks[0] <= 0 )
       {
-        building_4a_grow_value_house_foodstocks[64 * v5] = walkerId;
+        buildings[v5].grow_value_house_foodstocks[0] = walkerId;
         word_7FA366[64 * walkerId] = 0;
       }
-      if ( building_4a_grow_value_house_foodstocks[64 * v5] == walkerId )
+      if ( buildings[v5].grow_value_house_foodstocks[0] == walkerId )
       {
         building_65_house_bathhouse_dock_numships_entert_days[128 * v5] = 120;
         ++word_7FA366[64 * walkerId];
@@ -68875,7 +68705,7 @@ void  fun_walker_docker()
           word_7FA346[64 * walkerId] += fun_getResourceGraphicIdOffset(
                                           (unsigned __int8)byte_7FA34B[128 * walkerId],
                                           1);
-          building_4a_grow_value_house_foodstocks[64 * v5] = 0;
+          buildings[v5].grow_value_house_foodstocks[0] = 0;
         }
       }
       else
@@ -68883,32 +68713,32 @@ void  fun_walker_docker()
         v1 = 0;
         for ( i = 0; i <= 2; ++i )
         {
-          v6 = *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v5] + 2 * i);
-          if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v5] + 2 * i) )
+          v6 = buildings[v5].word_94BDAC[i];
+          if ( buildings[v5].word_94BDAC[i] )
           {
             if ( walkers[v6].state == 1 )
             {
               if ( walkers[v6].actionState == 133 || walkers[v6].actionState == 134 )
               {
-                if ( building_4a_grow_value_house_foodstocks[64 * v5] == v6 )
+                if ( buildings[v5].grow_value_house_foodstocks[0] == v6 )
                   v1 = 1;
               }
             }
           }
         }
         if ( v1 != 1 )
-          building_4a_grow_value_house_foodstocks[64 * v5] = 0;
+          buildings[v5].grow_value_house_foodstocks[0] = 0;
       }
       break;
     case 134:
       word_7FA346[64 * walkerId] = word_6E6C72 + 8 * (unsigned __int8)byte_7FA34B[128 * walkerId];
       word_7FA346[64 * walkerId] += fun_getResourceGraphicIdOffset((unsigned __int8)byte_7FA34B[128 * walkerId], 1);
-      if ( building_4a_grow_value_house_foodstocks[64 * v5] <= 0 )
+      if ( buildings[v5].grow_value_house_foodstocks[0] <= 0 )
       {
-        building_4a_grow_value_house_foodstocks[64 * v5] = walkerId;
+        buildings[v5].grow_value_house_foodstocks[0] = walkerId;
         word_7FA366[64 * walkerId] = 0;
       }
-      if ( building_4a_grow_value_house_foodstocks[64 * v5] == walkerId )
+      if ( buildings[v5].grow_value_house_foodstocks[0] == walkerId )
       {
         building_65_house_bathhouse_dock_numships_entert_days[128 * v5] = 120;
         ++word_7FA366[64 * walkerId];
@@ -68918,7 +68748,7 @@ void  fun_walker_docker()
           word_7FA366[64 * walkerId] = 0;
           walkers[walkerId].word_7FA344 = 0;
           word_7FA346[64 * walkerId] = 0;
-          building_4a_grow_value_house_foodstocks[64 * v5] = 0;
+          buildings[v5].grow_value_house_foodstocks[0] = 0;
         }
       }
       ++word_7FA366[64 * walkerId];
@@ -69218,15 +69048,7 @@ signed int  sub_4A4910(int a1)
   }
   return result;
 }
-// 402FFE: using guessed type _DWORD  sub_402FFE(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 6543BC: using guessed type int dword_6543BC[];
-// 654594: using guessed type int cityinfo_tradeCenterId[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (004A4B50) --------------------------------------------------------
 signed int  sub_4A4B50(int a1)
 {
   signed int result; // eax@2
@@ -69237,14 +69059,14 @@ signed int  sub_4A4B50(int a1)
   v4 = word_7FA38E[64 * a1];
   if ( buildings[v4].inUse == 1 )
   {
-    if ( building_0a_type[64 * v4] == 75 )
+    if ( buildings[v4].type == 75 )
     {
       if ( building_38_num_workers[64 * v4] > 0 )
       {
         for ( i = 0; i <= 2; ++i )
         {
-          v2 = *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v4] + 2 * i);
-          if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v4] + 2 * i)
+          v2 = buildings[v4].word_94BDAC[i];
+          if ( buildings[v4].word_94BDAC[i]
             && walkers[v2].state == 1
             && walkers[v2].actionState != 132 )
             return 0;
@@ -69290,7 +69112,7 @@ bool  sub_4A4CC0(int a1)
   v2 = word_7FA38E[64 * a1];
   if ( buildings[v2].inUse == 1 )
   {
-    if ( building_0a_type[64 * v2] == 75 )
+    if ( buildings[v2].type == 75 )
     {
       if ( building_38_num_workers[64 * v2] > 0 )
         result = building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v2] != a1;
@@ -69319,12 +69141,12 @@ signed int  sub_4A4D70(int a1)
   v4 = word_7FA38E[64 * a1];
   if ( buildings[v4].inUse == 1 )
   {
-    if ( building_0a_type[64 * v4] == 75 )
+    if ( buildings[v4].type == 75 )
     {
       for ( i = 0; i <= 2; ++i )
       {
-        v2 = *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v4] + 2 * i);
-        if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * v4] + 2 * i)
+        v2 = buildings[v4].word_94BDAC[i];
+        if ( buildings[v4].word_94BDAC[i]
           && walkers[v2].state == 1 )
         {
           if ( walkers[v2].actionState == 133 )
@@ -69368,9 +69190,9 @@ int  sub_4A4F80(int a1)
   v3 = 0;
   for ( i = 0; i <= 2; ++i )
   {
-    if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * a1] + 2 * i) )
+    if ( *(__int16 *)((char *)&buildings[a1].word_94BDAC + 2 * i) )
     {
-      v2 = *(__int16 *)((char *)&building_6c_word_94BDAC[64 * a1] + 2 * i);
+      v2 = *(__int16 *)((char *)&buildings[a1].word_94BDAC + 2 * i);
       if ( walkers[v2].actionState == 132 )
       {
         ++v3;
@@ -69831,9 +69653,9 @@ void  fun_walker_indigenousNative()
         else
         {
           if ( sub_48A050(
-                 buildings[building_0c_level_resourceId[64 * v1]].x,
-                 building__07_y[128 * building_0c_level_resourceId[64 * v1]],
-                 (unsigned __int8)building_03_size[128 * building_0c_level_resourceId[64 * v1]]) )
+                 buildings[buildings[v1].level_resourceId].x,
+                 building__07_y[128 * buildings[v1].level_resourceId],
+                 (unsigned __int8)building_03_size[128 * buildings[v1].level_resourceId]) )
           {
             walkers[walkerId].actionState = -100;
             walkers[walkerId].destination_x = walkerGridX;
@@ -74514,7 +74336,7 @@ void  fun_walkerAdvanceTile(int walkerId)
             {
               if ( v3 & 8 )
               {
-                if ( building_0a_type[64 * v1] == 58 )
+                if ( buildings[v1].type == 58 )
                   walkers[walkerId].direction = 9;
               }
             }
@@ -74523,13 +74345,13 @@ void  fun_walkerAdvanceTile(int walkerId)
           {
             if ( v3 & 8 )
             {
-              if ( building_0a_type[64 * v1] != 72 )
+              if ( buildings[v1].type != 72 )
               {
-                if ( building_0a_type[64 * v1] != 71 )
+                if ( buildings[v1].type != 71 )
                 {
-                  if ( building_0a_type[64 * v1] != 56 )
+                  if ( buildings[v1].type != 56 )
                   {
-                    if ( building_0a_type[64 * v1] != 54 )
+                    if ( buildings[v1].type != 54 )
                       walkers[walkerId].direction = 9;
                   }
                 }
@@ -75268,8 +75090,8 @@ void  fun_deleteWalker(int walkerId)
                                 buildingId = walkers[walkerId].buildingId;
                                 for ( i = 0; i < 3; ++i )
                                 {
-                                  if ( *(__int16 *)((char *)&building_6c_word_94BDAC[64 * buildingId] + 2 * i) == walkerId )
-                                    *(__int16 *)((char *)&building_6c_word_94BDAC[64 * buildingId] + 2 * i) = 0;
+                                  if ( *(__int16 *)((char *)&buildings[buildingId].word_94BDAC + 2 * i) == walkerId )
+                                    *(__int16 *)((char *)&buildings[buildingId].word_94BDAC + 2 * i) = 0;
                                 }
                               }
                               else
@@ -75721,13 +75543,13 @@ int  sub_4B8E80(int a1)
   {
     if ( buildings[v2].inUse == 1 )
     {
-      if ( building_0a_type[64 * v2] == 54 )
+      if ( buildings[v2].type == 54 )
       {
         result = building_48_word_94BD88[64 * v2];
       }
       else
       {
-        if ( building_0a_type[64 * v2] == 57 )
+        if ( buildings[v2].type == 57 )
           result = building_48_word_94BD88[64 * v2];
         else
           result = 0;
@@ -76270,7 +76092,7 @@ signed int  fun_createFortFormation(int buildingId)
   formation_start_inUse[128 * formationId] = 1;
   formation_isFort[128 * formationId] = 1;
   formation_01[128 * formationId] = ciid;
-  formation_walkerType[64 * formationId] = building_0c_level_resourceId[64 * buildingId];
+  formation_walkerType[64 * formationId] = buildings[buildingId].level_resourceId;
   formation_buildingId[64 * formationId] = buildingId;
   formation_layout[64 * formationId] = 1;
   formation_morale[64 * formationId] = 50;
@@ -76456,7 +76278,7 @@ signed int  fun_generateTowerSentryFromBarracks(int buildingId)
       if ( i >= 2000 )
         return 0;
       if ( buildings[i].inUse == 1
-        && building_0a_type[64 * i] == B_Tower
+        && buildings[i].type == B_Tower
         && building_38_num_workers[64 * i] > 0
         && !building_22_walkerId[64 * i]
         && (unsigned __int8)building_0e_byte_94BD4E[128 * i] == (unsigned __int8)building_0e_byte_94BD4E[128 * buildingId] )
@@ -76529,9 +76351,9 @@ signed int  sub_4BB640(int a1)
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( building_0a_type[64 * i] == 94 )
+      if ( buildings[i].type == 94 )
       {
-        if ( (signed int)building_38_num_workers[64 * i] >= model_buildings_laborers[8 * building_0a_type[64 * i]] )
+        if ( (signed int)building_38_num_workers[64 * i] >= model_buildings_laborers[8 * buildings[i].type] )
         {
           v4 = fun_getDistanceMaximum(
                  buildings[v5].x,
@@ -76588,11 +76410,11 @@ void  sub_4BB790(int a1)
         }
         else
         {
-          if ( building_0c_level_resourceId[64 * a1] == 13 )
+          if ( buildings[a1].level_resourceId == 13 )
             formation_3e[64 * v1] = 3;
-          if ( building_0c_level_resourceId[64 * a1] == 11 )
+          if ( buildings[a1].level_resourceId == 11 )
             formation_3e[64 * v1] = 2;
-          if ( building_0c_level_resourceId[64 * a1] == 12 )
+          if ( buildings[a1].level_resourceId == 12 )
             formation_3e[64 * v1] = 1;
         }
       }
@@ -76836,7 +76658,7 @@ void  fun_formationDecreaseMoraleAfterComradeDeath(int a2)
   int percentageDiedOff; // [sp+4Ch] [bp-4h]@1
 
   sub_4BC600();
-  percentageDiedOff = fun_getPercentage(1, (unsigned __int8)formation_numWalkers[128 * a2]);
+  percentageDiedOff = getPercentage(1, (unsigned __int8)formation_numWalkers[128 * a2]);
   if ( percentageDiedOff >= 8 )
   {
     if ( percentageDiedOff >= 10 )
@@ -78655,7 +78477,7 @@ void  sub_4C0AF0(int a1)
     {
       for ( j = 0; j < 100 && j <= v5 && *(__int16 *)((char *)&word_5FC9E8[100 * v6] + 2 * j); ++j )
       {
-        if ( building_0a_type[64 * i] == *(__int16 *)((char *)&word_5FC9E8[100 * v6] + 2 * j) )
+        if ( buildings[i].type == *(__int16 *)((char *)&word_5FC9E8[100 * v6] + 2 * j) )
         {
           v2 = fun_getDistanceMaximum(
                  (unsigned __int8)formation_fortX[128 * a1],
@@ -78689,7 +78511,7 @@ void  sub_4C0AF0(int a1)
       {
         for ( l = 0; l < 100 && l <= v5 && word_5FCD08[l]; ++l )
         {
-          if ( building_0a_type[64 * k] == word_5FCD08[l] )
+          if ( buildings[k].type == word_5FCD08[l] )
           {
             v3 = fun_getDistanceMaximum(
                    (unsigned __int8)formation_fortX[128 * a1],
@@ -78718,7 +78540,7 @@ void  sub_4C0AF0(int a1)
   }
   if ( v4 > 0 )
   {
-    if ( building_0a_type[64 * v4] == 72 )
+    if ( buildings[v4].type == 72 )
     {
       formation_34[128 * a1] = buildings[v4].x + 1;
       formation_35[128 * a1] = building__07_y[128 * v4];
@@ -78746,17 +78568,17 @@ void  sub_4C0F10(int a1)
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( building_0a_type[64 * i] != 80 )
+      if ( buildings[i].type != 80 )
       {
-        if ( building_0a_type[64 * i] != 88 )
+        if ( buildings[i].type != 88 )
         {
-          if ( building_0a_type[64 * i] != 89 )
+          if ( buildings[i].type != 89 )
           {
-            if ( building_0a_type[64 * i] != 93 )
+            if ( buildings[i].type != 93 )
             {
-              if ( building_0a_type[64 * i] != 72 )
+              if ( buildings[i].type != 72 )
               {
-                if ( building_0a_type[64 * i] != 57 )
+                if ( buildings[i].type != 57 )
                 {
                   v2 = fun_getDistanceMaximum(
                          city_inform[ciid].dword_6544C4,
@@ -78799,7 +78621,7 @@ void  sub_4C1100()
     {
       for ( j = 0; j < 100 && j <= v1 && word_5FCD08[j]; ++j )
       {
-        if ( building_0a_type[64 * i] == word_5FCD08[j] )
+        if ( buildings[i].type == word_5FCD08[j] )
         {
           if ( j < v1 )
           {
@@ -78813,7 +78635,7 @@ void  sub_4C1100()
   }
   if ( v0 > 0 )
   {
-    if ( building_0a_type[64 * v0] == 72 )
+    if ( buildings[v0].type == 72 )
     {
       walkerGridX = buildings[v0].x + 1;
       walkerGridY = building__07_y[128 * v0];
@@ -78975,7 +78797,7 @@ signed int  fun_walkerProvideServiceCoverage(int walkerId)
       break;
     case Walker_Priest:
       v3 = walkers[walkerId].buildingId;
-      switch ( building_0a_type[64 * v3] )
+      switch ( buildings[v3].type )
       {
         case B_SmallTempleCeres:
           v2 = fun_walkerProvideReligionAccess(walkers[walkerId].x, walkers[walkerId].y, 0);
@@ -79038,13 +78860,13 @@ signed int  fun_walkerProvideServiceCoverage(int walkerId)
         v4 = word_7FA38E[64 * walkerId];
       else
         v4 = walkers[walkerId].buildingId;
-      if ( building_0a_type[64 * v4] == B_Theater )
+      if ( buildings[v4].type == B_Theater )
       {
         v2 = fun_walkerProvideTheaterAccess(walkers[walkerId].x, walkers[walkerId].y);
       }
       else
       {
-        if ( building_0a_type[64 * v4] == B_Amphitheater )
+        if ( buildings[v4].type == B_Amphitheater )
         {
           if ( building_65_house_bathhouse_dock_numships_entert_days[128 * v4] )
             v2 = fun_walkerProvideAmphitheaterAccess(walkers[walkerId].x, walkers[walkerId].y, 2);
@@ -79059,7 +78881,7 @@ signed int  fun_walkerProvideServiceCoverage(int walkerId)
         v5 = word_7FA38E[64 * walkerId];
       else
         v5 = walkers[walkerId].buildingId;
-      if ( building_0a_type[64 * v5] == B_Amphitheater )
+      if ( buildings[v5].type == B_Amphitheater )
       {
         if ( building_66_house_hospital_entert_days2[128 * v5] )
           v2 = fun_walkerProvideAmphitheaterAccess(walkers[walkerId].x, walkers[walkerId].y, 2);
@@ -79068,7 +78890,7 @@ signed int  fun_walkerProvideServiceCoverage(int walkerId)
       }
       else
       {
-        if ( building_0a_type[64 * v5] == B_Colosseum )
+        if ( buildings[v5].type == B_Colosseum )
         {
           if ( building_65_house_bathhouse_dock_numships_entert_days[128 * v5] )
             v2 = fun_walkerProvideColosseumAccess(walkers[walkerId].x, walkers[walkerId].y, 2);
@@ -79491,7 +79313,7 @@ void  sub_4C4CC0()
     if ( helpDialog_value > 0 )
     {
       if ( helpDialog_value < helpDialog_max )
-        v1 = fun_getPercentage(helpDialog_value, helpDialog_max);
+        v1 = getPercentage(helpDialog_value, helpDialog_max);
       else
         v1 = 100;
     }
@@ -79925,7 +79747,7 @@ signed int  sub_4C5FE0()
               v2 = mouseclick_y - helpDialog_text_y - 11;
               if ( mouseclick_y - helpDialog_text_y - 11 > v3 )
                 v2 = 16 * helpDialog_text_height - 52;
-              v1 = fun_getPercentage(v2, v3);
+              v1 = getPercentage(v2, v3);
               helpDialog_value = fun_adjustWithPercentage(helpDialog_max, v1);
               dword_7E314C = 1;
               dword_7E2D0C = v2 - 25;
@@ -80711,8 +80533,8 @@ signed int  fun_getButtonTooltipText()
                     mouseover_last_update = time_current;
                     return 0;
                   }
-                  if ( building_0a_type[64 * currentlySelectedBuilding] < 10
-                    || building_0a_type[64 * currentlySelectedBuilding] > 29 )
+                  if ( buildings[currentlySelectedBuilding].type < 10
+                    || buildings[currentlySelectedBuilding].type > 29 )
                   {
                     mouseover_last_update = time_current;
                     return 0;
@@ -80911,7 +80733,7 @@ LABEL_196:
     v4 = grid_buildingIds[dword_8C79EC];
     if ( v4 > 0 )
     {
-      if ( building_0a_type[64 * v4] == B_SenateUpgraded )
+      if ( buildings[v4].type == B_SenateUpgraded )
       {
         mouseover_info_id = 1;
         dword_7E2D1C = 2;
@@ -81627,14 +81449,14 @@ signed int  fun_getOverlayTooltipText()
     case Overlay_FoodStocks:
       if ( buildings[v3].house_population <= 0 )
         return 0;
-      v9 = model_houses_foodtypes[20 * building_0c_level_resourceId[64 * v3]];
+      v9 = model_houses[buildings[v3].level_resourceId].foodtypes;
       if ( v9 )
         v9 = buildings[v3].house_population;
       v8 = 0;
       for ( i = 0; i < 4; ++i )
-        v8 += *(__int16 *)((char *)&building_4a_grow_value_house_foodstocks[64 * v3] + 2 * i);
+        v8 += buildings[v3].grow_value_house_foodstocks[i];
       if ( v9 )
-        v7 = fun_getPercentage(v8, v9);
+        v7 = getPercentage(v8, v9);
       else
         v7 = 400;
       if ( v9 > 0 )
@@ -81677,7 +81499,7 @@ signed int  fun_getOverlayTooltipText()
       }
       break;
     case Overlay_Workers:
-      v6 = fun_getPercentage(buildings[v3].walkerServiceAccess, 300);
+      v6 = getPercentage(buildings[v3].walkerServiceAccess, 300);
       if ( buildings[v3].walkerServiceAccess > 0 )
       {
         if ( v6 > 20 )
@@ -85242,20 +85064,19 @@ int  unused_4D12E0(int a1)
 }
 // 6DEC40: using guessed type int random_7fff_1;
 
-//----- (004D14B0) --------------------------------------------------------
+
 int  fun_adjustWithPercentage(int value, int percentage)
 {
   return percentage * value / 100;
 }
 
-//----- (004D14F0) --------------------------------------------------------
 int  unused_adjustWithPromille(int value, int promille)
 {
   return promille * value / 10000;
 }
 
-//----- (004D1530) --------------------------------------------------------
-int  fun_getPercentage(int value, signed int max)
+
+int  getPercentage(int value, signed int max)
 {
   signed int value100; // [sp+54h] [bp+8h]@1
   int percentage; // [sp+54h] [bp+8h]@2
@@ -85265,10 +85086,10 @@ int  fun_getPercentage(int value, signed int max)
     percentage = value100 / max;
   else
     percentage = 0;
+
   return percentage;
 }
 
-//----- (004D1580) --------------------------------------------------------
 int  unused_divideAndRoundUp(signed int value, signed int divisor)
 {
   int result; // eax@2
@@ -86996,8 +86817,8 @@ void  fun_getMouseCursorStatus()
   byte_660731[0] = mouse_isLeftClick;
   byte_660787 = mouse_isRightClick;
   v0 = ddraw_bottomright.y - dword_660554;
-  v1 = fun_getPercentage(ddraw_width, ddraw_bottomright.x - ddraw_rect.left);
-  v2 = fun_getPercentage(ddraw_height, v0);
+  v1 = getPercentage(ddraw_width, ddraw_bottomright.x - ddraw_rect.left);
+  v2 = getPercentage(ddraw_height, v0);
   mouseclick_x = fun_adjustWithPercentage(mouseInfo_x, v1);
   mouseclick_y = fun_adjustWithPercentage(mouseInfo_y, v2);
   dword_660C44 = 0;
@@ -91591,7 +91412,7 @@ void  fun_drawMessageListButtons()
       if ( dword_659C18 > 0 )
       {
         if ( dword_659C18 < dword_658DD0 )
-          v1 = fun_getPercentage(dword_659C18, dword_658DD0);
+          v1 = getPercentage(dword_659C18, dword_658DD0);
         else
           v1 = 100;
       }
@@ -91703,7 +91524,7 @@ signed int  sub_4DF2E0()
               v2 = mouseclick_y - dword_659B64 - 11;
               if ( mouseclick_y - dword_659B64 - 11 > v3 )
                 v2 = 16 * dword_659B54 - 52;
-              v1 = fun_getPercentage(v2, v3);
+              v1 = getPercentage(v2, v3);
               dword_659C18 = fun_adjustWithPercentage(dword_658DD0, v1);
               dword_659BF0 = 1;
               dword_659B80 = v2 - 25;
@@ -92385,7 +92206,7 @@ void  fun_showWarningMoreFoodNeeded(int buildingId)
         {
           if ( !scn_romeSuppliesWheat )
           {
-            if ( fun_getPercentage( city_inform[ciid].dword_654504, city_inform[ciid].dword_654500 ) <= 95 )
+            if ( getPercentage( city_inform[ciid].dword_654504, city_inform[ciid].dword_654500 ) <= 95 )
               fun_showWarning(18);
           }
         }
@@ -92698,18 +92519,18 @@ void  fun_calculateHealthRate()
             if (buildings[i].house_population )
             {
               v1 +=buildings[i].house_population;
-              if ( building_0c_level_resourceId[64 * i] > 1 )
+              if ( buildings[i].level_resourceId > 1 )
               {
                 if ( building_64_house_clinic[128 * i] )
                 {
-                  if ( (signed int)(unsigned __int8)building_78_byte_94BDB8[128 * i] > 0 )
+                  if ( buildings[i].byte_94BDB8 > 0 )
                     v0 +=buildings[i].house_population / 4;
                   else
                     v0 +=buildings[i].house_population;
                 }
                 else
                 {
-                  if ( (signed int)(unsigned __int8)building_78_byte_94BDB8[128 * i] <= 0 )
+                  if ( buildings[i].byte_94BDB8 <= 0 )
                     v0 +=buildings[i].house_population / 4;
                 }
               }
@@ -92724,7 +92545,7 @@ void  fun_calculateHealthRate()
           }
         }
       }
-      city_inform[ciid].calculatedTargetHealthRate = fun_getPercentage(v0, v1);
+      city_inform[ciid].calculatedTargetHealthRate = getPercentage(v0, v1);
       if ( city_inform[ciid].healthRate >= city_inform[ciid].calculatedTargetHealthRate )
       {
         if ( city_inform[ciid].healthRate > city_inform[ciid].calculatedTargetHealthRate )
@@ -92793,7 +92614,7 @@ void  fun_calculateHealthRate()
                   {
                     if ( buildings[k].house_population )
                     {
-                      if ( building_0c_level_resourceId[64 * k] <= 1 )
+                      if ( buildings[k].level_resourceId <= 1 )
                       {
                         v3 -= buildings[k].house_population;
                         sub_46E3D0(k, 1);
@@ -92986,8 +92807,8 @@ int  fun_calculateCityHappinessAndCrime()
   signed int v4; // [sp+58h] [bp-38h]@25
   signed int diffWages; // [sp+5Ch] [bp-34h]@3
   int v6; // [sp+60h] [bp-30h]@88
-  signed int v7; // [sp+64h] [bp-2Ch]@64
-  signed int v8; // [sp+68h] [bp-28h]@64
+  signed int numberHouse; // [sp+64h] [bp-2Ch]@64
+  signed int crimeRiskSum; // [sp+68h] [bp-28h]@64
   int v9; // [sp+6Ch] [bp-24h]@3
   signed int v10; // [sp+70h] [bp-20h]@27
   signed int v11; // [sp+74h] [bp-1Ch]@27
@@ -93092,19 +92913,20 @@ int  fun_calculateCityHappinessAndCrime()
             ++v10;
             v12 = 0;
             v9 = 0;
-            if ( model_houses_foodtypes[20 * building_0c_level_resourceId[64 * i]] )
+            if( model_houses[buildings[i].level_resourceId].foodtypes )
             {
               ++v13;
-              if ( (signed int)HIBYTE(building_6c_word_94BDAC[64 * i]) < 2 )
+              if ( (signed int)HIBYTE(buildings[i].word_94BDAC) < 2 )
               {
-                if ( (signed int)HIBYTE(building_6c_word_94BDAC[64 * i]) <= 0 )
+                if ( (signed int)HIBYTE(buildings[i].word_94BDAC) <= 0 )
                 {
-                  ++building_78_byte_94BDB8[128 * i];
-                  if ( (signed int)(unsigned __int8)building_78_byte_94BDB8[128 * i] > 3 )
-                    building_78_byte_94BDB8[128 * i] = 3;
-                  if ( (signed int)(unsigned __int8)building_78_byte_94BDB8[128 * i] < 3 )
+                  ++buildings[i].byte_94BDB8;
+                  if ( buildings[i].byte_94BDB8 > 3 )
+                    buildings[i].byte_94BDB8 = 3;
+
+                  if ( buildings[i].byte_94BDB8 < 3 )
                   {
-                    if ( (signed int)(unsigned __int8)building_78_byte_94BDB8[128 * i] < 2 )
+                    if ( buildings[i].byte_94BDB8 < 2 )
                     {
                       v12 = -1;
                       --v14;
@@ -93125,19 +92947,19 @@ int  fun_calculateCityHappinessAndCrime()
                 {
                   v12 = 1;
                   ++v14;
-                  building_78_byte_94BDB8[128 * i] = 0;
+                  buildings[i].byte_94BDB8 = 0;
                 }
               }
               else
               {
                 v12 = 2;
                 v14 += 2;
-                building_78_byte_94BDB8[128 * i] = 0;
+                buildings[i].byte_94BDB8 = 0;
               }
             }
             else
             {
-              building_78_byte_94BDB8[128 * i] = 0;
+              buildings[i].byte_94BDB8 = 0;
               v9 = v4;
               v11 += v4;
             }
@@ -93168,12 +92990,15 @@ int  fun_calculateCityHappinessAndCrime()
       }
     }
   }
+
   if ( v13 )
     v12 = v14 / v13;
+
   if ( v10 )
     v9 = v11 / v10;
-  v8 = 0;
-  v7 = 0;
+
+  crimeRiskSum = 0;
+  numberHouse = 0;
   for ( j = 1; j < 2000; ++j )
   {
     if ( buildings[j].inUse == 1 )
@@ -93182,19 +93007,20 @@ int  fun_calculateCityHappinessAndCrime()
       {
         if ( buildings[j].house_population )
         {
-          ++v7;
-          v8 += buildings[j].house_crimeRisk;
+          ++numberHouse;
+          crimeRiskSum += buildings[j].house_crimeRisk;
         }
       }
     }
   }
-  if ( v7 )
-    city_inform[ciid].hapinessCity = v8 / v7;
+  if ( numberHouse )
+    city_inform[ciid].hapinessCity = crimeRiskSum / numberHouse;
   else
     city_inform[ciid].hapinessCity = 60;
 
   if ( city_inform[ciid].dword_654460 )
     --city_inform[ciid].dword_654460;
+
   city_inform[ciid].dword_654464 = 0;
   if ( city_inform[ciid].hapinessCity < 48 )
   {
@@ -93300,7 +93126,7 @@ signed int  sub_4E3140()
   signed int result; // eax@3
   int pctTent; // [sp+4Ch] [bp-4h]@1
 
-  pctTent = fun_getPercentage(city_inform[ciid].peopleInTents, city_inform[ciid].population);
+  pctTent = getPercentage(city_inform[ciid].peopleInTents, city_inform[ciid].population);
   if ( city_inform[ciid].peopleInVillasAndPalaces <= 0 )
   {
     if ( city_inform[ciid].peopleInLargeInsulaAndAbove <= 0 )
@@ -94852,12 +94678,12 @@ signed int  sub_4E6EC0()
                                 if ( currentlySelectedBuilding )
                                 {
                                   dword_64E35C = 2;
-                                  currentBuilding_workerPercentage = fun_getPercentage(
+                                  currentBuilding_workerPercentage = getPercentage(
                                                                        building_38_num_workers[64
                                                                                              * currentlySelectedBuilding],
                                                                        model_buildings_laborers[8
-                                                                                              * building_0a_type[64 * currentlySelectedBuilding]]);
-                                  if ( building_0a_type[64 * currentlySelectedBuilding] == 54 )
+                                                                                              * buildings[currentlySelectedBuilding].type]);
+                                  if ( buildings[currentlySelectedBuilding].type == 54 )
                                   {
                                     currentlySelectedBuilding = building_30_warehouse_prevStorage[64
                                                                                                 * currentlySelectedBuilding];
@@ -94869,7 +94695,7 @@ signed int  sub_4E6EC0()
                                   else
                                   {
                                     v13 = currentlySelectedBuilding << 7;
-                                    switch ( building_0a_type[64 * currentlySelectedBuilding] )
+                                    switch ( buildings[currentlySelectedBuilding].type )
                                     {
                                       case B_FortGround__:
                                         dword_64E324 = building_48_word_94BD88[64 * currentlySelectedBuilding];
@@ -94894,7 +94720,7 @@ signed int  sub_4E6EC0()
                                         }
                                         else
                                         {
-                                          if ( building_0a_type[64 * currentlySelectedBuilding] == B_Barracks )
+                                          if ( buildings[currentlySelectedBuilding].type == B_Barracks )
                                           {
                                             dword_64E2C4[0] = sub_4BB5B0(/*v13, currentlySelectedBuilding << 7*/);
                                             dword_64E2C4[0] += dword_7FA224;
@@ -94904,7 +94730,7 @@ signed int  sub_4E6EC0()
                                     }
                                   }
                                   dword_64E370 = 0;
-                                  switch ( building_0a_type[64 * currentlySelectedBuilding] )
+                                  switch ( buildings[currentlySelectedBuilding].type )
                                   {
                                     case B_Granary:
                                       if ( fun_granaryHasRoadAccess(
@@ -95210,127 +95036,127 @@ signed int  sub_4E7D40()
       return 0;
     if ( dword_64E35C != 2 )
       goto LABEL_141;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_SmallTempleCeres )
+    if ( buildings[currentlySelectedBuilding].type == B_SmallTempleCeres )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_SmallTempleNeptune )
+    if ( buildings[currentlySelectedBuilding].type == B_SmallTempleNeptune )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_SmallTempleMercury )
+    if ( buildings[currentlySelectedBuilding].type == B_SmallTempleMercury )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_SmallTempleMars )
+    if ( buildings[currentlySelectedBuilding].type == B_SmallTempleMars )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_SmallTempleVenus )
+    if ( buildings[currentlySelectedBuilding].type == B_SmallTempleVenus )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_LargeTempleCeres )
+    if ( buildings[currentlySelectedBuilding].type == B_LargeTempleCeres )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_LargeTempleNeptune )
+    if ( buildings[currentlySelectedBuilding].type == B_LargeTempleNeptune )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_LargeTempleMercury )
+    if ( buildings[currentlySelectedBuilding].type == B_LargeTempleMercury )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_LargeTempleMars )
+    if ( buildings[currentlySelectedBuilding].type == B_LargeTempleMars )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_LargeTempleVenus )
+    if ( buildings[currentlySelectedBuilding].type == B_LargeTempleVenus )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_SmallStatue )
+    if ( buildings[currentlySelectedBuilding].type == B_SmallStatue )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_MediumStatue )
+    if ( buildings[currentlySelectedBuilding].type == B_MediumStatue )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_LargeStatue )
+    if ( buildings[currentlySelectedBuilding].type == B_LargeStatue )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_GladiatorSchool )
+    if ( buildings[currentlySelectedBuilding].type == B_GladiatorSchool )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_LionHouse )
+    if ( buildings[currentlySelectedBuilding].type == B_LionHouse )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_ActorColony )
+    if ( buildings[currentlySelectedBuilding].type == B_ActorColony )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_ChariotMaker )
+    if ( buildings[currentlySelectedBuilding].type == B_ChariotMaker )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Doctor )
+    if ( buildings[currentlySelectedBuilding].type == B_Doctor )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Hospital )
+    if ( buildings[currentlySelectedBuilding].type == B_Hospital )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Bathhouse )
+    if ( buildings[currentlySelectedBuilding].type == B_Bathhouse )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Barber )
+    if ( buildings[currentlySelectedBuilding].type == B_Barber )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Oracle )
+    if ( buildings[currentlySelectedBuilding].type == B_Oracle )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_BurningRuin )
+    if ( buildings[currentlySelectedBuilding].type == B_BurningRuin )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Reservoir )
+    if ( buildings[currentlySelectedBuilding].type == B_Reservoir )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Fountain )
+    if ( buildings[currentlySelectedBuilding].type == B_Fountain )
       return 4;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Well )
+    if ( buildings[currentlySelectedBuilding].type == B_Well )
       return 4;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_NativeHut )
+    if ( buildings[currentlySelectedBuilding].type == B_NativeHut )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_NativeMeeting )
+    if ( buildings[currentlySelectedBuilding].type == B_NativeMeeting )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_NativeCrops )
+    if ( buildings[currentlySelectedBuilding].type == B_NativeCrops )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_MissionPost )
+    if ( buildings[currentlySelectedBuilding].type == B_MissionPost )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Amphitheater )
+    if ( buildings[currentlySelectedBuilding].type == B_Amphitheater )
       return 3;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Theater )
+    if ( buildings[currentlySelectedBuilding].type == B_Theater )
       return 2;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Hippodrome )
+    if ( buildings[currentlySelectedBuilding].type == B_Hippodrome )
       return 2;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Colosseum )
+    if ( buildings[currentlySelectedBuilding].type == B_Colosseum )
       return 2;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Prefecture )
+    if ( buildings[currentlySelectedBuilding].type == B_Prefecture )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_EngineersPost )
+    if ( buildings[currentlySelectedBuilding].type == B_EngineersPost )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_School )
+    if ( buildings[currentlySelectedBuilding].type == B_School )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Academy )
+    if ( buildings[currentlySelectedBuilding].type == B_Academy )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Library )
+    if ( buildings[currentlySelectedBuilding].type == B_Library )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Gatehouse )
+    if ( buildings[currentlySelectedBuilding].type == B_Gatehouse )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Tower )
+    if ( buildings[currentlySelectedBuilding].type == B_Tower )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_FortGround__ )
+    if ( buildings[currentlySelectedBuilding].type == B_FortGround__ )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_MilitaryAcademy )
+    if ( buildings[currentlySelectedBuilding].type == B_MilitaryAcademy )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Barracks )
+    if ( buildings[currentlySelectedBuilding].type == B_Barracks )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Market )
+    if ( buildings[currentlySelectedBuilding].type == B_Market )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Granary )
+    if ( buildings[currentlySelectedBuilding].type == B_Granary )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Shipyard )
+    if ( buildings[currentlySelectedBuilding].type == B_Shipyard )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Dock )
+    if ( buildings[currentlySelectedBuilding].type == B_Dock )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Wharf )
+    if ( buildings[currentlySelectedBuilding].type == B_Wharf )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_GovernorsHouse )
+    if ( buildings[currentlySelectedBuilding].type == B_GovernorsHouse )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_GovernorsVilla )
+    if ( buildings[currentlySelectedBuilding].type == B_GovernorsVilla )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_GovernorsPalace )
+    if ( buildings[currentlySelectedBuilding].type == B_GovernorsPalace )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Senate )
+    if ( buildings[currentlySelectedBuilding].type == B_Senate )
       return 2;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_SenateUpgraded )
+    if ( buildings[currentlySelectedBuilding].type == B_SenateUpgraded )
       return 2;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Forum )
+    if ( buildings[currentlySelectedBuilding].type == B_Forum )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_ForumUpgraded )
+    if ( buildings[currentlySelectedBuilding].type == B_ForumUpgraded )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_WineWorkshop )
+    if ( buildings[currentlySelectedBuilding].type == B_WineWorkshop )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_OilWorkshop )
+    if ( buildings[currentlySelectedBuilding].type == B_OilWorkshop )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_WeaponsWorkshop )
+    if ( buildings[currentlySelectedBuilding].type == B_WeaponsWorkshop )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] == B_FurnitureWorkshop )
+    if ( buildings[currentlySelectedBuilding].type == B_FurnitureWorkshop )
       return 1;
-    if ( building_0a_type[64 * currentlySelectedBuilding] != B_PotteryWorkshop )
+    if ( buildings[currentlySelectedBuilding].type != B_PotteryWorkshop )
 LABEL_141:
       result = 0;
     else
@@ -95357,10 +95183,10 @@ void  fun_showRightClickInfo()
         fun_showFortInfo(dword_64E324);
         break;
       case 2:
-        if ( building_0a_type[64 * currentlySelectedBuilding] < (signed int)B_HouseVacantLot
-          || building_0a_type[64 * currentlySelectedBuilding] > (signed int)B_HouseLuxuryPalace )
+        if ( buildings[currentlySelectedBuilding].type < (signed int)B_HouseVacantLot
+          || buildings[currentlySelectedBuilding].type > (signed int)B_HouseLuxuryPalace )
         {
-          switch ( building_0a_type[64 * currentlySelectedBuilding] )
+          switch ( buildings[currentlySelectedBuilding].type )
           {
             case B_Amphitheater:
               fun_showBuildingInfoAmphitheater();
@@ -95621,10 +95447,10 @@ void  sub_4E92D0()
       {
         if ( dword_64E35C == 2 )
         {
-          if ( building_0a_type[64 * currentlySelectedBuilding] < (signed int)B_HouseVacantLot
-            || building_0a_type[64 * currentlySelectedBuilding] > (signed int)B_HouseLuxuryPalace )
+          if ( buildings[currentlySelectedBuilding].type < (signed int)B_HouseVacantLot
+            || buildings[currentlySelectedBuilding].type > (signed int)B_HouseLuxuryPalace )
           {
-            if ( building_0a_type[64 * currentlySelectedBuilding] == B_Granary )
+            if ( buildings[currentlySelectedBuilding].type == B_Granary )
             {
               if ( storage_specialOrdersShown )
                 sub_4F29B0();
@@ -95633,7 +95459,7 @@ void  sub_4E92D0()
             }
             else
             {
-              if ( building_0a_type[64 * currentlySelectedBuilding] == B_Warehouse )
+              if ( buildings[currentlySelectedBuilding].type == B_Warehouse )
               {
                 if ( storage_specialOrdersShown )
                   sub_4F3640();
@@ -95688,7 +95514,7 @@ void  fun_handleMouseClickRightClickInfo()
         1);
     goto LABEL_16;
   }
-  if ( building_0a_type[64 * currentlySelectedBuilding] == B_Warehouse )
+  if ( buildings[currentlySelectedBuilding].type == B_Warehouse )
     numButtons = availableGoods_count;
   else
     numButtons = availableFoods_count;
@@ -95764,8 +95590,8 @@ LABEL_16:
               {
                 if ( dword_64E35C == 2 )
                 {
-                  if ( building_0a_type[64 * currentlySelectedBuilding] < (signed int)B_HouseVacantLot
-                    || building_0a_type[64 * currentlySelectedBuilding] > (signed int)B_HouseLuxuryPalace
+                  if ( buildings[currentlySelectedBuilding].type < (signed int)B_HouseVacantLot
+                    || buildings[currentlySelectedBuilding].type > (signed int)B_HouseLuxuryPalace
                     || (mouseover_button_id_main = fun_isCustomButtonClick(
                                                      rightclickInfoDialog_x + 112,
                                                      rightclickInfoDialog_y
@@ -95779,7 +95605,7 @@ LABEL_16:
                            &buttons_debug_housingEvolveInfo,
                            1)) )
                   {
-                    if ( building_0a_type[64 * currentlySelectedBuilding] == B_Granary )
+                    if ( buildings[currentlySelectedBuilding].type == B_Granary )
                     {
                       if ( storage_specialOrdersShown )
                       {
@@ -95810,7 +95636,7 @@ LABEL_16:
                     }
                     else
                     {
-                      if ( building_0a_type[64 * currentlySelectedBuilding] == B_Warehouse )
+                      if ( buildings[currentlySelectedBuilding].type == B_Warehouse )
                       {
                         if ( storage_specialOrdersShown )
                         {
@@ -96358,7 +96184,7 @@ void  fun_drawWalkerRightClickInfoText(int walkerId)
                   0);
                 fun_drawGameText(
                   41,
-                  building_0a_type[64 * v32],
+                  buildings[v32].type,
                   rightclickInfoDialog_x + text_xoffset + 40,
                   rightclickInfoDialog_y + 200,
                   graphic_font + 1206,
@@ -96372,7 +96198,7 @@ void  fun_drawWalkerRightClickInfoText(int walkerId)
                   0);
                 fun_drawGameText(
                   41,
-                  building_0a_type[64 * v31],
+                  buildings[v31].type,
                   rightclickInfoDialog_x + text_xoffset + 40,
                   rightclickInfoDialog_y + 200,
                   graphic_font + 1206,
@@ -96389,7 +96215,7 @@ void  fun_drawWalkerRightClickInfoText(int walkerId)
                   0);
                 fun_drawGameText(
                   41,
-                  building_0a_type[64 * v31],
+                  buildings[v31].type,
                   rightclickInfoDialog_x + text_xoffset + 40,
                   rightclickInfoDialog_y + 200,
                   graphic_font + 1206,
@@ -96403,7 +96229,7 @@ void  fun_drawWalkerRightClickInfoText(int walkerId)
                   0);
                 fun_drawGameText(
                   41,
-                  building_0a_type[64 * v32],
+                  buildings[v32].type,
                   rightclickInfoDialog_x + text_xoffset + 40,
                   rightclickInfoDialog_y + 200,
                   graphic_font + 1206,
@@ -96889,7 +96715,7 @@ void  fun_drawRightClickWorkerInfo(int a1)
 {
   int v1; // [sp+4Ch] [bp-4h]@2
 
-  if ( model_buildings_laborers[8 * building_0a_type[64 * currentlySelectedBuilding]] > (signed int)building_38_num_workers[64 * currentlySelectedBuilding] )
+  if ( model_buildings_laborers[8 * buildings[currentlySelectedBuilding].type] > (signed int)building_38_num_workers[64 * currentlySelectedBuilding] )
   {
     if ( city_inform[ciid].population > 0 )
     {
@@ -96939,7 +96765,7 @@ void  fun_drawRightClickWorkerInfo(int a1)
       graphic_font + F_SmallBlack,
       0);
     fun_drawNumber(
-      model_buildings_laborers[8 * building_0a_type[64 * currentlySelectedBuilding]],
+      model_buildings_laborers[8 * buildings[currentlySelectedBuilding].type],
       40,
       " ",
       rightclickInfoDialog_x + text_xoffset + 70,
@@ -96962,7 +96788,7 @@ void  fun_drawRightClickWorkerInfo(int a1)
       graphic_font + 1206,
       0);
     fun_drawNumber(
-      model_buildings_laborers[8 * building_0a_type[64 * currentlySelectedBuilding]],
+      model_buildings_laborers[8 * buildings[currentlySelectedBuilding].type],
       40,
       " ",
       rightclickInfoDialog_x + text_xoffset + 70,
@@ -99020,7 +98846,7 @@ void  fun_showBuildingInfoMilitaryAcademy()
   {
     if ( building_38_num_workers[64 * currentlySelectedBuilding] > 0 )
     {
-      if ( (signed int)building_38_num_workers[64 * currentlySelectedBuilding] >= model_buildings_laborers[8 * building_0a_type[64 * currentlySelectedBuilding]] )
+      if ( (signed int)building_38_num_workers[64 * currentlySelectedBuilding] >= model_buildings_laborers[8 * buildings[currentlySelectedBuilding].type] )
         fun_drawGameTextWrapped(
           135,
           3,
@@ -100318,7 +100144,7 @@ void  fun_showBuildingInfoShipyard()
     0);
   if ( dword_64E370 > 0 )
   {
-    v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 160);
+    v0 = getPercentage( buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 160);
     text_xoffset = 0;
     fun_drawGameText(
       100,
@@ -101592,7 +101418,7 @@ void  fun_showBuildingInfoWheatFarm()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 200);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 200);
   text_xoffset = 0;
   fun_drawGameText(
     112,
@@ -101785,7 +101611,7 @@ void  fun_showBuildingInfoVegetableFarm()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 200);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 200);
   text_xoffset = 0;
   fun_drawGameText(
     113,
@@ -101978,7 +101804,7 @@ void  fun_showBuildingInfoFruitFarm()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 200);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 200);
   text_xoffset = 0;
   fun_drawGameText(
     114,
@@ -102171,7 +101997,7 @@ void  fun_showBuildingInfoOliveFarm()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + F_LargeBlack,
     0);
-  pctDone = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 200);
+  pctDone = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 200);
   text_xoffset = 0;
   fun_drawGameText(
     115,
@@ -102329,17 +102155,7 @@ void  fun_showBuildingInfoOliveFarm()
     graphic_font + F_NormalBlack,
     0);
 }
-// 608084: using guessed type int dword_608084;
-// 64E370: using guessed type int dword_64E370;
-// 64E380: using guessed type int currentBuilding_workerPercentage;
-// 6528B2: using guessed type __int16 cityinfo_industryMonthballed_olives[];
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 6E6CB2: using guessed type __int16 graphic_resourceIcons;
-// 7E2724: using guessed type int text_xoffset;
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
 
-//----- (004F7D70) --------------------------------------------------------
 void  fun_showBuildingInfoVinesFarm()
 {
   int v0; // ST68_4@3
@@ -102364,7 +102180,7 @@ void  fun_showBuildingInfoVinesFarm()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 200);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 200);
   text_xoffset = 0;
   fun_drawGameText(
     116,
@@ -102522,17 +102338,7 @@ void  fun_showBuildingInfoVinesFarm()
     graphic_font + 134,
     0);
 }
-// 608084: using guessed type int dword_608084;
-// 64E370: using guessed type int dword_64E370;
-// 64E380: using guessed type int currentBuilding_workerPercentage;
-// 6528B4: using guessed type __int16 cityinfo_industryMonthballed_vines[];
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 6E6CB2: using guessed type __int16 graphic_resourceIcons;
-// 7E2724: using guessed type int text_xoffset;
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
 
-//----- (004F8380) --------------------------------------------------------
 void  fun_showBuildingInfoPigFarm()
 {
   int v0; // ST68_4@3
@@ -102557,7 +102363,7 @@ void  fun_showBuildingInfoPigFarm()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 200);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 200);
   text_xoffset = 0;
   fun_drawGameText(
     112,
@@ -102715,17 +102521,7 @@ void  fun_showBuildingInfoPigFarm()
     graphic_font + 134,
     0);
 }
-// 608084: using guessed type int dword_608084;
-// 64E370: using guessed type int dword_64E370;
-// 64E380: using guessed type int currentBuilding_workerPercentage;
-// 6528B6: using guessed type __int16 cityinfo_industryMonthballed_meat[];
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 6E6CB2: using guessed type __int16 graphic_resourceIcons;
-// 7E2724: using guessed type int text_xoffset;
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
 
-//----- (004F8990) --------------------------------------------------------
 void  fun_showBuildingInfoMarbleQuarry()
 {
   int v0; // ST68_4@3
@@ -102750,7 +102546,7 @@ void  fun_showBuildingInfoMarbleQuarry()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 200);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 200);
   text_xoffset = 0;
   fun_drawGameText(
     118,
@@ -102894,17 +102690,7 @@ void  fun_showBuildingInfoMarbleQuarry()
     graphic_font + 134,
     0);
 }
-// 608084: using guessed type int dword_608084;
-// 64E370: using guessed type int dword_64E370;
-// 64E380: using guessed type int currentBuilding_workerPercentage;
-// 6528C2: using guessed type __int16 cityinfo_industryMonthballed_marble[];
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 6E6CB2: using guessed type __int16 graphic_resourceIcons;
-// 7E2724: using guessed type int text_xoffset;
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
 
-//----- (004F8F30) --------------------------------------------------------
 void  fun_showBuildingInfoIronMine()
 {
   int v0; // ST68_4@3
@@ -102929,7 +102715,7 @@ void  fun_showBuildingInfoIronMine()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 200);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 200);
   text_xoffset = 0;
   fun_drawGameText(
     119,
@@ -103108,7 +102894,7 @@ void  fun_showBuildingInfoTimberYard()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 200);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 200);
   text_xoffset = 0;
   fun_drawGameText(
     120,
@@ -103287,7 +103073,7 @@ void  fun_showBuildingInfoClayPit()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 200);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 200);
   text_xoffset = 0;
   fun_drawGameText(
     121,
@@ -103431,17 +103217,7 @@ void  fun_showBuildingInfoClayPit()
     graphic_font + 134,
     0);
 }
-// 608084: using guessed type int dword_608084;
-// 64E370: using guessed type int dword_64E370;
-// 64E380: using guessed type int currentBuilding_workerPercentage;
-// 6528C0: using guessed type __int16 cityinfo_industryMonthballed_clay[];
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 6E6CB2: using guessed type __int16 graphic_resourceIcons;
-// 7E2724: using guessed type int text_xoffset;
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
 
-//----- (004FA010) --------------------------------------------------------
 void  fun_showBuildingInfoWineWorkshop()
 {
   int v0; // ST68_4@3
@@ -103466,7 +103242,7 @@ void  fun_showBuildingInfoWineWorkshop()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 400);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 400);
   text_xoffset = 0;
   fun_drawGameText(
     122,
@@ -103637,18 +103413,7 @@ void  fun_showBuildingInfoWineWorkshop()
     4);
   fun_drawRightClickWorkerInfo(rightclickInfoDialog_y + 142);
 }
-// 608084: using guessed type int dword_608084;
-// 64E370: using guessed type int dword_64E370;
-// 64E380: using guessed type int currentBuilding_workerPercentage;
-// 6528B8: using guessed type __int16 cityinfo_industryMonthballed_wine[];
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 6E6CB2: using guessed type __int16 graphic_resourceIcons;
-// 7E2724: using guessed type int text_xoffset;
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
 
-//----- (004FA700) --------------------------------------------------------
 void  fun_showBuildingInfoOilWorkshop()
 {
   int v0; // ST68_4@3
@@ -103673,7 +103438,7 @@ void  fun_showBuildingInfoOilWorkshop()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 400);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 400);
   text_xoffset = 0;
   fun_drawGameText(
     123,
@@ -103844,18 +103609,7 @@ void  fun_showBuildingInfoOilWorkshop()
     4);
   fun_drawRightClickWorkerInfo(rightclickInfoDialog_y + 142);
 }
-// 608084: using guessed type int dword_608084;
-// 64E370: using guessed type int dword_64E370;
-// 64E380: using guessed type int currentBuilding_workerPercentage;
-// 6528BA: using guessed type __int16 cityinfo_industryMonthballed_oil[];
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 6E6CB2: using guessed type __int16 graphic_resourceIcons;
-// 7E2724: using guessed type int text_xoffset;
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
 
-//----- (004FADF0) --------------------------------------------------------
 void  fun_showBuildingInfoWeaponsWorkshop()
 {
   int v0; // ST68_4@3
@@ -103880,7 +103634,7 @@ void  fun_showBuildingInfoWeaponsWorkshop()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 400);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 400);
   text_xoffset = 0;
   fun_drawGameText(
     124,
@@ -104051,18 +103805,7 @@ void  fun_showBuildingInfoWeaponsWorkshop()
     4);
   fun_drawRightClickWorkerInfo(rightclickInfoDialog_y + 142);
 }
-// 608084: using guessed type int dword_608084;
-// 64E370: using guessed type int dword_64E370;
-// 64E380: using guessed type int currentBuilding_workerPercentage;
-// 6528C4: using guessed type __int16 cityinfo_industryMonthballed_weapons[];
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 6E6CB2: using guessed type __int16 graphic_resourceIcons;
-// 7E2724: using guessed type int text_xoffset;
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
 
-//----- (004FB4E0) --------------------------------------------------------
 void  fun_showBuildingInfoFurnitureWorkshop()
 {
   int v0; // ST68_4@3
@@ -104087,7 +103830,7 @@ void  fun_showBuildingInfoFurnitureWorkshop()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 400);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 400);
   text_xoffset = 0;
   fun_drawGameText(
     125,
@@ -104294,7 +104037,7 @@ void  fun_showBuildingInfoPotteryWorkshop()
     16 * rightclickInfoDialog_widthBlocks,
     graphic_font + 670,
     0);
-  v0 = fun_getPercentage(building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding], 400);
+  v0 = getPercentage(buildings[currentlySelectedBuilding].grow_value_house_foodstocks[0], 400);
   text_xoffset = 0;
   fun_drawGameText(
     126,
@@ -104498,7 +104241,7 @@ void  fun_showBuildingInfoHousing()
   __int16 v16; // [sp+54h] [bp-4h]@52
   __int16 v17; // [sp+54h] [bp-4h]@55
 
-  v4 = building_0a_type[64 * currentlySelectedBuilding] - 10;
+  v4 = buildings[currentlySelectedBuilding].type - 10;
   dialog_help_id = 56;
   if ( dword_608084 )
   {
@@ -104543,7 +104286,7 @@ void  fun_showBuildingInfoHousing()
       fun_drawGameText(127, 17, rightclickInfoDialog_x + 178, rightclickInfoDialog_y + 45, graphic_font, 0);
       fun_drawGameText(127, 18, rightclickInfoDialog_x + 264, rightclickInfoDialog_y + 45, graphic_font, 0);
       fun_drawGameText(127, 19, rightclickInfoDialog_x + 376, rightclickInfoDialog_y + 45, graphic_font, 0);
-      if ( building_7a_desirability[128 * currentlySelectedBuilding] < model_houses_des_evolve[20 * v4] )
+      if ( building_7a_desirability[128 * currentlySelectedBuilding] < model_houses[v4].des_evolve )
         v5 = 0;
       else
         v5 = 31;
@@ -104558,7 +104301,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v5);
       fun_drawNumberCentered(
-        model_houses_des_evolve[20 * v4],
+        model_houses[v4].des_evolve,
         64,
         " ",
         rightclickInfoDialog_x + 240,
@@ -104567,7 +104310,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v5);
       fun_drawNumberCentered(
-        model_houses_des_devolve[20 * v4] + 1,
+        model_houses[v4].des_devolve[0] + 1,
         64,
         " ",
         rightclickInfoDialog_x + 350,
@@ -104575,7 +104318,7 @@ void  fun_showBuildingInfoHousing()
         100,
         graphic_font,
         v5);
-      if ( building_6e_house_entertainment[128 * currentlySelectedBuilding] < model_houses_entertainment[20 * (v4 + 1)] )
+      if ( building_6e_house_entertainment[128 * currentlySelectedBuilding] < model_houses[v4+1].entertainment )
         v6 = 0;
       else
         v6 = 31;
@@ -104623,7 +104366,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v6);
       fun_drawNumberCentered(
-        model_houses_entertainment[20 * (v4 + 1)],
+        model_houses[v4+1].entertainment,
         64,
         " ",
         rightclickInfoDialog_x + 240,
@@ -104632,7 +104375,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v6);
       fun_drawNumberCentered(
-        model_houses_entertainment[20 * v4],
+        model_houses[v4].entertainment,
         64,
         " ",
         rightclickInfoDialog_x + 350,
@@ -104648,14 +104391,14 @@ void  fun_showBuildingInfoHousing()
       {
         if ( building_37_house_hasWell[128 * currentlySelectedBuilding] )
         {
-          if ( model_houses_water[20 * (v4 + 1)] == 2 )
+          if ( model_houses[v4+1].water == 2 )
             v7 = 0;
           else
             v7 = 31;
         }
         else
         {
-          if ( model_houses_water[20 * (v4 + 1)] )
+          if ( model_houses[v4+1].water )
             v7 = 0;
           else
             v7 = 31;
@@ -104698,7 +104441,7 @@ void  fun_showBuildingInfoHousing()
             v7);
       }
       fun_drawNumberCentered(
-        model_houses_water[20 * (v4 + 1)],
+        model_houses[v4+1].water,
         64,
         " ",
         rightclickInfoDialog_x + 240,
@@ -104707,7 +104450,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v7);
       fun_drawNumberCentered(
-        model_houses_water[20 * v4],
+        model_houses[v4].water,
         64,
         " ",
         rightclickInfoDialog_x + 350,
@@ -104715,7 +104458,7 @@ void  fun_showBuildingInfoHousing()
         100,
         graphic_font,
         v7);
-      if ( building_71_house_numGods[128 * currentlySelectedBuilding] < model_houses_religion[20 * (v4 + 1)] )
+      if ( building_71_house_numGods[128 * currentlySelectedBuilding] < model_houses[v4+1].religion )
         v8 = 0;
       else
         v8 = 31;
@@ -104730,7 +104473,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v8);
       fun_drawNumberCentered(
-        model_houses_religion[20 * (v4 + 1)],
+        model_houses[v4+1].religion,
         64,
         " ",
         rightclickInfoDialog_x + 240,
@@ -104739,7 +104482,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v8);
       fun_drawNumberCentered(
-        model_houses_religion[20 * v4],
+        model_houses[v4].religion,
         64,
         " ",
         rightclickInfoDialog_x + 350,
@@ -104747,7 +104490,7 @@ void  fun_showBuildingInfoHousing()
         100,
         graphic_font,
         v8);
-      if ( building_6f_house_education[128 * currentlySelectedBuilding] < model_houses_education[20 * (v4 + 1)] )
+      if ( building_6f_house_education[128 * currentlySelectedBuilding] < model_houses[v4+1].education )
         v9 = 0;
       else
         v9 = 31;
@@ -104762,7 +104505,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v9);
       fun_drawNumberCentered(
-        model_houses_education[20 * (v4 + 1)],
+        model_houses[v4+1].education,
         64,
         " ",
         rightclickInfoDialog_x + 240,
@@ -104771,7 +104514,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v9);
       fun_drawNumberCentered(
-        model_houses_education[20 * v4],
+        model_houses[v4].education,
         64,
         " ",
         rightclickInfoDialog_x + 350,
@@ -104779,7 +104522,7 @@ void  fun_showBuildingInfoHousing()
         100,
         graphic_font,
         v9);
-      if ( HIBYTE(building_62_house_academy_barber[64 * currentlySelectedBuilding]) < model_houses_barber[20 * (v4 + 1)] )
+      if ( HIBYTE(building_62_house_academy_barber[64 * currentlySelectedBuilding]) < model_houses[v4+1].barber )
         v10 = 0;
       else
         v10 = 31;
@@ -104794,7 +104537,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v10);
       fun_drawNumberCentered(
-        model_houses_barber[20 * (v4 + 1)],
+        model_houses[v4+1].barber,
         64,
         " ",
         rightclickInfoDialog_x + 240,
@@ -104803,7 +104546,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v10);
       fun_drawNumberCentered(
-        model_houses_barber[20 * v4],
+        model_houses[v4].barber,
         64,
         " ",
         rightclickInfoDialog_x + 350,
@@ -104811,7 +104554,7 @@ void  fun_showBuildingInfoHousing()
         100,
         graphic_font,
         v10);
-      if ( (unsigned __int8)building_65_house_bathhouse_dock_numships_entert_days[128 * currentlySelectedBuilding] < model_houses_bathhouse[20 * (v4 + 1)] )
+      if ( (unsigned __int8)building_65_house_bathhouse_dock_numships_entert_days[128 * currentlySelectedBuilding] < model_houses[v4+1].bathhouse )
         v11 = 0;
       else
         v11 = 31;
@@ -104826,7 +104569,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v11);
       fun_drawNumberCentered(
-        model_houses_bathhouse[20 * (v4 + 1)],
+        model_houses[v4+1].bathhouse,
         64,
         " ",
         rightclickInfoDialog_x + 240,
@@ -104835,7 +104578,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v11);
       fun_drawNumberCentered(
-        model_houses_bathhouse[20 * v4],
+        model_houses[v4].bathhouse,
         64,
         " ",
         rightclickInfoDialog_x + 350,
@@ -104843,7 +104586,7 @@ void  fun_showBuildingInfoHousing()
         100,
         graphic_font,
         v11);
-      if ( building_70_house_health[128 * currentlySelectedBuilding] < model_houses_health[20 * (v4 + 1)] )
+      if ( building_70_house_health[128 * currentlySelectedBuilding] < model_houses[v4+1].health )
         v12 = 0;
       else
         v12 = 31;
@@ -104858,7 +104601,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v12);
       fun_drawNumberCentered(
-        model_houses_health[20 * (v4 + 1)],
+        model_houses[v4+1].health,
         64,
         " ",
         rightclickInfoDialog_x + 240,
@@ -104867,7 +104610,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v12);
       fun_drawNumberCentered(
-        model_houses_health[20 * v4],
+        model_houses[v4].health,
         64,
         " ",
         rightclickInfoDialog_x + 350,
@@ -104875,13 +104618,13 @@ void  fun_showBuildingInfoHousing()
         100,
         graphic_font,
         v12);
-      if ( HIBYTE(building_6c_word_94BDAC[64 * currentlySelectedBuilding]) < model_houses_foodtypes[20 * (v4 + 1)] )
+      if ( HIBYTE(buildings[currentlySelectedBuilding].word_94BDAC[0]) < model_houses[v4+1].foodtypes )
         v13 = 0;
       else
         v13 = 31;
       fun_drawGameText(127, 12, rightclickInfoDialog_x + 16, rightclickInfoDialog_y + 220, graphic_font, v13);
       fun_drawNumberCentered(
-        HIBYTE(building_6c_word_94BDAC[64 * currentlySelectedBuilding]),
+        HIBYTE(buildings[currentlySelectedBuilding].word_94BDAC[0]),
         64,
         " ",
         rightclickInfoDialog_x + 140,
@@ -104890,7 +104633,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v13);
       fun_drawNumberCentered(
-        model_houses_foodtypes[20 * (v4 + 1)],
+        model_houses[v4+1].foodtypes,
         64,
         " ",
         rightclickInfoDialog_x + 240,
@@ -104899,7 +104642,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v13);
       fun_drawNumberCentered(
-        model_houses_foodtypes[20 * v4],
+        model_houses[v4].foodtypes,
         64,
         " ",
         rightclickInfoDialog_x + 350,
@@ -104907,7 +104650,7 @@ void  fun_showBuildingInfoHousing()
         100,
         graphic_font,
         v13);
-      if ( building_58_house_pottery[64 * currentlySelectedBuilding] < model_houses_pottery[20 * (v4 + 1)] )
+      if ( building_58_house_pottery[64 * currentlySelectedBuilding] < model_houses[v4+1].pottery )
         v14 = 0;
       else
         v14 = 31;
@@ -104922,7 +104665,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v14);
       fun_drawNumberCentered(
-        model_houses_pottery[20 * (v4 + 1)],
+        model_houses[v4+1].pottery,
         64,
         " ",
         rightclickInfoDialog_x + 240,
@@ -104931,7 +104674,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v14);
       fun_drawNumberCentered(
-        model_houses_pottery[20 * v4],
+        model_houses[v4].pottery,
         64,
         " ",
         rightclickInfoDialog_x + 350,
@@ -104939,7 +104682,7 @@ void  fun_showBuildingInfoHousing()
         100,
         graphic_font,
         v14);
-      if ( building_54_house_oil[64 * currentlySelectedBuilding] < model_houses_oil[20 * (v4 + 1)] )
+      if ( building_54_house_oil[64 * currentlySelectedBuilding] < model_houses[v4+1].oil )
         v15 = 0;
       else
         v15 = 31;
@@ -104954,7 +104697,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v15);
       fun_drawNumberCentered(
-        model_houses_oil[20 * (v4 + 1)],
+        model_houses[v4+1].oil,
         64,
         " ",
         rightclickInfoDialog_x + 240,
@@ -104963,7 +104706,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v15);
       fun_drawNumberCentered(
-        model_houses_oil[20 * v4],
+        model_houses[v4].oil,
         64,
         " ",
         rightclickInfoDialog_x + 350,
@@ -104971,7 +104714,7 @@ void  fun_showBuildingInfoHousing()
         100,
         graphic_font,
         v15);
-      if ( building_56_house_furniture[64 * currentlySelectedBuilding] < model_houses_furniture[20 * (v4 + 1)] )
+      if ( building_56_house_furniture[64 * currentlySelectedBuilding] < model_houses[v4+1].furniture )
         v16 = 0;
       else
         v16 = 31;
@@ -104986,7 +104729,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v16);
       fun_drawNumberCentered(
-        model_houses_furniture[20 * (v4 + 1)],
+        model_houses[v4+1].furniture,
         64,
         " ",
         rightclickInfoDialog_x + 240,
@@ -104995,7 +104738,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v16);
       fun_drawNumberCentered(
-        model_houses_furniture[20 * v4],
+        model_houses[v4].furniture,
         64,
         " ",
         rightclickInfoDialog_x + 350,
@@ -105003,7 +104746,7 @@ void  fun_showBuildingInfoHousing()
         100,
         graphic_font,
         v16);
-      if ( building_52_house_wine[64 * currentlySelectedBuilding] < model_houses_wine[20 * (v4 + 1)] )
+      if ( building_52_house_wine[64 * currentlySelectedBuilding] < model_houses[v4+1].wine )
         v17 = 0;
       else
         v17 = 31;
@@ -105018,7 +104761,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v17);
       fun_drawNumberCentered(
-        model_houses_wine[20 * (v4 + 1)],
+        model_houses[v4+1].wine,
         64,
         " ",
         rightclickInfoDialog_x + 240,
@@ -105027,7 +104770,7 @@ void  fun_showBuildingInfoHousing()
         graphic_font,
         v17);
       fun_drawNumberCentered(
-        model_houses_wine[20 * v4],
+        model_houses[v4].wine,
         64,
         " ",
         rightclickInfoDialog_x + 350,
@@ -105046,11 +104789,11 @@ void  fun_showBuildingInfoHousing()
       sub_4EBF50(rightclickInfoDialog_y + 154);
       sub_4EC1B0(rightclickInfoDialog_y + 194);
       sub_4EC350(rightclickInfoDialog_y + 214);
-      if ( model_houses_foodtypes[20 * building_0c_level_resourceId[64 * currentlySelectedBuilding]] )
+      if ( model_houses[buildings[currentlySelectedBuilding].level_resourceId].foodtypes )
       {
         fun_drawGraphic(graphic_resourceIcons + 1, rightclickInfoDialog_x + 32, rightclickInfoDialog_y + 234);
         fun_drawNumber(
-          building_4a_grow_value_house_foodstocks[64 * currentlySelectedBuilding],
+          buildings[64 * currentlySelectedBuilding].grow_value_house_foodstocks[0],
           64,
           " ",
           rightclickInfoDialog_x + 64,
@@ -105149,7 +104892,7 @@ void  fun_showBuildingInfoHousing()
           0);
         fun_drawGameText(
           41,
-          building_0a_type[64 * dword_64E378],
+          buildings[dword_64E378].type,
           rightclickInfoDialog_x + text_xoffset + 32,
           rightclickInfoDialog_y + 60,
           graphic_font,
@@ -105317,13 +105060,13 @@ void  sub_4FE3E0()
           if ( v13 != currentlySelectedBuilding )
           {
             if ( !buildings[v13].houseSize
-              || building_0a_type[64 * v13] < building_0a_type[64 * currentlySelectedBuilding] )
+              || buildings[v13].type < buildings[currentlySelectedBuilding].type )
             {
-              desirability = model_buildings_desirability[8 * building_0a_type[64 * v13]];
+              desirability = model_buildings_desirability[8 * buildings[v13].type];
               if ( desirability < 0 )
               {
-                v5 = model_buildings_des_stepSize[8 * building_0a_type[64 * v13]];
-                v2 = model_buildings_des_range[8 * building_0a_type[64 * v13]];
+                v5 = model_buildings_des_stepSize[8 * buildings[v13].type];
+                v2 = model_buildings_des_range[8 * buildings[v13].type];
                 v4 = fun_getDistanceMaximum(
                        v12,
                        v11,
@@ -105425,7 +105168,7 @@ void  fun_showFortInfo(int fortId)
     rightclickInfoDialog_y + 60,
     graphic_font + 134,
     0);
-  v6 = fun_getPercentage(formation_42[64 * fortId], formation_44[64 * fortId]);
+  v6 = getPercentage(formation_42[64 * fortId], formation_44[64 * fortId]);
   fun_drawGameText(138, 24, rightclickInfoDialog_x + 100, rightclickInfoDialog_y + 80, graphic_font + 134, 0);
   if ( v6 > 0 )
   {
@@ -105885,7 +105628,7 @@ void  fun_determineGroundType()
             buildingId = grid_buildingIds[offset];
             if ( grid_buildingIds[offset] )
             {
-              switch ( building_0a_type[64 * buildingId] )
+              switch ( buildings[buildingId].type )
               {
                 case B_Warehouse:
                   grid_groundType[offset] = 0;
@@ -105894,7 +105637,7 @@ void  fun_determineGroundType()
                   grid_groundType[offset] = 0;
                   break;
                 case B_TriumphalArch:
-                  if ( building_0c_level_resourceId[64 * buildingId] == 3 )
+                  if ( buildings[buildingId].level_resourceId == 3 )
                   {
                     v2 = grid_edge[offset] & 0x3F;
                     switch ( v2 )
@@ -106118,7 +105861,7 @@ void  sub_4FFDF0()
             if ( v1 & 8 )
             {
               v2 = grid_buildingIds[v3];
-              switch ( building_0a_type[64 * v2] )
+              switch ( buildings[v2].type )
               {
                 case B_Warehouse:
                   byte_6415A0[v3] = 0;
@@ -107467,11 +107210,7 @@ signed int  sub_502C50(int a1, int a2, int a3, int a4, int a5, signed int a6)
   }
   return result;
 }
-// 614150: using guessed type int destinationGridOffset;
-// 634480: using guessed type __int16 grid_pathingDistance[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (00503000) --------------------------------------------------------
 signed int  sub_503000(int a1, int a2, int a3, int a4)
 {
   signed int result; // eax@3
@@ -107505,7 +107244,7 @@ signed int  sub_503000(int a1, int a2, int a3, int a4)
       v5 = grid_terrain[destinationGridOffset];
       if ( !(v5 & 8) )
         return 0;
-      if ( building_0a_type[64 * grid_buildingIds[destinationGridOffset]] != 90 )
+      if ( buildings[grid_buildingIds[destinationGridOffset]].type != 90 )
         return 0;
     }
   }
@@ -108154,11 +107893,11 @@ char  fun_pathing_getDirection16(int xFrom, int yFrom, int xTo, int yTo)
     if ( deltaX >= deltaY )
       percentage = 100;
     else
-      percentage = -fun_getPercentage(deltaY, deltaX);
+      percentage = -getPercentage(deltaY, deltaX);
   }
   else
   {
-    percentage = fun_getPercentage(deltaX, deltaY);
+    percentage = getPercentage(deltaX, deltaY);
   }
   if ( xFrom != xTo )
     goto LABEL_64;
@@ -108363,11 +108102,11 @@ char  fun_pathing_getDirection8(int xFrom, int yFrom, int xTo, int yTo)
     if ( d_x >= d_y )
       v5 = 100;
     else
-      v5 = -fun_getPercentage(d_y, d_x);
+      v5 = -getPercentage(d_y, d_x);
   }
   else
   {
-    v5 = fun_getPercentage(d_x, d_y);
+    v5 = getPercentage(d_x, d_y);
   }
   if ( xFrom != xTo )
     goto LABEL_48;
@@ -114498,7 +114237,7 @@ void  fun_drawChiefAdvisor()
       fun_drawGraphic(graphic_bullet, dialog_x + 40, dialog_y + 147);
       fun_drawGameText(61, 62, dialog_x + 60, dialog_y + 146, graphic_font + 268, 0);
       text_xoffset = 0;
-      v2 = fun_getPercentage( city_inform[ciid].dword_654504, city_inform[ciid].dword_654500 );
+      v2 = getPercentage( city_inform[ciid].dword_654504, city_inform[ciid].dword_654500 );
       if ( scn_romeSuppliesWheat )
       {
         fun_drawGameText(61, 26, dialog_x + text_xoffset + 240, dialog_y + 146, graphic_font + 1072, 0);
@@ -116539,7 +116278,7 @@ void  fun_drawScrollbarDot()
       if ( filelist_scrollPosition > 0 )
       {
         if ( filelist_scrollPosition + 15 < filelist_numFiles )
-          percentageFromTop_large = fun_getPercentage(filelist_scrollPosition, filelist_numFiles - 15);
+          percentageFromTop_large = getPercentage(filelist_scrollPosition, filelist_numFiles - 15);
         else
           percentageFromTop_large = 100;
       }
@@ -116558,7 +116297,7 @@ void  fun_drawScrollbarDot()
       if ( filelist_scrollPosition > 0 )
       {
         if ( filelist_scrollPosition + 12 < filelist_numFiles )
-          percentageFromTop_small = fun_getPercentage(filelist_scrollPosition, filelist_numFiles - 12);
+          percentageFromTop_small = getPercentage(filelist_scrollPosition, filelist_numFiles - 12);
         else
           percentageFromTop_small = 100;
       }
@@ -117764,9 +117503,9 @@ void  fun_drawDebugInfoBuildings()
       else
         v4 = -2048;
       fun_drawNumber(v3, 64, " = building no", 8, v5 + 24, 27, v4);
-      fun_drawNumber(building_0a_type[64 * v3], 64, " = type", 8, v5 + 60, 27, 16122);
-      fun_drawNumber(building_0c_level_resourceId[64 * v3], 64, " = sub_type", 100, v5 + 60, 27, 16122);
-      if ( building_0a_type[64 * v3] == B_Reservoir )
+      fun_drawNumber(buildings[v3].type, 64, " = type", 8, v5 + 60, 27, 16122);
+      fun_drawNumber(buildings[v3].level_resourceId, 64, " = sub_type", 100, v5 + 60, 27, 16122);
+      if ( buildings[v3].type == B_Reservoir )
       {
         text_xoffset = 0;
         fun_drawText("aqua links", 8, v5 + 72, 27, 16122);
@@ -117782,7 +117521,7 @@ void  fun_drawDebugInfoBuildings()
       }
       else
       {
-        if ( building_0a_type[64 * v3] == B_Granary )
+        if ( buildings[v3].type == B_Granary )
         {
           text_xoffset = 0;
           fun_drawText("food", 8, v5 + 72, 27, 16122);
@@ -117802,9 +117541,9 @@ void  fun_drawDebugInfoBuildings()
         }
         else
         {
-          if ( building_0a_type[64 * v3] >= (signed int)B_WineWorkshop )
+          if ( buildings[v3].type >= (signed int)B_WineWorkshop )
           {
-            if ( building_0a_type[64 * v3] <= (signed int)B_PotteryWorkshop )
+            if ( buildings[v3].type <= (signed int)B_PotteryWorkshop )
             {
               text_xoffset = 0;
               fun_drawText("raw_materials", 8, v5 + 72, 27, 16122);
@@ -117913,7 +117652,7 @@ void  fun_drawDebugInfoBuildings()
         fun_drawNumber(building_70_house_health[128 * v3], 64, " he", 100, v5 + 240, 27, 16122);
         fun_drawNumber(building_71_house_numGods[128 * v3], 64, " re", 150, v5 + 240, 27, 16122);
         fun_drawNumber(
-          model_houses_entertainment[20 * building_0c_level_resourceId[64 * v3]],
+          model_houses[buildings[v3].level_resourceId].entertainment,
           40,
           ")",
           8,
@@ -117921,7 +117660,7 @@ void  fun_drawDebugInfoBuildings()
           27,
           16122);
         fun_drawNumber(
-          model_houses_education[20 * building_0c_level_resourceId[64 * v3]],
+          model_houses[buildings[v3].level_resourceId].education,
           40,
           ")",
           50,
@@ -117929,7 +117668,7 @@ void  fun_drawDebugInfoBuildings()
           27,
           16122);
         fun_drawNumber(
-          model_houses_religion[20 * building_0c_level_resourceId[64 * v3]],
+          model_houses[buildings[v3].level_resourceId].religion,
           40,
           ")",
           100,
@@ -117937,7 +117676,7 @@ void  fun_drawDebugInfoBuildings()
           27,
           16122);
         fun_drawNumber(
-          model_houses_health[20 * building_0c_level_resourceId[64 * v3]],
+          model_houses[buildings[v3].level_resourceId].health,
           40,
           ")",
           150,
@@ -117971,7 +117710,7 @@ void  fun_drawDebugInfoBuildings()
       {
         text_xoffset = 0;
         fun_drawNumber(
-          building_4a_grow_value_house_foodstocks[64 * v3],
+          buildings[v3].grow_value_house_foodstocks[0],
           64,
           " ,",
           text_xoffset + 8,
@@ -117985,7 +117724,7 @@ void  fun_drawDebugInfoBuildings()
       }
       else
       {
-        if ( building_0a_type[64 * v3] == B_Market )
+        if ( buildings[v3].type == B_Market )
         {
           text_xoffset = 0;
           fun_drawNumber(building_4c_granary_capacity[64 * v3], 64, " ,", text_xoffset + 8, v5 + 220, 27, 16122);
@@ -120358,22 +120097,7 @@ void  sub_530190()
   if ( fun_fileExistsOnCdWithMinimumLength("smk\\intro.smk", 60000000) )
     sub_530020();                               // altered
 }
-// 4017CB: using guessed type _DWORD  sub_4017CB(_DWORD);
-// 402C25: using guessed type int sub_402C25(void);
-// 6080A8: using guessed type int sidepanel_collapsed;
-// 65DEF8: using guessed type int mapOrientation;
-// 660730: using guessed type char winState;
-// 660B78: using guessed type int dword_660B78;
-// 660B7C: using guessed type int dword_660B7C;
-// 6E6B00: using guessed type int inputtext_lastUsed;
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 8C79E4: using guessed type int setting_map_camera_x;
-// 8C79E8: using guessed type int setting_map_camera_y;
-// 94BD30: using guessed type int debug_drawEvolveInfo;
-// 98C004: using guessed type int debug_drawBuildingInfo;
-// 98C498: using guessed type int debug_drawFigureInfo;
 
-//----- (005303E0) --------------------------------------------------------
 signed int  fun_loadC3ModelTxt()
 {
   signed int result; // eax@2
@@ -120446,7 +120170,7 @@ signed int  fun_loadC3ModelTxt()
           for ( k = 0; k < 20; ++k )
           {
             v2 = (char *)&v5[fun_strNumDigitChars((char *)v5)];
-            *(int *)((char *)&model_houses_des_devolve[20 * v15] + 4 * k) = fun_strToInt(v2);
+            model_houses[v15].des_devolve[k] = fun_strToInt(v2);
             v5 = &v2[fun_strnchr(v2, 0x2Cu, filesize)];
           }
           ++v15;

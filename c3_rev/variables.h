@@ -23,8 +23,7 @@ static char building_04_house_isMerged[__TD_TR]; // weak
 
 static unsigned char building__07_y[__TD_TR];
 static short building_08_gridOffset[__TD_TR]; // weak
-static short building_0a_type[__TD_TR]; // weak
-static short building_0c_level_resourceId[__TD_TR]; // weak
+
 static char building_0e_byte_94BD4E[__TD_TR]; // weak
 static short building_10_placedSequenceNumber[__TD_TR]; // weak
 
@@ -60,7 +59,7 @@ static char building_44_byte_94BD84[__TD_TR]; // weak
 static char building_45_byte_94BD85[__TD_TR]; // weak
 static char building_46_house_taxcollector[__TD_TR]; // weak
 static short building_48_word_94BD88[__TD_TR]; // weak
-static short building_4a_grow_value_house_foodstocks[__TD_TR]; // weak
+
 static short building_4c_granary_capacity[__TD_TR]; // weak
 static short building_4e_word_94BD8E[__TD_TR]; // weak
 static short building_50_word_94BD90[__TD_TR]; // weak
@@ -389,37 +388,19 @@ static char building_68_house_neptune[__TD_TR]; // weak
 static char building_69_house_mercury[__TD_TR]; // weak
 static char building_6a_house_mars[__TD_TR]; // weak
 static char building_6b_house_venus[__TD_TR]; // weak
-static short building_6c_word_94BDAC[__TD_TR]; // weak
+
 static char building_6e_house_entertainment[__TD_TR]; // weak
 static char building_6f_house_education[__TD_TR]; // weak
 static char building_70_house_health[__TD_TR]; // weak
 static char building_71_house_numGods[__TD_TR]; // weak
 static short building_72_wharf_hasBoat_house_evolveStatusDesir[__TD_TR]; // weak
 static int building_74_house_taxIncomeThisYear_senateForum_treasureStore[__TD_TR]; // weak
-static char building_78_byte_94BDB8[__TD_TR]; // weak
+
 static char building_79_byte_94BDB9[__TD_TR]; // weak
 static char building_7a_desirability[__TD_TR]; // weak
 static char building_7b_byte_94BDBB[__TD_TR]; // weak
 static char building_7c_adjacentToWater[__TD_TR]; // weak
 static char building_7f_byte_94BDBF[__TD_TR]; // idb
-
-static int model_houses_des_devolve[__TD_TR]; // weak
-static int model_houses_des_evolve[__TD_TR]; // weak
-static int model_houses_entertainment[__TD_TR]; // weak
-static int model_houses_water[__TD_TR]; // weak
-static int model_houses_religion[__TD_TR]; // weak
-static int model_houses_education[__TD_TR]; // weak
-static int model_houses_barber[__TD_TR]; // weak
-static int model_houses_bathhouse[__TD_TR]; // weak
-static int model_houses_health[__TD_TR]; // weak
-static int model_houses_foodtypes[__TD_TR]; // weak
-static int model_houses_pottery[__TD_TR]; // weak
-static int model_houses_oil[__TD_TR]; // weak
-static int model_houses_furniture[__TD_TR]; // weak
-static int model_houses_wine[__TD_TR]; // weak
-static int model_houses_prosperity[__TD_TR]; // weak
-static int model_houses_numPeople[__TD_TR]; // weak
-static int model_houses_tax[__TD_TR]; // idb
 
 static char current_fileExtension[32];
 
@@ -1114,6 +1095,7 @@ static Walker walkers[1000];
 
 struct Building
 {
+ int type;
  int d7d_storageId;
  int x;
 
@@ -1123,6 +1105,10 @@ struct Building
  int house_population;
  int walkerServiceAccess;
  int laborCategory;
+ int word_94BDAC[2];
+ char byte_94BDB8;
+ int level_resourceId;
+ int grow_value_house_foodstocks[8];
 };
 
 static Building buildings[2000];
@@ -1137,6 +1123,29 @@ char stateVegetables;
 char stateFruit;
 char stateMeatFish;
 };
+
+struct ModelHouse
+{
+int des_devolve[20];
+int des_evolve;
+int entertainment;
+int water;
+int religion;
+int education;
+int barber;
+int bathhouse;
+int health;
+int foodtypes;
+int pottery;
+int oil;
+int furniture;
+int wine;
+int prosperity;
+int numPeople;
+int tax;
+};
+
+static ModelHouse model_houses[20];
 
 static Storage storages[200];
 
