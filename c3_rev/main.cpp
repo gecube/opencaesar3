@@ -2194,8 +2194,8 @@ static char map_openPlayScenId; // weak
 static int dword_990CD8; // weak
 static int dword_990CDC; // weak
 static int editEmpire_addObjectGraphicID; // weak
-static char empire_type[0xff]; // weak
-static char empire_inUse[0xff]; // weak
+
+
 static char empire_currentAnimationIndex[0xff]; // weak
 static __int16 empire_xCoord[0xff]; // weak
 static __int16 empire_yCoord[0xff]; // weak
@@ -7838,7 +7838,7 @@ void  fun_editor_editEmpire_general_click()
         editEmpire_selectedObjectButton = currentButton_parameter;
         if ( editEmpire_selectedObjectButton == 2 )
         {
-          if ( empire_inUse[64 * currentEmpireEntryId] )
+          if ( empire[currentEmpireEntryId].inUse )
           {
             if ( map_empireExpanded )
               editEmpire_addObjectGraphicID = empire_graphicID_exp[32 * currentEmpireEntryId];
@@ -7875,7 +7875,7 @@ void  fun_editor_editEmpire_toggleExpanded()
     map_empireExpanded = 1;
     fun_fillExpandedEmpireFields();
   }
-  if ( empire_inUse[64 * currentEmpireEntryId] )
+  if ( empire[currentEmpireEntryId].inUse )
   {
     if ( map_empireExpanded )
       editEmpire_addObjectGraphicID = empire_graphicID_exp[32 * currentEmpireEntryId];
@@ -7961,7 +7961,7 @@ void  fun_editor_editEmpire_graphicArrowButtons()
     editEmpire_addObjectGraphicID = v1;
   if ( editEmpire_selectedObjectButton == 2 )
   {
-    if ( empire_inUse[64 * currentEmpireEntryId] )
+    if ( empire[currentEmpireEntryId].inUse )
     {
       if ( map_empireExpanded )
         empire_graphicID_exp[32 * currentEmpireEntryId] = editEmpire_addObjectGraphicID;
@@ -7989,7 +7989,7 @@ void  fun_editor_editEmpire_nextPrevEmpireArrowButtons()
       currentEmpireEntryId = 0;
     if ( currentEmpireEntryId >= edit_empire_max_inUse )
       currentEmpireEntryId = edit_empire_max_inUse - 1;
-    if ( empire_inUse[64 * currentEmpireEntryId] )
+    if ( empire[currentEmpireEntryId].inUse )
     {
       if ( map_empireExpanded )
         editEmpire_addObjectGraphicID = empire_graphicID_exp[32 * currentEmpireEntryId];
@@ -8016,22 +8016,22 @@ void  fun_editor_editEmpire_something(int a1, int a2)
         {
           if ( mouseclick_y < ddraw_height - empireMapBorderTop - empireMapBorderBottom )
           {
-            if ( !empire_inUse[64 * a1] )
+            if ( !empire[a1].inUse )
             {
               empire_graphicID[32 * a1] = editEmpire_addObjectGraphicID;
               if ( map_empireExpanded )
                 empire_graphicID_exp[32 * a1] = editEmpire_addObjectGraphicID;
-              empire_type[64 * a1] = dword_993F04;
-              if ( (unsigned __int8)empire_type[64 * a1] == 4 || (unsigned __int8)empire_type[64 * a1] == 5 )
+              empire[a1].type = dword_993F04;
+              if ( empire[a1].type == 4 || empire[a1].type == 5 )
                 empire_tradeRouteId[64 * a1] = empireScreen_selectedRouteId;
             }
             currentEmpireEntryId = a1;
-            empire_inUse[64 * a1] = 1;
+            empire[a1].inUse = 1;
             if ( byte_65E6C8 )
-              empire_inUse[64 * a1] = 2;
-            if ( (unsigned __int8)empire_type[64 * a1] == 6 )
+              empire[a1].inUse = 2;
+            if ( (unsigned __int8)empire[a1].type == 6 )
               fun_calculateDistantBattleRomanTravelTime(0);
-            if ( (unsigned __int8)empire_type[64 * a1] == 7 )
+            if ( (unsigned __int8)empire[a1].type == 7 )
               fun_calculateDistantBattleEnemyTravelTime(0);
             if ( map_empireExpanded )
               v2 = empire_graphicID_exp[32 * a1];
@@ -8103,7 +8103,7 @@ int  fun_editor_editEmpire_something2()
             v7 = mouseclick_y + empire_scroll_y - empireMapBorderTop;
             v2 = 10000;
             v1 = 0;
-            for ( i = 0; i < 200 && empire_inUse[64 * i]; ++i )
+            for ( i = 0; i < 200 && empire[i].inUse; ++i )
             {
               if ( map_empireExpanded )
               {
@@ -8194,7 +8194,7 @@ signed int  fun_editor_editEmpire_something3()
             v7 = mouseclick_y + empire_scroll_y - empireMapBorderTop;
             v2 = 10000;
             v1 = 0;
-            for ( i = 0; i < 200 && empire_inUse[64 * i]; ++i )
+            for ( i = 0; i < 200 && empire[i].inUse; ++i )
             {
               if ( scn_empireExpanded_flag )
               {
@@ -8265,7 +8265,7 @@ void  fun_editor_editEmpire_moveEmpireCity(int direction, __int16 amount)
   {
     if ( editEmpire_selectedObjectButton == 2 )
     {
-      if ( empire_inUse[64 * currentEmpireEntryId] )
+      if ( empire[currentEmpireEntryId].inUse )
       {
         if ( map_empireExpanded )
         {
@@ -8475,7 +8475,7 @@ void  fun_editor_editEmpire_editRoute_tradeRouteId()
   int v0; // [sp+4Ch] [bp-4h]@1
 
   v0 = currentEmpireEntryId;
-  if ( empire_inUse[64 * currentEmpireEntryId] )
+  if ( empire[currentEmpireEntryId].inUse )
   {
     empire_990D29[64 * currentEmpireEntryId] = 10;
     editEmpire_isSaved = 0;
@@ -8488,7 +8488,7 @@ void  fun_editor_editEmpire_editCity_type()
   int v0; // [sp+4Ch] [bp-4h]@1
 
   v0 = currentEmpireEntryId;
-  if ( empire_inUse[64 * currentEmpireEntryId] )
+  if ( empire[currentEmpireEntryId].inUse )
   {
     fun_empireCityClearBuysSells(currentEmpireEntryId);
     empire_990D29[64 * v0] = 10;
@@ -8503,7 +8503,7 @@ void  fun_editor_editEmpire_editCity_name()
   int v0; // [sp+4Ch] [bp-4h]@1
 
   v0 = currentEmpireEntryId;
-  if ( empire_inUse[64 * currentEmpireEntryId] )
+  if ( empire[currentEmpireEntryId].inUse )
   {
     empire_990D29[64 * currentEmpireEntryId] = 10;
     editEmpire_isSaved = 0;
@@ -8517,7 +8517,7 @@ void  fun_editor_editEmpire_editCity_tradeRouteId()
   int v0; // [sp+4Ch] [bp-4h]@1
 
   v0 = currentEmpireEntryId;
-  if ( empire_inUse[64 * currentEmpireEntryId] )
+  if ( empire[currentEmpireEntryId].inUse )
   {
     empire_990D29[64 * currentEmpireEntryId] = 10;
     editEmpire_isSaved = 0;
@@ -8538,7 +8538,7 @@ void  fun_editor_editEmpire_editCity_costToOpen()
   int v0; // [sp+4Ch] [bp-4h]@1
 
   v0 = currentEmpireEntryId;
-  if ( empire_inUse[64 * currentEmpireEntryId] )
+  if ( empire[currentEmpireEntryId].inUse )
   {
     empire_990D29[64 * currentEmpireEntryId] = 10;
     editEmpire_isSaved = 0;
@@ -8552,7 +8552,7 @@ void  fun_editor_editEmpire_editOwnCity_produces()
   int v0; // [sp+4Ch] [bp-4h]@1
 
   v0 = currentEmpireEntryId;
-  if ( empire_inUse[64 * currentEmpireEntryId] )
+  if ( empire[currentEmpireEntryId].inUse )
   {
     editEmpire_resourceSlotId = currentButton_parameter;
     empire_990D29[64 * currentEmpireEntryId] = 10;
@@ -8566,7 +8566,7 @@ void  fun_editor_editEmpire_editCity_sells()
   int v0; // [sp+4Ch] [bp-4h]@1
 
   v0 = currentEmpireEntryId;
-  if ( empire_inUse[64 * currentEmpireEntryId] )
+  if ( empire[currentEmpireEntryId].inUse )
   {
     editEmpire_resourceSlotId = currentButton_parameter;
     empire_990D29[64 * currentEmpireEntryId] = 10;
@@ -8580,7 +8580,7 @@ void  fun_editor_editEmpire_editCity_buys()
   int v0; // [sp+4Ch] [bp-4h]@1
 
   v0 = currentEmpireEntryId;
-  if ( empire_inUse[64 * currentEmpireEntryId] )
+  if ( empire[currentEmpireEntryId].inUse )
   {
     editEmpire_resourceSlotId = currentButton_parameter;
     empire_990D29[64 * currentEmpireEntryId] = 10;
@@ -8594,7 +8594,7 @@ void  fun_editor_editEmpire_editBattle_path()
   int v0; // [sp+4Ch] [bp-4h]@1
 
   v0 = currentEmpireEntryId;
-  if ( empire_inUse[64 * currentEmpireEntryId] )
+  if ( empire[currentEmpireEntryId].inUse )
   {
     empire_990D29[64 * currentEmpireEntryId] = 10;
     editEmpire_isSaved = 0;
@@ -8608,7 +8608,7 @@ void  fun_editor_editEmpire_editBattle_order()
   int v0; // [sp+4Ch] [bp-4h]@1
 
   v0 = currentEmpireEntryId;
-  if ( empire_inUse[64 * currentEmpireEntryId] )
+  if ( empire[currentEmpireEntryId].inUse )
   {
     empire_990D29[64 * currentEmpireEntryId] = 10;
     editEmpire_isSaved = 0;
@@ -29559,7 +29559,7 @@ void  fun_editor_empire_determineMaxEntryInUse()
   signed int i; // [sp+4Ch] [bp-4h]@1
 
   edit_empire_max_inUse = 0;
-  for ( i = 0; i < 200 && (signed int)(unsigned __int8)empire_inUse[64 * i] > 1; ++i )
+  for ( i = 0; i < 200 && (signed int)(unsigned __int8)empire[i].inUse > 1; ++i )
     ++edit_empire_max_inUse;
   if ( edit_empire_max_inUse >= 200 )
     edit_empire_max_inUse = 199;
@@ -29570,14 +29570,14 @@ void  fun_editor_empire_clearEmpireEntry(int entryId)
   int i; // [sp+4Ch] [bp-8h]@3
   int v2; // [sp+50h] [bp-4h]@3
 
-  if ( empire_inUse[64 * entryId] )
+  if ( empire[entryId].inUse )
   {
-    fun_memset(&empire_type[64 * entryId], 64, 0);
+    memset( &empire[entryId], 0, sizeof(Empire));
     v2 = entryId;
-    for ( i = entryId + 1; v2 < 199 && empire_inUse[64 * i]; ++i )
+    for ( i = entryId + 1; v2 < 199 && empire[i].inUse; ++i )
     {
-      fun_memcpy8((int *)&empire_type[64 * i], (int *)&empire_type[64 * v2], 64);
-      fun_memset(&empire_type[64 * i], 64, 0);
+      memcpy( &empire[i], &empire[v2], sizeof(Empire));
+      memset(&empire[i], 0, sizeof(Empire));
       ++v2;
     }
   }
@@ -29591,9 +29591,9 @@ int  unused_4425B0()
 
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i] )
+    if ( empire[i].inUse )
     {
-      switch ( empire_type[64 * i] )
+      switch ( empire[i].type )
       {
         case 3:
           empire_graphicID[32 * i] = graphic_empireBattleIcon;
@@ -29669,8 +29669,8 @@ void  fun_initEmpire()
   v1 = 0;
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i]
-      && (unsigned __int8)empire_type[64 * i] == Emp_City
+    if ( empire[i].inUse
+      && (unsigned __int8)empire[i].type == Emp_City
       && (unsigned __int8)empire_cityType[64 * i] == City_Ours )
     {
       v1 = empire_graphicID[32 * i];
@@ -29684,7 +29684,7 @@ void  fun_initEmpire()
       v0 = graphic_empireCity - v1;
       for ( j = 0; j < 200; ++j )
       {
-        if ( empire_inUse[64 * j] )
+        if ( empire[j].inUse )
         {
           if ( empire_graphicID[32 * j] )
           {
@@ -29705,9 +29705,9 @@ void  fun_editor_empire_determineGraphicSize()
 
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i] )
+    if ( empire[i].inUse )
     {
-      if ( (unsigned __int8)empire_type[64 * i] == 1 )
+      if ( (unsigned __int8)empire[i].type == 1 )
       {
         if ( empire_cityType[64 * i] )
         {
@@ -30035,11 +30035,11 @@ void  fun_editor_empire_fixOwnCity()
   numOwnCities = 0;
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i] )
+    if ( empire[i].inUse )
     {
       if ( (signed int)(unsigned __int8)empire_990D29[64 * i] > 0 )
         --empire_990D29[64 * i];
-      if ( (unsigned __int8)empire_type[64 * i] == Emp_City )
+      if ( (unsigned __int8)empire[i].type == Emp_City )
       {
         if ( (unsigned __int8)empire_cityType[64 * i] == City_Ours )
           ++numOwnCities;
@@ -30051,9 +30051,9 @@ void  fun_editor_empire_fixOwnCity()
   {
     for ( j = 0; j < 200; ++j )
     {
-      if ( empire_inUse[64 * j] )
+      if ( empire[j].inUse )
       {
-        if ( (unsigned __int8)empire_type[64 * j] == Emp_City )
+        if (empire[j].type == Emp_City )
         {
           if ( (unsigned __int8)empire_cityType[64 * j] == City_Ours )
           {
@@ -30075,8 +30075,8 @@ void  fun_empireObjectsCorrectOwnerCity(int cityId)
 
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i]
-      && (unsigned __int8)empire_type[64 * i] == 1
+    if ( empire[i].inUse
+      && (unsigned __int8)empire[i].type == 1
       && (unsigned __int8)empire_tradeRouteId[64 * i] == (unsigned __int8)empire_tradeRouteId[64 * cityId] )
     {
       empire_ownerCityIndex[64 * cityId] = i;
@@ -30092,10 +30092,10 @@ void  fun_empireObjectsCorrectTradeStatus()
 
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i] )
+    if ( empire[i].inUse )
     {                                           // trade route dots
-      if ( (unsigned __int8)empire_type[64 * i] == Emp_LandTradeRoute
-        || (unsigned __int8)empire_type[64 * i] == Emp_SeaTradeRoute )
+      if ( (unsigned __int8)empire[i].type == Emp_LandTradeRoute
+        || (unsigned __int8)empire[i].type == Emp_SeaTradeRoute )
         empire_tradeRouteOpen[64 * i] = empire_tradeRouteOpen[64 * (unsigned __int8)empire_ownerCityIndex[64 * i]];
     }
   }
@@ -30410,11 +30410,11 @@ void  fun_readEmpireFile(int isCustomScenario)
     fun_readDataFromFilename("c32.emp", empireindex_xOffset, 0x500u, 0);
   else
     fun_readDataFromFilename("c3.emp", empireindex_xOffset, 0x500u, 0);
-  fun_memset(empire_type, 12800, 0);
+  memset(empire, 0, sizeof(empire));
   if ( isCustomScenario )
-    fun_readDataFromFilename("c32.emp", empire_type, 0x3200u, 12800 * scenario_map_empire + 1280);
+    fun_readDataFromFilename("c32.emp", empire, 0x3200u, 12800 * scenario_map_empire + 1280);
   else
-    fun_readDataFromFilename("c3.emp", empire_type, 0x3200u, 12800 * scenario_map_empire + 1280);
+    fun_readDataFromFilename("c3.emp", empire, 0x3200u, 12800 * scenario_map_empire + 1280);
   fun_initEmpire();
 }
 
@@ -30425,7 +30425,7 @@ void  fun_copyEmpireData(signed int empireMapId)
     if ( empireMapId >= 0 )
     {
       fun_memcpy(&empireindex_xOffset[16 * empireMapId], &empireindex_xOffset[16 * scenario_map_empire], 32);
-      fun_readDataFromFilename("c32.emp", empire_type, 0x3200u, 12800 * empireMapId + 1280);
+      fun_readDataFromFilename("c32.emp", empire, 0x3200u, 12800 * empireMapId + 1280);
       fun_initEmpire();
       fun_writeCurrentEmpireToFileCustom();
     }
@@ -30435,7 +30435,7 @@ void  fun_copyEmpireData(signed int empireMapId)
 int  fun_writeCurrentEmpireToFileCustom()
 {
   fun_writeToFilenameAtOffset("c32.emp", empireindex_xOffset, 0x500u, 0);
-  return fun_writeToFilenameAtOffset("c32.emp", empire_type, 0x3200u, 12800 * scenario_map_empire + 1280);
+  return fun_writeToFilenameAtOffset("c32.emp", empire, 0x3200u, 12800 * scenario_map_empire + 1280);
 }
 
 void  unused_createEmptyEmpireStatesFile()
@@ -30447,9 +30447,9 @@ void  unused_createEmptyEmpireStatesFile()
   scenario_map_empire = 0;
   fun_memset(empireindex_xOffset, 1280, 0);
   fun_writeToFilenameAppend("c32.emp", empireindex_xOffset, 0x500u);
-  fun_memset(empire_type, 12800, 0);
+  fun_memset(empire, 12800, 0);
   for ( i = 0; i < 40; ++i )
-    fun_writeToFilenameAppend("c32.emp", empire_type, 0x3200u);
+    fun_writeToFilenameAppend("c32.emp", empire, 0x3200u);
 }
 
 void  fun_fillExpandedEmpireFields()
@@ -30458,7 +30458,7 @@ void  fun_fillExpandedEmpireFields()
 
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i] )
+    if ( empire[i].inUse )
     {
       if ( !empire_xCoord_exp[32 * i] && !empire_yCoord_exp[32 * i] || !empire_graphicID_exp[32 * i] )
       {
@@ -30486,9 +30486,9 @@ void  fun_initializeTradeRoutes()
   tradeIndex = 1;
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i] )
+    if ( empire[i].inUse )
     {
-      if ( (unsigned __int8)empire_type[64 * i] == 1 )
+      if ( (unsigned __int8)empire[i].type == 1 )
       {
         trade_inUse[66 * tradeIndex] = 1;
         trade_cityType[66 * tradeIndex] = empire_cityType[64 * i];
@@ -30602,11 +30602,11 @@ signed int  fun_isSeaTradeRoute(int tradeRouteId)
 
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i] && (unsigned __int8)empire_tradeRouteId[64 * i] == tradeRouteId )
+    if ( empire[i].inUse && (unsigned __int8)empire_tradeRouteId[64 * i] == tradeRouteId )
     {
-      if ( (unsigned __int8)empire_type[64 * i] == Emp_SeaTradeRoute )
+      if ( (unsigned __int8)empire[i].type == Emp_SeaTradeRoute )
         return 1;
-      if ( (unsigned __int8)empire_type[64 * i] == Emp_LandTradeRoute )
+      if ( (unsigned __int8)empire[i].type == Emp_LandTradeRoute )
         return 0;
     }
   }
@@ -30697,7 +30697,7 @@ signed int  fun_getEmpireTradeAmountId(int empireEntryId, __int16 goodId)
   signed int result; // eax@2
   __int16 goodId2; // [sp+4Ch] [bp-4h]@7
 
-  if ( (unsigned __int8)empire_type[64 * empireEntryId] == 1 )
+  if ( empire[empireEntryId].type == 1 )
   {
     if ( (signed int)(unsigned __int8)empire_cityType[64 * empireEntryId] > 1 )
     {
@@ -30744,7 +30744,7 @@ void  fun_setEmpireTradeAmountId(int empireEntryId, __int16 goodId, int amountId
 {
   __int16 goodMask; // [sp+50h] [bp-4h]@7
 
-  if ( (unsigned __int8)empire_type[64 * empireEntryId] == 1 )
+  if ( (unsigned __int8)empire[empireEntryId].type == 1 )
   {
     if ( (signed int)(unsigned __int8)empire_cityType[64 * empireEntryId] > 1 )
     {
@@ -30784,9 +30784,9 @@ void  sub_445880()
 
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i] )
+    if ( empire[i].inUse )
     {
-      if ( (unsigned __int8)empire_type[64 * i] == Emp_City )
+      if ( (unsigned __int8)empire[i].type == Emp_City )
       {
         totalAmount = 0;
         for ( resource = 1; resource <= 15; ++resource )
@@ -31902,9 +31902,9 @@ void  fun_calculateDistantBattleRomanTravelTime(int isGame)
 
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i] )
+    if ( empire[i].inUse )
     {
-      if ( (unsigned __int8)empire_type[64 * i] == 6 )
+      if ( (unsigned __int8)empire[i].type == 6 )
       {
         if ( isGame )
         {
@@ -31931,9 +31931,9 @@ void  fun_calculateDistantBattleEnemyTravelTime(int isGame)
     map_distantBattle_enemyTravelTime = 0;
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i] )
+    if ( empire[i].inUse )
     {
-      if ( (unsigned __int8)empire_type[64 * i] == 7 )
+      if ( (unsigned __int8)empire[i].type == 7 )
       {
         if ( isGame )
         {
@@ -31957,8 +31957,8 @@ void  fun_setDistantBattleCity()
   city_inform[ciid].distantBattleCity = 0;
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i]
-      && (unsigned __int8)empire_type[64 * i] == Emp_City
+    if ( empire[i].inUse
+      && (unsigned __int8)empire[i].type == Emp_City
       && (unsigned __int8)empire_cityType[64 * i] == City_VulnerableRoman )
     {
       city_inform[ciid].distantBattleCity = i;
@@ -31994,9 +31994,9 @@ void  fun_setInvasionMonthsAndPaths()
   {
     for ( i = 0; i < 200; ++i )
     {
-      if ( empire_inUse[64 * i] )
+      if ( empire[i].inUse )
       {
-        if ( (unsigned __int8)empire_type[64 * i] == 3 )
+        if ( (unsigned __int8)empire[i].type == 3 )
         {
           if ( (unsigned __int8)empire_invasionPathId[64 * i] > dword_990CDC )
             dword_990CDC = (unsigned __int8)empire_invasionPathId[64 * i];
@@ -32055,8 +32055,8 @@ signed int  sub_449570(int a1)
 
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire_inUse[64 * i]
-      && (unsigned __int8)empire_type[64 * i] == 3
+    if ( empire[i].inUse
+      && (unsigned __int8)empire[i].type == 3
       && (unsigned __int8)empire_invasionPathId[64 * i] == dword_990604
       && (unsigned __int8)empire_invasionYears[64 * i] == a1 )
       return i;
@@ -83484,7 +83484,7 @@ void  fun_drawWindowButtons()
                   1);
                 if ( empire_selectedCity )
                 {
-                  if ( (unsigned __int8)empire_type[64 * (empire_selectedCity - 1)] == 1 )
+                  if ( empire[empire_selectedCity - 1].type == 1 )
                   {
                     trade_selectedCity = fun_getTradeCityFromEmpireObject(empire_selectedCity - 1);
                     if ( (unsigned __int8)trade_cityType[66 * trade_selectedCity] == City_Trade )
@@ -84375,7 +84375,7 @@ void  fun_handleMouseClick()
               }
               if ( empire_selectedCity )
               {
-                if ( (unsigned __int8)empire_type[64 * (empire_selectedCity - 1)] == 1 )
+                if ( (unsigned __int8)empire[empire_selectedCity - 1].type == 1 )
                 {
                   trade_selectedCity = fun_getTradeCityFromEmpireObject(empire_selectedCity - 1);
                   if ( (unsigned __int8)trade_cityType[66 * trade_selectedCity] == 2 )
@@ -84439,7 +84439,7 @@ void  fun_handleMouseClick()
             if ( !fun_handleArrowButtonClick(223, screen_height - 114, &arrowbuttons_editEmpireMap, 5) )
             {
               v13 = currentEmpireEntryId;
-              switch ( empire_type[64 * currentEmpireEntryId] )
+              switch ( empire[currentEmpireEntryId].type )
               {
                 case Emp_City:
                   if ( fun_handleCustomButtonClick(223, screen_height - 114, &buttons_editEmpireMap_editCity, 5) )
@@ -109493,10 +109493,7 @@ void  fun_drawEmpireInfoPanelBackground()
   fun_drawGraphic(graphic_empirePanels + 2, screen_width - 16, screen_height - 120);
   fun_drawGraphic(graphic_empirePanels + 2, screen_width - 16, screen_height - 16);
 }
-// 65E6D4: using guessed type int screen_height;
-// 6E6D08: using guessed type __int16 graphic_empirePanels;
 
-//----- (0051CD50) --------------------------------------------------------
 void  fun_drawEmpireInfoPanelCityName()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -109509,7 +109506,7 @@ void  fun_drawEmpireInfoPanelCityName()
     fun_drawGraphic(graphic_empirePanels + 8, (screen_width - 332) / 2, screen_height - 181);
     if ( empire_selectedCity > 0 )
     {
-      if ( (unsigned __int8)empire_type[64 * v0] == Emp_City )
+      if ( empire[v0].type == Emp_City )
         fun_drawGameTextCentered(
           21,
           (unsigned __int8)trade_cityNameId[66 * trade_selectedCity],
@@ -109529,13 +109526,13 @@ void  fun_drawEmpireInfoPanelForeground()
   v0 = empire_selectedCity - 1;
   if ( empire_selectedCity > 0 )
   {
-    if ( (unsigned __int8)empire_type[64 * v0] == Emp_City )
+    if ( (unsigned __int8)empire[v0].type == Emp_City )
       fun_drawEmpireInfoPanelCity();
-    if ( (unsigned __int8)empire_type[64 * v0] == Emp_BattleIcon )
+    if ( (unsigned __int8)empire[v0].type == Emp_BattleIcon )
       fun_drawEmpireInfoPanelBattleIcon();
-    if ( (unsigned __int8)empire_type[64 * v0] == Emp_DistantBattleRomanArmy )
+    if ( (unsigned __int8)empire[v0].type == Emp_DistantBattleRomanArmy )
       fun_drawEmpireInfoPanelRomanArmy();
-    if ( (unsigned __int8)empire_type[64 * v0] == Emp_DistantBattleEnemyArmy )
+    if ( (unsigned __int8)empire[v0].type == Emp_DistantBattleEnemyArmy )
       fun_drawEmpireInfoPanelEnemyArmy();
   }
   else
@@ -110044,7 +110041,7 @@ void  fun_drawEditEmpireObjectPanel_Edit()
   fun_drawNumberCentered(editEmpire_addObjectGraphicID + 1, 64, " ", 225, screen_height - 28, 48, graphic_font, 0);
   v17 = currentEmpireEntryId;
   text_xoffset = 0;
-  if ( (unsigned __int8)empire_type[64 * currentEmpireEntryId] == 1 )
+  if ( (unsigned __int8)empire[currentEmpireEntryId].type == 1 )
   {
     fun_drawOutsetRect(393, screen_height - 112, 180, 20);
     if ( empire_cityType[64 * v17] )
@@ -110142,7 +110139,7 @@ void  fun_drawEditEmpireObjectPanel_Edit()
   }
   else
   {
-    if ( (unsigned __int8)empire_type[64 * currentEmpireEntryId] == 3 )
+    if ( (unsigned __int8)empire[currentEmpireEntryId].type == 3 )
     {
       fun_drawGameText(44, 69, 393, screen_height - 100, graphic_font + 536, 0);
       fun_drawGameText(44, 70, 423, screen_height - 64, graphic_font, 0);
@@ -110170,14 +110167,14 @@ void  fun_drawEditEmpireObjectPanel_Edit()
     }
     else
     {
-      if ( (unsigned __int8)empire_type[64 * currentEmpireEntryId] != 4
-        && (unsigned __int8)empire_type[64 * currentEmpireEntryId] != 5 )
+      if ( (unsigned __int8)empire[currentEmpireEntryId].type != 4
+        && (unsigned __int8)empire[currentEmpireEntryId].type != 5 )
       {
-        if ( (unsigned __int8)empire_type[64 * currentEmpireEntryId] == 6
-          || (unsigned __int8)empire_type[64 * currentEmpireEntryId] == 7 )
+        if ( (unsigned __int8)empire[currentEmpireEntryId].type == 6
+          || (unsigned __int8)empire[currentEmpireEntryId].type == 7 )
         {
           text_xoffset = 0;
-          if ( (unsigned __int8)empire_type[64 * currentEmpireEntryId] == 6 )
+          if ( (unsigned __int8)empire[currentEmpireEntryId].type == 6 )
             fun_drawGameText(44, 30, 393, screen_height - 100, graphic_font + 536, 0);
           else
             fun_drawGameText(44, 31, 393, screen_height - 100, graphic_font + 536, 0);
@@ -110194,7 +110191,7 @@ void  fun_drawEditEmpireObjectPanel_Edit()
       }
       else
       {
-        if ( (unsigned __int8)empire_type[64 * currentEmpireEntryId] == 4 )
+        if ( (unsigned __int8)empire[currentEmpireEntryId].type == 4 )
           fun_drawGameText(44, 28, 393, screen_height - 100, graphic_font + 536, 0);
         else
           fun_drawGameText(44, 29, 393, screen_height - 100, graphic_font + 536, 0);
@@ -110331,10 +110328,10 @@ void  fun_drawEmpire()
   draw_clip_xEnd = ddraw_width - empireMapBorderLeftRight;
   draw_clip_y = empireMapBorderTop;
   draw_clip_yEnd = ddraw_height - empireMapBorderBottom;
-  for ( i = 0; i < 200 && empire_inUse[64 * i]; ++i )
+  for ( i = 0; i < 200 && empire[i].inUse; ++i )
   {
     if ( window_id != 20
-      || (unsigned __int8)empire_type[64 * i] != 4 && (unsigned __int8)empire_type[64 * i] != 5
+      || (unsigned __int8)empire[i].type != 4 && (unsigned __int8)empire[i].type != 5
       || fun_isTradeRouteOpen((unsigned __int8)empire_tradeRouteId[64 * i]) )
     {
       if ( window_id == 21 && map_empireExpanded )
@@ -110358,7 +110355,7 @@ void  fun_drawEmpire()
           v3 = empire_graphicID[32 * i];
         }
       }
-      if ( (unsigned __int8)empire_type[64 * i] == Emp_City )
+      if ( (unsigned __int8)empire[i].type == Emp_City )
       {
         v8 = fun_getTradeCityFromEmpireObject(i);
         if ( (unsigned __int8)trade_cityType[66 * v8] == City_DistantForeign )
@@ -110366,7 +110363,7 @@ void  fun_drawEmpire()
         if ( (unsigned __int8)trade_cityType[66 * v8] == City_FutureRoman )
           v3 = word_6E6D6E;
       }
-      if ( (unsigned __int8)empire_type[64 * i] == Emp_BattleIcon )
+      if ( (unsigned __int8)empire[i].type == Emp_BattleIcon )
       {
         if ( window_id == W_EmpireMap )
           continue;
@@ -110403,12 +110400,12 @@ void  fun_drawEmpire()
           graphic_font + 938,
           -2048);
       }
-      if ( (unsigned __int8)empire_type[64 * i] != Emp_DistantBattleRomanArmy
-        && (unsigned __int8)empire_type[64 * i] != Emp_DistantBattleEnemyArmy )
+      if ( (unsigned __int8)empire[i].type != Emp_DistantBattleRomanArmy
+        && (unsigned __int8)empire[i].type != Emp_DistantBattleEnemyArmy )
         goto LABEL_49;
       if ( window_id != 20 )
       {
-        if ( (unsigned __int8)empire_type[64 * i] == Emp_DistantBattleRomanArmy )
+        if ( (unsigned __int8)empire[i].type == Emp_DistantBattleRomanArmy )
           v2 = -1;
         else
           v2 = -2048;
@@ -110445,7 +110442,7 @@ LABEL_49:
         }
         continue;
       }
-      if ( (unsigned __int8)empire_type[64 * i] == Emp_DistantBattleEnemyArmy )
+      if ( (unsigned __int8)empire[i].type == Emp_DistantBattleEnemyArmy )
       {
         if ( city_inform[ciid].byte_654583 > 0
           && city_inform[ciid].byte_65458A == (unsigned __int8)empire_distBattleTravelMonths[64 * i] )
@@ -110472,7 +110469,7 @@ LABEL_49:
       v7 = empire_xCoord[32 * currentEmpireEntryId];
       v5 = empire_yCoord[32 * currentEmpireEntryId];
     }
-    if ( empire_inUse[64 * currentEmpireEntryId] )
+    if ( empire[currentEmpireEntryId].inUse )
       fun_drawSelectionAnts(
         v7 + empireMapBorderLeftRight - empire_scroll_x - 4,
         v5 + empireMapBorderTop - empire_scroll_y - 4,

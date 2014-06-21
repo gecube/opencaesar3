@@ -1161,6 +1161,14 @@ int numPeople;
 int tax;
 };
 
+struct Empire
+{
+  char inUse;
+  char type;
+};
+
+static Empire empire[100];
+
 static ModelHouse model_houses[20];
 
 static Storage storages[200];
