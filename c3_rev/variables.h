@@ -15,11 +15,18 @@ static short building_5a_house_theater_amphi[__TD_TR];
 static short building_5c_house_amphiGlad_colo[__TD_TR];
 static short building_5e_house_coloLion_hippo[__TD_TR];
 static short building_60_house_school_library[__TD_TR];
-
+static char map_char_to_fontGraphic[0xff]; // idb
 static char building_01_ciid[__TD_TR]; // weak
 static char building_02_byte_always0[__TD_TR]; // weak
 static char building_03_size[__TD_TR]; // weak
 static char building_04_house_isMerged[__TD_TR]; // weak
+
+static int mouseover_last_update; // weak
+static int mouseover_info_id; // idb
+
+static char aC3_sg2[7]; // weak
+
+static C3Graphic c3_sg2[0xff];
 
 static unsigned char building__07_y[__TD_TR];
 static short building_08_gridOffset[__TD_TR]; // weak
@@ -488,9 +495,6 @@ static short graphic_clayPit; // weak
 
 static int dword_7E2C08; // weak
 
-static int buildmenu_xOffsets[0xff]; // weak
-static int buildmenu_yOffsets[0xff]; // idb
-
 static int xOffset; // idb
 static int yOffset; // idb
 static int font_currentFontId; // idb
@@ -655,7 +659,7 @@ struct CityInfo
   int dword_6543C8;
   int dword_654624;
   int dword_654520;
-  int dword_65429C;
+  int hippodromeBuiltInCity;
   int dword_65451C;
   int dword_6543B8;
   int dword_6543BC;
@@ -897,8 +901,8 @@ struct CityInfo
   int dword_6544F4;
   int dword_6544FC;
   int dword_654500;
-  int dword_654504;
-  int dword_654508;
+  int plebsFoodInCityLastYear;
+  int plebsFoodInCity;
   int dword_65450C;
   int estimatedTaxIncome;
 
@@ -1095,13 +1099,13 @@ static Walker walkers[1000];
 
 struct Building
 {
- int type;
+ BuildingType type;
  int d7d_storageId;
  int x;
 
  unsigned char inUse;
  int house_crimeRisk;
- int houseSize;
+ int house_size;
  int house_population;
  int walkerServiceAccess;
  int laborCategory;
@@ -1111,7 +1115,8 @@ struct Building
  int grow_value_house_foodstocks[8];
 };
 
-static Building buildings[2000];
+static const int MAX_BUILDINGS = 2000;
+static Building buildings[MAX_BUILDINGS];
 
 struct Storage
 {
@@ -1123,6 +1128,17 @@ char stateVegetables;
 char stateFruit;
 char stateMeatFish;
 };
+
+struct BuildMenu
+{
+  int xOffsets[100];
+  int yOffsets[100];
+  int submenuNumItems;
+  int selectedSubMenu;
+  BuildingType dword_5F453C[30][30];
+};
+
+static BuildMenu buildmenu; // weak
 
 struct ModelHouse
 {
@@ -1152,5 +1168,7 @@ static Storage storages[200];
 static char relatedToCityInfoAlwaysZero[8];
 
 static CityInfo city_inform[8];
+
+static int atoi_multipliers[0xff];
 
 #endif

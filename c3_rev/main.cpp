@@ -15,6 +15,8 @@
 #include <crtdbg.h>
 #include "mmio.h"
 #include "pk.h"
+#include "gui.h"
+#include "basic.h"
 //#include "C:/Qt/Qt5.1.1/Tools/mingw48_32/i686-w64-mingw32/include/ddraw.h"
 //#include "C:/Qt/Qt5.1.1/Tools/mingw48_32/i686-w64-mingw32/include/dsound.h"
 
@@ -58,7 +60,7 @@ static char aOkSetupLoadedD[0xff]; // idb
 static char aErrSetupCouldn[0xff]; // idb
 static char aOkCautionDatFi[0xff]; // idb
 static char aC3map_inf[0xff]; // idb
-static char aC3_sg2[7]; // weak
+
 static char aOkSetupLoadedA[0xff]; // idb
 static char aOkRemovedManma[0xff]; // idb
 static char aC3_inf[0xff]; // idb
@@ -583,8 +585,8 @@ static int dword_5F4500[0xff]; // weak
 static int dword_5F4504[0xff]; // weak
 static int dword_5F4520[0xff]; // weak
 static int dword_5F4524[0xff]; // weak
-static int dword_5F453C[0xff]; // weak
-static int buildingMenu_buildingId[30][30]; // idb
+
+static BuildingType buildingMenu_buildingId[30][30]; // idb
 
 static int overlayMenuIDToOverlayID[0xff]; // idb
 static int overlaySubMenuIDToOverlayID[0xff]; // idb
@@ -720,10 +722,9 @@ static __int16 word_5FC9E8[0xff]; // idb
 static __int16 word_5FCD08[0xff]; // idb
 static char byte_5FD6B4[0xff]; // idb
 static char byte_5FD6D4[0xff]; // idb
-static char map_char_to_fontGraphic[0xff]; // idb
 static char map_printChar_to_fontGraphic[0xff]; // idb
 static char extension_555[4]; // idb
-static int atoi_multipliers[0xff]; // idb
+
 static int video_busySwitching; // weak
 static int dword_5FD84C; // weak
 static int dword_5FD868; // weak
@@ -1287,7 +1288,7 @@ static __int16 graphic_firedScreenBg; // weak
 static __int16 word_6E6DAA; // weak
 static __int16 graphic_selectMissionButton[46]; // weak
 static char c3sg2_bitmaps[20000]; // idb
-static C3Graphic c3_sg2[0xff];
+
 
 
 static int dword_7E2BFC; // weak
@@ -1318,7 +1319,7 @@ static int dword_7E2D4C[0xff]; // weak
 static int dword_7E2D50[0xff]; // idb
 static int dword_7E3128; // weak
 static int dword_7E312C; // weak
-static int mouseover_info_id; // idb
+
 static int helpDialog_value; // idb
 static int helpDialog_windowId; // weak
 static int dword_7E313C; // weak
@@ -1332,7 +1333,7 @@ static int helpDialog_text_y; // idb
 static int helpDialog_text_x; // idb
 static int helpDialog_text_width; // idb
 static char byte_7E3180[0xff]; // idb
-static int mouseover_last_update; // weak
+
 static int seqWalkerName_citizen; // weak
 static int seqWalkerName_taxCollector; // weak
 static int dword_7F87A8; // weak
@@ -2268,12 +2269,12 @@ static int mouseover_button_id; // weak
 static int mouseover_button_id_main; // weak
 static int dword_9D7B34; // weak
 static int dword_9D7B38; // weak
-static int dword_9D7B40; // weak
-static int dword_9D7B44; // weak
-static int buildmenu_selectedSubMenu; // weak
+static int buildmenu_Y; // weak
+static int buildmenu_X; // weak
+
 static void (*confirmDialog_okFunc)(void);
 static int topmenu_fundsPopDateHit; // weak
-static int buildmenu_submenuNumItems; // weak
+
 static struct C3MenuItem *openMainMenuSubItems;
 static struct C3Menu *openMainMenuItem;
 static int selectedSubMenuItemId; // weak
@@ -2360,7 +2361,7 @@ static int soundOptions_effectsOn_undoCopy; // weak
 static int imagebuttonunknown_flag; // weak
 static int selectList_fromWindow; // weak
 static int mode_editor; // weak
-static signed int toPlace_buildingType; // idb
+static BuildingType toPlace_buildingType; // idb
 static __int16 *numericInput_valueShort;
 static int speedOptions_game_undoCopy; // weak
 static int dword_9DA8B4; // weak
@@ -2546,7 +2547,7 @@ void  fun_drawDialogTradePrices();
 void  fun_drawMinimapPixelGraphic(signed int a1, int x, int y); // idb
 int  fun_handleArrowButtonClick(int xOffset, int yOffset, struct C3ArrowButton *buttons, int numButtons); // idb
 int  fun_pk_inputFunc(char *buffer, int *length, struct PKToken *token);
-void  fun_ceresWitherCrops(int bigCurse);
+void  ceresWitherCrops(int bigCurse);
 
 void  fun_drawBuildingOnWorkersOverlay(int a1, int a2, int a3);
 void  fun_clearBuildingFootprintTile_26px();
@@ -2793,7 +2794,7 @@ void  fun_setDistantBattleCityAsForeign();
 void  fun_editor_startCond_startDate();
 
 signed int  fun_writeCompressedChunk(int fd, void *buffer, DWORD nNumberOfBytesToWrite);
-signed int  fun_dockIsConnectedToOpenWater(int x, int y); // idb
+int fun_dockIsConnectedToOpenWater(int x, int y); // idb
 void  fun_editor_winCriteria_ratingToggle();
 void  fun_drawRatingsAdvisorButtons();
 
@@ -2952,7 +2953,7 @@ void  fun_drawDialogDonateToCity();
 void fun_drawOpenSubMenu(void); // weak
 
 void  fun_showRightClickInfo();
-void fun_evolveHouseTo(int a1, __int16 type); // idb
+void fun_evolveHouseTo(int a1, BuildingType type); // idb
 void  fun_setCityScreenWidths();
 void  fun_drawPopulationAdvisorButtons();
 void  fun_showBuildingInfoPrefecture();
@@ -3011,7 +3012,7 @@ void  fun_menuResets_saveToBmp();
 void  fun_resolutionConfirm_ok();
 int  j_unused_4129D0(int a1, int a2, int a3);
 
-signed int  fun_createBuilding(int a1, int type, int x, int y); // idb
+int fun_createBuilding(int a1, BuildingType type, int x, int y); // idb
 void  fun_loadScenario(const char *filename);
 signed int  fun_createStorage();
 void  fun_showBuildingInfoFruitFarm();
@@ -3086,7 +3087,7 @@ void  unused_setIsometricPixel_safe(int x, int y, int color);
 void  fun_soundStopChannel(int channel); // idb
 void  fun_drawGreyButton(int a1, int x, int y, int width, int mouseOver);
 int  fun_getIsometricViewportWidth2();
-signed int  fun_isTerrainFree(int size, int x, int y, unsigned __int16 mask); // idb
+int fun_isTerrainFree(int size, int x, int y, unsigned __int16 mask); // idb
 void  fun_editor_specialEvents_ironMineCollapse();
 void  fun_drawBuildingOnWaterOverlay(int a2, int a3);
 signed int  fun_loadSavedGame(const char *filename); // idb
@@ -3830,11 +3831,11 @@ void  fun_gatherEntertainmentInfo();
 void  sub_450F10();
 void  sub_4510E0();
 void  fun_recalculateReservoirAndFountainAccess();
-void  sub_4516B0();
+void  decreaserWalkerServiceAccessForAll();
 void  sub_451770();
 void  sub_451AB0();
-void  fun_ceresWitherCrops(int bigCurse);
-void  sub_451E30();
+void  ceresWitherCrops(int bigCurse);
+void  ceresBlessingCrops();
 bool  gStockCapacity(int a1);
 void  sub_4520A0(int a1);
 int  fun_marketDetermineDestinationGranaryWarehouse(int buildingId);
@@ -3965,7 +3966,7 @@ void  sub_469280();
 int  sub_469320();
 int  sub_469470();
 void  fun_clearBuildings();
-signed int  fun_createBuilding(int ciid, int type, int x, int y);
+signed int  fun_createBuilding(int ciid, BuildingType type, int x, int y);
 void  fun_deleteBuilding(int buildingId);
 void  fun_deleteBuildingEvent(int buildingId);
 void  fun_clearStorages();
@@ -4007,7 +4008,7 @@ void  fun_initTerrainGridEdge();
 void  fun_initRandomGrid();
 void  fun_initMapEdges();
 
-void  fun_placeBuilding(int ciid_, int orientation, signed int xMin, signed int yMin, signed int xPos, signed int yPos, int buildingId); // idb
+void  fun_placeBuilding(int ciid_, int orientation, signed int xMin, signed int yMin, signed int xPos, signed int yPos, BuildingType buildingId);
 void  sub_476BA0(int a1, int a2, int a3, int a4, int a5);
 void  sub_476EB0(int a1, int a2, int a3, int x, int y); // idb
 void  sub_4771D0(int a2, int a3, int a4, int a5, int a6);
@@ -4199,9 +4200,9 @@ void  fun_setByte14Zero(char *buffer, int items);
 int  sub_490A00();
 void  sub_490A70();
 int  sub_490AE0();
-signed int  sub_490B40();
+int sub_490B40();
 int  sub_490D00();
-signed int  sub_490DE0(int a1);
+int sub_490DE0(int a1);
 signed int  sub_490F30(int a1);
 void  sub_490FD0();
 void  fun_performUndo();
@@ -4397,7 +4398,7 @@ void  sub_4BF500();
 void  sub_4BFCC0(int a1, int a2);
 signed int  sub_4BFE10(int a1, signed int a2, int a3, int a4, int a5, int a6);
 void  fun_killEnemiesSpiritOfMars();
-void  unused_4C01E0();
+void  killAllWalkersExcludeEnemies();
 signed int  sub_4C02C0();
 void  sub_4C0410(int a1);
 void  sub_4C04D0();
@@ -4436,7 +4437,7 @@ signed int  fun_getButtonTooltipText_EmpireMap();
 signed int  fun_getOverlayTooltipText();
 signed int  sub_4C9710();
 signed int  unused_4C9790();
-void  fun_resetTooltipTimer();
+
 void  fun_drawTooltip();
 void  unused_4C9D00();
 void  unused_4C9E30();
@@ -4478,7 +4479,7 @@ void  fun_inputAddCharacter(char value);
 void  fun_inputRemoveCurrentChar();
 void  fun_inputInit(int id);
 void  sub_4CBDD0();
-void  unused_inputRemoveSpaces();
+
 void  fun_initInputTextbox(int inputId, char *text, int maxlength, int textboxwidth, char allowPunctuation, int font);
 int  fun_intToString(signed int number, int offset, int addPlusSign); // idb
 int  fun_getGameTextStringWidth(int group, int number, int fontId);
@@ -5159,7 +5160,7 @@ void  fun_confirmdialog_requestDispatchGoods()
 
 void  fun_menuFile_newGame()
 {
-  toPlace_buildingType = 0;
+  toPlace_buildingType = B_none_building;
   dword_8E1484 = 0;
   currentOverlay = Overlay_None;
   previousOverlay = Overlay_None;
@@ -5169,7 +5170,7 @@ void  fun_menuFile_newGame()
 
 void  fun_menuFile_replayMap()
 {
-  toPlace_buildingType = 0;
+  toPlace_buildingType = B_none_building;
   if ( setting_isCustomScenario )
   {
     fun_initScenario(currentScenarioFilename);
@@ -5185,7 +5186,7 @@ void  fun_menuFile_replayMap()
 
 void  fun_menuFile_loadGame()
 {
-  toPlace_buildingType = 0;
+  toPlace_buildingType = B_none_building;
   fun_findFiles("*.sav");
   filelist_numFiles = findfiles_numFiles;
   filelist_scrollPosition = 0;
@@ -6053,16 +6054,17 @@ void  fun_showSelectListDialog(int x, int y, int numItems, int group, char *valu
 void  fun_sidePanel_build()
 {
   window_id = 6;
-  buildmenu_selectedSubMenu = currentButton_parameter;
-  if ( buildmenu_selectedSubMenu == 1 )
+  buildmenu.selectedSubMenu = currentButton_parameter;
+  if ( buildmenu.selectedSubMenu == 1 )
   {
     if ( debug_houseEvolution == 1 )
-      buildmenu_selectedSubMenu = 13;
+      buildmenu.selectedSubMenu = 13;
   }
-  buildmenu_submenuNumItems = fun_countBuildingSubMenuItems();
-  dword_9D7B44 = buildmenu_xOffsets[2 * buildmenu_submenuNumItems];
-  dword_9D7B40 = buildmenu_yOffsets[2 * buildmenu_submenuNumItems];
-  if ( buildmenu_selectedSubMenu == 2 || buildmenu_selectedSubMenu == 3 || buildmenu_selectedSubMenu == 1 )
+  buildmenu.submenuNumItems = fun_countBuildingSubMenuItems();
+  buildmenu_X = buildmenu.xOffsets[buildmenu.submenuNumItems];
+  buildmenu_Y = buildmenu.yOffsets[buildmenu.submenuNumItems];
+
+  if ( buildmenu.selectedSubMenu == 2 || buildmenu.selectedSubMenu == 3 || buildmenu.selectedSubMenu == 1 )
   {
     currentButton_parameter = 1;
     fun_editorPanel_buttonClick();
@@ -6082,18 +6084,18 @@ int  fun_sidePanel_submenuClick()
     submenu_xOffset = cityscreen_width_withoutControlpanel - 258;
   if ( mode_editor == 1 )
     submenu_xOffset = cityscreen_width_withControlpanel - 258;
-  submenu_yOffset = dword_9D7B44 + 110;
+  submenu_yOffset = buildmenu_X + 110;
   mouseover_button_id = fun_isCustomButtonClick(
                           submenu_xOffset,
-                          dword_9D7B44 + 110,
+                          buildmenu_X + 110,
                           &buttons_editorPanel,
-                          buildmenu_submenuNumItems);
+                          buildmenu.submenuNumItems);
   submenuParam = -1;
   for ( i = 0; ; ++i )
   {
-    if ( i >= buildmenu_submenuNumItems )
+    if ( i >= buildmenu.submenuNumItems )
       return 0;
-    submenuParam = fun_sidePanel_submenuGetNextIndex(buildmenu_selectedSubMenu - 1, submenuParam);
+    submenuParam = fun_sidePanel_submenuGetNextIndex(buildmenu.selectedSubMenu - 1, submenuParam);
     if ( submenu_xOffset + *(&buttons_editorPanel.xStart + 14 * i) <= mouseclick_x )
     {
       if ( submenu_xOffset + *(&buttons_editorPanel.xEnd + 14 * i) > mouseclick_x
@@ -6129,9 +6131,9 @@ int  fun_countBuildingSubMenuItems()
   signed int i; // [sp+50h] [bp-4h]@1
 
   v1 = 0;
-  for ( i = 0; i < 30 && *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu_selectedSubMenu - 1)] + 4 * i) > 0; ++i )
+  for ( i = 0; i < 30 && *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu.selectedSubMenu - 1)] + 4 * i) > 0; ++i )
   {
-    if ( *(int *)((char *)&buildingMenu_enabled[30 * (buildmenu_selectedSubMenu - 1)] + 4 * i) )
+    if ( *(int *)((char *)&buildingMenu_enabled[30 * (buildmenu.selectedSubMenu - 1)] + 4 * i) )
       ++v1;
   }
   return v1;
@@ -7012,11 +7014,11 @@ void  fun_enableSidebarButtons()
   for ( i = 0; i < 12; ++i )
   {
     imagebuttons_sidebar_build[i].state_enabled = 1;
-    buildmenu_selectedSubMenu = imagebuttons_sidebar_build[i].parameter1;
+    buildmenu.selectedSubMenu = imagebuttons_sidebar_build[i].parameter1;
     if ( fun_countBuildingSubMenuItems() <= 0 )
       imagebuttons_sidebar_build[i].state_enabled = 0;
     imagebuttons_sidebar_buildCollapsed[i].state_enabled = 1;
-    buildmenu_selectedSubMenu = imagebuttons_sidebar_buildCollapsed[i].parameter1;
+    buildmenu.selectedSubMenu = imagebuttons_sidebar_buildCollapsed[i].parameter1;
     if ( fun_countBuildingSubMenuItems() <= 0 )
       imagebuttons_sidebar_buildCollapsed[i].state_enabled = 0;
   }
@@ -7032,25 +7034,25 @@ void  fun_editorPanel_buttonClick()
   dword_8B460C = time_current;
   dword_9363AC = 0;
   dword_8C79EC = 0;
-  if ( buildmenu_selectedSubMenu != 14 )
+  if ( buildmenu.selectedSubMenu != 14 )
   {
-    if ( buildmenu_selectedSubMenu != 15 )
+    if ( buildmenu.selectedSubMenu != 15 )
     {
-      switch ( buildmenu_selectedSubMenu )
+      switch ( buildmenu.selectedSubMenu )
       {
         case 18:                                // river entry/exit point
           window_id = 1;
           if ( currentButton_parameter == 1 )
           {
             dword_9DA804 = 18;
-            toPlace_buildingType = 130;
+            toPlace_buildingType = (BuildingType)130;
           }
           else
           {
             if ( currentButton_parameter == 2 )
             {
               dword_9DA804 = 19;
-              toPlace_buildingType = 131;
+              toPlace_buildingType = (BuildingType)131;
             }
           }
           window_redrawRequest = 1;
@@ -7088,13 +7090,13 @@ void  fun_editorPanel_buttonClick()
           if ( currentButton_parameter > 8 )    // herd point
           {
             dword_9DA804 = 25;
-            toPlace_buildingType = 133;
+            toPlace_buildingType = (BuildingType)133;
             dword_9DA910 = currentButton_parameter - 8;
           }
           else
           {                                     // fishing point
             dword_9DA804 = 24;
-            toPlace_buildingType = 132;
+            toPlace_buildingType = (BuildingType)132;
             dword_9DA810 = currentButton_parameter;
           }
           window_id = 1;
@@ -7107,7 +7109,7 @@ void  fun_editorPanel_buttonClick()
           break;
         case 17:                                // invasion point
           dword_9DA804 = 13;
-          toPlace_buildingType = 126;
+          toPlace_buildingType = B_invasion_type;
           toPlace_invasionPointId = currentButton_parameter;
           window_id = 1;
           window_redrawRequest = 1;
@@ -7123,15 +7125,15 @@ void  fun_editorPanel_buttonClick()
           {
             case 1:
               dword_9DA804 = 11;
-              toPlace_buildingType = 123;
+              toPlace_buildingType = (BuildingType)123;
               break;
             case 2:
               dword_9DA804 = 12;
-              toPlace_buildingType = 124;
+              toPlace_buildingType = (BuildingType)124;
               break;
             case 3:
               dword_9DA804 = 9;
-              toPlace_buildingType = 129;
+              toPlace_buildingType = (BuildingType)129;
               break;
           }
           window_redrawRequest = 1;
@@ -7142,8 +7144,7 @@ void  fun_editorPanel_buttonClick()
           dword_9DA880 = toPlace_yPos;
           break;
         default:
-          toPlace_buildingType = *(int *)((char *)&dword_5F453C[30 * (buildmenu_selectedSubMenu - 1)]
-                                        + 4 * currentButton_parameter);
+          toPlace_buildingType = buildmenu.dword_5F453C[buildmenu.selectedSubMenu - 1][currentButton_parameter];
           if ( toPlace_buildingType != B_Menu_Farms
             && toPlace_buildingType != B_Menu_RawMaterials
             && toPlace_buildingType != B_Menu_Workshops )
@@ -7207,19 +7208,19 @@ void  fun_editorPanel_buttonClick()
               switch ( toPlace_buildingType )
               {
                 case B_Menu_SmallTemples:
-                  buildmenu_selectedSubMenu = 23;
+                  buildmenu.selectedSubMenu = 23;
                   break;
                 case B_Menu_LargeTemples:
-                  buildmenu_selectedSubMenu = 24;
+                  buildmenu.selectedSubMenu = 24;
                   break;
                 case B_FortGround__:
-                  buildmenu_selectedSubMenu = 25;
+                  buildmenu.selectedSubMenu = 25;
                   break;
               }
-              buildmenu_submenuNumItems = fun_countBuildingSubMenuItems();
-              dword_9D7B44 = buildmenu_xOffsets[2 * buildmenu_submenuNumItems];
-              dword_9D7B40 = buildmenu_yOffsets[2 * buildmenu_submenuNumItems];
-              toPlace_buildingType = 0;
+              buildmenu.submenuNumItems = fun_countBuildingSubMenuItems();
+              buildmenu_X = buildmenu.xOffsets[buildmenu.submenuNumItems];
+              buildmenu_Y = buildmenu.yOffsets[buildmenu.submenuNumItems];
+              toPlace_buildingType = B_none_building;
               dword_9DA918 = 0;
               toPlace_xPos = 0;
               dword_9DA884 = toPlace_xPos;
@@ -7233,19 +7234,19 @@ void  fun_editorPanel_buttonClick()
             switch ( toPlace_buildingType )
             {
               case B_Menu_Farms:
-                buildmenu_selectedSubMenu = 20;
+                buildmenu.selectedSubMenu = 20;
                 break;
               case B_Menu_RawMaterials:
-                buildmenu_selectedSubMenu = 21;
+                buildmenu.selectedSubMenu = 21;
                 break;
               case B_Menu_Workshops:
-                buildmenu_selectedSubMenu = 22;
+                buildmenu.selectedSubMenu = 22;
                 break;
             }
-            buildmenu_submenuNumItems = fun_countBuildingSubMenuItems();
-            dword_9D7B44 = buildmenu_xOffsets[2 * buildmenu_submenuNumItems];
-            dword_9D7B40 = buildmenu_yOffsets[2 * buildmenu_submenuNumItems];
-            toPlace_buildingType = 0;
+            buildmenu.submenuNumItems = fun_countBuildingSubMenuItems();
+            buildmenu_X = buildmenu.xOffsets[buildmenu.submenuNumItems];
+            buildmenu_Y = buildmenu.yOffsets[buildmenu.submenuNumItems];
+            toPlace_buildingType = B_none_building;
             dword_9DA918 = 0;
             toPlace_xPos = 0;
             dword_9DA884 = toPlace_xPos;
@@ -7269,7 +7270,7 @@ signed int  sub_40A700()
   if ( toPlace_buildingType )
     res = 1;
   window_id = 1;
-  toPlace_buildingType = 0;
+  toPlace_buildingType = B_none_building;
   dword_9DA918 = 0;
   toPlace_xPos = 0;
   dword_9DA884 = toPlace_xPos;
@@ -9204,7 +9205,7 @@ void  fun_imageButtonUnknown_doNothingRedraw()
 void  fun_imageButtonUnknown_setFlag()
 {
   imagebuttonunknown_flag = currentButton_parameter;
-  toPlace_buildingType = 0;
+  toPlace_buildingType = B_none_building;
   window_redrawRequest = 1;
 }
 
@@ -9220,9 +9221,9 @@ signed int  sub_40F120()
 void  fun_sidePanel_overlay()
 {
   window_id = W_OverlaySelectionMenu;
-  buildmenu_submenuNumItems = 20;
-  dword_9D7B44 = 40;
-  dword_9D7B40 = 12;
+  buildmenu.submenuNumItems = 20;
+  buildmenu_X = 40;
+  buildmenu_Y = 12;
   dword_9D7B7C = 0;
   selectedOverlaySubMenu = 0;
   selectedOverlaySubMenuNumItems = 0;
@@ -22263,7 +22264,7 @@ void  sub_42E7A0()
                   v3 = grid_bitfields[dword_9D4B4C];
                   if ( grid_terrain[dword_9D4B4C] & T_Garden )
                   {
-                    buildings[0].type = 39;
+                    buildings[0].type = B_Gardens;
                     sub_41C000(0, 2);
                   }
                   if ( v3 & 0x10 )
@@ -22849,7 +22850,7 @@ void  fun_drawBuildingWithOverlay(int buildingId, int xOffset, int yOffset, int 
     {
       case 1:
         graphic_currentGraphicId = graphic_overlaytiles;
-        if ( buildings[buildingId].houseSize )
+        if ( buildings[buildingId].house_size )
           graphic_currentGraphicId += 4;
         if ( currentOverlay != 8 && currentOverlay != 10 )
         {
@@ -22936,7 +22937,7 @@ void  fun_drawBuildingWithOverlay(int buildingId, int xOffset, int yOffset, int 
                                 graphic_currentGraphicId = graphic_overlaytiles;
                                 graphic_currentGraphicId += dword_5F949C[i];
                                 graphic_currentGraphicId += graphicOffset;
-                                if ( buildings[buildingId].houseSize )
+                                if ( buildings[buildingId].house_size )
                                   graphic_currentGraphicId += 4;
                                 fun_drawGraphic(
                                   graphic_currentGraphicId,
@@ -23134,7 +23135,7 @@ void  fun_drawBuildingWithOverlay(int buildingId, int xOffset, int yOffset, int 
                                   graphic_currentGraphicId = graphic_overlaytiles;
                                   graphic_currentGraphicId += dword_5F94AC[j];
                                   graphic_currentGraphicId += graphicOffset;
-                                  if ( buildings[buildingId].houseSize )
+                                  if ( buildings[buildingId].house_size )
                                     graphic_currentGraphicId += 4;
                                   fun_drawGraphic(
                                     graphic_currentGraphicId,
@@ -23222,7 +23223,7 @@ void  fun_drawBuildingWithOverlay(int buildingId, int xOffset, int yOffset, int 
           graphic_currentGraphicId = graphic_overlaytiles;
           graphic_currentGraphicId += dword_5F94D0[k];
           graphic_currentGraphicId += graphicOffset;
-          if ( buildings[buildingId].houseSize )
+          if ( buildings[buildingId].house_size )
             graphic_currentGraphicId += 4;
           fun_drawGraphic(graphic_currentGraphicId, dword_5F5BF0[2 * k] + xOffset, dword_5F5BF4[2 * k] + yOffset);
         }
@@ -23249,7 +23250,7 @@ void  fun_drawBuildingWithOverlay(int buildingId, int xOffset, int yOffset, int 
                     graphic_currentGraphicId = graphic_overlaytiles;
                     graphic_currentGraphicId += dword_5F9510[l];
                     graphic_currentGraphicId += graphicOffset;
-                    if ( buildings[buildingId].houseSize )
+                    if ( buildings[buildingId].house_size )
                       graphic_currentGraphicId += 4;
                     fun_drawGraphic(
                       graphic_currentGraphicId,
@@ -23593,7 +23594,7 @@ void  fun_drawBuildingOnCrimeOverlay(int a1, int a2, int a3)
     }
     else
     {
-      if ( buildings[a1].houseSize > 0 )
+      if ( buildings[a1].house_size > 0 )
       {
         if ( buildings[a1].house_crimeRisk < 50 )
         {
@@ -23666,7 +23667,7 @@ void  fun_drawBuildingOnEntertainmentOverlay(int a1, int a2, int a3)
       fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_width + 2, a3 - iso_tile_height);
       break;
     default:
-      if ( buildings[a1].houseSize )
+      if ( buildings[a1].house_size )
       {
         if ( building_6e_house_entertainment[128 * a1] > 0 )
           fun_drawOverlayColumn(building_6e_house_entertainment[128 * a1] / 10, a2, a3, 0);
@@ -23695,7 +23696,7 @@ void  fun_drawBuildingOnEducationOverlay(int a1, int a2, int a3)
     fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_half_width + 1, a3 - iso_tile_half_height);
     return;
   }
-  if ( buildings[a1].houseSize && building_6f_house_education[128 * a1] > 0 )
+  if ( buildings[a1].house_size && building_6f_house_education[128 * a1] > 0 )
   {
     if ( building_6f_house_education[128 * a1] == 1 )
     {
@@ -23733,7 +23734,7 @@ void  fun_drawBuildingOnTheaterOverlay(int a1, int a2, int a3)
     }
     else
     {
-      if ( buildings[a1].houseSize )
+      if ( buildings[a1].house_size )
       {
         if ( (signed int)LOBYTE(building_5a_house_theater_amphi[64 * a1]) > 0 )
           fun_drawOverlayColumn(LOBYTE(building_5a_house_theater_amphi[64 * a1]) / 10, a2, a3, 0);
@@ -23757,7 +23758,7 @@ void  fun_drawBuildingOnAmphitheaterOverlay(int a1, int a2, int a3)
       fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_width + 2, a3 - iso_tile_height);
       break;
     default:
-      if ( buildings[a1].houseSize )
+      if ( buildings[a1].house_size )
       {
         if ( (signed int)HIBYTE(building_5a_house_theater_amphi[64 * a1]) > 0 )
           fun_drawOverlayColumn(HIBYTE(building_5a_house_theater_amphi[64 * a1]) / 10, a2, a3, 0);
@@ -23781,7 +23782,7 @@ void  fun_drawBuildingOnColosseumOverlay(int a1, int a2, int a3)
       fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_width + 2, a3 - iso_tile_height);
       break;
     default:
-      if ( buildings[a1].houseSize )
+      if ( buildings[a1].house_size )
       {
         if ( (signed int)HIBYTE(building_5c_house_amphiGlad_colo[64 * a1]) > 0 )
           fun_drawOverlayColumn(HIBYTE(building_5c_house_amphiGlad_colo[64 * a1]) / 10, a2, a3, 0);
@@ -23805,7 +23806,7 @@ void  fun_drawBuildingOnHippodromeOverlay(int a1, int a2, int a3)
     }
     else
     {
-      if ( buildings[a1].houseSize )
+      if ( buildings[a1].house_size )
       {
         if ( (signed int)HIBYTE(building_5e_house_coloLion_hippo[64 * a1]) > 0 )
           fun_drawOverlayColumn(HIBYTE(building_5e_house_coloLion_hippo[64 * a1]) / 10, a2, a3, 0);
@@ -23835,7 +23836,7 @@ void  fun_drawBuildingOnFoodStocksOverlay(int a1, int a2, int a3)
       fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_width + 2, a3 - iso_tile_height);
       break;
     default:
-      if ( buildings[a1].houseSize )
+      if ( buildings[a1].house_size )
       {
         foodTypesCount = model_houses[ buildings[a1].level_resourceId ].foodtypes;
         if ( foodTypesCount )
@@ -23879,7 +23880,7 @@ void  fun_drawBuildingOnBathhouseOverlay(int a1, int a2, int a3)
   }
   else
   {
-    if ( buildings[a1].houseSize )
+    if ( buildings[a1].house_size )
     {
       if ( (signed int)(unsigned __int8)building_65_house_bathhouse_dock_numships_entert_days[128 * a1] > 0 )
         fun_drawOverlayColumn(
@@ -23930,7 +23931,7 @@ void  fun_drawBuildingOnReligionOverlay(int a1, int a2, int a3)
       fun_drawBuilding(graphic_currentGraphicId, a2 + iso_tile_width + 2, a3 - iso_tile_height);
       break;
     default:
-      if ( buildings[a1].houseSize )
+      if ( buildings[a1].house_size )
       {
         if ( building_71_house_numGods[128 * a1] > 0 )
           fun_drawOverlayColumn(17 * building_71_house_numGods[128 * a1] / 10, a2, a3, 0);
@@ -23948,7 +23949,7 @@ void  fun_drawBuildingOnSchoolOverlay(int a1, int a2, int a3)
   }
   else
   {
-    if ( buildings[a1].houseSize )
+    if ( buildings[a1].house_size )
     {
       if ( (signed int)LOBYTE(building_60_house_school_library[64 * a1]) > 0 )
         fun_drawOverlayColumn(LOBYTE(building_60_house_school_library[64 * a1]) / 10, a2, a3, 0);
@@ -23965,7 +23966,7 @@ void  fun_drawBuildingOnLibraryOverlay(int a1, int a2, int a3)
   }
   else
   {
-    if ( buildings[a1].houseSize )
+    if ( buildings[a1].house_size )
     {
       if ( (signed int)HIBYTE(building_60_house_school_library[64 * a1]) > 0 )
         fun_drawOverlayColumn(HIBYTE(building_60_house_school_library[64 * a1]) / 10, a2, a3, 0);
@@ -23982,7 +23983,7 @@ void  fun_drawBuildingOnAcademyOverlay(int a1, int a2, int a3)
   }
   else
   {
-    if ( buildings[a1].houseSize )
+    if ( buildings[a1].house_size )
     {
       if ( (signed int)LOBYTE(building_62_house_academy_barber[64 * a1]) > 0 )
         fun_drawOverlayColumn(LOBYTE(building_62_house_academy_barber[64 * a1]) / 10, a2, a3, 0);
@@ -23999,7 +24000,7 @@ void  fun_drawBuildingOnBarberOverlay(int a1, int a2, int a3)
   }
   else
   {
-    if ( buildings[a1].houseSize )
+    if ( buildings[a1].house_size )
     {
       if ( (signed int)HIBYTE(building_62_house_academy_barber[64 * a1]) > 0 )
         fun_drawOverlayColumn(HIBYTE(building_62_house_academy_barber[64 * a1]) / 10, a2, a3, 0);
@@ -24016,7 +24017,7 @@ void  fun_drawBuildingOnClinicOverlay(int a1, int a2, int a3)
   }
   else
   {
-    if ( buildings[a1].houseSize )
+    if ( buildings[a1].house_size )
     {
       if ( (signed int)(unsigned __int8)building_64_house_clinic[128 * a1] > 0 )
         fun_drawOverlayColumn((unsigned __int8)building_64_house_clinic[128 * a1] / 10, a2, a3, 0);
@@ -24033,7 +24034,7 @@ void  fun_drawBuildingOnHospitalOverlay(int a1, int a2, int a3)
   }
   else
   {
-    if ( buildings[a1].houseSize )
+    if ( buildings[a1].house_size )
     {
       if ( (signed int)(unsigned __int8)building_66_house_hospital_entert_days2[128 * a1] > 0 )
         fun_drawOverlayColumn((unsigned __int8)building_66_house_hospital_entert_days2[128 * a1] / 10, a2, a3, 0);
@@ -24058,7 +24059,7 @@ void  fun_drawBuildingOnTaxIncomeOverlay(int a1, int a2, int a3)
     }
     else
     {
-      if ( buildings[a1].houseSize )
+      if ( buildings[a1].house_size )
       {
         v3 = fun_adjustWithPercentage( building_74_house_taxIncomeThisYear_senateForum_treasureStore[32 * a1] / 2,
                                        city_inform[ciid].taxrate);
@@ -24078,7 +24079,7 @@ void  fun_drawBuildingOnProblemsOverlay(int a1, int a2, int a3)
   int v7; // [sp+5Ch] [bp-Ch]@17
 
   v3 = 0;
-  if ( !buildings[a1].houseSize )
+  if ( !buildings[a1].house_size )
   {
     if ( buildings[a1].type != B_Fountain && buildings[a1].type != B_Bathhouse )
     {
@@ -24218,7 +24219,7 @@ void  fun_drawBuildingOnWorkersOverlay(int buildingId, int a2, int a3)
 {
   int v3; // ST60_4@5
 
-  if ( !buildings[buildingId].houseSize )
+  if ( !buildings[buildingId].house_size )
   {
     if ( buildings[buildingId].walkerServiceAccess > 0 )
     {
@@ -26596,40 +26597,7 @@ void  fun_drawBuildingGhostDefault()
     }
   }
 }
-// 4022C5: using guessed type _DWORD  sub_4022C5(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 4023BF: using guessed type _DWORD  sub_4023BF(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402E3C: using guessed type _DWORD  sub_402E3C(_DWORD, _DWORD, _DWORD, __int16);
-// 402E78: using guessed type _DWORD  sub_402E78(_DWORD);
-// 4032B0: using guessed type _DWORD  sub_4032B0(_DWORD, _DWORD);
-// 4032B5: using guessed type _DWORD  sub_4032B5(_DWORD, _DWORD);
-// 5F5918: using guessed type int dword_5F5918[];
-// 5F5930: using guessed type int dword_5F5930[];
-// 5F6414: using guessed type int buildingSizes[];
-// 5F641C: using guessed type int dword_5F641C[];
-// 608008: using guessed type int time_current;
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 6543AE: using guessed type __int16 word_6543AE[];
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 6E6BDA: using guessed type __int16 graphic_fire_almost;
-// 6E6BF8: using guessed type __int16 graphic_housing_vacant;
-// 6E6C54: using guessed type __int16 word_6E6C54;
-// 6E6C56: using guessed type __int16 graphic_emptyWarehouseTile;
-// 6E6D4A: using guessed type __int16 word_6E6D4A;
-// 8B460C: using guessed type int dword_8B460C;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 9363AC: using guessed type int dword_9363AC;
-// 98BEDC: using guessed type int numBarracks;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04E8: using guessed type int dword_9A04E8;
-// 9A04EC: using guessed type int dword_9A04EC;
-// 9DA7C4: using guessed type int dword_9DA7C4;
-// 9DA800: using guessed type int dword_9DA800;
-// 9DA828: using guessed type int dword_9DA828;
-// 9DA8B4: using guessed type int dword_9DA8B4;
-// 9DA908: using guessed type int dword_9DA908;
 
-//----- (0043A850) --------------------------------------------------------
 void  fun_drawBuildingGhostRoad()
 {
   int v0; // ST74_4@16
@@ -26682,20 +26650,7 @@ void  fun_drawBuildingGhostRoad()
     drawGraphic_colorMask = 0;
   }
 }
-// 402293: using guessed type _DWORD  sub_402293(_DWORD);
-// 402E3C: using guessed type _DWORD  sub_402E3C(_DWORD, _DWORD, _DWORD, __int16);
-// 402EC3: using guessed type _DWORD  sub_402EC3(_DWORD, _DWORD);
-// 402EE1: using guessed type _DWORD  sub_402EE1(_DWORD, _DWORD);
-// 402FA4: using guessed type _DWORD  sub_402FA4(_DWORD);
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 6E6BD6: using guessed type __int16 graphic_aqueduct;
-// 6E6BDA: using guessed type __int16 graphic_fire_almost;
-// 6E6C90: using guessed type __int16 word_6E6C90;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04E8: using guessed type int dword_9A04E8;
-// 9A04EC: using guessed type int dword_9A04EC;
 
-//----- (0043AA60) --------------------------------------------------------
 void  fun_drawBuildingGhostReservoirSimon()
 {
   int v0; // [sp+4Ch] [bp-20h]@12
@@ -26872,23 +26827,7 @@ void  fun_drawBuildingGhostAqueduct()
     drawGraphic_colorMask = 0;
   }
 }
-// 401361: using guessed type _DWORD  sub_401361(_DWORD);
-// 40222A: using guessed type int __thiscall sub_40222A(_DWORD);
-// 4022F2: using guessed type int __fastcall sub_4022F2(_DWORD, _DWORD);
-// 402E3C: using guessed type _DWORD  sub_402E3C(_DWORD, _DWORD, _DWORD, __int16);
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 6E6BD6: using guessed type __int16 graphic_aqueduct;
-// 6E6BDA: using guessed type __int16 graphic_fire_almost;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 89AA70: using guessed type int dword_89AA70;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 9363A8: using guessed type int dword_9363A8;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04E8: using guessed type int dword_9A04E8;
-// 9A04EC: using guessed type int dword_9A04EC;
 
-//----- (0043B1A0) --------------------------------------------------------
 void  fun_drawBuildingGhostFountain()
 {
   __int16 v0; // dx@5
@@ -26923,16 +26862,7 @@ void  fun_drawBuildingGhostFountain()
     drawGraphic_colorMask = 0;
   }
 }
-// 402E3C: using guessed type _DWORD  sub_402E3C(_DWORD, _DWORD, _DWORD, __int16);
-// 5F69CC: using guessed type int dword_5F69CC[194];
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 6E6BDA: using guessed type __int16 graphic_fire_almost;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04E8: using guessed type int dword_9A04E8;
-// 9A04EC: using guessed type int dword_9A04EC;
 
-//----- (0043B390) --------------------------------------------------------
 void  fun_drawBuildingGhostBathhouse()
 {
   __int16 v0; // ax@22
@@ -27024,21 +26954,7 @@ void  fun_drawBuildingGhostBathhouse()
     drawGraphic_colorMask = 0;
   }
 }
-// 402E3C: using guessed type _DWORD  sub_402E3C(_DWORD, _DWORD, _DWORD, __int16);
-// 5F5918: using guessed type int dword_5F5918[];
-// 5F5930: using guessed type int dword_5F5930[];
-// 5F671C: using guessed type int dword_5F671C[22];
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 6E6BDA: using guessed type __int16 graphic_fire_almost;
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 9096A6: using guessed type __int16 grid_terrain_xPlusOne_yPlusOne[];
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04E8: using guessed type int dword_9A04E8;
-// 9A04EC: using guessed type int dword_9A04EC;
 
-//----- (0043B7C0) --------------------------------------------------------
 void  fun_drawBuildingGhostBridge()
 {
   int v0; // [sp+4Ch] [bp-20h]@1
@@ -27588,7 +27504,7 @@ void  fun_drawBuildingGhostHippodrome()
 
   v25 = 0;
   v24 = 0;
-  if ( city_inform[ciid].dword_65429C )
+  if ( city_inform[ciid].hippodromeBuiltInCity )
   {
     v25 = 1;
     v24 = 1;
@@ -27854,19 +27770,7 @@ void  fun_drawBuildingGhostShipyardWharf()
     drawGraphic_colorMask = 0;
   }
 }
-// 4015C3: using guessed type _DWORD  sub_4015C3(_DWORD, _DWORD, _DWORD);
-// 402E3C: using guessed type _DWORD  sub_402E3C(_DWORD, _DWORD, _DWORD, __int16);
-// 5F5930: using guessed type int dword_5F5930[];
-// 5F641C: using guessed type int dword_5F641C[];
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 6E6BDA: using guessed type __int16 graphic_fire_almost;
-// 89AA88: using guessed type int dword_89AA88;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04E8: using guessed type int dword_9A04E8;
-// 9A04EC: using guessed type int dword_9A04EC;
 
-//----- (0043E080) --------------------------------------------------------
 void  fun_drawBuildingGhostDock()
 {
   int v0; // ST60_4@11
@@ -27927,21 +27831,7 @@ void  fun_drawBuildingGhostDock()
     drawGraphic_colorMask = 0;
   }
 }
-// 4014BF: using guessed type _DWORD  sub_4014BF(_DWORD, _DWORD, _DWORD);
-// 402E3C: using guessed type _DWORD  sub_402E3C(_DWORD, _DWORD, _DWORD, __int16);
-// 5F5930: using guessed type int dword_5F5930[];
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 6E6BDA: using guessed type __int16 graphic_fire_almost;
-// 6E6C4C: using guessed type __int16 word_6E6C4C;
-// 6E6D00: using guessed type __int16 word_6E6D00;
-// 6E6D02: using guessed type __int16 word_6E6D02;
-// 6E6D04: using guessed type __int16 word_6E6D04;
-// 89AA88: using guessed type int dword_89AA88;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04E8: using guessed type int dword_9A04E8;
-// 9A04EC: using guessed type int dword_9A04EC;
 
-//----- (0043E2C0) --------------------------------------------------------
 void  fun_drawBuildingGhostType81()
 {
   signed int v0; // ST68_4@2
@@ -27971,18 +27861,7 @@ void  fun_drawBuildingGhostType81()
     drawGraphic_colorMask = 0;
   }
 }
-// 402E3C: using guessed type _DWORD  sub_402E3C(_DWORD, _DWORD, _DWORD, __int16);
-// 40336E: using guessed type _DWORD  sub_40336E(_DWORD, _DWORD, _DWORD);
-// 5F5930: using guessed type int dword_5F5930[];
-// 5F641C: using guessed type int dword_5F641C[];
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 6E6BDA: using guessed type __int16 graphic_fire_almost;
-// 8B4604: using guessed type int dword_8B4604;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04E8: using guessed type int dword_9A04E8;
-// 9A04EC: using guessed type int dword_9A04EC;
 
-//----- (0043E470) --------------------------------------------------------
 void  fun_drawSelectedCost()
 {
   __int16 color; // [sp+4Ch] [bp-4h]@8
@@ -28026,24 +27905,7 @@ void  fun_drawSelectedCost()
     }
   }
 }
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 65E6D4: using guessed type int screen_height;
-// 660C4C: using guessed type int shouldScrollMap;
-// 6ADBE4: using guessed type int draw_clip_y;
-// 6ADD2C: using guessed type int draw_clip_x;
-// 6E6B4C: using guessed type int draw_clip_xEnd;
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 7E26F8: using guessed type int draw_clip_yEnd;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04C4: using guessed type int cityviewport_yEnd;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04E4: using guessed type int cityviewport_x;
-// 9A04E8: using guessed type int dword_9A04E8;
-// 9A04EC: using guessed type int dword_9A04EC;
-// 9A0528: using guessed type int cityviewport_xEnd;
-// 9A0538: using guessed type int cityviewport_y;
 
-//----- (0043E600) --------------------------------------------------------
 void  sub_43E600()
 {
   signed int v0; // [sp+4Ch] [bp-14h]@5
@@ -28087,23 +27949,7 @@ void  sub_43E600()
     }
   }
 }
-// 94BD30: using guessed type int debug_drawEvolveInfo;
-// 98C004: using guessed type int debug_drawBuildingInfo;
-// 98C498: using guessed type int debug_drawFigureInfo;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04C0: using guessed type int iso_viewport_width;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04CC: using guessed type int iso_viewport_height;
-// 9A04D0: using guessed type int iso_yoffset;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A0504: using guessed type int iso_xoffset;
-// 9A050C: using guessed type int dword_9A050C;
-// 9A0510: using guessed type int dword_9A0510;
-// 9A053C: using guessed type int dword_9A053C;
-// 9A0540: using guessed type int dword_9A0540[8];
-// 9D4B4C: using guessed type int dword_9D4B4C;
 
-//----- (0043E7A0) --------------------------------------------------------
 void  sub_43E7A0(int a1, int a2)
 {
   __int16 v2; // [sp+4Ch] [bp-Ch]@1
@@ -28212,17 +28058,7 @@ void  sub_43E7A0(int a1, int a2)
     fun_drawNumber(v4, 32, " ", a1 + 24, a2 + 10, 107, v2);
   }
 }
-// 40330F: using guessed type _DWORD  sub_40330F(_DWORD);
-// 634480: using guessed type __int16 grid_pathingDistance[];
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD52: using guessed type __int16 building_12_walkerServiceAccess[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD7E: using guessed type __int16 building_3e_damageRisk[];
-// 9D4B4C: using guessed type int dword_9D4B4C;
 
-//----- (0043EC10) --------------------------------------------------------
 void  fun_drawMinimap(int in_x, int in_y, signed int a3, int a4)
 {
   int enemyColor; // [sp+4Ch] [bp-50h]@7
@@ -28395,7 +28231,7 @@ void  fun_drawMinimap(int in_x, int in_y, signed int a3, int a4)
                   {
                     if ( v15 & 0x40 )
                     {
-                      if ( buildings[v14].houseSize )
+                      if ( buildings[v14].house_size )
                       {
                         v13 = word_6E6CD8;
                       }
@@ -28639,23 +28475,7 @@ LABEL_12:
   }
   return result;
 }
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 9A04C0: using guessed type int iso_viewport_width;
-// 9A04CC: using guessed type int iso_viewport_height;
-// 9A04F4: using guessed type int minimap_left;
-// 9A04F8: using guessed type int minimap_right;
-// 9A04FC: using guessed type int minimap_top;
-// 9A0500: using guessed type int minimap_bottom;
-// 9A050C: using guessed type int dword_9A050C;
-// 9A0510: using guessed type int dword_9A0510;
-// 9A052C: using guessed type int dword_9A052C;
-// 9A053C: using guessed type int dword_9A053C;
-// 9A0540: using guessed type int dword_9A0540[8];
-// 9D4B4C: using guessed type int dword_9D4B4C;
-// 9D4DF0: using guessed type int dword_9D4DF0;
 
-//----- (0043FA80) --------------------------------------------------------
 signed int  fun_sound_43FA80(int a1, int a2)
 {
   signed int result; // eax@3
@@ -28690,11 +28510,7 @@ signed int  fun_sound_43FA80(int a1, int a2)
   }
   return result;
 }
-// 607F64: using guessed type int dword_607F64;
-// 995AC8: using guessed type int ds_dword_995AC8[];
-// 995C48: using guessed type int ds_dword_995C48[];
 
-//----- (0043FB40) --------------------------------------------------------
 signed int  fun_directSound_init()
 {
   DSBUFFERDESC Dst; // [sp+4Ch] [bp-18h]@5
@@ -28753,16 +28569,7 @@ LABEL_27:
   fun_logDebugMessage("OK :DS Installed.", 0, 0);
   return 1;
 }
-// 40103C: using guessed type _DWORD  fun_directSoundTranslateError(_DWORD);
-// 532B84: using guessed type int __stdcall DirectSoundCreate(_DWORD, _DWORD, _DWORD);
-// 607FFC: using guessed type int ds_idirectsound;
-// 660544: using guessed type int ds_primaryBuffer;
-// 995AC8: using guessed type int ds_dword_995AC8[];
-// 995AD0: using guessed type int ds_hresult;
-// 995B80: using guessed type __int16 ds_995B80;
-// 995C48: using guessed type int ds_dword_995C48[];
 
-//----- (0043FE40) --------------------------------------------------------
 signed int  fun_deinitDirectSound()
 {
   signed int result; // eax@2
@@ -28788,10 +28595,7 @@ signed int  fun_deinitDirectSound()
   }
   return result;
 }
-// 607FFC: using guessed type int ds_idirectsound;
-// 995AD0: using guessed type int ds_hresult;
 
-//----- (0043FF60) --------------------------------------------------------
 void  fun_sound_init()
 {
   memset(&ds_lPan, 0, 0x12u);
@@ -28801,13 +28605,7 @@ void  fun_sound_init()
   ds_995B8C = 524290;
   ds_995B88 = (unsigned __int16)ds_995B8C * ds_hertz;
 }
-// 995B80: using guessed type __int16 ds_995B80;
-// 995B82: using guessed type __int16 ds_995B82;
-// 995B84: using guessed type int ds_hertz;
-// 995B88: using guessed type int ds_995B88;
-// 995B8C: using guessed type int ds_995B8C;
 
-//----- (0043FFE0) --------------------------------------------------------
 signed int  fun_sound_playTestSound(const char *filename, int channel)
 {
   char *audioPtr2; // [sp+4Ch] [bp-34h]@18
@@ -28894,10 +28692,7 @@ LABEL_22:
   fun_logDebugMessage("ERR:Loading WAV file :", filename, 0);
   return 0;
 }
-// 607FFC: using guessed type int ds_idirectsound;
-// 995AD0: using guessed type int ds_hresult;
 
-//----- (00440330) --------------------------------------------------------
 signed int  fun_sound_440330(int a1, int a2)
 {
   signed int result; // eax@2
@@ -28979,12 +28774,7 @@ signed int  fun_sound_440330(int a1, int a2)
   }
   return result;
 }
-// 607FFC: using guessed type int ds_idirectsound;
-// 65E768: using guessed type char setting_sound_city_on;
-// 99583C: using guessed type int sound_effectsChannels[];
-// 995AD0: using guessed type int ds_hresult;
 
-//----- (004404C0) --------------------------------------------------------
 signed int  fun_sound_playChannel(int channel)
 {
   signed int result; // eax@2
@@ -29045,12 +28835,7 @@ signed int  fun_sound_playChannel(int channel)
   }
   return result;
 }
-// 607FFC: using guessed type int ds_idirectsound;
-// 65E70B: using guessed type char setting_sound_effects_on;
-// 99583C: using guessed type int sound_effectsChannels[];
-// 995AD0: using guessed type int ds_hresult;
 
-//----- (004405D0) --------------------------------------------------------
 signed int  fun_sound_isEffectsChannelInUse(int a1)
 {
   signed int result; // eax@2
@@ -29061,9 +28846,7 @@ signed int  fun_sound_isEffectsChannelInUse(int a1)
     result = 0;
   return result;
 }
-// 99583C: using guessed type int sound_effectsChannels[];
 
-//----- (00440600) --------------------------------------------------------
 signed int  fun_playInterfaceButtonSound(int a1)
 {
   signed int result; // eax@2
@@ -29105,12 +28888,7 @@ signed int  fun_playInterfaceButtonSound(int a1)
   }
   return result;
 }
-// 607FFC: using guessed type int ds_idirectsound;
-// 65E70B: using guessed type char setting_sound_effects_on;
-// 99583C: using guessed type int sound_effectsChannels[];
-// 995AD0: using guessed type int ds_hresult;
 
-//----- (004406D0) --------------------------------------------------------
 void  fun_soundStopEffectsChannel(int channel)
 {
   if ( ds_idirectsound )
@@ -29126,10 +28904,7 @@ void  fun_soundStopEffectsChannel(int channel)
     }
   }
 }
-// 607FFC: using guessed type int ds_idirectsound;
-// 99583C: using guessed type int sound_effectsChannels[];
 
-//----- (00440760) --------------------------------------------------------
 int  unused_440760(int a1)
 {
   int result; // eax@3
@@ -29142,10 +28917,7 @@ int  unused_440760(int a1)
   }
   return result;
 }
-// 607FFC: using guessed type int ds_idirectsound;
-// 99583C: using guessed type int sound_effectsChannels[];
 
-//----- (004407C0) --------------------------------------------------------
 signed int  fun_playSound(const char *filename, int isSpeech, int isBackgroundMusic)
 {
   signed int result; // eax@2
@@ -29200,12 +28972,7 @@ signed int  fun_playSound(const char *filename, int isSpeech, int isBackgroundMu
   }
   return result;
 }
-// 607FFC: using guessed type int ds_idirectsound;
-// 65E70C: using guessed type char setting_sound_music_on;
-// 65E70D: using guessed type char setting_sound_speech_on;
-// 995C48: using guessed type int ds_dword_995C48[];
 
-//----- (00440920) --------------------------------------------------------
 signed int  unused_440920(const char *a2, DWORD_PTR arg4, int a3)
 {
   signed int result; // eax@2
@@ -29267,12 +29034,7 @@ signed int  unused_440920(const char *a2, DWORD_PTR arg4, int a3)
   }
   return result;
 }
-// 607FFC: using guessed type int ds_idirectsound;
-// 65E70C: using guessed type char setting_sound_music_on;
-// 65E70D: using guessed type char setting_sound_speech_on;
-// 995C48: using guessed type int ds_dword_995C48[];
 
-//----- (00440AA0) --------------------------------------------------------
 signed int  unused_440AA0(int a1)
 {
   signed int result; // eax@2
@@ -29304,17 +29066,12 @@ signed int  unused_440AA0(int a1)
   }
   return result;
 }
-// 607FFC: using guessed type int ds_idirectsound;
-// 65E70C: using guessed type char setting_sound_music_on;
-// 65E70D: using guessed type char setting_sound_speech_on;
 
-//----- (00440B20) --------------------------------------------------------
 void  unused_440B20()
 {
   ;
 }
 
-//----- (00440B40) --------------------------------------------------------
 void  fun_sound_440B40(int a1, int a2)
 {
   int v2; // eax@22
@@ -29428,21 +29185,7 @@ LABEL_23:
     ds_dword_995BE4[21 * a1] = 0;
   }
 }
-// 5F96A0: using guessed type int dword_5F96A0;
-// 607FFC: using guessed type int ds_idirectsound;
-// 995AD0: using guessed type int ds_hresult;
-// 995BA0: using guessed type int dword_995BA0[];
-// 995BA4: using guessed type int dword_995BA4[];
-// 995BD0: using guessed type int ds_dword_995BD0[];
-// 995BD4: using guessed type int ds_dword_995BD4[];
-// 995BD8: using guessed type int ds_dword_995BD8[];
-// 995BDC: using guessed type int ds_sound_buffer_offset[];
-// 995BE0: using guessed type int ds_dword_995BE0[];
-// 995BE4: using guessed type int ds_dword_995BE4[];
-// 995BE8: using guessed type int ds_dword_995BE8[];
-// 995BEC: using guessed type int ds_dword_995BEC[];
 
-//----- (00441190) --------------------------------------------------------
 signed int  fun_sound_441190(DWORD_PTR dwUser)
 {
   signed int result; // eax@2
@@ -29479,11 +29222,7 @@ signed int  fun_sound_441190(DWORD_PTR dwUser)
   }
   return result;
 }
-// 995AD0: using guessed type int ds_hresult;
-// 995BA0: using guessed type int dword_995BA0[];
-// 995BA4: using guessed type int dword_995BA4[];
 
-//----- (00441340) --------------------------------------------------------
 void  fun_soundStopChannel(int channel)
 {
   if ( ds_idirectsound )
@@ -29508,15 +29247,7 @@ void  fun_soundStopChannel(int channel)
     }
   }
 }
-// 401DFC: using guessed type _DWORD  fun_sound_43FA80(_DWORD, _DWORD);
-// 607FFC: using guessed type int ds_idirectsound;
-// 995AD0: using guessed type int ds_hresult;
-// 995BA0: using guessed type int dword_995BA0[];
-// 995BA4: using guessed type int dword_995BA4[];
-// 995BE4: using guessed type int ds_dword_995BE4[];
-// 995C48: using guessed type int ds_dword_995C48[];
 
-//----- (00441490) --------------------------------------------------------
 LONG __stdcall fptc_0(int a1, int a2, int a3, int a4, int a5)
 {
   LONG result; // eax@1
@@ -29724,22 +29455,7 @@ LABEL_83:
   ds_dword_995AC8[a3] = 0;
   return InterlockedExchange(&Target, 0);
 }
-// 401DFC: using guessed type _DWORD  fun_sound_43FA80(_DWORD, _DWORD);
-// 660544: using guessed type int ds_primaryBuffer;
-// 995AC8: using guessed type int ds_dword_995AC8[];
-// 995AD0: using guessed type int ds_hresult;
-// 995BA0: using guessed type int dword_995BA0[];
-// 995BA4: using guessed type int dword_995BA4[];
-// 995BD0: using guessed type int ds_dword_995BD0[];
-// 995BD4: using guessed type int ds_dword_995BD4[];
-// 995BD8: using guessed type int ds_dword_995BD8[];
-// 995BDC: using guessed type int ds_sound_buffer_offset[];
-// 995BE4: using guessed type int ds_dword_995BE4[];
-// 995BE8: using guessed type int ds_dword_995BE8[];
-// 995BEC: using guessed type int ds_dword_995BEC[];
-// 995C48: using guessed type int ds_dword_995C48[];
 
-//----- (00442140) --------------------------------------------------------
 signed int  fun_directSoundTranslateError(int error)
 {
   signed int result; // eax@2
@@ -29795,7 +29511,6 @@ signed int  fun_directSoundTranslateError(int error)
   return result;
 }
 
-//----- (00442290) --------------------------------------------------------
 void  fun_adjustSoundVolumeForChannel(int percentage, int channel)
 {
   int v2; // eax@8
@@ -29814,10 +29529,7 @@ void  fun_adjustSoundVolumeForChannel(int percentage, int channel)
     }
   }
 }
-// 607FFC: using guessed type int ds_idirectsound;
-// 995AD0: using guessed type int ds_hresult;
 
-//----- (00442350) --------------------------------------------------------
 void  fun_adjustSoundVolumeForEffectsChannels(int percentage, int channelFrom, int channelTo)
 {
   int i; // [sp+4Ch] [bp-8h]@6
@@ -29841,11 +29553,7 @@ void  fun_adjustSoundVolumeForEffectsChannels(int percentage, int channelFrom, i
     }
   }
 }
-// 607FFC: using guessed type int ds_idirectsound;
-// 99583C: using guessed type int sound_effectsChannels[];
-// 995AD0: using guessed type int ds_hresult;
 
-//----- (00442430) --------------------------------------------------------
 void  fun_editor_empire_determineMaxEntryInUse()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -29857,7 +29565,6 @@ void  fun_editor_empire_determineMaxEntryInUse()
     edit_empire_max_inUse = 199;
 }
 
-//----- (004424C0) --------------------------------------------------------
 void  fun_editor_empire_clearEmpireEntry(int entryId)
 {
   int i; // [sp+4Ch] [bp-8h]@3
@@ -29876,7 +29583,6 @@ void  fun_editor_empire_clearEmpireEntry(int entryId)
   }
 }
 
-//----- (004425B0) --------------------------------------------------------
 int  unused_4425B0()
 {
   int result; // eax@2
@@ -29952,23 +29658,7 @@ int  unused_4425B0()
   }
   return result;
 }
-// 6E6D0C: using guessed type __int16 graphic_empireCity;
-// 6E6D0E: using guessed type __int16 graphic_empireCityTrade;
-// 6E6D10: using guessed type __int16 graphic_empireCityDistant;
-// 6E6D12: using guessed type __int16 graphic_empireBattleIcon;
-// 6E6D14: using guessed type __int16 graphic_empireDistantBattleRomanArmy;
-// 6E6D16: using guessed type __int16 word_6E6D16;
-// 6E6D18: using guessed type __int16 graphic_empireBorderMarker;
-// 6E6D1A: using guessed type __int16 graphic_empireLandTradeRoute;
-// 6E6D1C: using guessed type __int16 graphic_empireSeaTradeRoute;
-// 6E6D6E: using guessed type __int16 word_6E6D6E;
-// 6E6D70: using guessed type __int16 graphic_empireDistantBattleEnemyArmy;
-// 990D08: using guessed type __int16 empire_width[];
-// 990D0A: using guessed type __int16 empire_height[];
-// 990D0C: using guessed type __int16 empire_graphicID[];
-// 990D0E: using guessed type __int16 empire_graphicID_exp[];
 
-//----- (004429F0) --------------------------------------------------------
 void  fun_initEmpire()
 {
   int v0; // [sp+4Ch] [bp-10h]@15
@@ -30007,11 +29697,7 @@ void  fun_initEmpire()
     }
   }
 }
-// 6E6D0C: using guessed type __int16 graphic_empireCity;
-// 990D0C: using guessed type __int16 empire_graphicID[];
-// 990D0E: using guessed type __int16 empire_graphicID_exp[];
 
-//----- (00442B90) --------------------------------------------------------
 void  fun_editor_empire_determineGraphicSize()
 {
   int v0; // ST4C_4@21
@@ -30058,15 +29744,7 @@ void  fun_editor_empire_determineGraphicSize()
     }
   }
 }
-// 6E6D0C: using guessed type __int16 graphic_empireCity;
-// 6E6D0E: using guessed type __int16 graphic_empireCityTrade;
-// 6E6D10: using guessed type __int16 graphic_empireCityDistant;
-// 6E6D6E: using guessed type __int16 word_6E6D6E;
-// 990D08: using guessed type __int16 empire_width[];
-// 990D0A: using guessed type __int16 empire_height[];
-// 990D0C: using guessed type __int16 empire_graphicID[];
 
-//----- (00442DD0) --------------------------------------------------------
 void  fun_scrollEmpireMap(int direction)
 {
   if ( direction != 8 )
@@ -30109,10 +29787,7 @@ void  fun_scrollEmpireMap(int direction)
     fun_checkEmpireMapScrollBoundaries();
   }
 }
-// 9900E0: using guessed type int empire_scroll_x;
-// 9900E4: using guessed type int empire_scroll_y;
 
-//----- (00442F40) --------------------------------------------------------
 void  fun_checkEmpireMapScrollBoundaries()
 {
   if ( empire_scroll_x < 0 )
@@ -30124,13 +29799,7 @@ void  fun_checkEmpireMapScrollBoundaries()
   if ( empire_scroll_y >= empireMapHeight - (ddraw_height - empireMapBorderTop - empireMapBorderBottom) )
     empire_scroll_y = empireMapHeight - (ddraw_height - empireMapBorderTop - empireMapBorderBottom) - 1;
 }
-// 5F96A8: using guessed type int empireMapWidth;
-// 5F96AC: using guessed type int empireMapHeight;
-// 5F96B8: using guessed type int empireMapBorderBottom;
-// 9900E0: using guessed type int empire_scroll_x;
-// 9900E4: using guessed type int empire_scroll_y;
 
-//----- (00443030) --------------------------------------------------------
 void  fun_sortRequests()
 {
   __int16 v0; // ST58_2@10
@@ -30166,7 +29835,6 @@ void  fun_sortRequests()
   }
 }
 
-//----- (004431F0) --------------------------------------------------------
 void  fun_sortInvasions()
 {
   __int16 v0; // ST5C_2@10
@@ -30206,7 +29874,6 @@ void  fun_sortInvasions()
   }
 }
 
-//----- (004433F0) --------------------------------------------------------
 void  fun_sortDemandChanges()
 {
   __int16 v0; // ST58_2@15
@@ -30248,7 +29915,6 @@ void  fun_sortDemandChanges()
   }
 }
 
-//----- (004435D0) --------------------------------------------------------
 void  fun_sortPriceChanges()
 {
   __int16 v0; // ST58_2@15
@@ -30291,7 +29957,6 @@ void  fun_sortPriceChanges()
   }
 }
 
-//----- (004437B0) --------------------------------------------------------
 void  fun_empireCityClearBuysSells(int empireItemId)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -30303,7 +29968,6 @@ void  fun_empireCityClearBuysSells(int empireItemId)
     *(&empire_cityBuys[64 * empireItemId] + j) = 0;
 }
 
-//----- (00443830) --------------------------------------------------------
 void  fun_editor_empire_fixBuySell(int a1)
 {
   char v1; // ST4C_1@12
@@ -30361,9 +30025,7 @@ void  fun_editor_empire_fixBuySell(int a1)
     }
   }
 }
-// 990D1C: using guessed type __int16 empire_tradeCostToOpen[];
 
-//----- (00443B10) --------------------------------------------------------
 void  fun_editor_empire_fixOwnCity()
 {
   int numOwnCities; // [sp+4Ch] [bp-8h]@1
@@ -30406,9 +30068,7 @@ void  fun_editor_empire_fixOwnCity()
     }
   }
 }
-// 990608: using guessed type int scenario_map_empire;
 
-//----- (00443CD0) --------------------------------------------------------
 void  fun_empireObjectsCorrectOwnerCity(int cityId)
 {
   signed int i; // [sp+4Ch] [bp-8h]@1
@@ -30426,7 +30086,6 @@ void  fun_empireObjectsCorrectOwnerCity(int cityId)
   }
 }
 
-//----- (00443DA0) --------------------------------------------------------
 void  fun_empireObjectsCorrectTradeStatus()
 {
   signed int i; // [sp+50h] [bp-4h]@1
@@ -30442,7 +30101,6 @@ void  fun_empireObjectsCorrectTradeStatus()
   }
 }
 
-//----- (00443E60) --------------------------------------------------------
 signed int  fun_empireCitySellsGood(int empireId, int goodId)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -30455,7 +30113,6 @@ signed int  fun_empireCitySellsGood(int empireId, int goodId)
   return 0;
 }
 
-//----- (00443EC0) --------------------------------------------------------
 signed int  fun_empireCityBuysGood(int empireId, int goodId)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -30468,7 +30125,6 @@ signed int  fun_empireCityBuysGood(int empireId, int goodId)
   return 0;
 }
 
-//----- (00443F20) --------------------------------------------------------
 bool  fun_canExportGoodToCity(int ciid, int cityId, int resourceId)
 {
   bool result; // eax@4
@@ -30494,10 +30150,7 @@ bool  fun_canExportGoodToCity(int ciid, int cityId, int resourceId)
   }
   return result;
 }
-// 65284A: using guessed type __int16 cityinfo_resourceInStock[];
-// 65286A: using guessed type __int16 cityinfo_resourceTradeStatus[];
 
-//----- (00444020) --------------------------------------------------------
 bool  fun_canImportGoodFromCity(int ciid, int cityId, signed int resourceId)
 {
   bool result; // eax@2
@@ -30620,12 +30273,7 @@ bool  fun_canImportGoodFromCity(int ciid, int cityId, signed int resourceId)
   }
   return result;
 }
-// 6500C4: using guessed type int cityinfo_population[];
-// 65284A: using guessed type __int16 cityinfo_resourceInStock[];
-// 65286A: using guessed type __int16 cityinfo_resourceTradeStatus[];
-// 98BFC0: using guessed type int numWorkingIndustries[];
 
-//----- (00444330) --------------------------------------------------------
 signed int  fun_tradeCanBuyGoodNow(int goodId)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -30641,7 +30289,6 @@ signed int  fun_tradeCanBuyGoodNow(int goodId)
   return 0;
 }
 
-//----- (004443E0) --------------------------------------------------------
 signed int  fun_tradeCanBuyGoodPotentially(int goodId)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -30656,7 +30303,6 @@ signed int  fun_tradeCanBuyGoodPotentially(int goodId)
   return 0;
 }
 
-//----- (00444470) --------------------------------------------------------
 signed int  fun_tradeCanSellGoodNow(int goodId)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -30757,9 +30403,7 @@ signed int  fun_cityCanProduceGood(signed int goodId)
   }
   return 0;
 }
-// 402A9F: using guessed type _DWORD  fun_tradeCanBuyGoodPotentially(_DWORD);
 
-//----- (00444840) --------------------------------------------------------
 void  fun_readEmpireFile(int isCustomScenario)
 {
   if ( isCustomScenario )
@@ -30773,10 +30417,7 @@ void  fun_readEmpireFile(int isCustomScenario)
     fun_readDataFromFilename("c3.emp", empire_type, 0x3200u, 12800 * scenario_map_empire + 1280);
   fun_initEmpire();
 }
-// 990100: using guessed type __int16 empireindex_xOffset[];
-// 990608: using guessed type int scenario_map_empire;
 
-//----- (00444930) --------------------------------------------------------
 void  fun_copyEmpireData(signed int empireMapId)
 {
   if ( empireMapId < 40 )
@@ -30790,19 +30431,13 @@ void  fun_copyEmpireData(signed int empireMapId)
     }
   }
 }
-// 990100: using guessed type __int16 empireindex_xOffset[];
-// 990608: using guessed type int scenario_map_empire;
 
-//----- (004449D0) --------------------------------------------------------
 int  fun_writeCurrentEmpireToFileCustom()
 {
   fun_writeToFilenameAtOffset("c32.emp", empireindex_xOffset, 0x500u, 0);
   return fun_writeToFilenameAtOffset("c32.emp", empire_type, 0x3200u, 12800 * scenario_map_empire + 1280);
 }
-// 990100: using guessed type __int16 empireindex_xOffset[];
-// 990608: using guessed type int scenario_map_empire;
 
-//----- (00444A50) --------------------------------------------------------
 void  unused_createEmptyEmpireStatesFile()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -30816,11 +30451,7 @@ void  unused_createEmptyEmpireStatesFile()
   for ( i = 0; i < 40; ++i )
     fun_writeToFilenameAppend("c32.emp", empire_type, 0x3200u);
 }
-// 65E744: using guessed type int setting_unused_create_empire_zero;
-// 990100: using guessed type __int16 empireindex_xOffset[];
-// 990608: using guessed type int scenario_map_empire;
 
-//----- (00444B20) --------------------------------------------------------
 void  fun_fillExpandedEmpireFields()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -30843,14 +30474,7 @@ void  fun_fillExpandedEmpireFields()
     }
   }
 }
-// 990D04: using guessed type __int16 empire_xCoord[];
-// 990D06: using guessed type __int16 empire_yCoord[];
-// 990D0C: using guessed type __int16 empire_graphicID[];
-// 990D0E: using guessed type __int16 empire_graphicID_exp[];
-// 990D14: using guessed type __int16 empire_xCoord_exp[];
-// 990D16: using guessed type __int16 empire_yCoord_exp[];
 
-//----- (00444C40) --------------------------------------------------------
 void  fun_initializeTradeRoutes()
 {
   signed int amountId; // [sp+4Ch] [bp-10h]@27
@@ -30960,7 +30584,6 @@ void  fun_resetTradeAmounts()
   }
 }
 
-//----- (004451F0) --------------------------------------------------------
 signed int  fun_getTradeCityFromEmpireObject(int empireObjectId)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -30972,9 +30595,7 @@ signed int  fun_getTradeCityFromEmpireObject(int empireObjectId)
   }
   return 0;
 }
-// 98DE0E: using guessed type __int16 trade_empireObjectId[];
 
-//----- (00445260) --------------------------------------------------------
 signed int  fun_isSeaTradeRoute(int tradeRouteId)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -30992,7 +30613,6 @@ signed int  fun_isSeaTradeRoute(int tradeRouteId)
   return 0;
 }
 
-//----- (00445310) --------------------------------------------------------
 signed int  fun_isTradeRouteOpen(int tradeRouteId)
 {
   signed int result; // eax@8
@@ -31071,16 +30691,7 @@ void  fun_handleExpandEmpireEvent()
     }
   }
 }
-// 659B50: using guessed type int message_usePopup;
-// 6E6D0E: using guessed type __int16 graphic_empireCityTrade;
-// 6E6D10: using guessed type __int16 graphic_empireCityDistant;
-// 98DE0E: using guessed type __int16 trade_empireObjectId[];
-// 98E880: using guessed type __int16 scn_settings_startYear;
-// 98EF2C: using guessed type int scn_empireExpanded_flag;
-// 98EF30: using guessed type int scn_empireExpansion_year;
-// 990D0E: using guessed type __int16 empire_graphicID_exp[];
 
-//----- (004455C0) --------------------------------------------------------
 signed int  fun_getEmpireTradeAmountId(int empireEntryId, __int16 goodId)
 {
   signed int result; // eax@2
@@ -31128,10 +30739,7 @@ signed int  fun_getEmpireTradeAmountId(int empireEntryId, __int16 goodId)
   }
   return result;
 }
-// 990D34: using guessed type __int16 empire_trade40[];
-// 990D36: using guessed type __int16 empire_trade25[];
 
-//----- (004456C0) --------------------------------------------------------
 void  fun_setEmpireTradeAmountId(int empireEntryId, __int16 goodId, int amountId)
 {
   __int16 goodMask; // [sp+50h] [bp-4h]@7
@@ -31165,10 +30773,7 @@ void  fun_setEmpireTradeAmountId(int empireEntryId, __int16 goodId, int amountId
     }
   }
 }
-// 990D34: using guessed type __int16 empire_trade40[];
-// 990D36: using guessed type __int16 empire_trade25[];
 
-//----- (00445880) --------------------------------------------------------
 void  sub_445880()
 {
   int totalAmount; // [sp+4Ch] [bp-Ch]@8
@@ -31207,16 +30812,12 @@ void  sub_445880()
   }
 }
 
-//----- (004459F0) --------------------------------------------------------
 void  sub_4459F0()
 {
   fun_memset(dword_993F60, 4800, 0);
   dword_990CD8 = 0;
 }
-// 990CD8: using guessed type int dword_990CD8;
-// 993F60: using guessed type int dword_993F60[];
 
-//----- (00445A30) --------------------------------------------------------
 void  sub_445A30(int a1)
 {
   byte_7FA3AD[128 * a1] = dword_990CD8;
@@ -31224,10 +30825,7 @@ void  sub_445A30(int a1)
   if ( dword_990CD8 >= 100 )
     dword_990CD8 = 0;
 }
-// 990CD8: using guessed type int dword_990CD8;
-// 993F60: using guessed type int dword_993F60[];
 
-//----- (00445AB0) --------------------------------------------------------
 void  sub_445AB0(int a1, int a2)
 {
   int v2; // ST4C_4@1
@@ -31237,9 +30835,7 @@ void  sub_445AB0(int a1, int a2)
   ++*(&byte_993F78[48 * v2] + a2);
   dword_993F8C[12 * v2] += tradeprices_sell[2 * a2];
 }
-// 993F64: using guessed type int dword_993F64[];
 
-//----- (00445B60) --------------------------------------------------------
 void  sub_445B60(int a1, int a2)
 {
   int v2; // ST4C_4@1
@@ -31249,11 +30845,7 @@ void  sub_445B60(int a1, int a2)
   ++*(&byte_993F68[48 * v2] + a2);
   dword_993F88[12 * v2] += tradeprices_buy[2 * a2];
 }
-// 5F96C0: using guessed type int tradeprices_buy[];
-// 993F60: using guessed type int dword_993F60[];
-// 993F88: using guessed type int dword_993F88[];
 
-//----- (00445C10) --------------------------------------------------------
 void  fun_generateTraders()
 {
   int tradeShipId; // eax@94
@@ -31290,10 +30882,12 @@ void  fun_generateTraders()
     city_inform[ciid].seaTradeProblemDuration = 0;
   else
     --city_inform[ciid].seaTradeProblemDuration;
+
   if ( city_inform[ciid].landTradeProblemDuration <= 0 )
     city_inform[ciid].landTradeProblemDuration = 0;
   else
     --city_inform[ciid].landTradeProblemDuration;
+
   for ( j = 1; j < 41; ++j )
   {
     if ( !trade_inUse[66 * j] || !trade_isOpen[66 * j] )
@@ -31459,26 +31053,7 @@ LABEL_40:
     }
   }
 }
-// 652878: using guessed type __int16 cityinfo_resourceTradeStatus_wine[];
-// 6543A4: using guessed type __int16 cityinfo_numOpenSeaTradeRoutes[];
-// 6543A6: using guessed type __int16 cityinfo_numOpenLandTradeRoutes[];
-// 6543A8: using guessed type __int16 cityinfo_seaTradeProblemDuration[];
-// 6543AA: using guessed type __int16 cityinfo_landTradeProblemDuration[];
-// 6543AC: using guessed type __int16 cityinfo_numWorkingDocks[];
-// 6545C4: using guessed type int cityinfo_numWineTypesAvailable[];
-// 659B50: using guessed type int message_usePopup;
-// 65DE48: using guessed type int messageNoWorkingDockDelay;
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA398: using guessed type __int16 walker_tradeCaravanNextId[];
-// 98A57C: using guessed type int numWineWorkshops;
-// 98DE0A: using guessed type __int16 trade_walkerEntryDelay[];
-// 98DE0C: using guessed type __int16 trade_unknown0[];
-// 98DE12: using guessed type __int16 trade_walkerId1[];
-// 98DE14: using guessed type __int16 trade_walkerId2[];
-// 98EF04: using guessed type __int16 scn_riverEntry_x;
-// 98EF06: using guessed type __int16 scn_riverEntry_y;
 
-//----- (00446550) --------------------------------------------------------
 signed int  sub_446550(int a1, int a2, int a3, int a4, int a5)
 {
   int v6; // [sp+4Ch] [bp-28h]@30
@@ -31561,6 +31136,7 @@ signed int  sub_446550(int a1, int a2, int a3, int a4, int a5)
                         ++city_inform[ciid].dword_654220;
                         if ( city_inform[ciid].dword_654220 > 15 )
                           city_inform[ciid].dword_654220 = 1;
+
                         if ( storages[v6].resourceState[city_inform[ciid].dword_654220] == 1 )
                           continue;
                       }
@@ -31619,16 +31195,7 @@ signed int  sub_446550(int a1, int a2, int a3, int a4, int a5)
   }
   return v8;
 }
-// 401302: using guessed type _DWORD  sub_401302(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 654220: using guessed type int dword_654220[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD72: using guessed type __int16 building_32_warehouse_nextStorage[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
-// 993F20: using guessed type int dword_993F20[];
 
-//----- (00446B50) --------------------------------------------------------
 signed int  sub_446B50(int a1, int a2, int a3, int a4, int a5)
 {
   int v6; // [sp+4Ch] [bp-1Ch]@29
@@ -31770,12 +31337,7 @@ signed int  fun_importOneGoodFromCity(int buildingId, int resourceId, int cityId
   }
   return result;
 }
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD72: using guessed type __int16 building_32_warehouse_nextStorage[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
 
-//----- (00447210) --------------------------------------------------------
 signed int  sub_447210(int a1, int a2, int a3, int a4, int a5)
 {
   signed int v6; // [sp+4Ch] [bp-18h]@3
@@ -31864,7 +31426,7 @@ signed int  sub_447210(int a1, int a2, int a3, int a4, int a5)
   return v6;
 }
 
-signed int  fun_exportOneGoodToCity(int buildingId, int resourceId, int cityId)
+int  fun_exportOneGoodToCity(int buildingId, int resourceId, int cityId)
 {
   signed int result; // eax@2
   int v4; // [sp+4Ch] [bp-Ch]@17
@@ -31917,20 +31479,7 @@ signed int  fun_exportOneGoodToCity(int buildingId, int resourceId, int cityId)
   }
   return result;
 }
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 65284A: using guessed type __int16 cityinfo_resourceInStock[];
-// 652BC0: using guessed type int cityinfo_finance_exports_thisyear[];
-// 6544F0: using guessed type int dword_6544F0[];
-// 6E6C56: using guessed type __int16 graphic_emptyWarehouseTile;
-// 6E6C58: using guessed type __int16 word_6E6C58;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD72: using guessed type __int16 building_32_warehouse_nextStorage[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
 
-//----- (004479A0) --------------------------------------------------------
 void  sub_4479A0()
 {
   int numEnemies; // [sp+4Ch] [bp-8h]@38
@@ -32342,7 +31891,6 @@ signed int  sub_448D50()
   return v1;
 }
 
-//----- (00448EB0) --------------------------------------------------------
 void  fun_calculateDistantBattleRomanTravelTime(int isGame)
 {
   signed int i; // [sp+4Ch] [bp-4h]@4
@@ -32351,6 +31899,7 @@ void  fun_calculateDistantBattleRomanTravelTime(int isGame)
     scn_distantBattle_romanTravelTime = 0;
   else
     map_distantBattle_romanTravelTime = 0;
+
   for ( i = 0; i < 200; ++i )
   {
     if ( empire_inUse[64 * i] )
@@ -32371,10 +31920,7 @@ void  fun_calculateDistantBattleRomanTravelTime(int isGame)
     }
   }
 }
-// 98EF34: using guessed type char scn_distantBattle_romanTravelTime;
-// 990CD4: using guessed type char map_distantBattle_romanTravelTime;
 
-//----- (00448FA0) --------------------------------------------------------
 void  fun_calculateDistantBattleEnemyTravelTime(int isGame)
 {
   signed int i; // [sp+4Ch] [bp-4h]@4
@@ -32403,10 +31949,7 @@ void  fun_calculateDistantBattleEnemyTravelTime(int isGame)
     }
   }
 }
-// 98EF35: using guessed type char scn_distantBattle_enemyTravelTime;
-// 990CD5: using guessed type char map_distantBattle_enemyTravelTime;
 
-//----- (00449090) --------------------------------------------------------
 void  fun_setDistantBattleCity()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -32424,21 +31967,18 @@ void  fun_setDistantBattleCity()
   }
 }
 
-//----- (00449150) --------------------------------------------------------
 void  fun_setDistantBattleCityAsVulnerable()
 {
   if ( city_inform[ciid].distantBattleCity )
     trade_cityType[66 * (unsigned __int8)city_inform[ciid].distantBattleCity] = City_VulnerableRoman;
 }
 
-//----- (004491A0) --------------------------------------------------------
 void  fun_setDistantBattleCityAsForeign()
 {
   if ( city_inform[ciid].distantBattleCity )
     trade_cityType[66 * (unsigned __int8)city_inform[ciid].distantBattleCity] = City_DistantForeign;
 }
 
-//----- (004491F0) --------------------------------------------------------
 void  fun_setInvasionMonthsAndPaths()
 {
   signed int v0; // [sp+4Ch] [bp-10h]@15
@@ -32508,23 +32048,7 @@ void  fun_setInvasionMonthsAndPaths()
     }
   }
 }
-// 401262: using guessed type _DWORD  sub_401262(_DWORD);
-// 6AD9EC: using guessed type int random_7f_1;
-// 98EF44: using guessed type __int16 word_98EF44[];
-// 98EF46: using guessed type __int16 word_98EF46[];
-// 98EF48: using guessed type __int16 word_98EF48[];
-// 98EF4A: using guessed type __int16 word_98EF4A[];
-// 98EF4C: using guessed type __int16 word_98EF4C[];
-// 98EF4E: using guessed type __int16 word_98EF4E[];
-// 98EF50: using guessed type int dword_98EF50[];
-// 990604: using guessed type int dword_990604;
-// 990CDC: using guessed type int dword_990CDC;
-// 990D04: using guessed type __int16 empire_xCoord[];
-// 990D06: using guessed type __int16 empire_yCoord[];
-// 990D0C: using guessed type __int16 empire_graphicID[];
-// 9DA898: using guessed type int mode_editor;
 
-//----- (00449570) --------------------------------------------------------
 signed int  sub_449570(int a1)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -32539,9 +32063,7 @@ signed int  sub_449570(int a1)
   }
   return 0;
 }
-// 990604: using guessed type int dword_990604;
 
-//----- (00449620) --------------------------------------------------------
 void  fun_handleInvasionEvent()
 {
   signed int v0; // [sp+4Ch] [bp-Ch]@22
@@ -32645,16 +32167,7 @@ void  fun_handleInvasionEvent()
     }
   }
 }
-// 659B50: using guessed type int message_usePopup;
-// 98C594: using guessed type __int16 lastInvasionInternalId;
-// 98E880: using guessed type __int16 scn_settings_startYear;
-// 98E9FC: using guessed type __int16 scn_enemy;
-// 98EF4C: using guessed type __int16 word_98EF4C[];
-// 98EF4E: using guessed type __int16 word_98EF4E[];
-// 98EF50: using guessed type int dword_98EF50[];
-// 9DA898: using guessed type int mode_editor;
 
-//----- (00449B00) --------------------------------------------------------
 signed int  fun_startLocalUprisingFromMars()
 {
   signed int result; // eax@2
@@ -32692,11 +32205,7 @@ signed int  fun_startLocalUprisingFromMars()
   }
   return result;
 }
-// 659B50: using guessed type int message_usePopup;
-// 65E750: using guessed type int savedgame_missionId;
-// 98C594: using guessed type __int16 lastInvasionInternalId;
 
-//----- (00449BB0) --------------------------------------------------------
 void  fun_startInvasionFromCheat()
 {
   signed int v0; // [sp+50h] [bp-4h]@1
@@ -32711,11 +32220,7 @@ void  fun_startInvasionFromCheat()
       fun_postMessageToPlayer(23, lastInvasionInternalId, v0);
   }
 }
-// 659B50: using guessed type int message_usePopup;
-// 98C594: using guessed type __int16 lastInvasionInternalId;
-// 98E9FC: using guessed type __int16 scn_enemy;
 
-//----- (00449C60) --------------------------------------------------------
 signed int  sub_449C60()
 {
   signed int result; // eax@2
@@ -32736,9 +32241,7 @@ signed int  sub_449C60()
   }
   return result;
 }
-// 9DA898: using guessed type int mode_editor;
 
-//----- (00449CE0) --------------------------------------------------------
 signed int  fun_startInvasion(int enemyType, int numEnemies, int invasionPoint, __int16 attack, char invasionId)
 {
   int v6; // ST98_4@7
@@ -32981,23 +32484,7 @@ signed int  fun_startInvasion(int enemyType, int numEnemies, int invasionPoint, 
   }
   return mapOffset;
 }
-// 5F9794: using guessed type int dword_5F9794[];
-// 5F9798: using guessed type int dword_5F9798[];
-// 65E928: using guessed type int setting_difficulty;
-// 6AD9EC: using guessed type int random_7f_1;
-// 7F87FC: using guessed type __int16 formation_attackType[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA390: using guessed type __int16 walker_formationId[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 98C594: using guessed type __int16 lastInvasionInternalId;
-// 98EA04: using guessed type int scn_sizeX;
-// 98EA08: using guessed type int scn_sizeY;
-// 98EEDC: using guessed type __int16 scn_entryPoint_x;
-// 98EEDE: using guessed type __int16 scn_entryPoint_y;
-// 98EEE0: using guessed type __int16 scn_exitPoint_x;
-// 98EEE2: using guessed type __int16 scn_exitPoint_y;
 
-//----- (0044A4F0) --------------------------------------------------------
 void  fun_setRequestsMonths()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -33012,9 +32499,7 @@ void  fun_setRequestsMonths()
     }
   }
 }
-// 6AD9EC: using guessed type int random_7f_1;
 
-//----- (0044A580) --------------------------------------------------------
 void  fun_checkRequestsEvent()
 {
   int v0; // [sp+4Ch] [bp-8h]@34
@@ -33215,11 +32700,7 @@ void  fun_dispatchRequestedGoods(int requestId)
     }
   }
 }
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 652BE0: using guessed type int cityinfo_finance_sundries_thisyear[];
-// 6AD9EC: using guessed type int random_7f_1;
 
-//----- (0044AD70) --------------------------------------------------------
 void  fun_setDemandChangesMonths()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -33231,9 +32712,7 @@ void  fun_setDemandChangesMonths()
       scn_demandChanges_month[i] = (random_7f_1 & 7) + 2;
   }
 }
-// 6AD9EC: using guessed type int random_7f_1;
 
-//----- (0044ADE0) --------------------------------------------------------
 void  fun_checkDemandChangesEvent()
 {
   int v0; // eax@21
@@ -33318,10 +32797,7 @@ void  fun_checkDemandChangesEvent()
     }
   }
 }
-// 659B50: using guessed type int message_usePopup;
-// 98E880: using guessed type __int16 scn_settings_startYear;
 
-//----- (0044B0F0) --------------------------------------------------------
 void  fun_setPriceChangesMonths()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -33333,9 +32809,7 @@ void  fun_setPriceChangesMonths()
       scn_priceChanges_month[i] = (random_7f_1 & 7) + 2;
   }
 }
-// 6AD9EC: using guessed type int random_7f_1;
 
-//----- (0044B160) --------------------------------------------------------
 void  fun_checkPriceChangesEvent()
 {
   int v0; // [sp+4Ch] [bp-Ch]@10
@@ -33382,11 +32856,7 @@ void  fun_checkPriceChangesEvent()
     }
   }
 }
-// 5F96C0: using guessed type int tradeprices_buy[];
-// 659B50: using guessed type int message_usePopup;
-// 98E880: using guessed type __int16 scn_settings_startYear;
 
-//----- (0044B340) --------------------------------------------------------
 void  sub_44B340()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -33407,11 +32877,7 @@ void  sub_44B340()
     dword_98C4C0[i] = 0;
   }
 }
-// 949EF4: using guessed type int gametime_totalWeeks;
-// 94A30C: using guessed type int dword_94A30C;
-// 98C064: using guessed type int dword_98C064;
 
-//----- (0044B410) --------------------------------------------------------
 void  fun_doGameTick()
 {
   if ( game_ticks )
@@ -33454,7 +32920,7 @@ void  fun_doGameTick()
           switch ( game_ticks )
           {
             case 12:
-              sub_4516B0();
+              decreaserWalkerServiceAccessForAll();
               break;
             case 16:
               sub_458A80();
@@ -33749,13 +33215,13 @@ void  sub_44BE70()
     if ( buildings[i].inUse == 3 )
       buildings[i].inUse = 1;
 
-    if ( buildings[i].inUse != 1 || !buildings[i].houseSize )
+    if ( buildings[i].inUse != 1 || !buildings[i].house_size )
     {
       if ( buildings[i].inUse != 2 && buildings[i].inUse != 6 )
       {
         if ( buildings[i].inUse == 4 )
         {
-          if ( buildings[i].houseSize )
+          if ( buildings[i].house_size )
             sub_4E3800(ciid,buildings[i].house_population);
           fun_deleteBuilding(i);
         }
@@ -33875,19 +33341,14 @@ void  fun_checkEvolveLargeTent()
       if ( houseEvolve_status )
       {
         if ( houseEvolve_status == -1 )
-          fun_evolveHouseTo(buildingId, 10);
+          fun_evolveHouseTo(buildingId, B_HouseVacantLot);
         else
-          fun_evolveHouseTo(buildingId, 12);
+          fun_evolveHouseTo(buildingId, B_HouseSmallShack);
       }
     }
   }
 }
-// 402E14: using guessed type _DWORD  sub_402E14(_DWORD);
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044C450) --------------------------------------------------------
 void  fun_checkEvolveSmallShack()
 {
   sub_46AAC0(buildingId);
@@ -33919,17 +33380,13 @@ void  fun_checkEvolveSmallShack()
     if ( houseEvolve_status )
     {
       if ( houseEvolve_status == -1 )
-        fun_evolveHouseTo(buildingId, 11);
+        fun_evolveHouseTo(buildingId, B_HouseLargeTent);
       else
-        fun_evolveHouseTo(buildingId, 13);
+        fun_evolveHouseTo(buildingId, B_HouseLargeShack);
     }
   }
 }
-// 402E14: using guessed type _DWORD  sub_402E14(_DWORD);
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044C5B0) --------------------------------------------------------
 void  fun_checkEvolveLargeShack()
 {
   sub_46AAC0(buildingId);
@@ -33961,17 +33418,13 @@ void  fun_checkEvolveLargeShack()
     if ( houseEvolve_status )
     {
       if ( houseEvolve_status == -1 )
-        fun_evolveHouseTo(buildingId, 12);
+        fun_evolveHouseTo(buildingId, B_HouseSmallShack);
       else
-        fun_evolveHouseTo(buildingId, 14);
+        fun_evolveHouseTo(buildingId, B_HouseSmallHovel);
     }
   }
 }
-// 402E14: using guessed type _DWORD  sub_402E14(_DWORD);
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044C710) --------------------------------------------------------
 void  fun_checkEvolveSmallHovel()
 {
   sub_46AAC0(buildingId);
@@ -34004,17 +33457,13 @@ void  fun_checkEvolveSmallHovel()
     if ( houseEvolve_status )
     {
       if ( houseEvolve_status == -1 )
-        fun_evolveHouseTo(buildingId, 13);
+        fun_evolveHouseTo(buildingId, B_HouseLargeShack);
       else
-        fun_evolveHouseTo(buildingId, 15);
+        fun_evolveHouseTo(buildingId, B_HouseLargeHovel);
     }
   }
 }
-// 402E14: using guessed type _DWORD  sub_402E14(_DWORD);
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044C870) --------------------------------------------------------
 void  fun_checkEvolveLargeHovel()
 {
   sub_46AAC0(buildingId);
@@ -34046,17 +33495,13 @@ void  fun_checkEvolveLargeHovel()
     if ( houseEvolve_status )
     {
       if ( houseEvolve_status == -1 )
-        fun_evolveHouseTo(buildingId, 14);
+        fun_evolveHouseTo(buildingId, B_HouseSmallHovel);
       else
-        fun_evolveHouseTo(buildingId, 16);
+        fun_evolveHouseTo(buildingId, B_HouseSmallCasa);
     }
   }
 }
-// 402E14: using guessed type _DWORD  sub_402E14(_DWORD);
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044C9D0) --------------------------------------------------------
 void  fun_checkEvolveSmallCasa()
 {
   sub_46AAC0(buildingId);
@@ -34088,17 +33533,13 @@ void  fun_checkEvolveSmallCasa()
     if ( houseEvolve_status )
     {
       if ( houseEvolve_status == -1 )
-        fun_evolveHouseTo(buildingId, 15);
+        fun_evolveHouseTo(buildingId, B_HouseLargeHovel);
       else
-        fun_evolveHouseTo(buildingId, 17);
+        fun_evolveHouseTo(buildingId, B_HouseLargeCasa);
     }
   }
 }
-// 402E14: using guessed type _DWORD  sub_402E14(_DWORD);
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044CB30) --------------------------------------------------------
 void  fun_checkEvolveLargeCasa()
 {
   sub_46AAC0(buildingId);
@@ -34130,17 +33571,13 @@ void  fun_checkEvolveLargeCasa()
     if ( houseEvolve_status )
     {
       if ( houseEvolve_status == -1 )
-        fun_evolveHouseTo(buildingId, 16);
+        fun_evolveHouseTo(buildingId, B_HouseSmallCasa);
       else
-        fun_evolveHouseTo(buildingId, 18);
+        fun_evolveHouseTo(buildingId, B_HouseSmallInsula);
     }
   }
 }
-// 402E14: using guessed type _DWORD  sub_402E14(_DWORD);
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044CC90) --------------------------------------------------------
 void  fun_checkEvolveSmallInsula()
 {
   sub_46AAC0(buildingId);
@@ -34172,17 +33609,13 @@ void  fun_checkEvolveSmallInsula()
     if ( houseEvolve_status )
     {
       if ( houseEvolve_status == -1 )
-        fun_evolveHouseTo(buildingId, 17);
+        fun_evolveHouseTo(buildingId, B_HouseLargeCasa);
       else
-        fun_evolveHouseTo(buildingId, 19);
+        fun_evolveHouseTo(buildingId, B_HouseMediumInsula);
     }
   }
 }
-// 402E14: using guessed type _DWORD  sub_402E14(_DWORD);
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044CDF0) --------------------------------------------------------
 void  fun_checkEvolveMediumInsula()
 {
   short v0; // ST54_2@17
@@ -34217,7 +33650,7 @@ void  fun_checkEvolveMediumInsula()
     {
       if ( houseEvolve_status == -1 )
       {
-        fun_evolveHouseTo(buildingId, 18);
+        fun_evolveHouseTo(buildingId, B_HouseSmallInsula);
       }
       else
       {
@@ -34234,14 +33667,7 @@ void  fun_checkEvolveMediumInsula()
     }
   }
 }
-// 4017A3: using guessed type _DWORD  sub_4017A3(_DWORD, _DWORD);
-// 401EBA: using guessed type _DWORD  sub_401EBA(_DWORD, __int16);
-// 402E14: using guessed type _DWORD  sub_402E14(_DWORD);
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
-// 98BF1C: using guessed type int houseEvolveDevolve_hasExpanded;
 
-//----- (0044CFD0) --------------------------------------------------------
 void  fun_checkEvolveLargeInsula()
 {
   if ( !fun_preventHouseEvolution() )
@@ -34274,14 +33700,11 @@ void  fun_checkEvolveLargeInsula()
       if ( houseEvolve_status == -1 )
         fun_devolveHouse2x2ToMediumInsula(buildingId);
       else
-        fun_evolveHouseTo(buildingId, 21);
+        fun_evolveHouseTo(buildingId, B_HouseGrandInsula);
     }
   }
 }
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044D120) --------------------------------------------------------
 void  fun_checkEvolveGrandInsula()
 {
   if ( !fun_preventHouseEvolution() )
@@ -34312,16 +33735,13 @@ void  fun_checkEvolveGrandInsula()
     if ( houseEvolve_status )
     {
       if ( houseEvolve_status == -1 )
-        fun_evolveHouseTo(buildingId, 20);
+        fun_evolveHouseTo(buildingId, B_HouseLargeInsula);
       else
-        fun_evolveHouseTo(buildingId, 22);
+        fun_evolveHouseTo(buildingId, B_HouseSmallVilla);
     }
   }
 }
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044D270) --------------------------------------------------------
 void  fun_checkEvolveSmallVilla()
 {
   if ( !fun_preventHouseEvolution() )
@@ -34352,16 +33772,13 @@ void  fun_checkEvolveSmallVilla()
     if ( houseEvolve_status )
     {
       if ( houseEvolve_status == -1 )
-        fun_evolveHouseTo(buildingId, 21);
+        fun_evolveHouseTo(buildingId, B_HouseGrandInsula);
       else
-        fun_evolveHouseTo(buildingId, 23);
+        fun_evolveHouseTo(buildingId, B_HouseMediumVilla);
     }
   }
 }
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044D3C0) --------------------------------------------------------
 void  fun_checkEvolveMediumVilla()
 {
   __int16 v0; // ST54_2@17
@@ -34395,7 +33812,7 @@ void  fun_checkEvolveMediumVilla()
     {
       if ( houseEvolve_status == -1 )
       {
-        fun_evolveHouseTo(buildingId, 22);
+        fun_evolveHouseTo(buildingId, B_HouseSmallVilla);
       }
       else
       {
@@ -34411,12 +33828,7 @@ void  fun_checkEvolveMediumVilla()
     }
   }
 }
-// 4017A3: using guessed type _DWORD  sub_4017A3(_DWORD, _DWORD);
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
-// 98BF1C: using guessed type int houseEvolveDevolve_hasExpanded;
 
-//----- (0044D570) --------------------------------------------------------
 void  fun_checkEvolveLargeVilla()
 {
   if ( !fun_preventHouseEvolution() )
@@ -34449,15 +33861,11 @@ void  fun_checkEvolveLargeVilla()
       if ( houseEvolve_status == -1 )
         fun_devolveHouse3x3To2x2(buildingId);
       else
-        fun_evolveHouseTo(buildingId, 25);
+        fun_evolveHouseTo(buildingId, B_HouseGrandVilla);
     }
   }
 }
-// 402577: using guessed type _DWORD  fun_devolveHouse3x3To2x2(_DWORD);
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044D6C0) --------------------------------------------------------
 void  fun_checkEvolveGrandVilla()
 {
   if ( !fun_preventHouseEvolution() )
@@ -34488,16 +33896,13 @@ void  fun_checkEvolveGrandVilla()
     if ( houseEvolve_status )
     {
       if ( houseEvolve_status == -1 )
-        fun_evolveHouseTo(buildingId, 24);
+        fun_evolveHouseTo(buildingId, B_HouseLargeVilla);
       else
-        fun_evolveHouseTo(buildingId, 26);
+        fun_evolveHouseTo(buildingId, B_HouseSmallPalace);
     }
   }
 }
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044D810) --------------------------------------------------------
 void  fun_checkEvolveSmallPalace()
 {
   if ( !fun_preventHouseEvolution() )
@@ -34528,16 +33933,13 @@ void  fun_checkEvolveSmallPalace()
     if ( houseEvolve_status )
     {
       if ( houseEvolve_status == -1 )
-        fun_evolveHouseTo(buildingId, 25);
+        fun_evolveHouseTo(buildingId, B_HouseGrandVilla);
       else
-        fun_evolveHouseTo(buildingId, 27);
+        fun_evolveHouseTo(buildingId, B_HouseMediumPalace);
     }
   }
 }
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044D960) --------------------------------------------------------
 void  fun_checkEvolveMediumPalace()
 {
   __int16 v0; // ST54_2@17
@@ -34571,7 +33973,7 @@ void  fun_checkEvolveMediumPalace()
     {
       if ( houseEvolve_status == -1 )
       {
-        fun_evolveHouseTo(buildingId, 26);
+        fun_evolveHouseTo(buildingId, B_HouseSmallPalace);
       }
       else
       {
@@ -34587,13 +33989,7 @@ void  fun_checkEvolveMediumPalace()
     }
   }
 }
-// 4017A3: using guessed type _DWORD  sub_4017A3(_DWORD, _DWORD);
-// 401EF6: using guessed type _DWORD  sub_401EF6(_DWORD, __int16);
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
-// 98BF1C: using guessed type int houseEvolveDevolve_hasExpanded;
 
-//----- (0044DB10) --------------------------------------------------------
 void  fun_checkEvolveLargePalace()
 {
   if ( !fun_preventHouseEvolution() )
@@ -34630,10 +34026,7 @@ void  fun_checkEvolveLargePalace()
     }
   }
 }
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044DC60) --------------------------------------------------------
 void  fun_checkEvolveLuxuryPalace()
 {
   if ( !fun_preventHouseEvolution() )
@@ -34655,13 +34048,10 @@ void  fun_checkEvolveLuxuryPalace()
       _LOBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = 0;
     }
     if ( houseEvolve_status )
-      fun_evolveHouseTo(buildingId, 28);
+      fun_evolveHouseTo(buildingId, B_HouseLargePalace);
   }
 }
-// 94BD04: using guessed type int houseEvolve_status;
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0044DD70) --------------------------------------------------------
 signed int  fun_preventHouseEvolution()
 {
   signed int result; // eax@2
@@ -34684,10 +34074,7 @@ signed int  fun_preventHouseEvolution()
   }
   return result;
 }
-// 607F80: using guessed type int debug_houseEvolution;
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (0044DDF0) --------------------------------------------------------
 void  fun_calculateBuildingDesirability()
 {
   signed int elevationLevel; // [sp+4Ch] [bp-20h]@19
@@ -35048,38 +34435,7 @@ void  fun_resetServiceRequiredCounters()
   city_inform[ciid].serviceClinicRequired = 0;
   city_inform[ciid].serviceReligionRequired = 0;
 }
-// 654200: using guessed type int cityinfo_evolveRequired_unknown1[];
-// 654208: using guessed type int cityinfo_evolveRequired_unknown2[];
-// 654210: using guessed type int cityinfo_evolveRequired_unknown3[];
-// 654218: using guessed type int cityinfo_evolveRequired_unknown4[];
-// 654268: using guessed type int cityinfo_evolveFountainRequired[];
-// 65426C: using guessed type int cityinfo_evolveWaterRequired[];
-// 654270: using guessed type int cityinfo_evolveMoreEntertainmentRequired[];
-// 654274: using guessed type int cityinfo_evolveMoreEducationRequired[];
-// 654278: using guessed type int cityinfo_evolveEducationRequired[];
-// 65427C: using guessed type int cityinfo_serviceSchoolRequired[];
-// 654280: using guessed type int cityinfo_serviceLibraryRequired[];
-// 654284: using guessed type int cityinfo_evolveRequired_unknown5[];
-// 654288: using guessed type int cityinfo_evolveBarberRequired[];
-// 65428C: using guessed type int cityinfo_evolveBathhouseRequired[];
-// 654290: using guessed type int cityinfo_evolveFoodsRequired[];
-// 6542A0: using guessed type int cityinfo_evolveClinicRequired[];
-// 6542A4: using guessed type int cityinfo_evolveHospitalRequired[];
-// 6542A8: using guessed type int cityinfo_serviceBarberRequired[];
-// 6542AC: using guessed type int cityinfo_serviceBathhouseRequired[];
-// 6542B0: using guessed type int cityinfo_serviceClinicRequired[];
-// 6542B4: using guessed type int cityinfo_evolveReligionRequired[];
-// 6542B8: using guessed type int cityinfo_evolveMoreReligionRequired[];
-// 6542BC: using guessed type int cityinfo_evolveEvenMoreReligionRequired[];
-// 6542C0: using guessed type int cityinfo_serviceReligionRequired[];
-// 6542EC: using guessed type int cityinfo_evolveEntertainmentRequired[];
 
-//----- (0044FAA0) --------------------------------------------------------
-
-// 94BDA0: using guessed type __int16 building_60_house_school_library[];
-// 94BDA2: using guessed type __int16 building_62_house_academy_barber[];
-
-//----- (00450070) --------------------------------------------------------
 void  fun_determineHousingServicesForEvolve()
 {
   signed int i; // [sp+50h] [bp-4h]@1
@@ -35088,7 +34444,7 @@ void  fun_determineHousingServicesForEvolve()
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].houseSize )
+      if ( buildings[i].house_size )
       {
         building_6e_house_entertainment[128 * i] = 0;
         building_6f_house_education[128 * i] = 0;
@@ -35176,7 +34532,7 @@ void  fun_gatherEntertainmentInfo()
   {
     if ( buildings[v2].inUse == 1 )
     {
-      if ( buildings[v2].houseSize )
+      if ( buildings[v2].house_size )
       {
         ++numHouses;
         city_inform[ciid].entertainment_needsMet += building_6e_house_entertainment[128 * v2];
@@ -35287,7 +34643,7 @@ void  sub_450F10()
       }
       else
       {
-        if ( buildings[i].houseSize )
+        if ( buildings[i].house_size )
         {
           building_2d_house_hasFountain[128 * i] = 0;
           building_37_house_hasWell[128 * i] = 0;
@@ -35311,20 +34667,12 @@ void  sub_450F10()
     }
   }
 }
-// 40179E: using guessed type _DWORD  sub_40179E(_DWORD, _DWORD);
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 98BF14: using guessed type int dword_98BF14;
-// 98BF38: using guessed type int dword_98BF38;
 
-//----- (004510E0) --------------------------------------------------------
 void  sub_4510E0()
 {
   dword_94BD38 = random_7f_1 & 7;
 }
-// 6AD9EC: using guessed type int random_7f_1;
-// 94BD38: using guessed type int dword_94BD38;
 
-//----- (00451110) --------------------------------------------------------
 void  fun_recalculateReservoirAndFountainAccess()
 {
   __int16 terrain; // dx@41
@@ -35358,6 +34706,7 @@ void  fun_recalculateReservoirAndFountainAccess()
       }
     }
   }
+
   while ( change == 1 )
   {
     change = 0;
@@ -35374,6 +34723,7 @@ void  fun_recalculateReservoirAndFountainAccess()
       }
     }
   }
+
   gametick_tmpBuildingList_ctr = 0;
   while ( gametick_tmpBuildingList_ctr < gametick_tmpBuildingList_size )
   {
@@ -35381,6 +34731,7 @@ void  fun_recalculateReservoirAndFountainAccess()
     if ( building_2d_house_hasFountain[128 * v6] )
       fun_setMapAreaRangeTerrain(buildings[v6].x, building__07_y[128 * v6], 3, 10, T_ReservoirRange);
   }
+
   for ( k = 1; k < 2000; ++k )
   {
     if ( buildings[k].inUse == 1 )
@@ -35452,7 +34803,7 @@ void  fun_recalculateReservoirAndFountainAccess()
   }
 }
 
-void  sub_4516B0()
+void  decreaserWalkerServiceAccessForAll()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
 
@@ -35460,7 +34811,7 @@ void  sub_4516B0()
   {
     if ( buildings[i].inUse )
     {
-      if ( buildings[i].type != 59 )
+      if ( buildings[i].type != B_Tower )
       {
         if ( buildings[i].walkerServiceAccess <= 1 )
           buildings[i].walkerServiceAccess = 0;
@@ -35532,16 +34883,7 @@ void  sub_451770()
     }
   }
 }
-// 401AE1: using guessed type _DWORD  sub_401AE1(__int16, _DWORD, _DWORD, _DWORD, _DWORD);
-// 6E6C78: using guessed type __int16 graphic_nativeCrops;
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD52: using guessed type __int16 building_12_walkerServiceAccess[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
 
-//----- (00451AB0) --------------------------------------------------------
 void  sub_451AB0()
 {
   signed int i; // [sp+50h] [bp-4h]@3
@@ -35582,16 +34924,8 @@ void  sub_451AB0()
     }
   }
 }
-// 401AE1: using guessed type _DWORD  sub_401AE1(__int16, _DWORD, _DWORD, _DWORD, _DWORD);
-// 6E6C78: using guessed type __int16 graphic_nativeCrops;
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD52: using guessed type __int16 building_12_walkerServiceAccess[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
-// 98EF28: using guessed type char scn_climate;
 
-//----- (00451CC0) --------------------------------------------------------
-void  fun_ceresWitherCrops(int bigCurse)
+void  ceresWitherCrops(int bigCurse)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
 
@@ -35623,13 +34957,8 @@ void  fun_ceresWitherCrops(int bigCurse)
     }
   }
 }
-// 401AE1: using guessed type _DWORD  sub_401AE1(__int16, _DWORD, _DWORD, _DWORD, _DWORD);
-// 6E6C78: using guessed type __int16 graphic_nativeCrops;
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
 
-//----- (00451E30) --------------------------------------------------------
-void  sub_451E30()
+void ceresBlessingCrops()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
 
@@ -36075,23 +35404,7 @@ int  fun_marketDetermineDestinationGranaryWarehouse(int buildingId)
   }
   return result;
 }
-// 652A50: using guessed type int cityinfo_stockpile_wine[];
-// 652A6C: using guessed type int cityinfo_stockpile_furniture[];
-// 652A70: using guessed type int cityinfo_stockpile_pottery[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD8C: using guessed type __int16 building_4c_granary_capacity[];
-// 94BD8E: using guessed type __int16 building_4e_word_94BD8E[];
-// 94BD90: using guessed type __int16 building_50_word_94BD90[];
-// 94BD92: using guessed type __int16 building_52_house_wine[];
-// 94BD94: using guessed type __int16 building_54_house_oil[];
-// 94BD96: using guessed type __int16 building_56_house_furniture[];
-// 94BD98: using guessed type __int16 building_58_house_pottery[];
-// 94BDA0: using guessed type __int16 building_60_house_school_library[];
-// 94BDA2: using guessed type __int16 building_62_house_academy_barber[];
-// 98EE3C: using guessed type int scn_romeSuppliesWheat;
 
-//----- (00452DD0) --------------------------------------------------------
 signed int  sub_452DD0(int a1)
 {
   signed int result; // eax@2
@@ -36123,13 +35436,7 @@ signed int  sub_452DD0(int a1)
   }
   return result;
 }
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD8C: using guessed type __int16 building_4c_granary_capacity[];
-// 94BD8E: using guessed type __int16 building_4e_word_94BD8E[];
-// 94BD90: using guessed type __int16 building_50_word_94BD90[];
-// 94BD92: using guessed type __int16 building_52_house_wine[];
 
-//----- (00452ED0) --------------------------------------------------------
 signed int  sub_452ED0(int a1)
 {
   signed int result; // eax@2
@@ -36161,12 +35468,7 @@ signed int  sub_452ED0(int a1)
   }
   return result;
 }
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD94: using guessed type __int16 building_54_house_oil[];
-// 94BD96: using guessed type __int16 building_56_house_furniture[];
-// 94BD98: using guessed type __int16 building_58_house_pottery[];
 
-//----- (00452FD0) --------------------------------------------------------
 void  sub_452FD0()
 {
   signed int i; // [sp+5Ch] [bp-4h]@1
@@ -36174,27 +35476,17 @@ void  sub_452FD0()
   fun_determineOpenWaterTiles(scn_riverEntry_x, scn_riverEntry_y);
   for ( i = 1; i < 2000; ++i )
   {
-    if ( buildings[i].inUse == 1 )
+    if ( buildings[i].inUse == 1 && buildings[i].house_size > 0  && buildings[i].type == B_Dock )
     {
-      if ( !buildings[i].houseSize )
-      {
-        if ( buildings[i].type == B_Dock )
-        {
-          if ( fun_isAdjacentToOpenWater(buildings[i].x, building__07_y[128 * i], 3) )
+      if ( fun_isAdjacentToOpenWater(buildings[i].x, building__07_y[128 * i], 3) )
             building_2d_house_hasFountain[128 * i] = 1;
           else
             building_2d_house_hasFountain[128 * i] = 0;
-        }
-      }
     }
   }
 }
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 98EF04: using guessed type __int16 scn_riverEntry_x;
-// 98EF06: using guessed type __int16 scn_riverEntry_y;
 
-//----- (004530E0) --------------------------------------------------------
-signed int  fun_dockIsConnectedToOpenWater(int x, int y)
+int  fun_dockIsConnectedToOpenWater(int x, int y)
 {
   signed int result; // eax@2
 
@@ -36205,10 +35497,7 @@ signed int  fun_dockIsConnectedToOpenWater(int x, int y)
     result = 0;
   return result;
 }
-// 98EF04: using guessed type __int16 scn_riverEntry_x;
-// 98EF06: using guessed type __int16 scn_riverEntry_y;
 
-//----- (00453140) --------------------------------------------------------
 void  sub_453140()
 {
   int v0; // eax@35
@@ -36225,7 +35514,7 @@ void  sub_453140()
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].houseSize )
+      if ( buildings[i].house_size )
       {
         if ( sub_489070(buildings[i].x, building__07_y[128 * i], (unsigned __int8)building_03_size[128 * i], 2) )
         {
@@ -36379,30 +35668,7 @@ void  sub_453140()
     }
   }
 }
-// 4017DF: using guessed type _DWORD  sub_4017DF(_DWORD, _DWORD, _DWORD, _DWORD);
-// 4019CE: using guessed type _DWORD  sub_4019CE(_DWORD, _DWORD, _DWORD, _DWORD);
-// 40200E: using guessed type _DWORD  sub_40200E(_DWORD, _DWORD, _DWORD, _DWORD);
-// 4021EE: using guessed type _DWORD  sub_4021EE(_DWORD, _DWORD, _DWORD);
-// 4025A4: using guessed type _DWORD  sub_4025A4(_DWORD, _DWORD, _DWORD);
-// 4027F2: using guessed type int sub_4027F2(void);
-// 402BA8: using guessed type int sub_402BA8(void);
-// 402EAA: using guessed type _DWORD  sub_402EAA(_DWORD, _DWORD, _DWORD, _DWORD);
-// 403233: using guessed type _DWORD  sub_403233(_DWORD);
-// 634480: using guessed type __int16 grid_pathingDistance[];
-// 6500C4: using guessed type int cityinfo_population[];
-// 65281E: using guessed type __int16 cityinfo_exit_gridOffset[];
-// 654594: using guessed type int cityinfo_tradeCenterId[];
-// 659B50: using guessed type int message_usePopup;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD5E: using guessed type __int16 building_0e_word_94BD5E[];
 
-//----- (00453AA0) --------------------------------------------------------
 void  sub_453AA0()
 {
   int buildingId; // [sp+4Ch] [bp-Ch]@1
@@ -36443,12 +35709,7 @@ void  sub_453AA0()
     sub_4FFDF0();
   }
 }
-// 402824: using guessed type _DWORD  fun_createDustCloud(_DWORD, _DWORD, _DWORD);
-// 659B50: using guessed type int message_usePopup;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD50: using guessed type __int16 building_10_placedSequenceNumber[];
 
-//----- (00453C70) --------------------------------------------------------
 // return value in gametick_tmpBuildingList
 void  fun_getListOfAllHouses()
 {
@@ -36459,7 +35720,7 @@ void  fun_getListOfAllHouses()
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].houseSize )
+      if ( buildings[i].house_size )
         gametick_tmpBuildingList[gametick_tmpBuildingList_size++] = i;
     }
   }
@@ -36641,28 +35902,7 @@ void  fun_gametick_population()
     }
   }
 }
-// 6500C4: using guessed type int cityinfo_population[];
-// 652788: using guessed type int cityinfo_happiness_immigrationAmount[];
-// 65278C: using guessed type int cityinfo_happiness_emigrationValue[];
-// 652790: using guessed type int cityinfo_emigrationQueueSize[];
-// 652794: using guessed type int cityinfo_immigrationQueueSize[];
-// 6527B4: using guessed type int cityinfo_populationYearlyBirthsDeathsCalculationNeeded[];
-// 6527C0: using guessed type int cityinfo_numImmigrantsThisMonth[];
-// 6527C4: using guessed type int cityinfo_numEmigrantsThisMonth[];
-// 6527C8: using guessed type int cityinfo_wantedImmigrantsNoHousing[];
-// 654630: using guessed type int cityinfo_emigrationMessageShown[];
-// 659B50: using guessed type int message_usePopup;
-// 659E81: using guessed type char populationMessage_500_shown;
-// 659E82: using guessed type char populationMessage_1000_shown;
-// 659E83: using guessed type char populationMessage_2000_shown;
-// 659E84: using guessed type char populationMessage_3000_shown;
-// 659E85: using guessed type char populationMessage_5000_shown;
-// 659E86: using guessed type char populationMessage_10000_shown;
-// 659E87: using guessed type char populationMessage_15000_shown;
-// 659E88: using guessed type char populationMessage_20000_shown;
-// 659E89: using guessed type char populationMessage_25000_shown;
 
-//----- (004545B0) --------------------------------------------------------
 void  fun_calculateNumberOfWorkers()
 {
   int numPats; // [sp+4Ch] [bp-Ch]@1
@@ -36846,7 +36086,7 @@ int  sub_454D40(int a1, int a2)
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].houseSize )
+      if ( buildings[i].house_size )
       {
         if ( building_1a_word_94BD5A[64 * i] > 0 )
         {
@@ -36922,7 +36162,7 @@ int  fun_addBirthsToHouses(int ciid, int a2)
       buildingId = 1;
     if ( buildings[buildingId].inUse == 1 )
     {
-      if ( buildings[buildingId].houseSize )
+      if ( buildings[buildingId].house_size )
       {
         if ( building_1a_word_94BD5A[64 * buildingId] > 0 )
         {
@@ -36933,6 +36173,7 @@ int  fun_addBirthsToHouses(int ciid, int a2)
 
             if ( building_04_house_isMerged[128 * buildingId] )
               maxPeople *= 4;
+
             if ( maxPeople - buildings[buildingId].house_population > 0 )
             {
               ++newbornsAdded;
@@ -36964,7 +36205,7 @@ int  fun_removePeopleFromCity(int ciid, int amount)
       buildingId = 1;
     if ( buildings[buildingId].inUse == 1 )
     {
-      if ( buildings[buildingId].houseSize )
+      if ( buildings[buildingId].house_size )
       {
         city_inform[ciid].lastHousePeopleRemovedFrom = buildingId;
         if ( buildings[buildingId].house_population > 0 )
@@ -36977,10 +36218,7 @@ int  fun_removePeopleFromCity(int ciid, int amount)
   }
   return removed;
 }
-// 6527BC: using guessed type __int16 cityinfo_lastHousePeopleRemovedFrom[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
 
-//----- (00455360) --------------------------------------------------------
 int  fun_calculatePeopleInHousingTypes(int ciid)
 {
   int totalPop; // [sp+4Ch] [bp-Ch]@1
@@ -37002,7 +36240,7 @@ int  fun_calculatePeopleInHousingTypes(int ciid)
         {
           if ( buildings[i].inUse != 6 )
           {
-            if ( buildings[i].houseSize )
+            if ( buildings[i].house_size )
             {
               pop =buildings[i].house_population;
               totalPop +=buildings[i].house_population;
@@ -37138,10 +36376,7 @@ signed int  fun_isIndustryForBuildingEnabled(int buildingId)
   }
   return result;
 }
-// 6528AA: using guessed type __int16 cityinfo_industryMothballed[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (00455B10) --------------------------------------------------------
 void  fun_calculateUnemployment()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -37176,13 +36411,7 @@ void  fun_calculateUnemployment()
     }
   }
 }
-// 652B58: using guessed type int cityinfo_unemploymentPercentage[];
-// 652B5C: using guessed type int cityinfo_unemploymentForSenateDrawing[];
-// 652B60: using guessed type int cityinfo_numWorkersNeeded[];
-// 65DEA0: using guessed type int workersNeededMessageDelay;
-// 98E880: using guessed type __int16 scn_settings_startYear;
 
-//----- (00455CD0) --------------------------------------------------------
 void  fun_reallocateWorkersPerCategory()
 {
   int workersNeeded; // [sp+4Ch] [bp-20h]@1
@@ -37549,7 +36778,7 @@ void  fun_collectMonthlyTaxes()
   {
     if ( buildings[j].inUse == 1 )
     {
-      if ( buildings[j].houseSize )
+      if ( buildings[j].house_size )
       {
         isPatrician = buildings[j].level_resourceId >= 12;
         trm = fun_adjustWithPercentage(
@@ -37632,7 +36861,7 @@ void  fun_updateFinanceTaxes()
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].houseSize )
+      if ( buildings[i].house_size )
       {
         v3 = buildings[i].level_resourceId >= 12;
         v2 = fun_adjustWithPercentage(
@@ -37670,7 +36899,7 @@ void  fun_copyFinanceTaxesToLastYear()
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].houseSize )
+      if ( buildings[i].house_size )
         building_74_house_taxIncomeThisYear_senateForum_treasureStore[32 * i] = 0;
     }
   }
@@ -38076,7 +37305,7 @@ signed int  sub_458E80(int a1, int a2, int a3, int a4, int a5, int a6)
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].type == 73 )
+      if ( buildings[i].type == B_WarehouseSpace )
       {
         if ( building_3c_hasRoadAccess[128 * i] )
         {
@@ -38355,17 +37584,7 @@ signed int  fun_removeGoodFromWarehouse(int ciid, int buildingId, int resourceId
   }
   return result;
 }
-// 65284A: using guessed type __int16 cityinfo_resourceInStock[];
-// 6E6C56: using guessed type __int16 graphic_emptyWarehouseTile;
-// 6E6C58: using guessed type __int16 word_6E6C58;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD72: using guessed type __int16 building_32_warehouse_nextStorage[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
 
-//----- (00459AE0) --------------------------------------------------------
 void  fun_removeGoodsFromWarehouseForMercury(int buildingId, signed int amount)
 {
   int v2; // [sp+4Ch] [bp-10h]@16
@@ -38434,7 +37653,7 @@ signed int  sub_459DD0(int a1, int a2)
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].type == 72 )
+      if ( buildings[i].type == B_Warehouse )
       {
         if ( i != a1 )
         {
@@ -38736,7 +37955,7 @@ signed int  sub_45AA70(int a1, int a2, int a3, int a4)
   signed int result; // eax@2
   signed int i; // [sp+4Ch] [bp-4h]@5
 
-  if ( buildings[a3].type == 72 )
+  if ( buildings[a3].type == B_Warehouse )
   {
     if ( (signed int)(unsigned __int8)byte_7FA39F[128 * a1] < 8 )
     {
@@ -38771,7 +37990,7 @@ int  sub_45AB50(int a1, int a2, int a3)
   signed int i; // [sp+58h] [bp-4h]@3
 
   result = a2 << 7;
-  if ( buildings[a2].type == 72 )
+  if ( buildings[a2].type == B_Warehouse )
   {
     for ( i = 0; i < 8; ++i )
     {
@@ -38910,14 +38129,7 @@ LABEL_46:
   }
   return result;
 }
-// 654220: using guessed type int dword_654220[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD72: using guessed type __int16 building_32_warehouse_nextStorage[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
 
-//----- (0045B220) --------------------------------------------------------
 int  sub_45B220(int a1, int a2, int a3)
 {
   int result; // eax@2
@@ -39042,11 +38254,7 @@ int  fun_getGoodAmountStoredInWarehouse(int buildingId, int good)
   }
   return units;
 }
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD72: using guessed type __int16 building_32_warehouse_nextStorage[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
 
-//----- (0045B920) --------------------------------------------------------
 signed int  sub_45B920(int a1)
 {
   signed int result; // eax@5
@@ -39081,11 +38289,7 @@ signed int  sub_45B920(int a1)
   }
   return result;
 }
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD72: using guessed type __int16 building_32_warehouse_nextStorage[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
 
-//----- (0045B9F0) --------------------------------------------------------
 signed int  fun_getResourceGraphicIdOffset(int resourceId, int type)
 {
   signed int result; // eax@2
@@ -39128,9 +38332,7 @@ signed int  fun_getResourceGraphicIdOffset(int resourceId, int type)
   }
   return result;
 }
-// 98EE8A: using guessed type __int16 scn_allow_wharves;
 
-//----- (0045BA70) --------------------------------------------------------
 void  fun_updateAdvisorFoodAndSupplyRomeWheat()
 {
   int i; // [sp+4Ch] [bp-4h]@1
@@ -39348,15 +38550,7 @@ int  sub_45C100(int a1, int a2, int a3, signed int a4, int a5, int a6)
   }
   return result;
 }
-// 401302: using guessed type _DWORD  sub_401302(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 862D40: using guessed type int dword_862D40;
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8C: using guessed type __int16 building_4c_granary_capacity[];
-// 98EE3C: using guessed type int scn_romeSuppliesWheat;
 
-//----- (0045C3E0) --------------------------------------------------------
 int  sub_45C3E0(int a1, int a2, int a3, int a4, int a5, int a6)
 {
   int v7; // [sp+4Ch] [bp-8h]@2
@@ -39370,7 +38564,6 @@ int  sub_45C3E0(int a1, int a2, int a3, int a4, int a5, int a6)
   return v7 + fun_getDistanceMaximum(a1, a2, a3, a4);
 }
 
-//----- (0045C460) --------------------------------------------------------
 signed int  sub_45C460(int a1, int a2, signed int a3, int a4, int a5)
 {
   signed int result; // eax@2
@@ -39724,7 +38917,7 @@ signed int  sub_45D000()
     {
       if ( buildings[j].inUse == 1 )
       {
-        if ( buildings[j].type == 71 )
+        if ( buildings[j].type == B_Granary )
         {
           if ( building_3c_hasRoadAccess[128 * j] )
           {
@@ -39756,13 +38949,7 @@ signed int  sub_45D000()
   }
   return result;
 }
-// 94BCC0: using guessed type int dword_94BCC0[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8C: using guessed type __int16 building_4c_granary_capacity[];
-// 98EE3C: using guessed type int scn_romeSuppliesWheat;
 
-//----- (0045D1F0) --------------------------------------------------------
 signed int  sub_45D1F0()
 {
   signed int result; // eax@5
@@ -39785,7 +38972,7 @@ signed int  sub_45D1F0()
     {
       if ( buildings[j].inUse == 1 )
       {
-        if ( buildings[j].type == 71 )
+        if ( buildings[j].type == B_Granary )
         {
           if ( building_3c_hasRoadAccess[128 * j] )
           {
@@ -39824,7 +39011,7 @@ signed int  sub_45D3D0(int a1, signed int a2, int a3)
 
   if ( a1 > 0 )
   {
-    if ( buildings[a1].type == 71 )
+    if ( buildings[a1].type == B_Granary )
     {
       if ( a2 <= 6 )
       {
@@ -39846,17 +39033,17 @@ signed int  sub_45D3D0(int a1, signed int a2, int a3)
               {
                 switch ( a2 )
                 {
-                  case 1:
-                    city_inform[ciid].dword_654508 += 100;
+                  case G_Wheat:
+                    city_inform[ciid].plebsFoodInCity += 100;
                     break;
-                  case 3:
-                    city_inform[ciid].dword_654508 += 100;
+                  case G_Fruit:
+                    city_inform[ciid].plebsFoodInCity += 100;
                     break;
-                  case 6:
-                    city_inform[ciid].dword_654508 += 100;
+                  case G_MeatFish:
+                    city_inform[ciid].plebsFoodInCity += 100;
                     break;
-                  case 2:
-                    city_inform[ciid].dword_654508 += 100;
+                  case G_Vegetables:
+                    city_inform[ciid].plebsFoodInCity += 100;
                     break;
                 }
               }
@@ -39895,11 +39082,7 @@ signed int  sub_45D3D0(int a1, signed int a2, int a3)
   }
   return result;
 }
-// 654508: using guessed type int dword_654508[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD8C: using guessed type __int16 building_4c_granary_capacity[];
 
-//----- (0045D620) --------------------------------------------------------
 int  sub_45D620(int a1, signed int a2)
 {
   int result; // eax@2
@@ -39955,7 +39138,7 @@ int  sub_45D6A0(int a1, int a2, int a3)
 
     if ( buildings[v6].inUse == 1 )
     {
-      if ( buildings[v6].type == 71 )
+      if ( buildings[v6].type == B_Granary )
       {
         city_inform[ciid].word_6527E4[ a2] = v6;
         a3 = sub_45D7B0(a1, v6, a2, a3);
@@ -40043,7 +39226,7 @@ void  sub_45DAE0()
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].houseSize )
+      if ( buildings[i].house_size )
       {
         foodTypesCount = model_houses[buildings[i].level_resourceId].foodtypes;
 
@@ -40096,8 +39279,8 @@ void  sub_45DAE0()
     }
   }
   city_inform[ciid].dword_654500 = v0;
-  city_inform[ciid].dword_654504 = city_inform[ciid].dword_654508;
-  city_inform[ciid].dword_654508 = 0;
+  city_inform[ciid].plebsFoodInCityLastYear = city_inform[ciid].plebsFoodInCity;
+  city_inform[ciid].plebsFoodInCity = 0;
 }
 
 void  sub_45DE60()
@@ -40111,7 +39294,6 @@ void  sub_45DE60()
   }
 }
 
-//----- (0045DEC0) --------------------------------------------------------
 void  sub_45DEC0(int a1)
 {
   int v1; // [sp+4Ch] [bp-Ch]@12
@@ -40123,13 +39305,13 @@ void  sub_45DEC0(int a1)
     city_inform[ciid].x_cityinfo_dword_652900[i] = 0;
     city_inform[ciid].x_cityinfo_dword_6528E8[i] = 0;
   }
-  for ( j = 1; j < 2000; ++j )
+  for ( j = 1; j < MAX_BUILDINGS; ++j )
   {
     if ( buildings[j].inUse == 1 )
     {
-      if ( buildings[j].type >= 110 )
+      if ( buildings[j].type >= B_WineWorkshop )
       {
-        if ( buildings[j].type <= 114 )
+        if ( buildings[j].type <= B_PotteryWorkshop )
         {
           building_3c_hasRoadAccess[128 * j] = 0;
           if ( fun_determineAccessRoad(
@@ -40149,11 +39331,7 @@ void  sub_45DEC0(int a1)
     }
   }
 }
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
 
-//----- (0045E100) --------------------------------------------------------
 signed int  sub_45E100(int a1, int a2, int a3, int a4, int a5)
 {
   signed int v6; // [sp+4Ch] [bp-18h]@4
@@ -40187,13 +39365,13 @@ signed int  sub_45E100(int a1, int a2, int a3, int a4, int a5)
   }
   v8 = 10000;
   v7 = 0;
-  for ( i = 1; i < 2000; ++i )
+  for ( i = 1; i < MAX_BUILDINGS; ++i )
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].type >= 110 )
+      if ( buildings[i].type >= B_WineWorkshop )
       {
-        if ( buildings[i].type <= 114 )
+        if ( buildings[i].type <= B_PotteryWorkshop )
         {
           if ( building_3c_hasRoadAccess[128 * i] )
           {
@@ -40232,13 +39410,7 @@ signed int  sub_45E100(int a1, int a2, int a3, int a4, int a5)
   walkerGridY = (unsigned __int8)building_21_byte_94BD61[128 * v7];
   return v7;
 }
-// 401302: using guessed type _DWORD  sub_401302(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
 
-//----- (0045E390) --------------------------------------------------------
 signed int  sub_45E390(int a1, int a2, int a3, int a4, int a5)
 {
   signed int v6; // [sp+4Ch] [bp-18h]@4
@@ -40272,13 +39444,13 @@ signed int  sub_45E390(int a1, int a2, int a3, int a4, int a5)
   }
   v8 = 10000;
   v7 = 0;
-  for ( i = 1; i < 2000; ++i )
+  for ( i = 1; i < MAX_BUILDINGS; ++i )
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].type >= 110 )
+      if ( buildings[i].type >= B_WineWorkshop )
       {
-        if ( buildings[i].type <= 114 )
+        if ( buildings[i].type <= B_PotteryWorkshop )
         {
           if ( building_3c_hasRoadAccess[128 * i] )
           {
@@ -40313,13 +39485,7 @@ signed int  sub_45E390(int a1, int a2, int a3, int a4, int a5)
   walkerGridY = (unsigned __int8)building_21_byte_94BD61[128 * v7];
   return v7;
 }
-// 401302: using guessed type _DWORD  sub_401302(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
 
-//----- (0045E600) --------------------------------------------------------
 int  sub_45E600(int a1, int a2, int a3, int a4)
 {
   int result; // eax@2
@@ -40377,12 +39543,7 @@ int  sub_45E600(int a1, int a2, int a3, int a4)
   }
   return result;
 }
-// 6543D0: using guessed type int cityinfo_barracksBuildingId[];
-// 6545B8: using guessed type int cityinfo_numLegionaryForts[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
-// 98BF50: using guessed type int numWorkingBarracks;
 
-//----- (0045E740) --------------------------------------------------------
 signed int  sub_45E740(int a1)
 {
   signed int result; // eax@2
@@ -40406,10 +39567,7 @@ signed int  sub_45E740(int a1)
   }
   return result;
 }
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
 
-//----- (0045E7D0) --------------------------------------------------------
 signed int  sub_45E7D0(int a1)
 {
   signed int result; // eax@2
@@ -40425,9 +39583,7 @@ signed int  sub_45E7D0(int a1)
   }
   return result;
 }
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
 
-//----- (0045E820) --------------------------------------------------------
 void  fun_generateWalkersForBuildings()
 {
   int v0; // eax@20
@@ -40539,7 +39695,7 @@ void  fun_generateWalkersForBuildings()
       && (buildings[i].type != B_Hippodrome || !building_30_warehouse_prevStorage[64 * i]) )
     {
       building_7f_byte_94BDBF[128 * i] = 0;
-      if ( buildings[i].type < 22 || buildings[i].type > (signed int)B_HouseLuxuryPalace )
+      if ( buildings[i].type < B_HouseSmallVilla || buildings[i].type > (signed int)B_HouseLuxuryPalace )
       {
         if ( buildings[i].type < (signed int)B_WheatFarm
           || buildings[i].type > (signed int)B_PotteryWorkshop )
@@ -42547,14 +41703,7 @@ void  sub_4639D0(int a1)
     }
   }
 }
-// 6E6C3A: using guessed type __int16 word_6E6C3A;
-// 6E6D22: using guessed type __int16 word_6E6D22;
-// 6E6D56: using guessed type __int16 word_6E6D56;
-// 6E6D58: using guessed type __int16 word_6E6D58;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
 
-//----- (00463C80) --------------------------------------------------------
 void  sub_463C80(int a1)
 {
   if ( buildings[a1].inUse == 1 )
@@ -42579,11 +41728,7 @@ void  sub_463C80(int a1)
         8);
   }
 }
-// 6E6BDC: using guessed type __int16 graphic_market;
-// 6E6D54: using guessed type __int16 word_6E6D54;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
 
-//----- (00463DB0) --------------------------------------------------------
 void  sub_463DB0(int a1)
 {
   if ( buildings[a1].inUse == 1 )
@@ -42608,11 +41753,7 @@ void  sub_463DB0(int a1)
         8);
   }
 }
-// 6E6C2C: using guessed type __int16 word_6E6C2C;
-// 6E6D6A: using guessed type __int16 word_6E6D6A;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
 
-//----- (00463EE0) --------------------------------------------------------
 int  fun_determineEntertainerDestination(int x, int y, int buildingType1, int buildingType2)
 {
   int result; // eax@20
@@ -42774,9 +41915,9 @@ void  fun_countBuildingTypes()
   numWorkingLargeTemplesNeptune = numWorkingLargeTemplesMercury;
   numWorkingLargeTemplesCeres = numWorkingLargeTemplesNeptune;
   numOracles = 0;
-  for ( k = 1; k < 2000; ++k )
+  for ( k = 1; k < MAX_BUILDINGS; ++k )
   {
-    if ( buildings[k].inUse == 1 && !buildings[k].houseSize )
+    if ( buildings[k].inUse == 1 && !buildings[k].house_size )
     {
       switch ( buildings[k].type )
       {
@@ -43153,38 +42294,7 @@ void  fun_calculateCultureCoverage()
   if ( pctHospitalCoverage > 100 )
     pctHospitalCoverage = 100;
 }
-// 402815: using guessed type _DWORD  fun_getNumberOfAcademyAgeChildren(_DWORD);
-// 402EFF: using guessed type _DWORD  fun_getNumberOfSchoolAgeChildren(_DWORD);
-// 6500C4: using guessed type int cityinfo_population[];
-// 6500CC: using guessed type int cityinfo_schoolAgeChildren[];
-// 6500D0: using guessed type int cityinfo_academyAgeChildren[];
-// 654448: using guessed type int cityinfo_pctReligionCoverage[];
-// 949EE8: using guessed type int pctAcademyCoverage;
-// 94B3AC: using guessed type int pctColosseumCoverage;
-// 94BB98: using guessed type int numWorkingLargeTemplesVenus;
-// 94BCE0: using guessed type int numWorkingLargeTemplesNeptune;
-// 94BD00: using guessed type int numWorkingSmallTemplesNeptune;
-// 94BD08: using guessed type int pctTheaterCoverage;
-// 94BD0C: using guessed type int numWorkingLargeTemplesMars;
-// 94BD10: using guessed type int pctHippodromeCoverage;
-// 94BD18: using guessed type int pctLibraryCoverage;
-// 94BD1C: using guessed type int numWorkingLargeTemplesMercury;
-// 94BD20: using guessed type int numWorkingLargeTemplesCeres;
-// 94BD34: using guessed type int numWorkingSmallTemplesCeres;
-// 94BD3C: using guessed type int numWorkingSmallTemplesMercury;
-// 98A54C: using guessed type int pctReligionCoverageMars;
-// 98A5A0: using guessed type int pctHospitalCoverage;
-// 98BEC0: using guessed type int pctReligionCoverageOracles;
-// 98BECC: using guessed type int pctReligionCoverageNeptune;
-// 98BF0C: using guessed type int numWorkingSmallTemplesMars;
-// 98BF20: using guessed type int pctReligionCoverageVenus;
-// 98BF58: using guessed type int pctSchoolCoverage;
-// 98BF7C: using guessed type int pctReligionCoverageCeres;
-// 98C000: using guessed type int pctAmphitheaterCoverage;
-// 98C008: using guessed type int pctReligionCoverageMercury;
-// 98C590: using guessed type int numWorkingSmallTemplesVenus;
 
-//----- (00466000) --------------------------------------------------------
 void  fun_distributeTreasuryOverForumsAndSenates()
 {
   int remainder; // [sp+4Ch] [bp-10h]@2
@@ -43215,7 +42325,7 @@ void  fun_distributeTreasuryOverForumsAndSenates()
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( !buildings[i].houseSize )
+      if ( !buildings[i].house_size )
       {
         building_74_house_taxIncomeThisYear_senateForum_treasureStore[32 * i] = 0;
         if ( building_38_num_workers[64 * i] > 0 )
@@ -43318,10 +42428,7 @@ void  sub_466330(int a1)
       break;
   }
 }
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (004664C0) --------------------------------------------------------
 void  fun_setAqueductGraphicIdsToWaterFromOffset(int gridOffset)
 {
   signed int v1; // eax@4
@@ -43404,14 +42511,7 @@ void  fun_setAqueductGraphicIdsToWaterFromOffset(int gridOffset)
     while ( nextOffset > -1 );
   }
 }
-// 6E6BD6: using guessed type __int16 graphic_aqueduct;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94A310: using guessed type int dword_94A310;
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 98C490: using guessed type int dword_98C490;
 
-//----- (00466780) --------------------------------------------------------
 void  fun_setAqueductGraphicIdsToNoWater()
 {
   int offset; // [sp+4Ch] [bp-10h]@1
@@ -43610,7 +42710,7 @@ void  fun_handleFireCollapseEvent()
               if ( !tutorial1_prefectureBuilt )
                 building_3e_damageRisk[64 * i] += 5;
             }
-            if ( buildings[i].houseSize )
+            if ( buildings[i].house_size )
             {
               if ( buildings[i].level_resourceId <= 1 )
                 building_3e_damageRisk[64 * i] = 0;
@@ -43619,7 +42719,7 @@ void  fun_handleFireCollapseEvent()
             {
               if ( v1 == v2 )
               {
-                if ( buildings[i].houseSize )
+                if ( buildings[i].house_size )
                 {
                   if (buildings[i].house_population > 0 )
                   {
@@ -43735,32 +42835,7 @@ void  fun_handleFireCollapseEvent()
     }
   }
 }
-// 402824: using guessed type _DWORD  fun_createDustCloud(_DWORD, _DWORD, _DWORD);
-// 607F80: using guessed type int debug_houseEvolution;
-// 608008: using guessed type int time_current;
-// 65433C: using guessed type int dword_65433C[];
-// 654340: using guessed type int cityinfo_crimeRate[];
-// 659B50: using guessed type int message_usePopup;
-// 659B68: using guessed type int dword_659B68;
-// 65DE10: using guessed type int dword_65DE10;
-// 65DE24: using guessed type int dword_65DE24;
-// 65DE28: using guessed type int dword_65DE28;
-// 65DE84: using guessed type int dword_65DE84;
-// 65DE88: using guessed type int dword_65DE88[6];
-// 65DED0: using guessed type int dword_65DED0;
-// 6AD9EC: using guessed type int random_7f_1;
-// 949EF8: using guessed type int tutorial1_prefectureBuilt;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD70: using guessed type __int16 building_30_warehouse_prevStorage[];
-// 94BD7E: using guessed type __int16 building_3e_damageRisk[];
-// 94BD80: using guessed type __int16 building_40_fireRisk[];
-// 98BEFC: using guessed type int tutorial1_fire;
-// 98EF28: using guessed type char scn_climate;
 
-//----- (00467530) --------------------------------------------------------
 void  fun_enemyHitBuilding(int gridOffset, signed int maxDamage)
 {
   ++grid_buildingDamage[gridOffset];
@@ -43770,9 +42845,7 @@ void  fun_enemyHitBuilding(int gridOffset, signed int maxDamage)
       (gridOffset - setting_map_startGridOffset) / 162,
       gridOffset);
 }
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004675C0) --------------------------------------------------------
 void  fun_destroyBuildingByEnemyAt(int x, int y, int mapOffset)
 {
   int buildingId; // [sp+4Ch] [bp-4h]@1
@@ -43844,12 +42917,7 @@ void  fun_destroyBuildingByEnemyAt(int x, int y, int mapOffset)
   sub_4FFDF0();
   sub_500420();
 }
-// 402824: using guessed type _DWORD  fun_createDustCloud(_DWORD, _DWORD, _DWORD);
-// 654578: using guessed type int cityinfo_numDestroyedBuildingsByEnemies[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (00467A70) --------------------------------------------------------
 void  sub_467A70(int a1, int a2)
 {
   int v2; // [sp+4Ch] [bp-8h]@1
@@ -43923,7 +42991,7 @@ void  sub_467C40()
   dword_98C020 = 0;
   dword_98C024 = 0;
   dword_98BF18 = 0;
-  for ( i = 1; i < 2000; ++i )
+  for ( i = 1; i < MAX_BUILDINGS; ++i )
   {
     if ( buildings[i].inUse == 1 && buildings[i].type == B_BurningRuin )
     {
@@ -44014,18 +43082,7 @@ void  sub_467C40()
     sub_4FFDF0();
   }
 }
-// 6AD9EC: using guessed type int random_7f_1;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD38: using guessed type int dword_94BD38;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD82: using guessed type __int16 building_42_word_94BD82[];
-// 98BF18: using guessed type int dword_98BF18;
-// 98C020: using guessed type int dword_98C020;
-// 98C024: using guessed type int dword_98C024;
-// 98EF28: using guessed type char scn_climate;
 
-//----- (004680A0) --------------------------------------------------------
 int  sub_4680A0(int a1, int a2)
 {
   signed int v3; // [sp+4Ch] [bp-14h]@1
@@ -44043,7 +43100,7 @@ int  sub_4680A0(int a1, int a2)
     v7 = word_98C080[dword_98C020++];
     if ( buildings[v7].inUse == 1 )
     {
-      if ( buildings[v7].type == 99 )
+      if ( buildings[v7].type == B_BurningRuin )
       {
         if ( !building_79_byte_94BDB9[128 * v7] )
         {
@@ -44082,7 +43139,7 @@ int  sub_4680A0(int a1, int a2)
   return v6;
 }
 
-void  checkCrimeAndGenerateCriminal()
+void checkCrimeAndGenerateCriminal()
 {
   signed int v0; // [sp+54h] [bp-14h]@1
   int v1; // [sp+58h] [bp-10h]@1
@@ -44093,7 +43150,7 @@ void  checkCrimeAndGenerateCriminal()
 
   for ( i = 1; i <= buildingId_highestInUse; ++i )
   {
-    if ( buildings[i].inUse == 1 && buildings[i].houseSize > 0)
+    if ( buildings[i].inUse == 1 && buildings[i].house_size > 0)
     {
       if ( buildings[i].house_crimeRisk < 50 )
       {
@@ -44328,7 +43385,7 @@ void  fun_removeGoodsFromStorageForMercury(int bigCurse)
 
   v4 = 0;
   buildingId = 0;
-  for ( i = 1; i < 2000; ++i )                  // find building with most goods
+  for ( i = 1; i < MAX_BUILDINGS; ++i )                  // find building with most goods
   {
     if ( buildings[i].inUse != 1 )
       continue;
@@ -44383,12 +43440,7 @@ void  fun_removeGoodsFromStorageForMercury(int bigCurse)
     }
   }
 }
-// 402D51: using guessed type _DWORD  sub_402D51(_DWORD, _DWORD);
-// 65DED0: using guessed type int dword_65DED0;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (00468F00) --------------------------------------------------------
 void  sub_468F00()
 {
   signed int v0; // [sp+4Ch] [bp-14h]@1
@@ -44403,12 +43455,12 @@ void  sub_468F00()
 
   v0 = 10000;
   v1 = 0;
-  for ( i = 1; i < 2000; ++i )
+  for ( i = 1; i < MAX_BUILDINGS; ++i )
   {
     if ( buildings[i].inUse == 1 )
     {
       v2 = 0;
-      if ( buildings[i].type == 71 )
+      if ( buildings[i].type == B_Granary )
       {
         for ( j = 1; j <= 6; ++j )
           v2 += sub_45D620(i, j);
@@ -44432,17 +43484,13 @@ void  sub_468F00()
       sub_45D3D0(v1, 6, 0);
   }
 }
-// 401744: using guessed type _DWORD  sub_401744(_DWORD, _DWORD, _DWORD);
-// 402D51: using guessed type _DWORD  sub_402D51(_DWORD, _DWORD);
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (004690D0) --------------------------------------------------------
 int  fun_destroyFirstBuildingOfType(int buildingType)
 {
   int gridOffset; // ST60_4@8
   int i; // [sp+50h] [bp-4h]@1
 
-  for ( i = 1; i < 2000; ++i )
+  for ( i = 1; i < MAX_BUILDINGS; ++i )
   {
     if ( buildings[i].inUse == 1 && buildings[i].type == buildingType )
     {
@@ -44463,10 +43511,7 @@ int  fun_destroyFirstBuildingOfType(int buildingType)
   }
   return 0;
 }
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (004691F0) --------------------------------------------------------
 void  sub_4691F0()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -44478,12 +43523,7 @@ void  sub_4691F0()
   for ( i = 1; i <= buildingId_highestInUse; ++i )
     ;
 }
-// 98BEC4: using guessed type int dword_98BEC4;
-// 98BEE8: using guessed type int dword_98BEE8;
-// 98BF40: using guessed type int dword_98BF40;
-// 98BF6C: using guessed type int dword_98BF6C;
 
-//----- (00469280) --------------------------------------------------------
 void  sub_469280()
 {
   dword_94A2FC = 0;
@@ -44497,18 +43537,7 @@ void  sub_469280()
   dword_98BEE8 = 0;
   dword_98BEC4 = 0;
 }
-// 94A2FC: using guessed type int dword_94A2FC;
-// 98BEC4: using guessed type int dword_98BEC4;
-// 98BEE8: using guessed type int dword_98BEE8;
-// 98BF40: using guessed type int dword_98BF40;
-// 98BF6C: using guessed type int dword_98BF6C;
-// 98BF74: using guessed type int dword_98BF74;
-// 98C00C: using guessed type int dword_98C00C;
-// 98C05C: using guessed type int dword_98C05C;
-// 98C468: using guessed type int dword_98C468;
-// 98C48C: using guessed type int dword_98C48C;
 
-//----- (00469320) --------------------------------------------------------
 int  sub_469320()
 {
   int result; // eax@1
@@ -44530,14 +43559,7 @@ int  sub_469320()
   }
   return result;
 }
-// 402301: using guessed type _DWORD  sub_402301(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 5F6CD8: using guessed type int model_buildings_desirability[];
-// 5F6CDC: using guessed type int model_buildings_des_step[];
-// 5F6CE0: using guessed type int model_buildings_des_stepSize[];
-// 5F6CE4: using guessed type int model_buildings_des_range[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (00469470) --------------------------------------------------------
 int  sub_469470()
 {
   int result; // eax@2
@@ -44623,20 +43645,21 @@ void  fun_clearBuildings()
   buildingId_placedSequence = 0;
 }
 
-signed int  fun_createBuilding(int ciid, int type, int x, int y)
+int fun_createBuilding(int ciid, BuildingType type, int x, int y)
 {
   signed int buildingId; // [sp+4Ch] [bp-4h]@1
 
   for ( buildingId = 1; ; ++buildingId )
   {
-    if ( buildingId >= 2000 )
+    if ( buildingId >= MAX_BUILDINGS )
     {
-      fun_showWarning(65);                    // data limit reached
+      fun_showWarning( messageBildingLimitReach );                    // data limit reached
       return 0;
     }
     if ( !buildings[buildingId].inUse && !sub_490F30(buildingId) )
       break;
   }
+
   buildings[buildingId].inUse = 3;
   building_01_ciid[128 * buildingId] = ciid;
   building_02_byte_always0[128 * buildingId] = city_inform[ciid].byte_6500A5_always0;
@@ -44645,7 +43668,7 @@ signed int  fun_createBuilding(int ciid, int type, int x, int y)
   building_10_placedSequenceNumber[64 * buildingId] = buildingId_placedSequence++;
   buildings[buildingId].house_crimeRisk = 50;
   building_1a_word_94BD5A[64 * buildingId] = 0;
-  buildings[buildingId].houseSize = 0;
+  buildings[buildingId].house_size = 0;
   if ( buildings[buildingId].type < (signed int)B_HouseVacantLot
     || buildings[buildingId].type > (signed int)B_HouseMediumInsula )
   {
@@ -44658,22 +43681,22 @@ signed int  fun_createBuilding(int ciid, int type, int x, int y)
         if ( buildings[buildingId].type >= (signed int)B_HouseLargePalace )
         {
           if ( buildings[buildingId].type <= (signed int)B_HouseLuxuryPalace )
-            buildings[buildingId].houseSize = 4;
+            buildings[buildingId].house_size = 4;
         }
       }
       else
       {
-        buildings[buildingId].houseSize = 3;
+        buildings[buildingId].house_size = 3;
       }
     }
     else
     {
-      buildings[buildingId].houseSize = 2;
+      buildings[buildingId].house_size = 2;
     }
   }
   else
   {
-    buildings[buildingId].houseSize = 1;
+    buildings[buildingId].house_size = 1;
   }
   if ( buildings[buildingId].type < (signed int)B_HouseVacantLot
     || buildings[buildingId].type > (signed int)B_HouseLuxuryPalace )
@@ -44744,17 +43767,14 @@ signed int  fun_createBuilding(int ciid, int type, int x, int y)
   building_45_byte_94BD85[128 * buildingId] = grid_random[building_08_gridOffset[64 * buildingId]] & 0x7F;
   building_2c_byte_94BD6C[128 * buildingId] = building_45_byte_94BD85[128 * buildingId] & 6;
   building_44_byte_94BD84[128 * buildingId] = byte_5F6418[16 * type];
-  building_7c_adjacentToWater[128 * buildingId] = fun_isAdjacentToWater(
-                                                    x,
-                                                    y,
-                                                    (unsigned __int8)building_03_size[128 * buildingId]);
+  building_7c_adjacentToWater[128 * buildingId] = fun_isAdjacentToWater(x,y,(unsigned __int8)building_03_size[128 * buildingId]);
   return buildingId;
 }
 
 void  fun_deleteBuilding(int buildingId)
 {
   fun_deleteBuildingEvent(buildingId);
-  fun_memset(&buildings[buildingId].inUse, 128, 0);
+  memset( &buildings[buildingId], 0, sizeof(Building) );
 }
 
 void  fun_deleteBuildingEvent(int buildingId)
@@ -44772,6 +43792,7 @@ void  fun_deleteBuildingEvent(int buildingId)
       city_inform[ciid].word_6543AE = 0;
     }
   }
+
   if ( buildings[buildingId].type == B_Dock )
     --city_inform[ciid].numWorkingDocks;
 
@@ -44785,6 +43806,7 @@ void  fun_deleteBuildingEvent(int buildingId)
       city_inform[ciid].dword_6543D4 = 0;
     }
   }
+
   if ( buildings[buildingId].type == B_DistributionCenter_Unused )
   {
     if ( building_08_gridOffset[64 * buildingId] == city_inform[ciid].word_65451A )
@@ -44797,8 +43819,9 @@ void  fun_deleteBuildingEvent(int buildingId)
   }
   if ( buildings[buildingId].type == B_FortGround__ )
     sub_4BD530(building_48_word_94BD88[64 * buildingId]);
+
   if ( buildings[buildingId].type == B_Hippodrome )
-    city_inform[ciid].dword_65429C = 0;
+    city_inform[ciid].hippodromeBuiltInCity = 0;
 }
 
 void  fun_clearStorages()
@@ -44890,7 +43913,7 @@ int  fun_houseCanExpand(int buildingId, int numTiles)
         {
           if ( buildings[v18].inUse == 1 )
           {
-            if ( buildings[v18].houseSize )
+            if ( buildings[v18].house_size )
             {
               if ( buildings[v18].level_resourceId <= buildings[buildingId].level_resourceId )
                 ++v3;
@@ -44927,7 +43950,7 @@ int  fun_houseCanExpand(int buildingId, int numTiles)
         {
           if ( buildings[v19].inUse == 1 )
           {
-            if ( buildings[v19].houseSize )
+            if ( buildings[v19].house_size )
             {
               if ( buildings[v19].level_resourceId <= buildings[buildingId].level_resourceId )
                 ++v4;
@@ -44964,7 +43987,7 @@ int  fun_houseCanExpand(int buildingId, int numTiles)
         {
           if ( buildings[v20].inUse == 1 )
           {
-            if ( buildings[v20].houseSize )
+            if ( buildings[v20].house_size )
             {
               if ( buildings[v20].level_resourceId <= buildings[buildingId].level_resourceId )
                 ++v5;
@@ -45027,17 +44050,7 @@ void  sub_46A900(int a1)
     buildings[a1].inUse = 4;
   }
 }
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94A30C: using guessed type int dword_94A30C;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BDAC: using guessed type __int16 building_6c_word_94BDAC[];
-// 98C064: using guessed type int dword_98C064;
 
-//----- (0046AAC0) --------------------------------------------------------
 signed int  sub_46AAC0(int buildingId)
 {
   signed int result; // eax@2
@@ -45074,7 +44087,7 @@ signed int  sub_46AAC0(int buildingId)
           {
             if ( buildings[v8].inUse == 1 )
             {
-              if ( buildings[v8].houseSize )
+              if ( buildings[v8].house_size )
               {
                 if ( buildings[v8].level_resourceId == buildings[buildingId].level_resourceId )
                 {
@@ -45106,17 +44119,7 @@ signed int  sub_46AAC0(int buildingId)
   }
   return result;
 }
-// 4017A3: using guessed type _DWORD  sub_4017A3(_DWORD, _DWORD);
-// 402496: using guessed type _DWORD  sub_402496(_DWORD, __int16);
-// 5F9990: using guessed type int dword_5F9990[];
-// 5F9994: using guessed type int dword_5F9994[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 98BF08: using guessed type int dword_98BF08;
-// 98BF10: using guessed type int dword_98BF10;
 
-//----- (0046ACB0) --------------------------------------------------------
 void  sub_46ACB0(int a1, int a2)
 {
   __int16 v2; // cx@4
@@ -45135,7 +44138,7 @@ void  sub_46ACB0(int a1, int a2)
       v6 = grid_buildingIds[v3 + v4];
       if ( v6 != a1 )
       {
-        if ( buildings[v6].houseSize )
+        if ( buildings[v6].house_size )
         {
           if ( (unsigned __int8)building_04_house_isMerged[128 * v6] == 1 )
           {
@@ -45158,13 +44161,7 @@ void  sub_46ACB0(int a1, int a2)
     }
   }
 }
-// 4017F8: using guessed type _DWORD  fun_devolveHouse3x3ToMediumInsula(_DWORD);
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 98BF08: using guessed type int dword_98BF08;
-// 98BF10: using guessed type int dword_98BF10;
 
-//----- (0046AE00) --------------------------------------------------------
 int  sub_46AE00(int buildingId, int a2)
 {
   __int16 v2; // ax@7
@@ -45189,7 +44186,7 @@ int  sub_46AE00(int buildingId, int a2)
       v10 = grid_buildingIds[v5 + v6];
       if ( v10 != buildingId )
       {
-        if ( buildings[v10].houseSize )
+        if ( buildings[v10].house_size )
         {
           v4 += buildings[v10].house_population;
           for ( k = 0; k < 8; ++k )
@@ -45208,10 +44205,10 @@ void  sub_46AFA0(int a1, __int16 a2)
   int v2; // ST68_4@4
   signed int i; // [sp+50h] [bp-4h]@1
 
-  buildings[a1].type = 20;
+  buildings[a1].type = B_HouseLargeInsula;
   buildings[a1].level_resourceId = 10;
   building_03_size[128 * a1] = 2;
-  buildings[a1].houseSize = 2;
+  buildings[a1].house_size = 2;
   buildings[a1].house_population += a2;
   for ( i = 0; i < 8; ++i )
     buildings[a1].grow_value_house_foodstocks[i] += dword_94BC80[2 * i];
@@ -45238,10 +44235,10 @@ void  sub_46B1F0(int a1, __int16 a2)
   int v2; // ST68_4@4
   signed int i; // [sp+50h] [bp-4h]@1
 
-  buildings[a1].type = 24;
+  buildings[a1].type = B_HouseLargeVilla;
   buildings[a1].level_resourceId = 14;
   building_03_size[128 * a1] = 3;
-  buildings[a1].houseSize = 3;
+  buildings[a1].house_size = 3;
   buildings[a1].house_population += a2;
 
   for ( i = 0; i < 8; ++i )
@@ -45268,10 +44265,10 @@ void  sub_46B410(int a1, __int16 a2)
   int v2; // ST68_4@4
   signed int i; // [sp+50h] [bp-4h]@1
 
-  buildings[a1].type = 28;
+  buildings[a1].type = B_HouseLargePalace;
   buildings[a1].level_resourceId = 18;
   building_03_size[128 * a1] = 4;
-  buildings[a1].houseSize = 4;
+  buildings[a1].house_size = 4;
   buildings[a1].house_population += a2;
   for ( i = 0; i < 8; ++i )
     buildings[a1].grow_value_house_foodstocks[i] += dword_94BC80[2 * i];
@@ -45298,7 +44295,7 @@ void  sub_46B630(int a1, __int16 a2)
   signed int i; // [sp+50h] [bp-4h]@1
 
   building_03_size[128 * a1] = 2;
-  buildings[a1].houseSize = 2;
+  buildings[a1].house_size = 2;
   buildings[a1].house_population += a2;
   for ( i = 0; i < 8; ++i )
     buildings[a1].grow_value_house_foodstocks[i] += dword_94BC80[2 * i];
@@ -45341,9 +44338,10 @@ void  fun_splitHouse2x2(int buildingId)
   popRemainder = pop % 4;
   sub_480FC0(buildingId, buildings[buildingId].x, building__07_y[128 * buildingId]);
   building_03_size[128 * buildingId] = 1;
-  buildings[buildingId].houseSize = 1;
+  buildings[buildingId].house_size = 1;
   building_04_house_isMerged[128 * buildingId] = 0;
   buildings[buildingId].house_population = popRemainder + popPerTile;
+
   for ( i = 0; i < 8; ++i )
     buildings[buildingId].grow_value_house_foodstocks[i] = LOWORD(v7[i]) + LOWORD(v8[i]);
 
@@ -45433,7 +44431,7 @@ void  fun_devolveHouse2x2ToMediumInsula(int a1)
   buildings[a1].type = B_HouseMediumInsula;
   buildings[a1].level_resourceId = buildings[a1].type - 10;
   building_03_size[128 * a1] = 1;
-  buildings[a1].houseSize = 1;
+  buildings[a1].house_size = 1;
   building_04_house_isMerged[128 * a1] = 0;
   buildings[a1].house_population = v9 + v10;
   for ( i = 0; i < 8; ++i )
@@ -45528,7 +44526,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
   buildings[a1].type = B_HouseMediumInsula;
   buildings[a1].level_resourceId = buildings[a1].type - 10;
   building_03_size[128 * a1] = 1;
-  buildings[a1].houseSize = 1;
+  buildings[a1].house_size = 1;
   building_04_house_isMerged[128 * a1] = 0;
   buildings[a1].house_population = v13 + v14;
   for ( i = 0; i < 8; ++i )
@@ -45547,7 +44545,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
     8);
   v10 = buildings[a1].x;
   v9 = building__07_y[128 * a1];
-  v1 = fun_createBuilding(ciid, 19, v10 + 1, v9);
+  v1 = fun_createBuilding(ciid, B_HouseMediumInsula, v10 + 1, v9);
   buildings[v1].house_population = v14;
   for ( i = 0; i < 8; ++i )
     buildings[v1].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
@@ -45561,7 +44559,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
     1,
     (grid_random[building_08_gridOffset[64 * v1]] & 1) + v16,
     8);
-  v2 = fun_createBuilding(ciid, 19, v10 + 2, v9);
+  v2 = fun_createBuilding(ciid, B_HouseMediumInsula, v10 + 2, v9);
   buildings[v2].house_population = v14;
   for ( i = 0; i < 8; ++i )
     buildings[v2].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
@@ -45574,7 +44572,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
     1,
     (grid_random[building_08_gridOffset[64 * v2]] & 1) + v16,
     8);
-  v3 = fun_createBuilding(ciid, 19, v10, v9 + 1);
+  v3 = fun_createBuilding(ciid, B_HouseMediumInsula, v10, v9 + 1);
   buildings[v3].house_population = v14;
   for ( i = 0; i < 8; ++i )
     buildings[v3].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
@@ -45587,7 +44585,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
     1,
     (grid_random[building_08_gridOffset[64 * v3]] & 1) + v16,
     8);
-  v4 = fun_createBuilding(ciid, 19, v10 + 1, v9 + 1);
+  v4 = fun_createBuilding(ciid, B_HouseMediumInsula, v10 + 1, v9 + 1);
   buildings[v4].house_population = v14;
   for ( i = 0; i < 8; ++i )
     buildings[v4].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
@@ -45600,7 +44598,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
     1,
     (grid_random[building_08_gridOffset[64 * v4]] & 1) + v16,
     8);
-  v5 = fun_createBuilding(ciid, 19, v10 + 2, v9 + 1);
+  v5 = fun_createBuilding(ciid, B_HouseMediumInsula, v10 + 2, v9 + 1);
   buildings[v5].house_population = v14;
   for ( i = 0; i < 8; ++i )
     buildings[v5].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
@@ -45614,7 +44612,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
     1,
     (grid_random[building_08_gridOffset[64 * v5]] & 1) + v16,
     8);
-  v6 = fun_createBuilding(ciid, 19, v10, v9 + 2);
+  v6 = fun_createBuilding(ciid, B_HouseMediumInsula, v10, v9 + 2);
   buildings[v6].house_population = v14;
   for ( i = 0; i < 8; ++i )
     buildings[v6].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
@@ -45627,7 +44625,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
     1,
     (grid_random[building_08_gridOffset[64 * v6]] & 1) + v16,
     8);
-  v7 = fun_createBuilding(ciid, 19, v10 + 1, v9 + 2);
+  v7 = fun_createBuilding(ciid, B_HouseMediumInsula, v10 + 1, v9 + 2);
   buildings[v7].house_population = v14;
   for ( i = 0; i < 8; ++i )
     buildings[v7].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
@@ -45640,7 +44638,7 @@ void  fun_devolveHouse3x3ToMediumInsula(int a1)
     1,
     (grid_random[building_08_gridOffset[64 * v7]] & 1) + v16,
     8);
-  v8 = fun_createBuilding(ciid, 19, v10 + 2, v9 + 2);
+  v8 = fun_createBuilding(ciid, B_HouseMediumInsula, v10 + 2, v9 + 2);
   buildings[v8].house_population = v14;
   for ( i = 0; i < 8; ++i )
     buildings[v8].grow_value_house_foodstocks[i] = LOWORD(v12[i]);
@@ -45684,7 +44682,7 @@ void  fun_devolveHouse3x3To2x2(int a1)
   buildings[a1].type = B_HouseMediumVilla;
   buildings[a1].level_resourceId = buildings[a1].type - 10;
   building_03_size[128 * a1] = 2;
-  buildings[a1].houseSize = 2;
+  buildings[a1].house_size = 2;
   building_04_house_isMerged[128 * a1] = 0;
   buildings[a1].house_population = v10 + v11;
   for ( i = 0; i < 8; ++i )
@@ -45772,19 +44770,7 @@ void  fun_devolveHouse3x3To2x2(int a1)
     (grid_random[building_08_gridOffset[64 * v5]] & 1) + v13,
     8);
 }
-// 5F5E28: using guessed type int dword_5F5E28;
-// 5F5E54: using guessed type int dword_5F5E54[];
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
-// 46CDA0: using guessed type int var_34[8];
-// 46CDA0: using guessed type int var_54[8];
 
-//----- (0046D540) --------------------------------------------------------
 void  fun_devolveHouse4x4To3x3(int a1)
 {
   __int64 v1; // qax@3
@@ -45818,7 +44804,7 @@ void  fun_devolveHouse4x4To3x3(int a1)
   buildings[a1].type = B_HouseMediumPalace;
   buildings[a1].level_resourceId = buildings[a1].type - 10;
   building_03_size[128 * a1] = 3;
-  buildings[a1].houseSize = 3;
+  buildings[a1].house_size = 3;
   building_04_house_isMerged[128 * a1] = 0;
   buildings[a1].house_population = v13 + v14;
   for ( i = 0; i < 8; ++i )
@@ -45932,20 +44918,8 @@ void  fun_devolveHouse4x4To3x3(int a1)
     (grid_random[building_08_gridOffset[64 * v8]] & 1) + graphicId[0],
     8);
 }
-// 5F5E28: using guessed type int dword_5F5E28;
-// 5F5E54: using guessed type int dword_5F5E54[];
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
-// 46D540: using guessed type int var_34[8];
-// 46D540: using guessed type int var_54[8];
 
-//----- (0046DEC0) --------------------------------------------------------
-void  fun_evolveHouseTo(int buildingId, __int16 type)
+void  fun_evolveHouseTo(int buildingId, BuildingType type)
 {
   int v2; // [sp+4Ch] [bp-8h]@1
   int v3; // [sp+50h] [bp-4h]@2
@@ -45975,13 +44949,7 @@ void  fun_evolveHouseTo(int buildingId, __int16 type)
     v3,
     8);
 }
-// 5F5E54: using guessed type int dword_5F5E54[];
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
 
-//----- (0046E080) --------------------------------------------------------
 void  fun_revertHouseToVacantLot(int buildingId)
 {
   int v1; // ST70_4@3
@@ -45999,7 +44967,7 @@ void  fun_revertHouseToVacantLot(int buildingId)
     sub_480FC0(buildingId, buildings[buildingId].x, building__07_y[128 * buildingId]);
     building_04_house_isMerged[128 * buildingId] = 0;
     building_03_size[128 * buildingId] = 1;
-    buildings[buildingId].houseSize = 1;
+    buildings[buildingId].house_size = 1;
     fun_putBuildingOnTerrainAndGraphicGrids(
       buildingId,
       buildings[buildingId].x,
@@ -46028,15 +44996,7 @@ void  fun_revertHouseToVacantLot(int buildingId)
     grid_graphicIds[building_08_gridOffset[64 * buildingId]] = graphic_housing_vacant;
   }
 }
-// 6E6BF8: using guessed type __int16 graphic_housing_vacant;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
 
-//----- (0046E3D0) --------------------------------------------------------
 void  sub_46E3D0(int buildingId, char a2)
 {
   __int16 v2; // cx@21
@@ -46057,13 +45017,13 @@ void  sub_46E3D0(int buildingId, char a2)
   dword_8E1484 = 0;
   building_40_fireRisk[64 * buildingId] = 0;
   building_3e_damageRisk[64 * buildingId] = 0;
-  if ( buildings[buildingId].houseSize )
+  if ( buildings[buildingId].house_size )
   {
     if ( buildings[buildingId].house_population )
       sub_4E3800(ciid, buildings[buildingId].house_population);
   }
   buildings[buildingId].house_population = 0;
-  buildings[buildingId].houseSize = 0;
+  buildings[buildingId].house_size = 0;
   building_3b_industry_outputGood[128 * buildingId] = 0;
   building_1a_word_94BD5A[64 * buildingId] = 0;
   fun_deleteBuildingEvent(buildingId);
@@ -46071,7 +45031,7 @@ void  sub_46E3D0(int buildingId, char a2)
     || buildings[buildingId].type == B_Wharf
     || buildings[buildingId].type == B_Shipyard )
     watersideBuilding = 1;
-  v7 = buildings[buildingId].houseSize && buildings[buildingId].level_resourceId <= 1;
+  v7 = buildings[buildingId].house_size && buildings[buildingId].level_resourceId <= 1;
   switch ( building_03_size[128 * buildingId] )
   {
     case 2:
@@ -46147,7 +45107,7 @@ void  sub_46E3D0(int buildingId, char a2)
     v3 = grid_terrain[162 * v11 + v12 + setting_map_startGridOffset];
     if ( !(v3 & 4) )
     {
-      v10 = fun_createBuilding(ciid, 99, v12, v11);
+      v10 = fun_createBuilding(ciid, B_BurningRuin, v12, v11);
       v9 = grid_random[building_08_gridOffset[64 * v10]] & 3;
       if ( v7 )
       {
@@ -46184,22 +45144,7 @@ void  sub_46E3D0(int buildingId, char a2)
   if ( watersideBuilding == 1 )
     sub_5001A0();
 }
-// 5F3580: using guessed type int dword_5F3580[];
-// 6E6C9E: using guessed type __int16 word_6E6C9E;
-// 6E6CA0: using guessed type __int16 word_6E6CA0;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD5A: using guessed type __int16 building_1a_word_94BD5A[];
-// 94BD68: using guessed type __int16 building_28_towerBallistaId[];
-// 94BD7E: using guessed type __int16 building_3e_damageRisk[];
-// 94BD80: using guessed type __int16 building_40_fireRisk[];
-// 94BD82: using guessed type __int16 building_42_word_94BD82[];
-// 94BDB4: using guessed type int building_74_house_taxIncomeThisYear_senateForum_treasureStore[];
 
-//----- (0046E9E0) --------------------------------------------------------
 void  sub_46E9E0()
 {
   __int16 v0; // dx@6
@@ -46211,7 +45156,7 @@ void  sub_46E9E0()
   signed int j; // [sp+5Ch] [bp-18h]@48
   signed int v7; // [sp+60h] [bp-14h]@21
   int v8; // [sp+60h] [bp-14h]@57
-  int buildingType; // [sp+64h] [bp-10h]@13
+  BuildingType buildingType; // [sp+64h] [bp-10h]@13
   int v10; // [sp+68h] [bp-Ch]@1
   int v11; // [sp+6Ch] [bp-8h]@1
   int v12; // [sp+70h] [bp-4h]@3
@@ -46619,35 +45564,20 @@ void  sub_46F260()
     }
   }
 }
-// 4011EA: using guessed type _DWORD  sub_4011EA(__int16, _DWORD, _DWORD, __int16);
-// 4016E5: using guessed type _DWORD  sub_4016E5(__int16, _DWORD, _DWORD, __int16);
-// 403422: using guessed type _DWORD  sub_403422(_DWORD, _DWORD, _DWORD);
-// 6E6BD2: using guessed type __int16 graphic_tower;
-// 6E6C4A: using guessed type __int16 word_6E6C4A;
-// 6E6C4C: using guessed type __int16 word_6E6C4C;
-// 6E6C4E: using guessed type __int16 word_6E6C4E;
-// 6E6D00: using guessed type __int16 word_6E6D00;
-// 6E6D02: using guessed type __int16 word_6E6D02;
-// 6E6D04: using guessed type __int16 word_6E6D04;
-// 6E6D4A: using guessed type __int16 word_6E6D4A;
-// 6E6D5A: using guessed type __int16 word_6E6D5A;
-// 6E6D5C: using guessed type __int16 word_6E6D5C;
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
 
-//----- (0046FC00) --------------------------------------------------------
 void  fun_updateRatings(int yearlyUpdate)
 {
   fun_updateCultureRating();
   fun_updateFavorRating(yearlyUpdate);
   fun_calculateMaxProsperity();
+
   if ( yearlyUpdate )
     fun_updateProsperityRating();
+
   if ( yearlyUpdate )
     fun_updatePeaceRating();
 }
 
-//----- (0046FC50) --------------------------------------------------------
 void  fun_updateCultureRating()
 {
   city_inform[ciid].cultureRating = 0;
@@ -46695,6 +45625,7 @@ void  fun_updateCultureRating()
       city_inform[ciid].cultureRating += 25;
       city_inform[ciid].culture_theater = 25;
     }
+
     if ( city_inform[ciid].pctReligionCoverage < 100 )
     {
       if ( city_inform[ciid].pctReligionCoverage <= 85 )
@@ -46736,6 +45667,7 @@ void  fun_updateCultureRating()
       city_inform[ciid].cultureRating += 30;
       city_inform[ciid].culture_religion = 30;
     }
+
     if ( pctSchoolCoverage < 100 )
     {
       if ( pctSchoolCoverage <= 85 )
@@ -46777,6 +45709,7 @@ void  fun_updateCultureRating()
       city_inform[ciid].cultureRating += 15;
       city_inform[ciid].culture_school = 15;
     }
+
     if ( pctAcademyCoverage < 100 )
     {
       if ( pctAcademyCoverage <= 85 )
@@ -46818,6 +45751,7 @@ void  fun_updateCultureRating()
       city_inform[ciid].cultureRating += 10;
       city_inform[ciid].culture_academy = 10;
     }
+
     if ( pctLibraryCoverage < 100 )
     {
       if ( pctLibraryCoverage <= 85 )
@@ -46898,14 +45832,7 @@ void  fun_setCultureRatingExplanation()
     reason = 2;
   city_inform[ciid].cultureRatingExplanation = reason + 1;
 }
-// 65435C: using guessed type int cityinfo_cultureRatingExplanation[];
-// 654448: using guessed type int cityinfo_pctReligionCoverage[];
-// 949EE8: using guessed type int pctAcademyCoverage;
-// 94BD08: using guessed type int pctTheaterCoverage;
-// 94BD18: using guessed type int pctLibraryCoverage;
-// 98BF58: using guessed type int pctSchoolCoverage;
 
-//----- (004707F0) --------------------------------------------------------
 void  fun_updateProsperityRating()
 {
   int poor; // ST60_4@14
@@ -46924,14 +45851,17 @@ void  fun_updateProsperityRating()
   {
     labor = 1;                                  // +1 Less than 5% unemployment
   }
+
   if ( city_inform[ciid].finance_construction_lastyear + city_inform[ciid].treasury <= city_inform[ciid].treasury_lastyear_prosperity )
     increase = labor - 1;                       // -1 Losing money
   else
     increase = labor + 5;                       // +5 Making a profit
+
   city_inform[ciid].treasury_lastyear_prosperity = city_inform[ciid].treasury;
   if ( city_inform[ciid].foodTypesEaten >= 2 )// == grand insula or better
     ++increase;                                 // +1 There is at least one Grand Insula or better
   avgWage = city_inform[ciid].wageTotal_lastyear / 12;
+
   if ( avgWage <= city_inform[ciid].wagesRome + 1 )
   {
     if ( avgWage < city_inform[ciid].wagesRome )
@@ -46941,14 +45871,19 @@ void  fun_updateProsperityRating()
   {
     ++increase;                                 // You pay at least 2 Dn more than Rome's wage
   }
+
   poor = getPercentage(city_inform[ciid].peopleInTentsAndShacks, city_inform[ciid].population);
   rich = getPercentage(city_inform[ciid].peopleInVillasAndPalaces, city_inform[ciid].population);
+
   if ( poor > 30 )
     --increase;
+
   if ( rich > 10 )
     ++increase;                                 // +1 10% or more of your population lives in villas
+
   if ( city_inform[ciid].tributeNotPaid )
     --increase;
+
   if ( city_inform[ciid].hippodromeShows > 0 )
     ++increase;                                 // +1 Active Hippodrome
   city_inform[ciid].prosperityRating += increase;
@@ -47087,7 +46022,7 @@ void  fun_calculateMaxProsperity()
   {
     if ( buildings[i].inUse )
     {
-      if ( buildings[i].houseSize )
+      if ( buildings[i].house_size )
       {
         v1 += model_houses[buildings[i].level_resourceId].prosperity;
         ++v0;
@@ -47222,6 +46157,7 @@ void  fun_updateFavorRating(int isYearlyUpdate)
     ++city_inform[ciid].favor_monthsSinceGift;
     if ( city_inform[ciid].favor_monthsSinceGift >= 12 )
       city_inform[ciid].favor_giftPenalty = 0;
+
     if ( isYearlyUpdate )
     {
       city_inform[ciid].salaryDifferenceForFavor = 0;
@@ -47616,10 +46552,7 @@ void  fun_initNewScenarioMap()
   fun_initRandomGrid();
   fun_initGraphicIdGrid();
 }
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
 
-//----- (00472950) --------------------------------------------------------
 void  fun_initTerrainGridEdge()
 {
   int v0; // [sp+4Ch] [bp-Ch]@1
@@ -47645,10 +46578,7 @@ void  fun_initTerrainGridEdge()
     }
   }
 }
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
 
-//----- (00472A90) --------------------------------------------------------
 void  fun_initRandomGrid()
 {
   int v0; // [sp+4Ch] [bp-Ch]@1
@@ -47668,9 +46598,7 @@ void  fun_initRandomGrid()
     }
   }
 }
-// 6DEC40: using guessed type int random_7fff_1;
 
-//----- (00472B20) --------------------------------------------------------
 void  fun_initMapEdges()
 {
   int gridOffset; // [sp+4Ch] [bp-Ch]@1
@@ -47723,13 +46651,7 @@ void  fun_initMapEdges()
     gridOffset = gridOffset + setting_map_gridBorderSize - 1;
   }
 }
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (00472C90) --------------------------------------------------------
 void  sub_472C90(int a1, int a2, int x, int y, int buildingType)
 {
   int v5; // [sp+4Ch] [bp-Ch]@1
@@ -47900,7 +46822,7 @@ void  sub_472C90(int a1, int a2, int x, int y, int buildingType)
   }
 }
 
-void  fun_placeBuilding(int ciid_, int orientation, signed int xMin, signed int yMin, signed int xPos, signed int yPos, int buildingId)
+void  fun_placeBuilding(int ciid_, int orientation, signed int xMin, signed int yMin, signed int xPos, signed int yPos, BuildingType buildingId)
 {
   signed int v7; // ST88_4@53
   signed int v8; // ST88_4@55
@@ -48073,7 +46995,7 @@ LABEL_390:
     v32 = xMin + setting_map_startGridOffset + 162 * (yMin - 1) - 1;
     if ( dword_89AA84 == 1 )
     {
-      v7 = fun_createBuilding(ciid_, 90, xMin - 1, yMin - 1);
+      v7 = fun_createBuilding(ciid_, B_Reservoir, xMin - 1, yMin - 1);
       sub_490DE0(v7);
       fun_putBuildingOnTerrainAndGraphicGrids(v7, xMin - 1, yMin - 1, 3, 3, graphic_reservoir, 8);
       grid_aqueducts[v32] = 0;
@@ -48081,7 +47003,7 @@ LABEL_390:
     v33 = xPos + setting_map_startGridOffset + 162 * (yPos - 1) - 1;
     if ( dword_8E147C == 1 )
     {
-      v8 = fun_createBuilding(ciid_, 90, xPos - 1, yPos - 1);
+      v8 = fun_createBuilding(ciid_, B_Reservoir, xPos - 1, yPos - 1);
       sub_490DE0(v8);
       fun_putBuildingOnTerrainAndGraphicGrids(v8, xPos - 1, yPos - 1, 3, 3, graphic_reservoir, 8);
       grid_aqueducts[v33] = 0;
@@ -48260,7 +47182,7 @@ LABEL_390:
   }
   if ( buildingId == B_Hippodrome )
   {
-    if ( city_inform[ciid].dword_65429C )
+    if ( city_inform[ciid].hippodromeBuiltInCity )
     {
       fun_showWarning(4);
       return;
@@ -48582,7 +47504,7 @@ LABEL_390:
         sub_478310(0, 0, setting_map_width - 1, setting_map_height - 1, 1);
         ++city_inform[ciid].placedTriumphalArches;
         fun_enableBuildingMenuItems();
-        toPlace_buildingType = 0;
+        toPlace_buildingType = B_none_building;
         break;
       default:
         if ( buildingId != B_FortLegionaries && buildingId != B_FortJavelin && buildingId != B_FortMounted )
@@ -48611,7 +47533,7 @@ LABEL_390:
               }
               break;
             case B_Hippodrome:
-              city_inform[ciid].dword_65429C = 1;
+              city_inform[ciid].hippodromeBuiltInCity = 1;
               if ( setting_map_orientation && setting_map_orientation != 4 )
                 buildings[v37].level_resourceId = 3;
               else
@@ -48638,7 +47560,7 @@ LABEL_390:
                 _LOWORD(v30) = word_6E6D5C;
               }
               fun_putBuildingOnTerrainAndGraphicGrids(v37, xPos, yPos, width, width, v30, 8);
-              v38 = fun_createBuilding(ciid_, 32, xPos + 5, yPos);
+              v38 = fun_createBuilding(ciid_, B_Hippodrome, xPos + 5, yPos);
               sub_490DE0(v38);
               if ( setting_map_orientation && setting_map_orientation != 4 )
                 buildings[v38].level_resourceId = 4;
@@ -48668,7 +47590,7 @@ LABEL_390:
                 v30 = word_6E6D5C + 2;
               }
               fun_putBuildingOnTerrainAndGraphicGrids(v38, xPos + 5, yPos, width, width, v30, 8);
-              v39 = fun_createBuilding(ciid_, 32, xPos + 10, yPos);
+              v39 = fun_createBuilding(ciid_, B_Hippodrome, xPos + 10, yPos);
               sub_490DE0(v39);
               if ( setting_map_orientation && setting_map_orientation != 4 )
                 buildings[v39].level_resourceId = 5;
@@ -48703,7 +47625,7 @@ LABEL_390:
               building_30_warehouse_prevStorage[64 * v37] = 0;
               v10 = v37;
               fun_putBuildingOnTerrainAndGraphicGrids(v37, xPos, yPos, width, width, word_6E6C54, 8);
-              v11 = fun_createBuilding(ciid_, 73, xPos + 1, yPos);
+              v11 = fun_createBuilding(ciid_, B_WarehouseSpace, xPos + 1, yPos);
               sub_490DE0(v11);
               building_30_warehouse_prevStorage[64 * v11] = v10;
               building_32_warehouse_nextStorage[64 * v10] = v11;
@@ -48716,7 +47638,7 @@ LABEL_390:
                 width,
                 graphic_emptyWarehouseTile,
                 8);
-              v13 = fun_createBuilding(ciid_, 73, xPos + 2, yPos);
+              v13 = fun_createBuilding(ciid_, B_WarehouseSpace, xPos + 2, yPos);
               sub_490DE0(v13);
               building_30_warehouse_prevStorage[64 * v13] = v12;
               building_32_warehouse_nextStorage[64 * v12] = v13;
@@ -48729,7 +47651,7 @@ LABEL_390:
                 width,
                 graphic_emptyWarehouseTile,
                 8);
-              v15 = fun_createBuilding(ciid_, 73, xPos, yPos + 1);
+              v15 = fun_createBuilding(ciid_, B_WarehouseSpace, xPos, yPos + 1);
               sub_490DE0(v15);
               building_30_warehouse_prevStorage[64 * v15] = v14;
               building_32_warehouse_nextStorage[64 * v14] = v15;
@@ -48742,7 +47664,7 @@ LABEL_390:
                 width,
                 graphic_emptyWarehouseTile,
                 8);
-              v17 = fun_createBuilding(ciid_, 73, xPos + 1, yPos + 1);
+              v17 = fun_createBuilding(ciid_, B_WarehouseSpace, xPos + 1, yPos + 1);
               sub_490DE0(v17);
               building_30_warehouse_prevStorage[64 * v17] = v16;
               building_32_warehouse_nextStorage[64 * v16] = v17;
@@ -48755,7 +47677,7 @@ LABEL_390:
                 width,
                 graphic_emptyWarehouseTile,
                 8);
-              v19 = fun_createBuilding(ciid_, 73, xPos + 2, yPos + 1);
+              v19 = fun_createBuilding(ciid_, B_WarehouseSpace, xPos + 2, yPos + 1);
               sub_490DE0(v19);
               building_30_warehouse_prevStorage[64 * v19] = v18;
               building_32_warehouse_nextStorage[64 * v18] = v19;
@@ -48768,7 +47690,7 @@ LABEL_390:
                 width,
                 graphic_emptyWarehouseTile,
                 8);
-              v21 = fun_createBuilding(ciid_, 73, xPos, yPos + 2);
+              v21 = fun_createBuilding(ciid_, B_WarehouseSpace, xPos, yPos + 2);
               sub_490DE0(v21);
               building_30_warehouse_prevStorage[64 * v21] = v20;
               building_32_warehouse_nextStorage[64 * v20] = v21;
@@ -48781,7 +47703,7 @@ LABEL_390:
                 width,
                 graphic_emptyWarehouseTile,
                 8);
-              v23 = fun_createBuilding(ciid_, 73, xPos + 1, yPos + 2);
+              v23 = fun_createBuilding(ciid_, B_WarehouseSpace, xPos + 1, yPos + 2);
               sub_490DE0(v23);
               building_30_warehouse_prevStorage[64 * v23] = v22;
               building_32_warehouse_nextStorage[64 * v22] = v23;
@@ -48794,7 +47716,7 @@ LABEL_390:
                 width,
                 graphic_emptyWarehouseTile,
                 8);
-              v25 = fun_createBuilding(ciid_, 73, xPos + 2, yPos + 2);
+              v25 = fun_createBuilding(ciid_, B_WarehouseSpace, xPos + 2, yPos + 2);
               sub_490DE0(v25);
               building_30_warehouse_prevStorage[64 * v25] = v24;
               building_32_warehouse_nextStorage[64 * v24] = v25;
@@ -48939,7 +47861,7 @@ void  sub_476BA0(int a1, int a2, int a3, int a4, int a5)
         }
         else
         {
-          v6 = fun_createBuilding(ciid, 10, dword_909544, dword_909548);
+          v6 = fun_createBuilding(ciid, B_HouseVacantLot, dword_909544, dword_909548);
           sub_490DE0(v6);
           if ( v6 > 0 )
           {
@@ -48966,17 +47888,7 @@ void  sub_476BA0(int a1, int a2, int a3, int a4, int a5)
     window_redrawRequest = 1;
   }
 }
-// 4023BF: using guessed type _DWORD  sub_4023BF(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 403201: using guessed type _DWORD  sub_403201(_DWORD);
-// 660C5C: using guessed type char window_redrawRequest;
-// 6E6BF8: using guessed type __int16 graphic_housing_vacant;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B45F0: using guessed type int multipleConstruction_itemsPlaced;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (00476EB0) --------------------------------------------------------
 void  sub_476EB0(int a1, int a2, int a3, int x, int y)
 {
   __int16 terrain; // cx@21
@@ -49068,18 +47980,7 @@ void  sub_476EB0(int a1, int a2, int a3, int x, int y)
     }
   }
 }
-// 401BFE: using guessed type int fun_confirmdialog_deleteBridge();
-// 4033AA: using guessed type int fun_confirmdialog_deleteFort();
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 89AA90: using guessed type int deleteFort_confirmed;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8DADC8: using guessed type int deleteBridge_confirmed;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (004771D0) --------------------------------------------------------
 void  sub_4771D0(int a2, int a3, int a4, int a5, int a6)
 {
   __int16 v5; // [sp+50h] [bp-2Ch]@20
@@ -49166,7 +48067,7 @@ void  sub_4771D0(int a2, int a3, int a4, int a5, int a6)
                               dword_8E1484 = 0;
                           }
                         }
-                        if ( buildings[v10].houseSize )
+                        if ( buildings[v10].house_size )
                         {
                           if ( buildings[v10].house_population )
                           {
@@ -49288,28 +48189,7 @@ void  sub_4771D0(int a2, int a3, int a4, int a5, int a6)
     window_redrawRequest = 1;
   }
 }
-// 4012FD: using guessed type _DWORD  sub_4012FD(_DWORD, _DWORD, _DWORD, _DWORD);
-// 4015AF: using guessed type _DWORD  sub_4015AF(_DWORD, _DWORD);
-// 4018ED: using guessed type _DWORD  sub_4018ED(_DWORD);
-// 4019CE: using guessed type _DWORD  sub_4019CE(_DWORD, _DWORD, _DWORD, _DWORD);
-// 40280B: using guessed type _DWORD  sub_40280B(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402905: using guessed type _DWORD  sub_402905(_DWORD, _DWORD, _DWORD);
-// 403201: using guessed type _DWORD  sub_403201(_DWORD);
-// 660C5C: using guessed type char window_redrawRequest;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 89AA90: using guessed type int deleteFort_confirmed;
-// 8B45F0: using guessed type int multipleConstruction_itemsPlaced;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8DADC8: using guessed type int deleteBridge_confirmed;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD70: using guessed type __int16 building_30_warehouse_prevStorage[];
-// 94BD72: using guessed type __int16 building_32_warehouse_nextStorage[];
 
-//----- (004779D0) --------------------------------------------------------
 void  sub_4779D0(int a1, int a2, int a3, int a4, int a5)
 {
   __int16 v5; // ax@1
@@ -49357,12 +48237,6 @@ void  sub_4779D0(int a1, int a2, int a3, int a4, int a5)
   }
 }
 
-// 402324: using guessed type _DWORD  sub_402324(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 660C5C: using guessed type char window_redrawRequest;
-// 8B45F0: using guessed type int multipleConstruction_itemsPlaced;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-
-//----- (00477B90) --------------------------------------------------------
 void  fun_buildConstructWall(int a1, int a2, int a3, int a4, int a5)
 {
   __int16 v5; // ax@1
@@ -49426,13 +48300,7 @@ void  fun_buildConstructWall(int a1, int a2, int a3, int a4, int a5)
     }
   }
 }
-// 401343: using guessed type _DWORD  sub_401343(_DWORD, _DWORD, _DWORD);
-// 402324: using guessed type _DWORD  sub_402324(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 660C5C: using guessed type char window_redrawRequest;
-// 8B45F0: using guessed type int multipleConstruction_itemsPlaced;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (00477DD0) --------------------------------------------------------
 int  sub_477DD0(int a1, int a2, int a3, int a4, int a5)
 {
   int v5; // ST6C_4@2
@@ -49508,15 +48376,7 @@ int  sub_477DD0(int a1, int a2, int a3, int a4, int a5)
   }
   return sub_478310(0, 0, setting_map_width - 1, setting_map_height - 1, 1);
 }
-// 40280B: using guessed type _DWORD  sub_40280B(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 8B45F0: using guessed type int multipleConstruction_itemsPlaced;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (004780E0) --------------------------------------------------------
 bool  sub_4780E0(int a1)
 {
   __int16 v1; // cx@1
@@ -49572,14 +48432,7 @@ bool  sub_4780E0(int a1)
     --v11;
   return v11 == 3;
 }
-// 8B4622: using guessed type __int16 word_8B4622[];
-// 8B4764: using guessed type __int16 word_8B4764[];
-// 8B4766: using guessed type __int16 word_8B4766[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 9096A6: using guessed type __int16 grid_terrain_xPlusOne_yPlusOne[];
 
-//----- (00478310) --------------------------------------------------------
 int  sub_478310(int a1, int a2, int a3, int a4, int a5)
 {
   int v5; // ST7C_4@2
@@ -49723,15 +48576,7 @@ int  sub_478310(int a1, int a2, int a3, int a4, int a5)
   }
   return result;
 }
-// 401F73: using guessed type _DWORD  sub_401F73(_DWORD);
-// 6E6C24: using guessed type __int16 word_6E6C24;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (004787A0) --------------------------------------------------------
 void  sub_4787A0(int a1, int a2, int a3, int a4, int a5)
 {
   int v5; // ST68_4@2
@@ -49791,13 +48636,7 @@ void  sub_4787A0(int a1, int a2, int a3, int a4, int a5)
   }
   sub_479240();
 }
-// 8B45F0: using guessed type int multipleConstruction_itemsPlaced;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (004789E0) --------------------------------------------------------
 int  sub_4789E0(int a1)
 {
   int v2; // [sp+4Ch] [bp-8h]@1
@@ -49814,9 +48653,7 @@ int  sub_4789E0(int a1)
   }
   return 0;
 }
-// 94BD70: using guessed type __int16 building_30_warehouse_prevStorage[];
 
-//----- (00478A50) --------------------------------------------------------
 void  fun_initGraphicIdGrid()
 {
   int v0; // [sp+4Ch] [bp-Ch]@1
@@ -49838,14 +48675,7 @@ void  fun_initGraphicIdGrid()
     v0 += setting_map_gridBorderSize;
   }
 }
-// 6E6BB6: using guessed type __int16 graphic_terrain_uglygrass;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (00478B80) --------------------------------------------------------
 int  sub_478B80(int a1, int a2, int a3, int a4)
 {
   int result; // eax@10
@@ -49888,13 +48718,7 @@ int  sub_478B80(int a1, int a2, int a3, int a4)
   }
   return result;
 }
-// 4021DA: using guessed type _DWORD  sub_4021DA(_DWORD, _DWORD, _DWORD);
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (00478CE0) --------------------------------------------------------
 void  sub_478CE0(int xStart, int yStart, int xEnd, int yEnd)
 {
   __int16 terrain; // ax@14
@@ -49934,12 +48758,7 @@ void  sub_478CE0(int xStart, int yStart, int xEnd, int yEnd)
     gridOffset += setting_map_gridBorderSize + xSkip;
   }
 }
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (00478E40) --------------------------------------------------------
 int  sub_478E40()
 {
   int result; // eax@2
@@ -50037,17 +48856,7 @@ int  sub_478E40()
   }
   return result;
 }
-// 4023BF: using guessed type _DWORD  sub_4023BF(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402CCF: using guessed type _DWORD  sub_402CCF(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 6E6BC0: using guessed type __int16 graphic_terrain_rock;
-// 6E6D8E: using guessed type __int16 word_6E6D8E;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (00479240) --------------------------------------------------------
 void  sub_479240()
 {
   __int16 v0; // dx@6
@@ -50169,15 +48978,7 @@ void  sub_479240()
     v5 += setting_map_gridBorderSize;
   }
 }
-// 402CCF: using guessed type _DWORD  sub_402CCF(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 6E6C26: using guessed type __int16 word_6E6C26;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (00479600) --------------------------------------------------------
 int  sub_479600()
 {
   int result; // eax@1
@@ -50216,14 +49017,7 @@ int  sub_479600()
   }
   return result;
 }
-// 6E6C26: using guessed type __int16 word_6E6C26;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (00479720) --------------------------------------------------------
 void  sub_479720(int x, int y, int width, int height)
 {
   signed int v4; // [sp+4Ch] [bp-18h]@44
@@ -50334,17 +49128,7 @@ void  sub_479720(int x, int y, int width, int height)
     v7 += setting_map_gridBorderSize + v8;
   }
 }
-// 402ED7: using guessed type _DWORD  sub_402ED7(__int16, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD, __int16);
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
-// 6E6BBE: using guessed type __int16 graphic_terrain_grass2;
-// 6E6BC4: using guessed type __int16 graphic_terrain_grass1;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (00479C80) --------------------------------------------------------
 void  sub_479C80(int a1, int a2, int a3, int a4)
 {
   __int16 v4; // ax@14
@@ -50382,13 +49166,7 @@ void  sub_479C80(int a1, int a2, int a3, int a4)
     v5 += setting_map_gridBorderSize + v6;
   }
 }
-// 401C7B: using guessed type _DWORD  sub_401C7B(_DWORD, _DWORD, _DWORD);
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (00479DE0) --------------------------------------------------------
 void  sub_479DE0(int a1, int a2, int a3, int a4)
 {
   __int16 v4; // ax@14
@@ -50426,12 +49204,7 @@ void  sub_479DE0(int a1, int a2, int a3, int a4)
     v5 += setting_map_gridBorderSize + v6;
   }
 }
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (00479F40) --------------------------------------------------------
 int  sub_479F40(int a1, int a2, int a3, int a4)
 {
   int result; // eax@10
@@ -50493,13 +49266,7 @@ int  sub_479F40(int a1, int a2, int a3, int a4)
   }
   return result;
 }
-// 40254A: using guessed type _DWORD  sub_40254A(_DWORD, _DWORD, _DWORD);
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (0047A140) --------------------------------------------------------
 int  sub_47A140(int a1, int a2, int a3, int a4)
 {
   int result; // eax@10
@@ -50558,13 +49325,7 @@ int  sub_47A140(int a1, int a2, int a3, int a4)
   }
   return result;
 }
-// 40110E: using guessed type _DWORD  sub_40110E(_DWORD, _DWORD);
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (0047A320) --------------------------------------------------------
 int  sub_47A320(int a1, int a2)
 {
   int result; // eax@1
@@ -50614,12 +49375,7 @@ int  sub_47A320(int a1, int a2)
   }
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E1470: using guessed type int dword_8E1470;
-// 8EFAE4: using guessed type int dword_8EFAE4;
 
-//----- (0047A4C0) --------------------------------------------------------
 void  sub_47A4C0(int a1, int a2)
 {
   __int16 v2; // ax@1
@@ -50667,12 +49423,7 @@ void  sub_47A4C0(int a1, int a2)
     dword_8E1470 = 1;
   }
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E1470: using guessed type int dword_8E1470;
-// 8EFAE4: using guessed type int dword_8EFAE4;
 
-//----- (0047A660) --------------------------------------------------------
 int  sub_47A660(int a1, int a2)
 {
   int result; // eax@1
@@ -50724,12 +49475,7 @@ int  sub_47A660(int a1, int a2)
   }
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E1470: using guessed type int dword_8E1470;
-// 8EFAE4: using guessed type int dword_8EFAE4;
 
-//----- (0047A800) --------------------------------------------------------
 int  sub_47A800(int a1, int a2)
 {
   int result; // eax@1
@@ -50781,12 +49527,7 @@ int  sub_47A800(int a1, int a2)
   }
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E1470: using guessed type int dword_8E1470;
-// 8EFAE4: using guessed type int dword_8EFAE4;
 
-//----- (0047A9A0) --------------------------------------------------------
 int  sub_47A9A0(int a1, int a2)
 {
   int result; // eax@1
@@ -50838,12 +49579,7 @@ int  sub_47A9A0(int a1, int a2)
   }
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E1470: using guessed type int dword_8E1470;
-// 8EFAE4: using guessed type int dword_8EFAE4;
 
-//----- (0047AB40) --------------------------------------------------------
 int  sub_47AB40(int a1, int a2)
 {
   int result; // eax@1
@@ -50898,12 +49634,7 @@ int  sub_47AB40(int a1, int a2)
   }
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E1470: using guessed type int dword_8E1470;
-// 8EFAE4: using guessed type int dword_8EFAE4;
 
-//----- (0047AD00) --------------------------------------------------------
 int  unused_47AD00(int a1, int a2)
 {
   int result; // eax@1
@@ -50916,11 +49647,7 @@ int  unused_47AD00(int a1, int a2)
     dword_8EFAE4 = 1;
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8EFAE4: using guessed type int dword_8EFAE4;
 
-//----- (0047AD60) --------------------------------------------------------
 int  sub_47AD60(int a1, int a2)
 {
   int result; // eax@1
@@ -50972,12 +49699,7 @@ int  sub_47AD60(int a1, int a2)
   }
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E1470: using guessed type int dword_8E1470;
-// 8EFAE4: using guessed type int dword_8EFAE4;
 
-//----- (0047AF00) --------------------------------------------------------
 void  fun_placeEditorBuilding(int x, int y)
 {
   int v2; // ecx@96
@@ -51224,45 +49946,7 @@ void  fun_placeEditorBuilding(int x, int y)
       break;
   }
 }
-// 401005: using guessed type _DWORD  sub_401005(_DWORD, _DWORD);
-// 401131: using guessed type _DWORD  sub_401131(_DWORD, _DWORD, _DWORD, _DWORD);
-// 4011E5: using guessed type _DWORD  sub_4011E5(_DWORD, _DWORD);
-// 4012C6: using guessed type _DWORD  sub_4012C6(_DWORD, _DWORD, _DWORD, _DWORD);
-// 401325: using guessed type _DWORD  sub_401325(_DWORD, _DWORD);
-// 4017BC: using guessed type _DWORD  sub_4017BC(_DWORD, _DWORD, _DWORD, _DWORD);
-// 401A0F: using guessed type _DWORD  sub_401A0F(_DWORD, _DWORD);
-// 401A37: using guessed type _DWORD  sub_401A37(_DWORD, _DWORD);
-// 401A41: using guessed type _DWORD  sub_401A41(_DWORD, _DWORD, _DWORD, _DWORD);
-// 401B9F: using guessed type _DWORD  sub_401B9F(_DWORD, _DWORD);
-// 401BD1: using guessed type _DWORD  sub_401BD1(_DWORD, _DWORD);
-// 402270: using guessed type _DWORD  sub_402270(_DWORD, _DWORD, _DWORD, _DWORD);
-// 40252C: using guessed type _DWORD  sub_40252C(_DWORD, _DWORD);
-// 402BF8: using guessed type _DWORD  sub_402BF8(_DWORD, _DWORD, _DWORD, _DWORD);
-// 402E78: using guessed type _DWORD  sub_402E78(_DWORD);
-// 402F7C: using guessed type _DWORD  sub_402F7C(_DWORD, _DWORD);
-// 402FC2: using guessed type _DWORD  sub_402FC2(_DWORD, _DWORD, _DWORD, _DWORD);
-// 5F3100: using guessed type int dword_5F3100[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 990A16: using guessed type __int16 map_playerRank[];
-// 990C78: using guessed type __int16 map_earthquake_x;
-// 990C7A: using guessed type __int16 map_earthquake_y;
-// 990C7C: using guessed type __int16 map_entry_x[];
-// 990C7E: using guessed type __int16 map_entry_y;
-// 990C80: using guessed type __int16 map_exit_x;
-// 990C82: using guessed type __int16 map_exit_y[];
-// 990CA4: using guessed type __int16 map_riverEntry_x;
-// 990CA6: using guessed type __int16 map_riverEntry_y;
-// 990CA8: using guessed type __int16 map_riverExit_x;
-// 990CAA: using guessed type __int16 map_riverExit_y;
-// 9DA810: using guessed type int dword_9DA810;
-// 9DA81C: using guessed type int toPlace_invasionPointId;
-// 9DA910: using guessed type int dword_9DA910;
 
-//----- (0047B8D0) --------------------------------------------------------
 void  sub_47B8D0(int xStart, int yStart, int xEnd, int yEnd)
 {
   fun_setByte14Zero(byte_5F2250, 48);
@@ -51392,11 +50076,7 @@ int  sub_47BD60(int a1, int a2)
   }
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8EFAE8: using guessed type int dword_8EFAE8;
 
-//----- (0047BEF0) --------------------------------------------------------
 char  sub_47BEF0(int a1, int a2)
 {
   __int16 v2; // dx@2
@@ -51442,11 +50122,7 @@ char  sub_47BEF0(int a1, int a2)
   }
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8EFAE8: using guessed type int dword_8EFAE8;
 
-//----- (0047C0A0) --------------------------------------------------------
 void  sub_47C0A0(int a1, int a2)
 {
   int v2; // ST68_4@5
@@ -51487,13 +50163,7 @@ void  sub_47C0A0(int a1, int a2)
     fun_putBuildingOnTerrainAndGraphicGrids(0, a1, a2, 2, 2, dword_8B4604 + word_6E6D60, 1024);
   }
 }
-// 40336E: using guessed type _DWORD  sub_40336E(_DWORD, _DWORD, _DWORD);
-// 6E6D60: using guessed type __int16 word_6E6D60;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4604: using guessed type int dword_8B4604;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0047C2A0) --------------------------------------------------------
 void  sub_47C2A0(int a1, int a2, int a3, int a4)
 {
   fun_setByte14Zero(byte_5F2250, 48);
@@ -51508,14 +50178,7 @@ void  sub_47C2A0(int a1, int a2, int a3, int a4)
   sub_478E40();
   sub_479720(a1, a2, a3, a4);
 }
-// 401799: using guessed type _DWORD  sub_401799(_DWORD, _DWORD, _DWORD, _DWORD);
-// 4019CE: using guessed type _DWORD  sub_4019CE(_DWORD, _DWORD, _DWORD, _DWORD);
-// 401F00: using guessed type _DWORD  sub_401F00(_DWORD, _DWORD, _DWORD, _DWORD);
-// 403058: using guessed type _DWORD  sub_403058(_DWORD, _DWORD, _DWORD, _DWORD);
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
 
-//----- (0047C3D0) --------------------------------------------------------
 int  sub_47C3D0()
 {
   sub_47CA20();
@@ -51527,13 +50190,7 @@ int  sub_47C3D0()
   sub_479720(0, 0, setting_map_width - 1, setting_map_height - 1);
   return sub_479F40(0, 0, setting_map_width - 1, setting_map_height - 1);
 }
-// 401799: using guessed type _DWORD  sub_401799(_DWORD, _DWORD, _DWORD, _DWORD);
-// 4019CE: using guessed type _DWORD  sub_4019CE(_DWORD, _DWORD, _DWORD, _DWORD);
-// 40268A: using guessed type int sub_40268A(void);
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
 
-//----- (0047C480) --------------------------------------------------------
 int  sub_47C480(int a1, int a2, int a3, int a4)
 {
   int result; // eax@17
@@ -51689,27 +50346,7 @@ int  sub_47C480(int a1, int a2, int a3, int a4)
   }
   return result;
 }
-// 4020A9: using guessed type _DWORD  sub_4020A9(_DWORD, _DWORD, _DWORD);
-// 402C16: using guessed type _DWORD  sub_402C16(_DWORD);
-// 402DAB: using guessed type _DWORD  sub_402DAB(_DWORD, _DWORD, _DWORD);
-// 40336E: using guessed type _DWORD  sub_40336E(_DWORD, _DWORD, _DWORD);
-// 6E6BB4: using guessed type __int16 graphic_terrain_trees;
-// 6E6BB8: using guessed type __int16 graphic_terrain_shrub;
-// 6E6BC2: using guessed type __int16 graphic_terrain_cliff;
-// 6E6BC4: using guessed type __int16 graphic_terrain_grass1;
-// 6E6CC4: using guessed type __int16 word_6E6CC4;
-// 6E6D60: using guessed type __int16 word_6E6D60;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4604: using guessed type int dword_8B4604;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
-// 8E7B28: using guessed type int dword_8E7B28;
-// 9363A8: using guessed type int dword_9363A8;
 
-//----- (0047CA20) --------------------------------------------------------
 int  sub_47CA20()
 {
   int result; // eax@2
@@ -51762,13 +50399,7 @@ int  sub_47CA20()
   }
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (0047CBF0) --------------------------------------------------------
 void  unused_47CBF0()
 {
   __int16 v0; // cx@6
@@ -51795,13 +50426,7 @@ void  unused_47CBF0()
     walkerBaseGridOffset += setting_map_gridBorderSize;
   }
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (0047CCD0) --------------------------------------------------------
 void  unused_47CCD0()
 {
   __int16 v0; // cx@6
@@ -51828,13 +50453,7 @@ void  unused_47CCD0()
     walkerBaseGridOffset += setting_map_gridBorderSize;
   }
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (0047CDB0) --------------------------------------------------------
 int  sub_47CDB0(int a1, int a2, int a3)
 {
   __int16 v3; // ax@2
@@ -51932,15 +50551,7 @@ int  sub_47CDB0(int a1, int a2, int a3)
   }
   return result;
 }
-// 401E60: using guessed type _DWORD  sub_401E60(_DWORD, _DWORD, _DWORD);
-// 6E6BB8: using guessed type __int16 graphic_terrain_shrub;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0047D180) --------------------------------------------------------
 void  sub_47D180(int a1, int a2, int a3)
 {
   __int16 v3; // ax@2
@@ -52023,17 +50634,7 @@ void  sub_47D180(int a1, int a2, int a3)
     walkerBaseGridOffset += 162 - v9;
   }
 }
-// 401A0A: using guessed type int __fastcall sub_401A0A(_DWORD, _DWORD);
-// 6E6BBC: using guessed type __int16 graphic_terrain_quake;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E7B28: using guessed type int dword_8E7B28;
-// 9363A8: using guessed type int dword_9363A8;
 
-//----- (0047D4B0) --------------------------------------------------------
 void  sub_47D4B0(int a1, int a2, int a3)
 {
   __int16 v3; // ax@2
@@ -52059,12 +50660,7 @@ void  sub_47D4B0(int a1, int a2, int a3)
     grid_edge[walkerBaseGridOffset] |= 0x40u;
   }
 }
-// 6E6BB4: using guessed type __int16 graphic_terrain_trees;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0047D5B0) --------------------------------------------------------
 void  sub_47D5B0(int a1, int a2, int a3)
 {
   __int16 v3; // ax@2
@@ -52168,15 +50764,7 @@ void  sub_47D5B0(int a1, int a2, int a3)
     walkerBaseGridOffset += 162 - v9;
   }
 }
-// 4030F8: using guessed type _DWORD  sub_4030F8(_DWORD, _DWORD, _DWORD);
-// 6E6CC4: using guessed type __int16 word_6E6CC4;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0047D9D0) --------------------------------------------------------
 int  sub_47D9D0(int a1, int a2)
 {
   int result; // eax@1
@@ -52189,12 +50777,7 @@ int  sub_47D9D0(int a1, int a2)
   grid_aqueducts[walkerBaseGridOffset] = 0;
   return result;
 }
-// 6E6C94: using guessed type __int16 word_6E6C94;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0047DA90) --------------------------------------------------------
 void  sub_47DA90(int x, int y, int isWater)
 {
   __int16 v3; // ax@2
@@ -52318,20 +50901,7 @@ void  sub_47DA90(int x, int y, int isWater)
     walkerBaseGridOffset += 162 - v10;
   }
 }
-// 4017C6: using guessed type int sub_4017C6(void);
-// 4023BF: using guessed type _DWORD  sub_4023BF(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 4029FF: using guessed type _DWORD  sub_4029FF(__int16);
-// 6E6BBA: using guessed type __int16 graphic_terrain_water;
-// 6E6D4E: using guessed type __int16 word_6E6D4E;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E7B28: using guessed type int dword_8E7B28;
-// 9363A8: using guessed type int dword_9363A8;
 
-//----- (0047DF20) --------------------------------------------------------
 int  sub_47DF20(int a1, int a2, int a3)
 {
   __int16 v3; // cx@5
@@ -52426,22 +50996,7 @@ int  sub_47DF20(int a1, int a2, int a3)
   }
   return result;
 }
-// 4017C6: using guessed type int sub_4017C6(void);
-// 401B4F: using guessed type _DWORD  sub_401B4F(_DWORD);
-// 401DDE: using guessed type int __thiscall sub_401DDE(_DWORD);
-// 4029FA: using guessed type int sub_4029FA(void);
-// 4029FF: using guessed type _DWORD  sub_4029FF(__int16);
-// 6E6BE0: using guessed type __int16 graphic_wall_top;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B45F0: using guessed type int multipleConstruction_itemsPlaced;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E7B28: using guessed type int dword_8E7B28;
-// 9363A8: using guessed type int dword_9363A8;
 
-//----- (0047E2B0) --------------------------------------------------------
 void  sub_47E2B0(int x, int y, int size)
 {
   __int16 v3; // dx@16
@@ -52517,21 +51072,7 @@ void  sub_47E2B0(int x, int y, int size)
     walkerBaseGridOffset += 162 - v7;
   }
 }
-// 4017C6: using guessed type int sub_4017C6(void);
-// 401B4F: using guessed type _DWORD  sub_401B4F(_DWORD);
-// 401DDE: using guessed type int __thiscall sub_401DDE(_DWORD);
-// 4029FA: using guessed type int sub_4029FA(void);
-// 4029FF: using guessed type _DWORD  sub_4029FF(__int16);
-// 6E6BE0: using guessed type __int16 graphic_wall_top;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E7B28: using guessed type int dword_8E7B28;
-// 9363A8: using guessed type int dword_9363A8;
 
-//----- (0047E590) --------------------------------------------------------
 int  sub_47E590()
 {
   int result; // eax@2
@@ -52584,22 +51125,7 @@ int  sub_47E590()
   }
   return result;
 }
-// 4017C6: using guessed type int sub_4017C6(void);
-// 401B4F: using guessed type _DWORD  sub_401B4F(_DWORD);
-// 401DDE: using guessed type int __thiscall sub_401DDE(_DWORD);
-// 4029FA: using guessed type int sub_4029FA(void);
-// 4029FF: using guessed type _DWORD  sub_4029FF(__int16);
-// 6E6BE0: using guessed type __int16 graphic_wall_top;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
-// 8E7B28: using guessed type int dword_8E7B28;
-// 9363A8: using guessed type int dword_9363A8;
 
-//----- (0047E7A0) --------------------------------------------------------
 void  sub_47E7A0(int a1)
 {
   signed int v1; // [sp+4Ch] [bp-14h]@10
@@ -52818,13 +51344,7 @@ void  sub_47E7A0(int a1)
     }
   }
 }
-// 40119F: using guessed type _DWORD  sub_40119F(_DWORD, _DWORD);
-// 403247: using guessed type _DWORD  sub_403247(_DWORD);
-// 6E6BE0: using guessed type __int16 graphic_wall_top;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
 
-//----- (0047EDE0) --------------------------------------------------------
 int  sub_47EDE0(int a1, int a2, int a3)
 {
   __int16 v3; // ax@1
@@ -52941,23 +51461,7 @@ int  sub_47EDE0(int a1, int a2, int a3)
   }
   return result;
 }
-// 40107D: using guessed type int sub_40107D(void);
-// 402036: using guessed type int sub_402036(void);
-// 40222A: using guessed type int __thiscall sub_40222A(_DWORD);
-// 4022F2: using guessed type int __fastcall sub_4022F2(_DWORD, _DWORD);
-// 4029FF: using guessed type _DWORD  sub_4029FF(__int16);
-// 6E6BD6: using guessed type __int16 graphic_aqueduct;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 89AA70: using guessed type int dword_89AA70;
-// 8B45F0: using guessed type int multipleConstruction_itemsPlaced;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 9363A8: using guessed type int dword_9363A8;
 
-//----- (0047F200) --------------------------------------------------------
 int  sub_47F200(int a1, int a2, int a3)
 {
   int result; // eax@10
@@ -53026,15 +51530,7 @@ int  sub_47F200(int a1, int a2, int a3)
   }
   return result;
 }
-// 40107D: using guessed type int sub_40107D(void);
-// 402036: using guessed type int sub_402036(void);
-// 4029FF: using guessed type _DWORD  sub_4029FF(__int16);
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0047F400) --------------------------------------------------------
 void  sub_47F400()
 {
   __int16 v0; // dx@6
@@ -53070,16 +51566,7 @@ void  sub_47F400()
     walkerBaseGridOffset += setting_map_gridBorderSize;
   }
 }
-// 40107D: using guessed type int sub_40107D(void);
-// 402036: using guessed type int sub_402036(void);
-// 4029FF: using guessed type _DWORD  sub_4029FF(__int16);
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (0047F530) --------------------------------------------------------
 int  sub_47F530()
 {
   int result; // eax@1
@@ -53142,19 +51629,7 @@ int  sub_47F530()
   }
   return result;
 }
-// 40222A: using guessed type int __thiscall sub_40222A(_DWORD);
-// 4022F2: using guessed type int __fastcall sub_4022F2(_DWORD, _DWORD);
-// 607F84: using guessed type int debug_roadEvolution;
-// 6E6BD6: using guessed type __int16 graphic_aqueduct;
-// 6E6C90: using guessed type __int16 word_6E6C90;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 89AA70: using guessed type int dword_89AA70;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8E7B28: using guessed type int dword_8E7B28;
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 9363A8: using guessed type int dword_9363A8;
 
-//----- (0047F7B0) --------------------------------------------------------
 signed int  sub_47F7B0()
 {
   signed int result; // eax@2
@@ -53179,9 +51654,7 @@ signed int  sub_47F7B0()
   }
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
 
-//----- (0047F830) --------------------------------------------------------
 int  sub_47F830(int a1, int a2)
 {
   int result; // eax@1
@@ -53196,11 +51669,7 @@ int  sub_47F830(int a1, int a2)
   grid_bitfields[walkerBaseGridOffset] &= 0xEFu;
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B45F0: using guessed type int multipleConstruction_itemsPlaced;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0047F8C0) --------------------------------------------------------
 void  sub_47F8C0(int x, int y, int a3)
 {
   __int16 v3; // cx@3
@@ -53251,19 +51720,7 @@ void  sub_47F8C0(int x, int y, int a3)
     }
   }
 }
-// 40222A: using guessed type int __thiscall sub_40222A(_DWORD);
-// 4022F2: using guessed type int __fastcall sub_4022F2(_DWORD, _DWORD);
-// 6E6BD6: using guessed type __int16 graphic_aqueduct;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 89AA70: using guessed type int dword_89AA70;
-// 8B45F0: using guessed type int multipleConstruction_itemsPlaced;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E7B28: using guessed type int dword_8E7B28;
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 9363A8: using guessed type int dword_9363A8;
 
-//----- (0047FAF0) --------------------------------------------------------
 void  sub_47FAF0(int a1, int a2, int a3, int a4, int a5)
 {
   int v5; // ecx@31
@@ -53373,38 +51830,19 @@ void  sub_47FAF0(int a1, int a2, int a3, int a4, int a5)
   }
   dword_607FA4 = 0;
 }
-// 40222A: using guessed type int __thiscall sub_40222A(_DWORD);
-// 4022F2: using guessed type int __fastcall sub_4022F2(_DWORD, _DWORD);
-// 607FA4: using guessed type int dword_607FA4;
-// 6E6BD6: using guessed type __int16 graphic_aqueduct;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 89AA70: using guessed type int dword_89AA70;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E7B28: using guessed type int dword_8E7B28;
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 9363A8: using guessed type int dword_9363A8;
 
-//----- (0047FEA0) --------------------------------------------------------
 void  unused_47FEA0()
 {
   ;
 }
 
-//----- (0047FEC0) --------------------------------------------------------
 void  unused_47FEC0(int a1, int a2, __int16 a3, __int16 a4)
 {
   walkerBaseGridOffset = 162 * a2 + a1 + setting_map_startGridOffset;
   grid_terrain[walkerBaseGridOffset] = a4;
   grid_graphicIds[walkerBaseGridOffset] = a3;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0047FF20) --------------------------------------------------------
 void  fun_putBuildingOnTerrainAndGraphicGrids(__int16 buildingId, int x, int y, int width, int height, __int16 graphicId, __int16 terrain)
 {
   int v7; // [sp+4Ch] [bp-18h]@30
@@ -53500,17 +51938,7 @@ void  fun_putBuildingOnTerrainAndGraphicGrids(__int16 buildingId, int x, int y, 
     dword_8E146C = 1;
   }
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 65DEF8: using guessed type int mapOrientation;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E146C: using guessed type int dword_8E146C;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
 
-//----- (00480260) --------------------------------------------------------
 int  sub_480260(__int16 a1, int a2, int a3, int a4, int a5, __int16 a6, __int16 a7)
 {
   int result; // eax@5
@@ -53570,16 +51998,7 @@ int  sub_480260(__int16 a1, int a2, int a3, int a4, int a5, __int16 a6, __int16 
   }
   return result;
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E146C: using guessed type int dword_8E146C;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
 
-//----- (00480460) --------------------------------------------------------
 int  sub_480460(__int16 a1, int a2, int a3, int a4, signed int a5)
 {
   int result; // eax@13
@@ -53848,17 +52267,7 @@ void  fun_collapseBuildingToRubble(int buildingId, int x, int y, int width, int 
     dword_8E146C = 1;
   }
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 6E6C94: using guessed type __int16 word_6E6C94;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E146C: using guessed type int dword_8E146C;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (00480FC0) --------------------------------------------------------
 void  sub_480FC0(int a1, int a2, int a3)
 {
   __int16 v3; // ax@26
@@ -53948,21 +52357,7 @@ void  sub_480FC0(int a1, int a2, int a3)
     dword_8E146C = 1;
   }
 }
-// 4012FD: using guessed type _DWORD  sub_4012FD(_DWORD, _DWORD, _DWORD, _DWORD);
-// 4019CE: using guessed type _DWORD  sub_4019CE(_DWORD, _DWORD, _DWORD, _DWORD);
-// 402941: using guessed type _DWORD  sub_402941(_DWORD, _DWORD);
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 6E6BB6: using guessed type __int16 graphic_terrain_uglygrass;
-// 8B45E4: using guessed type int dword_8B45E4;
-// 8B4608: using guessed type int dword_8B4608;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8E146C: using guessed type int dword_8E146C;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (00481370) --------------------------------------------------------
 int  sub_481370(int a1, int a2)
 {
   int j; // [sp+4Ch] [bp-Ch]@15
@@ -54010,11 +52405,7 @@ int  sub_481370(int a1, int a2)
     v5 -= 162;
   return v5;
 }
-// 8B45E4: using guessed type int dword_8B45E4;
-// 8B4608: using guessed type int dword_8B4608;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (00481530) --------------------------------------------------------
 signed int  fun_terrainIsClear(int x, int y, int width, int height, unsigned __int16 terrainMask, int a6)
 {
   signed int result; // eax@2
@@ -54067,14 +52458,7 @@ signed int  fun_terrainIsClear(int x, int y, int width, int height, unsigned __i
   }
   return result;
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004816D0) --------------------------------------------------------
 int  unused_4816D0(int a1, int a2, int a3, int a4)
 {
   int result; // eax@5
@@ -54110,13 +52494,7 @@ int  unused_4816D0(int a1, int a2, int a3, int a4)
   }
   return result;
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004817E0) --------------------------------------------------------
 int  sub_4817E0(int a1, int a2, int a3, int a4, int a5)
 {
   int result; // eax@5
@@ -54152,14 +52530,7 @@ int  sub_4817E0(int a1, int a2, int a3, int a4, int a5)
   }
   return result;
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 634480: using guessed type __int16 grid_pathingDistance[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004818F0) --------------------------------------------------------
 signed int  sub_4818F0(int a1, int a2, int a3, int a4, int a5, int a6)
 {
   signed int result; // eax@2
@@ -54210,14 +52581,7 @@ signed int  sub_4818F0(int a1, int a2, int a3, int a4, int a5, int a6)
   }
   return result;
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (00481A50) --------------------------------------------------------
 signed int  sub_481A50(int a1, int a2, int a3)
 {
   signed int result; // eax@11
@@ -54354,17 +52718,7 @@ signed int  sub_481A50(int a1, int a2, int a3)
   }
   return result;
 }
-// 5F9E00: using guessed type int dword_5F9E00[];
-// 5F9E40: using guessed type int dword_5F9E40[];
-// 5F9E60: using guessed type int dword_5F9E60[];
-// 5F9E80: using guessed type int dword_5F9E80[];
-// 89AA88: using guessed type int dword_89AA88;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E1468: using guessed type int dword_8E1468;
 
-//----- (00481E70) --------------------------------------------------------
 int  sub_481E70(__int16 a1, int a2, int a3, __int16 a4)
 {
   int result; // eax@13
@@ -54468,17 +52822,7 @@ int  sub_481E70(__int16 a1, int a2, int a3, __int16 a4)
   }
   return result;
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 65DEF8: using guessed type int mapOrientation;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E146C: using guessed type int dword_8E146C;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
 
-//----- (00482140) --------------------------------------------------------
 signed int  sub_482140(int a1, int a2, int a3)
 {
   signed int result; // eax@11
@@ -54607,15 +52951,7 @@ signed int  sub_482140(int a1, int a2, int a3)
   }
   return result;
 }
-// 5F9EA0: using guessed type int dword_5F9EA0[];
-// 5F9F30: using guessed type int dword_5F9F30[];
-// 89AA88: using guessed type int dword_89AA88;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E1468: using guessed type int dword_8E1468;
 
-//----- (004824E0) --------------------------------------------------------
 int  sub_4824E0(__int16 a1, int a2, int a3, __int16 a4)
 {
   int result; // eax@13
@@ -54719,17 +53055,7 @@ int  sub_4824E0(__int16 a1, int a2, int a3, __int16 a4)
   }
   return result;
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 65DEF8: using guessed type int mapOrientation;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E146C: using guessed type int dword_8E146C;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
 
-//----- (004827B0) --------------------------------------------------------
 signed int  sub_4827B0(int a1, int a2, int a3)
 {
   signed int result; // eax@2
@@ -54876,15 +53202,7 @@ signed int  sub_4827B0(int a1, int a2, int a3)
   }
   return result;
 }
-// 5F9F50: using guessed type int dword_5F9F50[];
-// 5F9F68: using guessed type int dword_5F9F68[];
-// 65DEF8: using guessed type int mapOrientation;
-// 8B4604: using guessed type int dword_8B4604;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (00482BD0) --------------------------------------------------------
 int  sub_482BD0(int size, int x, int y, __int16 a4, int a5)
 {
   int result; // eax@1
@@ -54950,16 +53268,7 @@ int  sub_482BD0(int size, int x, int y, __int16 a4, int a5)
   }
   return result;
 }
-// 401C35: using guessed type int __thiscall sub_401C35(_DWORD);
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B45E4: using guessed type int dword_8B45E4;
-// 8B4608: using guessed type int dword_8B4608;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (00482DE0) --------------------------------------------------------
 int  sub_482DE0()
 {
   int v0; // ecx@5
@@ -54979,14 +53288,8 @@ int  sub_482DE0()
   }
   return result;
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B45E4: using guessed type int dword_8B45E4;
-// 8B4608: using guessed type int dword_8B4608;
-// 9DA7C8: using guessed type int dword_9DA7C8;
 
-//----- (00482E90) --------------------------------------------------------
-signed int  fun_isTerrainFree(int size, int x, int y, unsigned __int16 mask)
+int  fun_isTerrainFree(int size, int x, int y, unsigned __int16 mask)
 {
   signed int result; // eax@10
   int i; // [sp+54h] [bp-Ch]@17
@@ -55051,15 +53354,7 @@ signed int  fun_isTerrainFree(int size, int x, int y, unsigned __int16 mask)
   }
   return result;
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B45E4: using guessed type int dword_8B45E4;
-// 8B4608: using guessed type int dword_8B4608;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (00483090) --------------------------------------------------------
 int  unused_483090(int a1, int a2, int a3)
 {
   int result; // eax@1
@@ -55097,15 +53392,7 @@ int  unused_483090(int a1, int a2, int a3)
   }
   return result;
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B45E4: using guessed type int dword_8B45E4;
-// 8B4608: using guessed type int dword_8B4608;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004831E0) --------------------------------------------------------
 void  sub_4831E0()
 {
   sub_4837C0(1);
@@ -55130,17 +53417,7 @@ void  sub_4831E0()
   sub_4A7A70();
   sub_4B2CA0();
 }
-// 4012FD: using guessed type _DWORD  sub_4012FD(_DWORD, _DWORD, _DWORD, _DWORD);
-// 401370: using guessed type int sub_401370(void);
-// 401799: using guessed type _DWORD  sub_401799(_DWORD, _DWORD, _DWORD, _DWORD);
-// 4019CE: using guessed type _DWORD  sub_4019CE(_DWORD, _DWORD, _DWORD, _DWORD);
-// 40280B: using guessed type _DWORD  sub_40280B(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402AC2: using guessed type int sub_402AC2(void);
-// 402BA8: using guessed type int sub_402BA8(void);
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
 
-//----- (004833A0) --------------------------------------------------------
 int  sub_4833A0()
 {
   int result; // eax@2
@@ -55293,13 +53570,7 @@ int  sub_4833A0()
   }
   return result;
 }
-// 65DEF8: using guessed type int mapOrientation;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (004837C0) --------------------------------------------------------
 void  sub_4837C0(int a1)
 {
   __int16 v1; // ax@2
@@ -55415,25 +53686,7 @@ void  sub_4837C0(int a1)
     }
   }
 }
-// 4026A3: using guessed type _DWORD  sub_4026A3(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 607F94: using guessed type int dword_607F94;
-// 607F98: using guessed type int dword_607F98;
-// 607F9C: using guessed type int dword_607F9C;
-// 607FA0: using guessed type int dword_607FA0;
-// 65DEF8: using guessed type int mapOrientation;
-// 6E6D90: using guessed type __int16 word_6E6D90;
-// 89AA64: using guessed type int dword_89AA64;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E7B24: using guessed type int dword_8E7B24;
-// 98EEDC: using guessed type __int16 scn_entryPoint_x;
-// 98EEDE: using guessed type __int16 scn_entryPoint_y;
-// 98EEE0: using guessed type __int16 scn_exitPoint_x;
-// 98EEE2: using guessed type __int16 scn_exitPoint_y;
 
-//----- (00483BF0) --------------------------------------------------------
 void  sub_483BF0(__int16 a1)
 {
   dword_8A11C0[0] = a1 & grid_terrain_x_yMinusOne[walkerBaseGridOffset];
@@ -55445,24 +53698,7 @@ void  sub_483BF0(__int16 a1)
   dword_8A11D8 = a1 & grid_terrain_xMinusOne_y[walkerBaseGridOffset];
   dword_8A11DC = a1 & grid_terrain_xMinusOne_yMinusOne[walkerBaseGridOffset];
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8A11C4: using guessed type int dword_8A11C4;
-// 8A11C8: using guessed type int dword_8A11C8;
-// 8A11CC: using guessed type int dword_8A11CC;
-// 8A11D0: using guessed type int dword_8A11D0;
-// 8A11D4: using guessed type int dword_8A11D4;
-// 8A11D8: using guessed type int dword_8A11D8;
-// 8A11DC: using guessed type int dword_8A11DC;
-// 90941A: using guessed type __int16 grid_terrain_xMinusOne_yMinusOne[];
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A2: using guessed type __int16 grid_terrain_xMinusOne_yPlusOne[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 9096A6: using guessed type __int16 grid_terrain_xPlusOne_yPlusOne[];
 
-//----- (00483D00) --------------------------------------------------------
 void  sub_483D00()
 {
   __int16 v0; // cx@1
@@ -55491,24 +53727,7 @@ void  sub_483D00()
   v7 = grid_terrain_xMinusOne_yMinusOne[walkerBaseGridOffset];
   dword_8A11DC = v7 & 2 && byte_8E13FD[walkerBaseGridOffset] & 0x80;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8A11C4: using guessed type int dword_8A11C4;
-// 8A11C8: using guessed type int dword_8A11C8;
-// 8A11CC: using guessed type int dword_8A11CC;
-// 8A11D0: using guessed type int dword_8A11D0;
-// 8A11D4: using guessed type int dword_8A11D4;
-// 8A11D8: using guessed type int dword_8A11D8;
-// 8A11DC: using guessed type int dword_8A11DC;
-// 90941A: using guessed type __int16 grid_terrain_xMinusOne_yMinusOne[];
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A2: using guessed type __int16 grid_terrain_xMinusOne_yPlusOne[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 9096A6: using guessed type __int16 grid_terrain_xPlusOne_yPlusOne[];
 
-//----- (00483FB0) --------------------------------------------------------
 bool  sub_483FB0()
 {
   dword_8A11DC = 0;
@@ -55521,21 +53740,7 @@ bool  sub_483FB0()
   dword_8A11D8 = grid_terrain_xMinusOne_y[walkerBaseGridOffset] & 0x8000;
   return dword_8A11C0[0] || dword_8A11C8 || dword_8A11D0 || dword_8A11D8;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8A11C4: using guessed type int dword_8A11C4;
-// 8A11C8: using guessed type int dword_8A11C8;
-// 8A11CC: using guessed type int dword_8A11CC;
-// 8A11D0: using guessed type int dword_8A11D0;
-// 8A11D4: using guessed type int dword_8A11D4;
-// 8A11D8: using guessed type int dword_8A11D8;
-// 8A11DC: using guessed type int dword_8A11DC;
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
 
-//----- (004840B0) --------------------------------------------------------
 signed int  sub_4840B0(int a1)
 {
   __int16 v1; // cx@1
@@ -55744,25 +53949,7 @@ signed int  sub_484470(int a1)
     ++v6;
   return v6;
 }
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8A11C4: using guessed type int dword_8A11C4;
-// 8A11C8: using guessed type int dword_8A11C8;
-// 8A11CC: using guessed type int dword_8A11CC;
-// 8A11D0: using guessed type int dword_8A11D0;
-// 8A11D4: using guessed type int dword_8A11D4;
-// 8A11D8: using guessed type int dword_8A11D8;
-// 8A11DC: using guessed type int dword_8A11DC;
-// 8F605C: using guessed type __int16 word_8F605C[];
-// 8F619E: using guessed type __int16 word_8F619E[];
-// 8F61A2: using guessed type __int16 word_8F61A2[];
-// 8F62E4: using guessed type __int16 word_8F62E4[];
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (004847A0) --------------------------------------------------------
 int  sub_4847A0(int a1)
 {
   int v2; // [sp+4Ch] [bp-Ch]@4
@@ -56017,19 +54204,7 @@ signed int  sub_484B20(int a1, int a2)
   }
   return v3;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8F605A: using guessed type __int16 word_8F605A[];
-// 8F62E2: using guessed type __int16 word_8F62E2[];
-// 8F62E6: using guessed type __int16 word_8F62E6[];
-// 90941A: using guessed type __int16 grid_terrain_xMinusOne_yMinusOne[];
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A2: using guessed type __int16 grid_terrain_xMinusOne_yPlusOne[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 9096A6: using guessed type __int16 grid_terrain_xPlusOne_yPlusOne[];
 
-//----- (00485390) --------------------------------------------------------
 int  sub_485390()
 {
   int result; // eax@1
@@ -56041,17 +54216,7 @@ int  sub_485390()
   dword_8A11D8 += grid_terrain_xMinusOne_y[walkerBaseGridOffset] & 0x4000;
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8A11C8: using guessed type int dword_8A11C8;
-// 8A11D0: using guessed type int dword_8A11D0;
-// 8A11D8: using guessed type int dword_8A11D8;
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
 
-//----- (00485450) --------------------------------------------------------
 signed int  sub_485450(signed int a1)
 {
   signed int result; // eax@22
@@ -56067,17 +54232,7 @@ signed int  sub_485450(signed int a1)
   dword_8A11DC = result >= a1;
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8A11C4: using guessed type int dword_8A11C4;
-// 8A11C8: using guessed type int dword_8A11C8;
-// 8A11CC: using guessed type int dword_8A11CC;
-// 8A11D0: using guessed type int dword_8A11D0;
-// 8A11D4: using guessed type int dword_8A11D4;
-// 8A11D8: using guessed type int dword_8A11D8;
-// 8A11DC: using guessed type int dword_8A11DC;
 
-//----- (00485600) --------------------------------------------------------
 int  unused_485600(__int16 a1)
 {
   int result; // eax@15
@@ -56150,33 +54305,7 @@ int  unused_485600(__int16 a1)
   }
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8943C8: using guessed type int dword_8943C8;
-// 89AA68: using guessed type int dword_89AA68;
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8A11C4: using guessed type int dword_8A11C4;
-// 8A11C8: using guessed type int dword_8A11C8;
-// 8A11CC: using guessed type int dword_8A11CC;
-// 8A11D0: using guessed type int dword_8A11D0;
-// 8A11D4: using guessed type int dword_8A11D4;
-// 8A11D8: using guessed type int dword_8A11D8;
-// 8A11DC: using guessed type int dword_8A11DC;
-// 8C79C4: using guessed type int dword_8C79C4;
-// 8C7A10: using guessed type int dword_8C7A10;
-// 8CE0A4: using guessed type int dword_8CE0A4;
-// 8E1464: using guessed type int dword_8E1464;
-// 8E1488: using guessed type int dword_8E1488;
-// 8E7B2C: using guessed type int dword_8E7B2C;
-// 90941A: using guessed type __int16 grid_terrain_xMinusOne_yMinusOne[];
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A2: using guessed type __int16 grid_terrain_xMinusOne_yPlusOne[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 9096A6: using guessed type __int16 grid_terrain_xPlusOne_yPlusOne[];
-// 93CA54: using guessed type int dword_93CA54;
 
-//----- (004859A0) --------------------------------------------------------
 int  unused_4859A0()
 {
   int result; // eax@1
@@ -56192,24 +54321,7 @@ int  unused_4859A0()
   dword_8A11DC = word_63433A[walkerBaseGridOffset];
   return result;
 }
-// 63433A: using guessed type __int16 word_63433A[];
-// 63433C: using guessed type __int16 word_63433C[];
-// 63433E: using guessed type __int16 word_63433E[147];
-// 63447E: using guessed type __int16 word_63447E[];
-// 6345C2: using guessed type __int16 word_6345C2[];
-// 6345C4: using guessed type __int16 word_6345C4[];
-// 6345C6: using guessed type __int16 word_6345C6[23893];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8A11C4: using guessed type int dword_8A11C4;
-// 8A11C8: using guessed type int dword_8A11C8;
-// 8A11CC: using guessed type int dword_8A11CC;
-// 8A11D0: using guessed type int dword_8A11D0;
-// 8A11D4: using guessed type int dword_8A11D4;
-// 8A11D8: using guessed type int dword_8A11D8;
-// 8A11DC: using guessed type int dword_8A11DC;
 
-//----- (00485A80) --------------------------------------------------------
 int  sub_485A80()
 {
   __int16 v0; // cx@1
@@ -56341,27 +54453,7 @@ int  sub_485A80()
   }
   return result;
 }
-// 607FA4: using guessed type int dword_607FA4;
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8A11C4: using guessed type int dword_8A11C4;
-// 8A11C8: using guessed type int dword_8A11C8;
-// 8A11CC: using guessed type int dword_8A11CC;
-// 8A11D0: using guessed type int dword_8A11D0;
-// 8A11D4: using guessed type int dword_8A11D4;
-// 8A11D8: using guessed type int dword_8A11D8;
-// 8A11DC: using guessed type int dword_8A11DC;
-// 8F605C: using guessed type __int16 word_8F605C[];
-// 8F619E: using guessed type __int16 word_8F619E[];
-// 8F61A2: using guessed type __int16 word_8F61A2[];
-// 8F62E4: using guessed type __int16 word_8F62E4[];
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (00485F70) --------------------------------------------------------
 signed int  unused_485F70(int a1, int a2)
 {
   signed int result; // eax@2
@@ -56393,12 +54485,7 @@ signed int  unused_485F70(int a1, int a2)
   }
   return result;
 }
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
 
-//----- (00486010) --------------------------------------------------------
 signed int  unused_486010(int a1, int a2)
 {
   signed int result; // eax@2
@@ -56430,11 +54517,7 @@ signed int  unused_486010(int a1, int a2)
   }
   return result;
 }
-// 90941A: using guessed type __int16 grid_terrain_xMinusOne_yMinusOne[];
-// 9096A2: using guessed type __int16 grid_terrain_xMinusOne_yPlusOne[];
-// 9096A6: using guessed type __int16 grid_terrain_xPlusOne_yPlusOne[];
 
-//----- (004860B0) --------------------------------------------------------
 signed int  unused_4860B0(int a1, int a2)
 {
   signed int result; // eax@2
@@ -56466,11 +54549,7 @@ signed int  unused_4860B0(int a1, int a2)
   }
   return result;
 }
-// 90941A: using guessed type __int16 grid_terrain_xMinusOne_yMinusOne[];
-// 9096A2: using guessed type __int16 grid_terrain_xMinusOne_yPlusOne[];
-// 9096A6: using guessed type __int16 grid_terrain_xPlusOne_yPlusOne[];
 
-//----- (00486150) --------------------------------------------------------
 signed int  sub_486150(int a1, int a2)
 {
   signed int v3; // [sp+4Ch] [bp-4h]@1
@@ -56486,12 +54565,7 @@ signed int  sub_486150(int a1, int a2)
     ++v3;
   return v3;
 }
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
 
-//----- (00486200) --------------------------------------------------------
 signed int  sub_486200(int a1, int a2)
 {
   signed int v3; // [sp+4Ch] [bp-4h]@1
@@ -56507,11 +54581,7 @@ signed int  sub_486200(int a1, int a2)
     ++v3;
   return v3;
 }
-// 90941A: using guessed type __int16 grid_terrain_xMinusOne_yMinusOne[];
-// 9096A2: using guessed type __int16 grid_terrain_xMinusOne_yPlusOne[];
-// 9096A6: using guessed type __int16 grid_terrain_xPlusOne_yPlusOne[];
 
-//----- (004862B0) --------------------------------------------------------
 signed int  sub_4862B0(int a1, int a2)
 {
   signed int result; // eax@2
@@ -56529,10 +54599,7 @@ signed int  sub_4862B0(int a1, int a2)
   }
   return result;
 }
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
 
-//----- (00486310) --------------------------------------------------------
 signed int  sub_486310(int a1, int a2)
 {
   signed int result; // eax@2
@@ -56550,10 +54617,7 @@ signed int  sub_486310(int a1, int a2)
   }
   return result;
 }
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
 
-//----- (00486370) --------------------------------------------------------
 bool  unused_486370(int a1, int a2)
 {
   bool result; // eax@2
@@ -56578,12 +54642,7 @@ bool  unused_486370(int a1, int a2)
   }
   return result;
 }
-// 8F605C: using guessed type __int16 word_8F605C[];
-// 8F619E: using guessed type __int16 word_8F619E[];
-// 8F61A2: using guessed type __int16 word_8F61A2[];
-// 8F62E4: using guessed type __int16 word_8F62E4[];
 
-//----- (00486400) --------------------------------------------------------
 signed int  unused_486400(int a1)
 {
   __int16 v1; // cx@1
@@ -56607,12 +54666,7 @@ signed int  unused_486400(int a1)
     ++v6;
   return v6;
 }
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
 
-//----- (004864B0) --------------------------------------------------------
 signed int  sub_4864B0(int a1)
 {
   __int16 v1; // cx@1
@@ -56652,12 +54706,7 @@ signed int  sub_4864B0(int a1)
   }
   return result;
 }
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
 
-//----- (00486540) --------------------------------------------------------
 signed int  sub_486540(int a1, int a2, int a3, int a4, int a5)
 {
   signed int result; // eax@17
@@ -56807,19 +54856,6 @@ signed int  sub_486540(int a1, int a2, int a3, int a4, int a5)
   return result;
 }
 
-// 401B2C: using guessed type _DWORD  sub_401B2C(_DWORD);
-// 401CB7: using guessed type _DWORD  sub_401CB7(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402324: using guessed type _DWORD  sub_402324(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 5F6DD4: using guessed type int dword_5F6DD4[656];
-// 5F7814: using guessed type int dword_5F7814[400];
-// 5FA008: using guessed type int dword_5FA008[];
-// 5FA00C: using guessed type int dword_5FA00C[];
-// 89AA84: using guessed type int dword_89AA84;
-// 8B45F0: using guessed type int multipleConstruction_itemsPlaced;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E147C: using guessed type int dword_8E147C;
-
-//----- (00486AF0) --------------------------------------------------------
 signed int  sub_486AF0(int a1)
 {
   signed int result; // eax@3
@@ -56846,11 +54882,7 @@ signed int  sub_486AF0(int a1)
   }
   return result;
 }
-// 5F3248: using guessed type int multipleTileBuildingGridOffset[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (00486BC0) --------------------------------------------------------
 signed int  sub_486BC0(int a1, int a2, int a3, int a4, int a5)
 {
   __int16 v5; // cx@1
@@ -56912,13 +54944,6 @@ signed int  sub_486BC0(int a1, int a2, int a3, int a4, int a5)
   return result;
 }
 
-// 402324: using guessed type _DWORD  sub_402324(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 5F6DD4: using guessed type int dword_5F6DD4[656];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B45F0: using guessed type int multipleConstruction_itemsPlaced;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-
-//----- (00486DF0) --------------------------------------------------------
 int  sub_486DF0(int a1, int a2)
 {
   int result; // eax@1
@@ -57022,20 +55047,7 @@ int  sub_486DF0(int a1, int a2)
   }
   return result;
 }
-// 4026E9: using guessed type _DWORD  sub_4026E9(_DWORD, _DWORD);
-// 402BE9: using guessed type _DWORD  sub_402BE9(_DWORD, _DWORD);
-// 86331C: using guessed type int dword_86331C[29533];
-// 8A7884: using guessed type int dword_8A7884;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E1490: using guessed type int dword_8E1490;
-// 8F6184: using guessed type int dword_8F6184;
-// 902EAC: using guessed type int bridge_something;
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
 
-//----- (004870D0) --------------------------------------------------------
 void  sub_4870D0(int a1, int a2, int a3)
 {
   __int16 v3; // cx@28
@@ -57323,13 +55335,7 @@ void  sub_4870D0(int a1, int a2, int a3)
     bridge_something = 0;
   }
 }
-// 86331C: using guessed type int dword_86331C[29533];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8E1490: using guessed type int dword_8E1490;
-// 8F6184: using guessed type int dword_8F6184;
-// 902EAC: using guessed type int bridge_something;
 
-//----- (00487650) --------------------------------------------------------
 int  sub_487650(int a1, int a2)
 {
   int result; // eax@1
@@ -57464,14 +55470,7 @@ int  sub_487650(int a1, int a2)
   }
   return result;
 }
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955C: using guessed type __int16 grid_terrain_xMinusTwo_y[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 9097E8: using guessed type __int16 word_9097E8[];
 
-//----- (004879A0) --------------------------------------------------------
 signed int  sub_4879A0(int a1)
 {
   __int16 v1; // cx@1
@@ -57593,14 +55592,7 @@ signed int  sub_4879A0(int a1)
   }
   return result;
 }
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955C: using guessed type __int16 grid_terrain_xMinusTwo_y[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 9097E8: using guessed type __int16 word_9097E8[];
 
-//----- (00487CD0) --------------------------------------------------------
 int  sub_487CD0()
 {
   int result; // eax@2
@@ -57706,13 +55698,7 @@ int  sub_487CD0()
   }
   return result;
 }
-// 8A788C: using guessed type int dword_8A788C;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
 
-//----- (004880A0) --------------------------------------------------------
 void  sub_4880A0(int a1, int a2)
 {
   int v2; // ST58_4@1
@@ -57753,12 +55739,7 @@ void  sub_4880A0(int a1, int a2)
     v8 += 162 - (v5 - v7 + 1);
   }
 }
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
 
-//----- (00488240) --------------------------------------------------------
 signed int  sub_488240(int a1, int a2)
 {
   int v2; // ST58_4@1
@@ -57797,7 +55778,7 @@ signed int  sub_488240(int a1, int a2)
       v10 = grid_buildingIds[v11];
       if ( v10 > 0 )
       {
-        if ( buildings[v10].houseSize )
+        if ( buildings[v10].house_size )
         {
           ++v9;
           if ( !(grid_terrain[v11] & 0x2000) )
@@ -57816,12 +55797,7 @@ signed int  sub_488240(int a1, int a2)
     result = 2;
   return result;
 }
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
 
-//----- (00488430) --------------------------------------------------------
 bool  sub_488430(int a1, int a2)
 {
   __int16 v2; // ax@9
@@ -57972,18 +55948,7 @@ bool  sub_488430(int a1, int a2)
   }
   return !v30 && !v28;
 }
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A2: using guessed type __int16 grid_terrain_xMinusOne_yPlusOne[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 9096A6: using guessed type __int16 grid_terrain_xPlusOne_yPlusOne[];
-// 9096A8: using guessed type __int16 grid_terrain_xPlusTwo_yPlusOne[];
-// 9097E8: using guessed type __int16 word_9097E8[];
-// 9097EA: using guessed type __int16 word_9097EA[];
 
-//----- (00488860) --------------------------------------------------------
 signed int  sub_488860(int a1, int a2)
 {
   signed int result; // eax@38
@@ -58088,15 +56053,7 @@ signed int  sub_488860(int a1, int a2)
   }
   return result;
 }
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 9096A6: using guessed type __int16 grid_terrain_xPlusOne_yPlusOne[];
-// 9096A8: using guessed type __int16 grid_terrain_xPlusTwo_yPlusOne[];
-// 9097E8: using guessed type __int16 word_9097E8[];
-// 9097EA: using guessed type __int16 word_9097EA[];
 
-//----- (00488B70) --------------------------------------------------------
 void  sub_488B70(int x, int y, int a3)
 {
   __int16 terrainValue; // ax@1
@@ -58184,18 +56141,7 @@ void  sub_488B70(int x, int y, int a3)
     }
   }
 }
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 90941C: using guessed type __int16 grid_terrain_x_yMinusOne[];
-// 90955E: using guessed type __int16 grid_terrain_xMinusOne_y[];
-// 909562: using guessed type __int16 grid_terrain_xPlusOne_y[];
-// 9096A2: using guessed type __int16 grid_terrain_xMinusOne_yPlusOne[];
-// 9096A4: using guessed type __int16 grid_terrain_x_yPlusOne[];
-// 9096A6: using guessed type __int16 grid_terrain_xPlusOne_yPlusOne[];
-// 9096A8: using guessed type __int16 grid_terrain_xPlusTwo_yPlusOne[];
-// 9097E8: using guessed type __int16 word_9097E8[];
-// 9097EA: using guessed type __int16 word_9097EA[];
 
-//----- (00488E00) --------------------------------------------------------
 char  sub_488E00(int a1, int a2, int a3)
 {
   int v3; // eax@1
@@ -58390,13 +56336,7 @@ signed int  sub_489350(int a1, int a2, int a3, int a4, int a5)
   }
   return 0;
 }
-// 634480: using guessed type __int16 grid_pathingDistance[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (00489500) --------------------------------------------------------
 signed int  sub_489500(int a1, int a2, int a3, signed int a4)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -58408,9 +56348,7 @@ signed int  sub_489500(int a1, int a2, int a3, signed int a4)
   }
   return 0;
 }
-// 402A5E: using guessed type _DWORD  sub_402A5E(_DWORD, _DWORD, _DWORD, _DWORD);
 
-//----- (00489570) --------------------------------------------------------
 signed int  sub_489570(int a1, int a2, int a3, int a4)
 {
   int v5; // [sp+4Ch] [bp-Ch]@1
@@ -58646,13 +56584,7 @@ signed int  sub_4898D0(int a1, int a2)
   }
   return result;
 }
-// 5F39C0: using guessed type int dword_5F39C0[];
-// 6545CC: using guessed type int dword_6545CC[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (00489D40) --------------------------------------------------------
 signed int  fun_granaryHasRoadAccess(int x, int y)
 {
   __int16 v2; // ax@1
@@ -58706,10 +56638,7 @@ signed int  fun_granaryHasRoadAccess(int x, int y)
   }
   return result;
 }
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 9096A2: using guessed type __int16 grid_terrain_xMinusOne_yPlusOne[];
 
-//----- (00489E70) --------------------------------------------------------
 signed int  sub_489E70(int a1, int a2, int a3)
 {
   __int16 v3; // cx@6
@@ -58743,13 +56672,7 @@ signed int  sub_489E70(int a1, int a2, int a3)
   }
   return 0;
 }
-// 4028BF: using guessed type int sub_4028BF(void);
-// 4029FF: using guessed type _DWORD  sub_4029FF(__int16);
-// 5F36A0: using guessed type int dword_5F36A0[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (00489FB0) --------------------------------------------------------
 signed int  fun_isAdjacentToWall(int x, int y, int size)
 {
   signed int i; // [sp+4Ch] [bp-Ch]@1
@@ -58765,9 +56688,7 @@ signed int  fun_isAdjacentToWall(int x, int y, int size)
   }
   return 0;
 }
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048A050) --------------------------------------------------------
 signed int  sub_48A050(int a1, int a2, int a3)
 {
   signed int v4; // [sp+4Ch] [bp-14h]@6
@@ -58801,10 +56722,7 @@ signed int  sub_48A050(int a1, int a2, int a3)
   }
   return 0;
 }
-// 5F36A0: using guessed type int dword_5F36A0[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048A180) --------------------------------------------------------
 int  sub_48A180(int a1)
 {
   int result; // eax@2
@@ -58868,11 +56786,7 @@ int  sub_48A180(int a1)
   }
   return result;
 }
-// 654388: using guessed type __int16 word_654388[];
-// 6543AC: using guessed type __int16 cityinfo_numWorkingDocks[];
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0048A390) --------------------------------------------------------
 signed int  sub_48A390(int a1)
 {
   signed int result; // eax@14
@@ -58932,10 +56846,7 @@ signed int  sub_48A390(int a1)
   }
   return result;
 }
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (0048A590) --------------------------------------------------------
 signed int  sub_48A590(int a1)
 {
   signed int result; // eax@7
@@ -59126,14 +57037,7 @@ signed int  sub_48A900(int a1)
   }
   return result;
 }
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 90955C: using guessed type __int16 grid_terrain_xMinusTwo_y[];
-// 9097E8: using guessed type __int16 word_9097E8[];
 
-//----- (0048ABC0) --------------------------------------------------------
 int  sub_48ABC0()
 {
   int result; // eax@2
@@ -59222,11 +57126,7 @@ int  sub_48ABC0()
   }
   return result;
 }
-// 654388: using guessed type __int16 word_654388[];
-// 6543AC: using guessed type __int16 cityinfo_numWorkingDocks[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048AF90) --------------------------------------------------------
 signed int  fun_isAdjacentToWater(int x, int y, int size)
 {
   __int16 v3; // cx@5
@@ -59244,9 +57144,7 @@ signed int  fun_isAdjacentToWater(int x, int y, int size)
   }
   return 0;
 }
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048B030) --------------------------------------------------------
 int  sub_48B030(int a1, int a2, int a3)
 {
   __int16 v3; // dx@6
@@ -59335,12 +57233,7 @@ int  sub_48B030(int a1, int a2, int a3)
   }
   return result;
 }
-// 5F36A0: using guessed type int dword_5F36A0[];
-// 634480: using guessed type __int16 grid_pathingDistance[];
-// 6545CC: using guessed type int dword_6545CC[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048B2F0) --------------------------------------------------------
 int  sub_48B2F0(int a1, int a2, int a3)
 {
   __int16 v3; // cx@8
@@ -59447,12 +57340,7 @@ int  sub_48B2F0(int a1, int a2, int a3)
   }
   return result;
 }
-// 5F36A0: using guessed type int dword_5F36A0[];
-// 634480: using guessed type __int16 grid_pathingDistance[];
-// 6545CC: using guessed type int dword_6545CC[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048B650) --------------------------------------------------------
 signed int  fun_isAdjacentToOpenWater(int x, int y, int size)
 {
   __int16 terrain; // cx@6
@@ -59472,10 +57360,7 @@ signed int  fun_isAdjacentToOpenWater(int x, int y, int size)
   }
   return 0;
 }
-// 634480: using guessed type __int16 grid_pathingDistance[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048B700) --------------------------------------------------------
 signed int  sub_48B700(int a1, int a2, int a3)
 {
   __int16 v3; // cx@6
@@ -59504,13 +57389,7 @@ signed int  sub_48B700(int a1, int a2, int a3)
   }
   return 1;
 }
-// 4032A1: using guessed type _DWORD  sub_4032A1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 5F1816: using guessed type __int16 word_5F1816[];
-// 5F1852: using guessed type __int16 word_5F1852[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048B840) --------------------------------------------------------
 signed int  sub_48B840(int a1, int a2, int a3)
 {
   __int16 *v4; // [sp+4Ch] [bp-20h]@1
@@ -59527,13 +57406,7 @@ signed int  sub_48B840(int a1, int a2, int a3)
   }
   return 1;
 }
-// 4032A1: using guessed type _DWORD  sub_4032A1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 5F1816: using guessed type __int16 word_5F1816[];
-// 5F1852: using guessed type __int16 word_5F1852[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048B960) --------------------------------------------------------
 signed int  fun_mapAreaContainsTerrain(int x, int y, int size, int terrain)
 {
   walkerBaseGridOffset = 162 * y + x + setting_map_startGridOffset;
@@ -59557,12 +57430,7 @@ signed int  fun_mapAreaContainsTerrain(int x, int y, int size, int terrain)
   }
   return 0;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048BAC0) --------------------------------------------------------
 signed int  sub_48BAC0(int a1, int a2, int a3)
 {
   signed int v4; // [sp+4Ch] [bp-20h]@9
@@ -59622,11 +57490,7 @@ signed int  sub_48BAC0(int a1, int a2, int a3)
   walkerGridY = v5;
   return v4;
 }
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048BCD0) --------------------------------------------------------
 int  sub_48BCD0(int a1, int a2, int a3, int a4, int a5, int a6, signed int a7)
 {
   int result; // eax@7
@@ -59654,9 +57518,7 @@ int  sub_48BCD0(int a1, int a2, int a3, int a4, int a5, int a6, signed int a7)
   }
   return result;
 }
-// 4012B7: using guessed type _DWORD  sub_4012B7(_DWORD, _DWORD, _DWORD, _DWORD, char);
 
-//----- (0048BD80) --------------------------------------------------------
 int  sub_48BD80(int a1, int a2, int a3, int a4, char a5)
 {
   int result; // eax@7
@@ -59738,23 +57600,7 @@ int  sub_48BD80(int a1, int a2, int a3, int a4, char a5)
   }
   return result;
 }
-// 4032A1: using guessed type _DWORD  sub_4032A1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 5F1816: using guessed type __int16 word_5F1816[];
-// 5F1822: using guessed type __int16 word_5F1822[];
-// 5F182E: using guessed type __int16 word_5F182E[];
-// 5F183A: using guessed type __int16 word_5F183A[];
-// 5F1846: using guessed type __int16 word_5F1846[];
-// 5F1852: using guessed type __int16 word_5F1852[];
-// 5F185E: using guessed type __int16 word_5F185E[];
-// 5F186A: using guessed type __int16 word_5F186A[];
-// 5F1876: using guessed type __int16 word_5F1876[];
-// 5F1882: using guessed type __int16 word_5F1882[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048C110) --------------------------------------------------------
 bool  sub_48C110(int a1, int a2, int buildingSize, int distance, int a5)
 {
   bool result; // eax@71
@@ -59929,10 +57775,7 @@ bool  sub_48C110(int a1, int a2, int buildingSize, int distance, int a5)
   }
   return result;
 }
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
 
-//----- (0048C740) --------------------------------------------------------
 __int16  sub_48C740()
 {
   int v0; // eax@18
@@ -60178,13 +58021,7 @@ __int16  sub_48C740()
   }
   return v0;
 }
-// 5F1818: using guessed type __int16 word_5F1818[];
-// 5F1824: using guessed type __int16 word_5F1824[];
-// 5F1830: using guessed type __int16 word_5F1830[];
-// 5F183C: using guessed type __int16 word_5F183C[];
-// 5F1848: using guessed type __int16 word_5F1848[];
 
-//----- (0048CFE0) --------------------------------------------------------
 void  fun_setMapAreaRangeTerrain(int x, int y, int size, int range, __int16 terrain)
 {
   int yMax; // [sp+4Ch] [bp-Ch]@1
@@ -60219,12 +58056,7 @@ void  fun_setMapAreaRangeTerrain(int x, int y, int size, int range, __int16 terr
     walkerBaseGridOffset += 162 - (xMax - xMin + 1);
   }
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048D170) --------------------------------------------------------
 void  sub_48D170(int a1, int a2, int a3, int a4, __int16 a5)
 {
   int v5; // [sp+4Ch] [bp-Ch]@1
@@ -60259,12 +58091,7 @@ void  sub_48D170(int a1, int a2, int a3, int a4, __int16 a5)
     walkerBaseGridOffset += 162 - (v6 - v7 + 1);
   }
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048D300) --------------------------------------------------------
 signed int  sub_48D300(int x, int y, int a3, int a4, int a5)
 {
   int v6; // [sp+4Ch] [bp-10h]@1
@@ -60302,11 +58129,7 @@ signed int  sub_48D300(int x, int y, int a3, int a4, int a5)
   }
   return 0;
 }
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048D480) --------------------------------------------------------
 signed int  sub_48D480(int a1, int a2, int a3, int a4, int a5)
 {
   int v6; // [sp+4Ch] [bp-10h]@1
@@ -60344,11 +58167,7 @@ signed int  sub_48D480(int a1, int a2, int a3, int a4, int a5)
   }
   return 0;
 }
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048D600) --------------------------------------------------------
 signed int  sub_48D600(int a1, int a2, int a3, int a4, int a5)
 {
   int v6; // [sp+4Ch] [bp-10h]@1
@@ -60386,11 +58205,7 @@ signed int  sub_48D600(int a1, int a2, int a3, int a4, int a5)
   }
   return 1;
 }
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048D780) --------------------------------------------------------
 void  sub_48D780(int a1, int a2, int a3, int a4)
 {
   int v4; // [sp+4Ch] [bp-Ch]@1
@@ -60425,12 +58240,7 @@ void  sub_48D780(int a1, int a2, int a3, int a4)
     walkerBaseGridOffset += 162 - (v5 - v6 + 1);
   }
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048D910) --------------------------------------------------------
 int  sub_48D910(int a1, int a2, int a3, int a4)
 {
   int result; // eax@9
@@ -60473,12 +58283,7 @@ int  sub_48D910(int a1, int a2, int a3, int a4)
   }
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0048DAA0) --------------------------------------------------------
 signed int  sub_48DAA0(int x, int y, int size, int range)
 {
   signed int result; // [sp+4Ch] [bp-14h]@1
@@ -60534,14 +58339,7 @@ signed int  sub_48DAA0(int x, int y, int size, int range)
   }
   return result;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (0048DCC0) --------------------------------------------------------
 int  fun_walkerProvideEngineerCoverage(int x, int y)
 {
   int v3; // [sp+4Ch] [bp-14h]@1
@@ -60583,7 +58381,7 @@ int  fun_walkerProvideEngineerCoverage(int x, int y)
       }
       if ( buildingId > 0 )
       {
-        if ( buildings[buildingId].houseSize )
+        if ( buildings[buildingId].house_size )
         {
           if ( buildings[buildingId].house_population > 0 )
             ++v3;
@@ -60597,18 +58395,7 @@ int  fun_walkerProvideEngineerCoverage(int x, int y)
   }
   return v3;
 }
-// 403233: using guessed type _DWORD  sub_403233(_DWORD);
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 89AA7C: using guessed type char engineerMaxDamageSeen;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD7E: using guessed type __int16 building_3e_damageRisk[];
 
-//----- (0048DF10) --------------------------------------------------------
 int  fun_walkerProvidePrefectFireCoverage(int x, int y)
 {
   int v3; // [sp+4Ch] [bp-14h]@1
@@ -60650,7 +58437,7 @@ int  fun_walkerProvidePrefectFireCoverage(int x, int y)
       }
       if ( v6 > 0 )
       {
-        if ( buildings[v6].houseSize )
+        if ( buildings[v6].house_size )
         {
           if ( buildings[v6].house_population > 0 )
             ++v3;
@@ -60664,18 +58451,7 @@ int  fun_walkerProvidePrefectFireCoverage(int x, int y)
   }
   return v3;
 }
-// 403233: using guessed type _DWORD  sub_403233(_DWORD);
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8B45FC: using guessed type int prefectMaxFireRiskSeen;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD80: using guessed type __int16 building_40_fireRisk[];
 
-//----- (0048E160) --------------------------------------------------------
 int  fun_walkerProvidePrefectCrimeCoverage(int x, int y)
 {
   int result; // eax@10
@@ -60755,7 +58531,7 @@ int  fun_walkerProvideTheaterAccess(int x, int y)
       v6 = grid_buildingIds[walkerBaseGridOffset];
       if ( v6 > 0 )
       {
-        if ( buildings[v6].houseSize )
+        if ( buildings[v6].house_size )
         {
           if ( buildings[v6].house_population > 0 )
           {
@@ -60772,14 +58548,7 @@ int  fun_walkerProvideTheaterAccess(int x, int y)
   }
   return v3;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
 
-//----- (0048E500) --------------------------------------------------------
 int  fun_walkerProvideAmphitheaterAccess(int x, int y, int numShows)
 {
   int v4; // [sp+4Ch] [bp-14h]@1
@@ -60812,7 +58581,7 @@ int  fun_walkerProvideAmphitheaterAccess(int x, int y, int numShows)
       v7 = grid_buildingIds[walkerBaseGridOffset];
       if ( v7 > 0 )
       {
-        if ( buildings[v7].houseSize )
+        if ( buildings[v7].house_size )
         {
           if ( buildings[v7].house_population > 0 )
           {
@@ -60831,14 +58600,7 @@ int  fun_walkerProvideAmphitheaterAccess(int x, int y, int numShows)
   }
   return v4;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
 
-//----- (0048E6F0) --------------------------------------------------------
 int  fun_walkerProvideColosseumAccess(int x, int y, int numShows)
 {
   int v4; // [sp+4Ch] [bp-14h]@1
@@ -60871,7 +58633,7 @@ int  fun_walkerProvideColosseumAccess(int x, int y, int numShows)
       v7 = grid_buildingIds[walkerBaseGridOffset];
       if ( v7 > 0 )
       {
-        if ( buildings[v7].houseSize )
+        if ( buildings[v7].house_size )
         {
           if ( buildings[v7].house_population > 0 )
           {
@@ -60890,14 +58652,7 @@ int  fun_walkerProvideColosseumAccess(int x, int y, int numShows)
   }
   return v4;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
 
-//----- (0048E8E0) --------------------------------------------------------
 int  fun_walkerProvideHippodromeAccess(int x, int y)
 {
   int v3; // [sp+4Ch] [bp-14h]@1
@@ -60930,7 +58685,7 @@ int  fun_walkerProvideHippodromeAccess(int x, int y)
       v6 = grid_buildingIds[walkerBaseGridOffset];
       if ( v6 > 0 )
       {
-        if ( buildings[v6].houseSize )
+        if ( buildings[v6].house_size )
         {
           if ( buildings[v6].house_population > 0 )
           {
@@ -60947,14 +58702,7 @@ int  fun_walkerProvideHippodromeAccess(int x, int y)
   }
   return v3;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
 
-//----- (0048EAC0) --------------------------------------------------------
 int  fun_walkerProvideMarketGoods(int buildingId, int x, int y)
 {
   int homesSeen; // [sp+4Ch] [bp-40h]@1
@@ -60998,7 +58746,7 @@ int  fun_walkerProvideMarketGoods(int buildingId, int x, int y)
     while ( walkerGridX <= maxX )
     {
       houseId = grid_buildingIds[walkerBaseGridOffset];
-      if ( houseId > 0 && buildings[houseId].houseSize && buildings[houseId].house_population > 0 )
+      if ( houseId > 0 && buildings[houseId].house_size && buildings[houseId].house_population > 0 )
       {
         ++homesSeen;
         houseNextLevel = buildings[houseId].level_resourceId;
@@ -61129,29 +58877,7 @@ int  fun_walkerProvideMarketGoods(int buildingId, int x, int y)
   }
   return homesSeen;
 }
-// 60777C: using guessed type int model_houses_foodtypes[];
-// 607780: using guessed type int model_houses_pottery[];
-// 607784: using guessed type int model_houses_oil[];
-// 607788: using guessed type int model_houses_furniture[];
-// 60778C: using guessed type int model_houses_wine[];
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD5C: using guessed type __int16 building_1c_house_maxPopEver[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
-// 94BD8C: using guessed type __int16 building_4c_granary_capacity[];
-// 94BD92: using guessed type __int16 building_52_house_wine[];
-// 94BD94: using guessed type __int16 building_54_house_oil[];
-// 94BD96: using guessed type __int16 building_56_house_furniture[];
-// 94BD98: using guessed type __int16 building_58_house_pottery[];
-// 94BDA0: using guessed type __int16 building_60_house_school_library[];
-// 94BDA2: using guessed type __int16 building_62_house_academy_barber[];
 
-//----- (0048F320) --------------------------------------------------------
 int  fun_walkerProvideBathhouseAccess(int x, int y)
 {
   int v3; // [sp+4Ch] [bp-14h]@1
@@ -61184,7 +58910,7 @@ int  fun_walkerProvideBathhouseAccess(int x, int y)
       v6 = grid_buildingIds[walkerBaseGridOffset];
       if ( v6 > 0 )
       {
-        if ( buildings[v6].houseSize )
+        if ( buildings[v6].house_size )
         {
           if ( buildings[v6].house_population > 0 )
           {
@@ -61201,14 +58927,7 @@ int  fun_walkerProvideBathhouseAccess(int x, int y)
   }
   return v3;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
 
-//----- (0048F500) --------------------------------------------------------
 int  fun_walkerProvideReligionAccess(int x, int y, int god)
 {
   int v4; // [sp+4Ch] [bp-14h]@1
@@ -61241,7 +58960,7 @@ int  fun_walkerProvideReligionAccess(int x, int y, int god)
       v7 = grid_buildingIds[walkerBaseGridOffset];
       if ( v7 > 0 )
       {
-        if ( buildings[v7].houseSize )
+        if ( buildings[v7].house_size )
         {
           if ( buildings[v7].house_population > 0 )
           {
@@ -61279,14 +58998,7 @@ int  fun_walkerProvideReligionAccess(int x, int y, int god)
   }
   return v4;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
 
-//----- (0048F750) --------------------------------------------------------
 int  fun_walkerProvideSchoolAccess(int x, int y)
 {
   int v3; // [sp+4Ch] [bp-14h]@1
@@ -61319,7 +59031,7 @@ int  fun_walkerProvideSchoolAccess(int x, int y)
       v6 = grid_buildingIds[walkerBaseGridOffset];
       if ( v6 > 0 )
       {
-        if ( buildings[v6].houseSize )
+        if ( buildings[v6].house_size )
         {
           if ( buildings[v6].house_population > 0 )
           {
@@ -61336,15 +59048,7 @@ int  fun_walkerProvideSchoolAccess(int x, int y)
   }
   return v3;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BDA0: using guessed type __int16 building_60_house_school_library[];
 
-//----- (0048F930) --------------------------------------------------------
 int  fun_walkerProvideAcademyAccess(int x, int y)
 {
   int v3; // [sp+4Ch] [bp-14h]@1
@@ -61377,7 +59081,7 @@ int  fun_walkerProvideAcademyAccess(int x, int y)
       v6 = grid_buildingIds[walkerBaseGridOffset];
       if ( v6 > 0 )
       {
-        if ( buildings[v6].houseSize )
+        if ( buildings[v6].house_size )
         {
           if ( buildings[v6].house_population > 0 )
           {
@@ -61394,15 +59098,7 @@ int  fun_walkerProvideAcademyAccess(int x, int y)
   }
   return v3;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BDA2: using guessed type __int16 building_62_house_academy_barber[];
 
-//----- (0048FB10) --------------------------------------------------------
 int  fun_walkerProvideLibraryAccess(int x, int y)
 {
   int v3; // [sp+4Ch] [bp-14h]@1
@@ -61435,7 +59131,7 @@ int  fun_walkerProvideLibraryAccess(int x, int y)
       v6 = grid_buildingIds[walkerBaseGridOffset];
       if ( v6 > 0 )
       {
-        if ( buildings[v6].houseSize )
+        if ( buildings[v6].house_size )
         {
           if ( buildings[v6].house_population > 0 )
           {
@@ -61452,15 +59148,7 @@ int  fun_walkerProvideLibraryAccess(int x, int y)
   }
   return v3;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BDA0: using guessed type __int16 building_60_house_school_library[];
 
-//----- (0048FCF0) --------------------------------------------------------
 int  fun_walkerProvideBarberAccess(int x, int y)
 {
   int v3; // [sp+4Ch] [bp-14h]@1
@@ -61493,7 +59181,7 @@ int  fun_walkerProvideBarberAccess(int x, int y)
       v6 = grid_buildingIds[walkerBaseGridOffset];
       if ( v6 > 0 )
       {
-        if ( buildings[v6].houseSize )
+        if ( buildings[v6].house_size )
         {
           if ( buildings[v6].house_population > 0 )
           {
@@ -61510,15 +59198,7 @@ int  fun_walkerProvideBarberAccess(int x, int y)
   }
   return v3;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BDA2: using guessed type __int16 building_62_house_academy_barber[];
 
-//----- (0048FED0) --------------------------------------------------------
 int  fun_walkerProvideClinicAccess(int x, int y)
 {
   int v3; // [sp+4Ch] [bp-14h]@1
@@ -61551,11 +59231,11 @@ int  fun_walkerProvideClinicAccess(int x, int y)
       v6 = grid_buildingIds[walkerBaseGridOffset];
       if ( v6 > 0 )
       {
-        if ( buildings[v6].houseSize )
+        if ( buildings[v6].house_size )
         {
           if ( buildings[v6].house_population > 0 )
           {
-            building_64_house_clinic[128 * v6] = 96;
+            building_64_house_clinic[128 * v6] = 0x60;
             ++v3;
           }
         }
@@ -61568,14 +59248,7 @@ int  fun_walkerProvideClinicAccess(int x, int y)
   }
   return v3;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
 
-//----- (004900B0) --------------------------------------------------------
 int  fun_walkerProvideHospitalAccess(int x, int y)
 {
   int v3; // [sp+4Ch] [bp-14h]@1
@@ -61608,11 +59281,11 @@ int  fun_walkerProvideHospitalAccess(int x, int y)
       v6 = grid_buildingIds[walkerBaseGridOffset];
       if ( v6 > 0 )
       {
-        if ( buildings[v6].houseSize )
+        if ( buildings[v6].house_size )
         {
           if ( buildings[v6].house_population > 0 )
           {
-            building_66_house_hospital_entert_days2[128 * v6] = 96;
+            building_66_house_hospital_entert_days2[128 * v6] = 0x60;
             ++v3;
           }
         }
@@ -61625,14 +59298,7 @@ int  fun_walkerProvideHospitalAccess(int x, int y)
   }
   return v3;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
 
-//----- (00490290) --------------------------------------------------------
 signed int  fun_walkerProvideMissionaryAccess(int x, int y)
 {
   int v3; // [sp+50h] [bp-10h]@1
@@ -61681,14 +59347,7 @@ signed int  fun_walkerProvideMissionaryAccess(int x, int y)
   }
   return 1;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (00490470) --------------------------------------------------------
 int  fun_walkerProvideLaborSeekerAccess(int x, int y)
 {
   int v3; // [sp+4Ch] [bp-14h]@1
@@ -61721,7 +59380,7 @@ int  fun_walkerProvideLaborSeekerAccess(int x, int y)
       v6 = grid_buildingIds[walkerBaseGridOffset];
       if ( v6 > 0 )
       {
-        if ( buildings[v6].houseSize )
+        if ( buildings[v6].house_size )
         {
           if ( buildings[v6].house_population > 0 )
             ++v3;
@@ -61735,14 +59394,7 @@ int  fun_walkerProvideLaborSeekerAccess(int x, int y)
   }
   return v3;
 }
-// 8876BC: using guessed type int walkerBaseGridOffset;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
 
-//----- (00490630) --------------------------------------------------------
 int  fun_walkerProvideTaxCollectorAccess(int x, int y)
 {
   int v3; // [sp+4Ch] [bp-18h]@1
@@ -61776,7 +59428,7 @@ int  fun_walkerProvideTaxCollectorAccess(int x, int y)
       v6 = grid_buildingIds[walkerBaseGridOffset];
       if ( v6 > 0 )
       {
-        if ( buildings[v6].houseSize )
+        if ( buildings[v6].house_size )
         {
           if ( buildings[v6].house_population > 0 )
           {
@@ -61820,12 +59472,7 @@ void  sub_490850(char *buffer, int numItems)
     buffer += 16;
   }
 }
-// 89AA70: using guessed type int dword_89AA70;
-// 8A11C0: using guessed type int dword_8A11C0[];
-// 8E7B28: using guessed type int dword_8E7B28;
-// 9363A8: using guessed type int dword_9363A8;
 
-//----- (004909B0) --------------------------------------------------------
 void  fun_setByte14Zero(char *buffer, int items)
 {
   int index; // [sp+4Ch] [bp-4h]@1
@@ -61839,7 +59486,6 @@ void  fun_setByte14Zero(char *buffer, int items)
   }
 }
 
-//----- (00490A00) --------------------------------------------------------
 int  sub_490A00()
 {
   int result; // eax@6
@@ -61855,9 +59501,7 @@ int  sub_490A00()
   }
   return result;
 }
-// 8A11C0: using guessed type int dword_8A11C0[];
 
-//----- (00490A70) --------------------------------------------------------
 void  sub_490A70()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -61870,9 +59514,7 @@ void  sub_490A70()
       dword_8A11C0[i] = 0;
   }
 }
-// 8A11C0: using guessed type int dword_8A11C0[];
 
-//----- (00490AE0) --------------------------------------------------------
 int  sub_490AE0()
 {
   int v1; // [sp+4Ch] [bp-8h]@1
@@ -61886,10 +59528,8 @@ int  sub_490AE0()
   }
   return v1;
 }
-// 8A11C0: using guessed type int dword_8A11C0[];
 
-//----- (00490B40) --------------------------------------------------------
-signed int  sub_490B40()
+int  sub_490B40()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
 
@@ -61919,12 +59559,7 @@ signed int  sub_490B40()
   fun_memcpy(grid_animation, undo_grid_animation, 26244);
   return 1;
 }
-// 8A7888: using guessed type int dword_8A7888;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8E1478: using guessed type int dword_8E1478;
-// 929644: using guessed type int undo_lastBuildingCost;
 
-//----- (00490D00) --------------------------------------------------------
 int  sub_490D00()
 {
   int v1; // [sp+4Ch] [bp-8h]@4
@@ -61945,8 +59580,7 @@ int  sub_490D00()
   return fun_memset(word_89AAA0, 100, 0);
 }
 
-//----- (00490DE0) --------------------------------------------------------
-signed int  sub_490DE0(int a1)
+int  sub_490DE0(int a1)
 {
   signed int result; // eax@2
   signed int v2; // [sp+4Ch] [bp-8h]@1
@@ -61991,7 +59625,6 @@ signed int  sub_490DE0(int a1)
   return result;
 }
 
-//----- (00490F30) --------------------------------------------------------
 signed int  sub_490F30(int a1)
 {
   signed int result; // eax@2
@@ -62034,7 +59667,6 @@ signed int  sub_490F30(int a1)
   return result;
 }
 
-//----- (00490FD0) --------------------------------------------------------
 void  sub_490FD0()
 {
   dword_9363B0 = 1;
@@ -62136,15 +59768,7 @@ void  fun_performUndo()
     }
   }
 }
-// 401226: using guessed type _DWORD  sub_401226(_DWORD);
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 652BE8: using guessed type int cityinfo_finance_construction_thisyear[];
-// 8A7888: using guessed type int dword_8A7888;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 929644: using guessed type int undo_lastBuildingCost;
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (004914E0) --------------------------------------------------------
 void  sub_4914E0()
 {
   int y; // [sp+4Ch] [bp-Ch]@1
@@ -62167,14 +59791,7 @@ void  sub_4914E0()
     gridOffset += setting_map_gridBorderSize;
   }
 }
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8C7A04: using guessed type int setting_map_gridBorderSize;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
 
-//----- (004915A0) --------------------------------------------------------
 void  sub_4915A0(int a1)
 {
   int v1; // ST68_4@15
@@ -62211,13 +59828,7 @@ void  sub_4915A0(int a1)
     buildings[a1].inUse = 1;
   }
 }
-// 401AE1: using guessed type _DWORD  sub_401AE1(__int16, _DWORD, _DWORD, _DWORD, _DWORD);
-// 5F6414: using guessed type int buildingSizes[];
-// 6E6C78: using guessed type __int16 graphic_nativeCrops;
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BDB2: using guessed type __int16 building_72_wharf_hasBoat_house_evolveStatusDesir[];
 
-//----- (004918A0) --------------------------------------------------------
 void  sub_4918A0()
 {
   int v0; // [sp+4Ch] [bp-8h]@31
@@ -62306,16 +59917,7 @@ void  sub_4918A0()
     }
   }
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 8A7888: using guessed type int dword_8A7888;
-// 8E1478: using guessed type int dword_8E1478;
-// 8E1480: using guessed type int event_earthquake_state;
-// 8EE1E8: using guessed type __int16 word_8EE1E8[];
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
 
-//----- (00491BD0) --------------------------------------------------------
 void  fun_handleEarthquakeEvent()
 {
   signed int v0; // [sp+4Ch] [bp-18h]@21
@@ -62448,10 +60050,8 @@ void  fun_handleEarthquakeEvent()
     }
     else
     {
-      if ( gametime_year == event_earthquake_gameYear )
+      if ( gametime_year == event_earthquake_gameYear && gametime_month == event_earthquake_month)
       {
-        if ( gametime_month == event_earthquake_month )
-        {
           event_earthquake_state = 1;
           dword_89AA8C = 0;
           dword_89AB08 = 0;
@@ -62461,7 +60061,6 @@ void  fun_handleEarthquakeEvent()
             62,
             0,
             162 * LOWORD(dword_929664[0]) + LOWORD(dword_929660[0]) + setting_map_startGridOffset);
-        }
       }
     }
   }
@@ -62504,9 +60103,7 @@ signed int  sub_492240(int a1, int a2)
     result = 1;
   return result;
 }
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004922A0) --------------------------------------------------------
 void  fun_handleGladiatorRevoltEvent()
 {
   if ( mode_editor != 1 )
@@ -62550,21 +60147,11 @@ void  fun_handleGladiatorRevoltEvent()
     }
   }
 }
-// 659B50: using guessed type int message_usePopup;
-// 8A11A4: using guessed type int event_gladiatorRevolt_gameYear;
-// 8B45F4: using guessed type int event_gladiatorRevold_endMonth;
-// 8E1494: using guessed type int event_gladiatorRevolt_state;
-// 902EA8: using guessed type int event_gladiatorRevolt_month;
-// 98ED78: using guessed type int scn_event_gladiatorRevolt_on;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (004923B0) --------------------------------------------------------
 void  fun_handleEmperorChangeEvent()
 {
-  if ( mode_editor != 1 )
+  if ( mode_editor != 1 && scn_event_emperorChange_on)
   {
-    if ( scn_event_emperorChange_on )
-    {
       if ( event_emperorChange_state < 1 )
       {
         if ( !event_emperorChange_state )
@@ -62580,17 +60167,9 @@ void  fun_handleEmperorChangeEvent()
           }
         }
       }
-    }
   }
 }
-// 659B50: using guessed type int message_usePopup;
-// 8B45F8: using guessed type int event_emperorChange_state;
-// 8EE1C4: using guessed type int event_emperorChange_gameYear;
-// 929648: using guessed type int event_emperorChange_month;
-// 98ED80: using guessed type int scn_event_emperorChange_on;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (00492450) --------------------------------------------------------
 void  fun_handleRandomEvents()
 {
   int gridOffsetIronmine; // [sp+4Ch] [bp-8h]@46
@@ -62710,8 +60289,10 @@ void  sub_492870()
   city_inform[ciid].enemyDestroyedBuildings = 0;
   city_inform[ciid].dword_654598 = 0;
   city_inform[ciid].dword_654624 = 0;
+
   if ( city_inform[ciid].dword_654468 > 0 )
     --city_inform[ciid].dword_654468;
+
   for ( walkerId = 1; walkerId < 1000; ++walkerId )
   {
     if ( walkers[walkerId].state )
@@ -62750,7 +60331,7 @@ void  fun_walker_immigrant()
   buildingId = walker_migrantDestinationHome[64 * walkerId];
   if ( buildings[buildingId].inUse == 1
     && building_26_immigrantId[64 * buildingId] == walkerId
-    && buildings[buildingId].houseSize )
+    && buildings[buildingId].house_size )
   {
     ++byte_7FA341[128 * walkerId];
     if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
@@ -62831,7 +60412,7 @@ void  fun_walker_immigrant()
           if ( !buildings[buildingId].house_population )
           {
             if ( !debug_houseEvolution )
-              fun_evolveHouseTo(buildingId, 10);
+              fun_evolveHouseTo(buildingId, B_HouseVacantLot);
           }
           buildings[buildingId].house_population += (unsigned __int8)walker_migrantNumPeopleCarried[128 * walkerId];
           building_18_house_roomForPeople[64 * buildingId] = v1 - buildings[buildingId].house_population;
@@ -63095,7 +60676,7 @@ void  fun_walker_homeless()
               if ( v0 < (unsigned __int8)walker_migrantNumPeopleCarried[128 * walkerId] )
                 walker_migrantNumPeopleCarried[128 * walkerId] = v0;
               if ( !buildings[v5].house_population )
-                fun_evolveHouseTo(v5, 10);
+                fun_evolveHouseTo(v5, B_HouseVacantLot);
               buildings[v5].house_population += (unsigned __int8)walker_migrantNumPeopleCarried[128 * walkerId];
               building_18_house_roomForPeople[64 * v5] = housePeopleNumber - buildings[v5].house_population;
               sub_4E3920(ciid, (unsigned __int8)walker_migrantNumPeopleCarried[128 * walkerId]);
@@ -63477,14 +61058,20 @@ void  fun_walker_laborSeeker()
   walkers[walkerId].byte_7FA34C = 0;
   word_7FA372[64 * walkerId] = 384;
   v0 = walkers[walkerId].buildingId;
+
   if ( buildings[v0].inUse != 1 || building_24_laborSeekerId[64 * v0] != walkerId )
     walkers[walkerId].state = 2;
+
   ++byte_7FA341[128 * walkerId];
+
+
   if ( (signed int)(unsigned __int8)byte_7FA341[128 * walkerId] >= 12 )
     byte_7FA341[128 * walkerId] = 0;
+
   sub_49FFE0(1);
   dword_65DF24 = walkers[walkerId].direction - setting_map_orientation;
   dword_65DF24 += dword_65DF24 < 0 ? 8 : 0;
+
   if ( walkers[walkerId].actionState == 149 )
     walkers[walkerId].word_7FA344 = word_6E6C22 + (unsigned __int8)byte_5F5EA4[word_7FA366[64 * walkerId] / 2] + 96;
   else
@@ -63495,9 +61082,12 @@ void  fun_walker_explosion()
 {
   walkers[walkerId].byte_7FA34C = 1;
   ++walkers[walkerId].progressOnTile;
+
   if ( walkers[walkerId].progressOnTile > 44 )
     walkers[walkerId].state = 2;
+
   sub_4B66E0(walkerId, (unsigned __int8)byte_7FA389[128 * walkerId]);
+
   if ( walkers[walkerId].progressOnTile < 48 )
     walkers[walkerId].word_7FA344 = LOWORD(dword_5FA2A8[walkers[walkerId].progressOnTile / 2]) + word_6E6C7C;
   else
@@ -65241,36 +62831,7 @@ void  fun_walker_soldier()
     }
   }
 }
-// 401203: using guessed type _DWORD  sub_401203(_DWORD);
-// 4016D1: using guessed type _DWORD  sub_4016D1(__int16, _DWORD, _DWORD, char, char, _DWORD);
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 402356: using guessed type _DWORD  sub_402356(_DWORD, _DWORD, _DWORD);
-// 4028BA: using guessed type _DWORD  sub_4028BA(_DWORD, _DWORD);
-// 5F3CB0: using guessed type int dword_5F3CB0[];
-// 654598: using guessed type int dword_654598[];
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D44: using guessed type __int16 word_6E6D44;
-// 6E6D48: using guessed type __int16 word_6E6D48;
-// 6E6D80: using guessed type __int16 word_6E6D80;
-// 7F87EA: using guessed type __int16 formation_layout[];
-// 7F8800: using guessed type __int16 formation_hasMilitaryTraining[];
-// 7F8808: using guessed type __int16 formation_48[];
-// 7F8812: using guessed type __int16 formation_52[];
-// 7F8814: using guessed type __int16 formation_54[];
-// 7F8816: using guessed type __int16 formation_56[];
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA35E: using guessed type __int16 word_7FA35E[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA390: using guessed type __int16 walker_formationId[];
-// 7FA3B0: using guessed type __int16 word_7FA3B0[];
-// 7FA3B2: using guessed type __int16 word_7FA3B2[];
-// 7FA3B4: using guessed type __int16 word_7FA3B4[];
-// 7FA3B6: using guessed type __int16 word_7FA3B6[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0049C5A0) --------------------------------------------------------
 void  fun_walker_militaryStandard()
 {
   int v0; // [sp+50h] [bp-4h]@1
@@ -66212,7 +63773,7 @@ signed int  sub_49FDE0(int walkerId)
     v3 = grid_buildingIds[v1];
     if ( grid_buildingIds[v1] )
     {
-      if ( (!buildings[v3].houseSize || buildings[v3].level_resourceId > 5)
+      if ( (!buildings[v3].house_size || buildings[v3].level_resourceId > 5)
         && buildings[v3].type != B_WarehouseSpace
         && buildings[v3].type != B_Warehouse
         && buildings[v3].type != B_FortGround
@@ -66708,16 +64269,7 @@ void  fun_walker_surgeon()
   else
     walkers[walkerId].word_7FA344 = word_6E6D78 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 401D7A: using guessed type _DWORD  sub_401D7A(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D78: using guessed type __int16 word_6E6D78;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (004A2160) --------------------------------------------------------
 void  fun_walker_worker()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -66729,11 +64281,7 @@ void  fun_walker_worker()
   if ( buildings[v0].inUse != 1 || building_22_walkerId[64 * v0] != walkerId )
     walkers[walkerId].state = 2;
 }
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (004A2210) --------------------------------------------------------
 void  fun_walker_mapFlag()
 {
   ++byte_7FA341[128 * walkerId];
@@ -66994,6 +64542,7 @@ void  fun_walker_docker()
   }
   if ( building_65_house_bathhouse_dock_numships_entert_days[128 * v5] )
     --building_65_house_bathhouse_dock_numships_entert_days[128 * v5];
+
   if ( building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v5] )
   {
     v7 = building_72_wharf_hasBoat_house_evolveStatusDesir[64 * v5];
@@ -67444,12 +64993,7 @@ signed int  sub_4A4B50(int a1)
   }
   return result;
 }
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BDAC: using guessed type __int16 building_6c_word_94BDAC[];
 
-//----- (004A4CC0) --------------------------------------------------------
 bool  sub_4A4CC0(int a1)
 {
   bool result; // eax@2
@@ -67660,20 +65204,7 @@ void  fun_walker_marketBuyer()
   else
     walkers[walkerId].word_7FA344 = word_6E6C84 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 401172: using guessed type _DWORD  sub_401172(_DWORD, _DWORD, _DWORD);
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 40300D: using guessed type _DWORD  sub_40300D(_DWORD, _DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C84: using guessed type __int16 word_6E6C84;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 94BD64: using guessed type __int16 building_24_laborSeekerId[];
 
-//----- (004A5680) --------------------------------------------------------
 signed int  sub_4A5680(int a1, int a2, int a3)
 {
   signed int result; // eax@32
@@ -67867,12 +65398,7 @@ signed int  sub_4A5680(int a1, int a2, int a3)
   }
   return result;
 }
-// 4024D2: using guessed type _DWORD  sub_4024D2(_DWORD, _DWORD, _DWORD, _DWORD);
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA398: using guessed type __int16 walker_tradeCaravanNextId[];
-// 94BD8C: using guessed type __int16 building_4c_granary_capacity[];
 
-//----- (004A5EB0) --------------------------------------------------------
 signed int  sub_4A5EB0(int a1, int a2, int a3)
 {
   signed int result; // eax@15
@@ -70443,21 +67969,7 @@ void  fun_walker_nativeTrader()
     byte_7FA39D[128 * walkerId] = byte_5FA159[2 * dword_65DF24];
   }
 }
-// 40141F: using guessed type _DWORD  sub_40141F(_DWORD, _DWORD, _DWORD);
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401A8C: using guessed type _DWORD  sub_401A8C(_DWORD, _DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 402E8C: using guessed type _DWORD  sub_402E8C(_DWORD, _DWORD, _DWORD, _DWORD);
-// 402FAE: using guessed type _DWORD  sub_402FAE(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6C86: using guessed type __int16 word_6E6C86;
-// 6E6CB6: using guessed type __int16 word_6E6CB6;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
 
-//----- (004AEC30) --------------------------------------------------------
 void  fun_walker_arrow()
 {
   __int16 v0; // ST54_2@13
@@ -70518,21 +68030,7 @@ void  fun_walker_arrow()
   dword_65DF24 += dword_65DF24 < 0 ? 0x10 : 0;
   walkers[walkerId].word_7FA344 = word_6E6D3C + dword_65DF24 + 16;
 }
-// 401C8A: using guessed type _DWORD  sub_401C8A(_DWORD);
-// 402919: using guessed type _DWORD  sub_402919(_DWORD);
-// 402E50: using guessed type _DWORD  sub_402E50(_DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D3C: using guessed type __int16 word_6E6D3C;
-// 7F87EA: using guessed type __int16 formation_layout[];
-// 7F8812: using guessed type __int16 formation_52[];
-// 7F8816: using guessed type __int16 formation_56[];
-// 7F8818: using guessed type __int16 formation_58[];
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004AEF80) --------------------------------------------------------
 int  fun_walker_javelin()
 {
   __int16 v0; // ST54_2@13
@@ -70596,21 +68094,7 @@ int  fun_walker_javelin()
   walkers[walkerId].word_7FA344 = dword_65DF24 + word_6E6D3C;
   return result;
 }
-// 401C8A: using guessed type _DWORD  sub_401C8A(_DWORD);
-// 402DA1: using guessed type _DWORD  sub_402DA1(_DWORD);
-// 402E50: using guessed type _DWORD  sub_402E50(_DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D3C: using guessed type __int16 word_6E6D3C;
-// 7F87EA: using guessed type __int16 formation_layout[];
-// 7F8812: using guessed type __int16 formation_52[];
-// 7F8816: using guessed type __int16 formation_56[];
-// 7F8818: using guessed type __int16 formation_58[];
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004AF2C0) --------------------------------------------------------
 void  fun_walker_bolt()
 {
   int v0; // [sp+4Ch] [bp-20h]@6
@@ -70662,16 +68146,7 @@ void  fun_walker_bolt()
   dword_65DF24 += dword_65DF24 < 0 ? 0x10 : 0;
   walkers[walkerId].word_7FA344 = word_6E6D3C + dword_65DF24 + 32;
 }
-// 401C8A: using guessed type _DWORD  sub_401C8A(_DWORD);
-// 402DA1: using guessed type _DWORD  sub_402DA1(_DWORD);
-// 402E50: using guessed type _DWORD  sub_402E50(_DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D3C: using guessed type __int16 word_6E6D3C;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004AF570) --------------------------------------------------------
 void  fun_walker_ballista()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -70790,16 +68265,7 @@ void  fun_walker_missionary()
   else
     walkers[walkerId].word_7FA344 = word_6E6D7C + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 401D7A: using guessed type _DWORD  sub_401D7A(_DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D7C: using guessed type __int16 word_6E6D7C;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA372: using guessed type __int16 word_7FA372[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 94BD62: using guessed type __int16 building_22_walkerId[];
 
-//----- (004AFE00) --------------------------------------------------------
 void  fun_walker_seagulls()
 {
   byte_7FA3A2[128 * walkerId] = 0;
@@ -70893,17 +68359,7 @@ void  fun_walker_deliveryBoy()
   else
     walkers[walkerId].word_7FA344 = word_6E6D52 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
 }
-// 403170: using guessed type _DWORD  sub_403170(_DWORD, _DWORD, _DWORD);
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D52: using guessed type __int16 word_6E6D52;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA398: using guessed type __int16 walker_tradeCaravanNextId[];
-// 94BD8C: using guessed type __int16 building_4c_granary_capacity[];
 
-//----- (004B04A0) --------------------------------------------------------
 void  fun_walker_shipwreck()
 {
   byte_7FA395[128 * walkerId] = 0;
@@ -71192,18 +68648,7 @@ void  fun_walker_zebra()
       walkers[walkerId].word_7FA344 = word_6E6D86 + dword_65DF24 + 8 * (unsigned __int8)byte_7FA341[128 * walkerId];
   }
 }
-// 4018B6: using guessed type _DWORD  sub_4018B6(_DWORD);
-// 401C8F: using guessed type _DWORD  sub_401C8F(_DWORD);
-// 5F4130: using guessed type int dword_5F4130[];
-// 6543A2: using guessed type __int16 word_6543A2[];
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6D86: using guessed type __int16 word_6E6D86;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA374: using guessed type __int16 word_7FA374[];
-// 7FA390: using guessed type __int16 walker_formationId[];
 
-//----- (004B1A30) --------------------------------------------------------
 void  fun_walker_spear()
 {
   __int16 v0; // ST54_2@13
@@ -71984,11 +69429,7 @@ char  fun_roamWalker(int walkerId)
   }
   return v1;
 }
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
 
-//----- (004B3F00) --------------------------------------------------------
 void  sub_4B3F00(int a1, int a2)
 {
   signed int v2; // eax@38
@@ -72281,7 +69722,6 @@ void  sub_4B4880(int a1, int a2, int a3)
   }
 }
 
-//----- (004B4A40) --------------------------------------------------------
 void  fun_walkerWalkTicks(int walkerId, int numTicks)
 {
   while ( numTicks > 0 )
@@ -72311,11 +69751,7 @@ void  fun_walkerWalkTicks(int walkerId, int numTicks)
   }
   dword_7FA238 = 0;
 }
-// 7FA238: using guessed type int dword_7FA238;
-// 7FA36A: using guessed type __int16 walker_destinationpathId[];
-// 7FA36C: using guessed type __int16 walker_destinationPathCurrent[];
 
-//----- (004B4BC0) --------------------------------------------------------
 void  sub_4B4BC0(int a1, int a2)
 {
   while ( a2 > 0 )
@@ -72329,7 +69765,6 @@ void  sub_4B4BC0(int a1, int a2)
   }
 }
 
-//----- (004B4C50) --------------------------------------------------------
 void  fun_determineDestinationPathForWalker(int walkerId)
 {
   signed int v1; // [sp+4Ch] [bp-Ch]@19
@@ -72488,20 +69923,7 @@ void  fun_determineDestinationPathForWalker(int walkerId)
     }
   }
 }
-// 4015FA: using guessed type _DWORD  sub_4015FA(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 401B59: using guessed type _DWORD  sub_401B59(_DWORD, _DWORD, _DWORD, _DWORD);
-// 401D57: using guessed type _DWORD  sub_401D57(_DWORD, _DWORD);
-// 401DC0: using guessed type _DWORD  sub_401DC0(_DWORD, _DWORD, _DWORD, _DWORD);
-// 40209F: using guessed type _DWORD  sub_40209F(_DWORD, _DWORD, _DWORD, _DWORD);
-// 7FA36A: using guessed type __int16 walker_destinationpathId[];
-// 7FA36C: using guessed type __int16 walker_destinationPathCurrent[];
-// 7FA36E: using guessed type __int16 walker_destinationPathLength[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 990CA4: using guessed type __int16 map_riverEntry_x;
-// 990CA6: using guessed type __int16 map_riverEntry_y;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (004B5430) --------------------------------------------------------
 void  fun_removeDestinationPathForWalker(int walkerId)
 {
   if ( walker_destinationpathId[64 * walkerId] > 0 )
@@ -72511,9 +69933,7 @@ void  fun_removeDestinationPathForWalker(int walkerId)
     walker_destinationpathId[64 * walkerId] = 0;
   }
 }
-// 7FA36A: using guessed type __int16 walker_destinationpathId[];
 
-//----- (004B54B0) --------------------------------------------------------
 void  fun_clearDestinationPaths()
 {
   signed int j; // [sp+4Ch] [bp-8h]@3
@@ -72527,7 +69947,6 @@ void  fun_clearDestinationPaths()
   }
 }
 
-//----- (004B5540) --------------------------------------------------------
 void  fun_garbageCollectDestinationPaths()
 {
   signed int walkerId; // [sp+4Ch] [bp-8h]@4
@@ -72548,9 +69967,7 @@ void  fun_garbageCollectDestinationPaths()
     }
   }
 }
-// 7FA36A: using guessed type __int16 walker_destinationpathId[];
 
-//----- (004B55F0) --------------------------------------------------------
 int  fun_getNumFreeDestinationPaths()
 {
   int free; // [sp+4Ch] [bp-8h]@1
@@ -72594,11 +70011,7 @@ void  fun_walkerGetNextTileDirection(int walkerId)
       walkers[walkerId].direction = 10;
   }
 }
-// 7FA36A: using guessed type __int16 walker_destinationpathId[];
-// 7FA36C: using guessed type __int16 walker_destinationPathCurrent[];
-// 7FA36E: using guessed type __int16 walker_destinationPathLength[];
 
-//----- (004B57A0) --------------------------------------------------------
 void  fun_walkerAdvanceTile(int walkerId)
 {
   int v1; // [sp+4Ch] [bp-18h]@3
@@ -72730,38 +70143,38 @@ char  sub_4B5BE0(int a1)
   v1 = walkers[a1].direction;
   switch ( v1 )
   {
-    case 0:
+    case Direction_North:
       --walkers[a1].y;
       walkers[a1].gridOffset -= 162;
       goto LABEL_10;
-    case 1:
+    case Direction_NorthEast:
       --walkers[a1].y;
       ++walkers[a1].x;
       walkers[a1].gridOffset -= 161;
       goto LABEL_10;
-    case 2:
+    case Direction_East:
       ++walkers[a1].x;
       ++walkers[a1].gridOffset;
       goto LABEL_10;
-    case 3:
+    case Direction_SouthEast:
       ++walkers[a1].y;
       ++walkers[a1].x;
       walkers[a1].gridOffset += 163;
       goto LABEL_10;
-    case 4:
+    case Direction_South:
       ++walkers[a1].y;
       walkers[a1].gridOffset += 162;
       goto LABEL_10;
-    case 5:
+    case Direction_SouthWest:
       ++walkers[a1].y;
       --walkers[a1].x;
       walkers[a1].gridOffset += 161;
       goto LABEL_10;
-    case 6:
+    case Direction_West:
       --walkers[a1].x;
       --walkers[a1].gridOffset;
       goto LABEL_10;
-    case 7:
+    case Direction_NorthWest:
       --walkers[a1].y;
       --walkers[a1].x;
       walkers[a1].gridOffset -= 163;
@@ -72991,11 +70404,7 @@ int  sub_4B69C0(int a1)
   }
   return result;
 }
-// 7FA382: using guessed type __int16 word_7FA382[];
-// 7FA384: using guessed type __int16 word_7FA384[];
-// 7FA386: using guessed type __int16 word_7FA386[];
 
-//----- (004B6B70) --------------------------------------------------------
 int  sub_4B6B70(int a1, int a2, int a3, int a4, int a5, int a6)
 {
   int result; // eax@32
@@ -73077,13 +70486,7 @@ int  sub_4B6B70(int a1, int a2, int a3, int a4, int a5, int a6)
   }
   return result;
 }
-// 7FA37E: using guessed type __int16 word_7FA37E[];
-// 7FA380: using guessed type __int16 word_7FA380[];
-// 7FA382: using guessed type __int16 word_7FA382[];
-// 7FA384: using guessed type __int16 word_7FA384[];
-// 7FA386: using guessed type __int16 word_7FA386[];
 
-//----- (004B6F50) --------------------------------------------------------
 __int16  sub_4B6F50(int a1)
 {
   __int16 result; // ax@2
@@ -73104,10 +70507,7 @@ __int16  sub_4B6F50(int a1)
   }
   return result;
 }
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA380: using guessed type __int16 word_7FA380[];
 
-//----- (004B7000) --------------------------------------------------------
 __int16  sub_4B7000(int a1)
 {
   __int16 result; // ax@2
@@ -73202,18 +70602,7 @@ LABEL_4:
     return result;
   }
 }
-// 401208: using guessed type _DWORD  sub_401208(_DWORD);
-// 401F37: using guessed type _DWORD  sub_401F37(_DWORD);
-// 4025D1: using guessed type _DWORD  sub_4025D1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 402608: using guessed type _DWORD  sub_402608(_DWORD);
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA382: using guessed type __int16 word_7FA382[];
-// 7FA384: using guessed type __int16 word_7FA384[];
-// 7FA386: using guessed type __int16 word_7FA386[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004B73E0) --------------------------------------------------------
 signed int  fun_createDustCloud(__int16 x, __int16 y, int size)
 {
   int v4; // [sp+4Ch] [bp-10h]@1
@@ -73377,15 +70766,7 @@ int  fun_spawnWalker(char a1, int type, __int16 x, __int16 y, char a5)
     walkerId_lastUsed = walkerId;
   return walkerId;
 }
-// 607FC8: using guessed type int dword_607FC8;
-// 6AD9EC: using guessed type int random_7f_1;
-// 7FA35A: using guessed type __int16 walker_gridOffset[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA3B4: using guessed type __int16 word_7FA3B4[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004B7BC0) --------------------------------------------------------
 void  fun_deleteWalker(int walkerId)
 {
   signed int i; // [sp+4Ch] [bp-8h]@31
@@ -73989,7 +71370,6 @@ signed int  fun_hasEnemyNear(signed int xMin, signed int yMin, signed int xMax, 
   return 0;
 }
 
-//----- (004B93A0) --------------------------------------------------------
 void  fun_initWalkerNameSequences()
 {
   fun_generateRandomness();
@@ -74035,30 +71415,7 @@ void  fun_initWalkerNameSequences()
   fun_generateRandomness();
   seqWalkerName_unknown2 = random_7f_1 & 0xF;
 }
-// 6AD9EC: using guessed type int random_7f_1;
-// 7E324C: using guessed type int seqWalkerName_citizen;
-// 7F87A4: using guessed type int seqWalkerName_taxCollector;
-// 7F87B4: using guessed type int seqWalkerName_actor;
-// 7F87B8: using guessed type int seqWalkerName_javelinThrower;
-// 7FA0C0: using guessed type int seqWalkerName_barbarian;
-// 7FA230: using guessed type int seqWalkerName_patrician;
-// 819740: using guessed type int seqWalkerName_lionTamer;
-// 819744: using guessed type int seqWalkerName_legionary;
-// 8197C4: using guessed type int seqWalkerName_unknown2;
-// 819844: using guessed type int seqWalkerName_female;
-// 81984C: using guessed type int seqWalkerName_prefect;
-// 819854: using guessed type int seqWalkerName_cavalry;
-// 819944: using guessed type int seqWalkerName_charioteer;
-// 862D4C: using guessed type int seqWalkerName_gladiator;
-// 862D50: using guessed type int seqWalkerName_arabian;
-// 862D54: using guessed type int seqWalkerName_trader;
-// 862E44: using guessed type int seqWalkerName_unknown1;
-// 862E4C: using guessed type int seqWalkerName_engineer;
-// 862E50: using guessed type int seqWalkerName_greek;
-// 863310: using guessed type int seqWalkerName_tradeShip;
-// 863314: using guessed type int seqWalkerName_egyptian;
 
-//----- (004B95B0) --------------------------------------------------------
 void  fun_generateWalkerName(int walkerId)
 {
   int formation; // [sp+4Ch] [bp-4h]@1
@@ -74419,9 +71776,7 @@ int  unused_4BAA80(int a1)
     result = 1;
   return result;
 }
-// 7FA35E: using guessed type __int16 word_7FA35E[];
 
-//----- (004BAAF0) --------------------------------------------------------
 signed int  fun_createFortFormation(int buildingId)
 {
   int flagId; // ST60_4@5
@@ -74492,11 +71847,7 @@ signed int  fun_createFormation(__int16 walkerType, int layout, int orientation,
   formation_morale[64 * i] = 100;
   return i;
 }
-// 7F87C4: using guessed type __int16 formation_walkerType[];
-// 7F87EA: using guessed type __int16 formation_layout[];
-// 7F87EC: using guessed type __int16 formation_morale[];
 
-//----- (004BAED0) --------------------------------------------------------
 signed int  fun_generateSoldierFromBarracks(int buildingId)
 {
   signed int result; // eax@33
@@ -74601,16 +71952,7 @@ signed int  fun_generateSoldierFromBarracks(int buildingId)
     result = 0;
   return result;
 }
-// 40310C: using guessed type _DWORD  sub_40310C(_DWORD);
-// 7F87C4: using guessed type __int16 formation_walkerType[];
-// 7F87C6: using guessed type __int16 formation_buildingId[];
-// 7F87FE: using guessed type __int16 formation_3e[];
-// 7FA35E: using guessed type __int16 word_7FA35E[];
-// 7FA390: using guessed type __int16 walker_formationId[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
 
-//----- (004BB2D0) --------------------------------------------------------
 signed int  fun_generateTowerSentryFromBarracks(int buildingId)
 {
   signed int result; // eax@2
@@ -74717,11 +72059,7 @@ signed int  sub_4BB640(int a1)
   }
   return v2;
 }
-// 7F87C6: using guessed type __int16 formation_buildingId[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
 
-//----- (004BB790) --------------------------------------------------------
 void  sub_4BB790(int a1)
 {
   int v1; // [sp+4Ch] [bp-10h]@1
@@ -74767,12 +72105,7 @@ void  sub_4BB790(int a1)
     }
   }
 }
-// 7F87FE: using guessed type __int16 formation_3e[];
-// 7F881C: using guessed type __int16 formation_cursedByMars[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD88: using guessed type __int16 building_48_word_94BD88[];
 
-//----- (004BB990) --------------------------------------------------------
 int  sub_4BB990(int a1)
 {
   fun_calculateFortTotals();
@@ -74841,7 +72174,6 @@ signed int  fun_getFormationIdOfLegion(int legionId)
   return 0;
 }
 
-//----- (004BBC10) --------------------------------------------------------
 int  fun_calculateNumForts()
 {
   int numForts; // [sp+4Ch] [bp-8h]@1
@@ -74925,11 +72257,7 @@ void  sub_4BBD90()
     }
   }
 }
-// 7F87EA: using guessed type __int16 formation_layout[];
-// 7F8808: using guessed type __int16 formation_48[];
-// 7F881A: using guessed type __int16 formation_5a[];
 
-//----- (004BBF50) --------------------------------------------------------
 void  sub_4BBF50()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -74996,9 +72324,7 @@ void  sub_4BBF50()
     }
   }
 }
-// 7F87EC: using guessed type __int16 formation_morale[];
 
-//----- (004BC1C0) --------------------------------------------------------
 void  fun_formationDecreaseMoraleAfterComradeDeath(int a2)
 {
   int percentageDiedOff; // [sp+4Ch] [bp-4h]@1
@@ -75039,7 +72365,6 @@ void  fun_formationDecreaseMoraleAfterComradeDeath(int a2)
   }
 }
 
-//----- (004BC2A0) --------------------------------------------------------
 void  fun_formationIncreaseMorale(int formationId, __int16 moraleToAdd)
 {
   signed int maxMorale; // [sp+4Ch] [bp-4h]@3
@@ -75094,11 +72419,7 @@ void  fun_formationIncreaseMorale(int formationId, __int16 moraleToAdd)
   if ( formation_morale[64 * formationId] < 0 )
     formation_morale[64 * formationId] = 0;
 }
-// 7F87C4: using guessed type __int16 formation_walkerType[];
-// 7F87EC: using guessed type __int16 formation_morale[];
-// 7F8800: using guessed type __int16 formation_hasMilitaryTraining[];
 
-//----- (004BC4C0) --------------------------------------------------------
 void  fun_increaseMoraleOfAllForts(__int16 a1)
 {
   int i; // [sp+4Ch] [bp-4h]@1
@@ -75273,17 +72594,7 @@ void  sub_4BC600()
     }
   }
 }
-// 7F87A8: using guessed type int dword_7F87A8;
-// 7F87AC: using guessed type int dword_7F87AC;
-// 7F87C4: using guessed type __int16 formation_walkerType[];
-// 7F8802: using guessed type __int16 formation_42[];
-// 7F8804: using guessed type __int16 formation_44[];
-// 7F8812: using guessed type __int16 formation_52[];
-// 7FA234: using guessed type int dword_7FA234;
-// 7FA390: using guessed type __int16 walker_formationId[];
-// 819848: using guessed type int dword_819848;
 
-//----- (004BCD40) --------------------------------------------------------
 void  fun_setMaxSoldiersPerFort()
 {
   signed int i; // [sp+54h] [bp-4h]@1
@@ -75304,10 +72615,7 @@ void  fun_setMaxSoldiersPerFort()
     }
   }
 }
-// 7F87C6: using guessed type __int16 formation_buildingId[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
 
-//----- (004BCE50) --------------------------------------------------------
 int  fun_getInvasionGridOffset(int invasionId)
 {
   int result; // eax@13
@@ -75332,9 +72640,7 @@ int  fun_getInvasionGridOffset(int invasionId)
     result = 0;
   return result;
 }
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004BCF70) --------------------------------------------------------
 int  sub_4BCF70()
 {
   int result; // eax@2
@@ -75450,10 +72756,7 @@ int  sub_4BCF70()
   }
   return result;
 }
-// 7F87EA: using guessed type __int16 formation_layout[];
-// 7F8814: using guessed type __int16 formation_54[];
 
-//----- (004BD4B0) --------------------------------------------------------
 void  fun_clearFormations()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -75464,11 +72767,7 @@ void  fun_clearFormations()
   formationId_lastFort = 0;
   numForts = 0;
 }
-// 7FA228: using guessed type int numForts;
-// 819850: using guessed type int formationId_lastFort;
-// 862D48: using guessed type int formationId_lastInUse;
 
-//----- (004BD530) --------------------------------------------------------
 void  sub_4BD530(int a1)
 {
   if ( a1 > 0 )
@@ -75482,9 +72781,7 @@ void  sub_4BD530(int a1)
     }
   }
 }
-// 7F87F8: using guessed type __int16 formation_bannerId[];
 
-//----- (004BD5C0) --------------------------------------------------------
 void sub_4BD5C0()
 {
   int v0; // [sp+4Ch] [bp-10h]@1
@@ -75581,7 +72878,6 @@ int  sub_4BD8D0()
   return result;
 }
 
-//----- (004BDA20) --------------------------------------------------------
 void  sub_4BDA20(int a1)
 {
   int v1; // [sp+4Ch] [bp-14h]@20
@@ -75770,13 +73066,7 @@ void  sub_4BE0F0()
   dword_7F87AC = 0;
   dword_863318 = 0;
 }
-// 7F87A8: using guessed type int dword_7F87A8;
-// 7F87AC: using guessed type int dword_7F87AC;
-// 7FA234: using guessed type int dword_7FA234;
-// 819848: using guessed type int dword_819848;
-// 863318: using guessed type int dword_863318;
 
-//----- (004BE200) --------------------------------------------------------
 void  sub_4BE200()
 {
   signed int v0; // [sp+4Ch] [bp-40h]@1
@@ -76160,32 +73450,7 @@ void  sub_4BE200()
     sub_4C0F10(0);
   }
 }
-// 4015BE: using guessed type _DWORD  sub_4015BE(_DWORD);
-// 4015FA: using guessed type _DWORD  sub_4015FA(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 40218A: using guessed type _DWORD  sub_40218A(_DWORD);
-// 40231A: using guessed type _DWORD  sub_40231A(_DWORD, _DWORD, _DWORD);
-// 402CF7: using guessed type _DWORD  sub_402CF7(_DWORD, _DWORD, _DWORD);
-// 654598: using guessed type int dword_654598[];
-// 7F87AC: using guessed type int dword_7F87AC;
-// 7F87C4: using guessed type __int16 formation_walkerType[];
-// 7F87EA: using guessed type __int16 formation_layout[];
-// 7F87F6: using guessed type __int16 formation_36[];
-// 7F8806: using guessed type __int16 formation_46[];
-// 7F8808: using guessed type __int16 formation_48[];
-// 7F880A: using guessed type __int16 formation_4a[];
-// 7F880C: using guessed type __int16 formation_4c[];
-// 7F880E: using guessed type __int16 formation_4e[];
-// 7F8810: using guessed type __int16 formation_50[];
-// 7F8814: using guessed type __int16 formation_54[];
-// 7F8816: using guessed type __int16 formation_56[];
-// 7F8818: using guessed type __int16 formation_58[];
-// 7FA1A8: using guessed type int dword_7FA1A8;
-// 7FA1AC: using guessed type int dword_7FA1AC;
-// 7FA234: using guessed type int dword_7FA234;
-// 819848: using guessed type int dword_819848;
-// 863318: using guessed type int dword_863318;
 
-//----- (004BF390) --------------------------------------------------------
 void  sub_4BF390(int a1)
 {
   if ( sub_501B60(
@@ -76426,9 +73691,7 @@ void  sub_4BFCC0(int a1, int a2)
     }
   }
 }
-// 7F8806: using guessed type __int16 formation_46[];
 
-//----- (004BFE10) --------------------------------------------------------
 signed int  sub_4BFE10(int a1, signed int a2, int a3, int a4, int a5, int a6)
 {
   int v7; // [sp+4Ch] [bp-10h]@23
@@ -76531,6 +73794,7 @@ void  fun_killEnemiesSpiritOfMars()
       {
         if ( v1 <= 0 )
           break;
+
         if ( walkers[i].type< (signed int)Walker_Enemy43
           || walkers[i].type> (signed int)Walker_Enemy53 )
         {
@@ -76538,7 +73802,7 @@ void  fun_killEnemiesSpiritOfMars()
           {
             if ( walkers[i].type<= (signed int)Walker_Enemy57 )
             {
-              walkers[i].actionState = -107;
+              walkers[i].actionState = actionWalkerDie;
               --v1;
               if ( !gridOffset )
                 gridOffset = walkers[i].gridOffset;
@@ -76547,7 +73811,7 @@ void  fun_killEnemiesSpiritOfMars()
         }
         else
         {
-          walkers[i].actionState = -107;
+          walkers[i].actionState = actionWalkerDie;
           --v1;
           if ( !gridOffset )
             gridOffset = walkers[i].gridOffset;
@@ -76560,7 +73824,7 @@ void  fun_killEnemiesSpiritOfMars()
   }
 }
 
-void  unused_4C01E0()
+void  killAllWalkersExcludeEnemies()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
 
@@ -76568,18 +73832,18 @@ void  unused_4C01E0()
   {
     if ( walkers[i].state == 1 )
     {
-      if ( (signed int)walkers[i].type< 43
-        || (signed int)walkers[i].type> 53 )
+      if ( (signed int)walkers[i].type < Walker_Enemy43
+        || (signed int)walkers[i].type > Walker_Enemy53 )
       {
-        if ( (signed int)walkers[i].type>= 55 )
+        if ( (signed int)walkers[i].type>= Walker_Enemy55 )
         {
-          if ( (signed int)walkers[i].type<= 57 )
-            walkers[i].actionState = -107;
+          if ( (signed int)walkers[i].type<= Walker_Enemy57 )
+            walkers[i].actionState = actionWalkerDie;
         }
       }
       else
       {
-        walkers[i].actionState = -107;
+        walkers[i].actionState = actionWalkerDie;
       }
     }
   }
@@ -76654,9 +73918,7 @@ void  sub_4C0410(int a1)
     }
   }
 }
-// 7FA366: using guessed type __int16 word_7FA366[];
 
-//----- (004C04D0) --------------------------------------------------------
 void  sub_4C04D0()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -76684,9 +73946,7 @@ void  sub_4C04D0()
     }
   }
 }
-// 40303F: using guessed type _DWORD  sub_40303F(_DWORD, _DWORD, _DWORD, char);
 
-//----- (004C0730) --------------------------------------------------------
 void  sub_4C0730(int a1, int a2, int a3, char a4)
 {
   int v4; // [sp+4Ch] [bp-1Ch]@1
@@ -76792,12 +74052,7 @@ signed int  sub_4C0910(int a1, int a2, int a3)
   }
   return result;
 }
-// 634480: using guessed type __int16 grid_pathingDistance[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004C0AF0) --------------------------------------------------------
 void  sub_4C0AF0(int a1)
 {
   signed int v1; // [sp+4Ch] [bp-20h]@3
@@ -76914,17 +74169,17 @@ void  sub_4C0F10(int a1)
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].type != 80 )
+      if ( buildings[i].type != B_MissionPost )
       {
-        if ( buildings[i].type != 88 )
+        if ( buildings[i].type != B_NativeHut )
         {
-          if ( buildings[i].type != 89 )
+          if ( buildings[i].type != B_NativeMeeting )
           {
-            if ( buildings[i].type != 93 )
+            if ( buildings[i].type != B_NativeCrops )
             {
-              if ( buildings[i].type != 72 )
+              if ( buildings[i].type != B_Warehouse )
               {
-                if ( buildings[i].type != 57 )
+                if ( buildings[i].type != B_FortGround__ )
                 {
                   v2 = fun_getDistanceMaximum(
                          city_inform[ciid].dword_6544C4,
@@ -76961,7 +74216,7 @@ void  sub_4C1100()
 
   v1 = 100;
   v0 = 0;
-  for ( i = 1; i < 2000; ++i )
+  for ( i = 1; i < MAX_BUILDINGS; ++i )
   {
     if ( buildings[i].inUse == 1 )
     {
@@ -76981,7 +74236,7 @@ void  sub_4C1100()
   }
   if ( v0 > 0 )
   {
-    if ( buildings[v0].type == 72 )
+    if ( buildings[v0].type == B_Warehouse )
     {
       walkerGridX = buildings[v0].x + 1;
       walkerGridY = building__07_y[128 * v0];
@@ -77072,18 +74327,7 @@ signed int  sub_4C1280(int a1, int a2, int a3)
   }
   return 0;
 }
-// 4015FA: using guessed type _DWORD  sub_4015FA(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 5F3CB0: using guessed type int dword_5F3CB0[];
-// 634480: using guessed type __int16 grid_pathingDistance[];
-// 7F87EA: using guessed type __int16 formation_layout[];
-// 7FA1A8: using guessed type int dword_7FA1A8;
-// 7FA1AC: using guessed type int dword_7FA1AC;
-// 7FA390: using guessed type __int16 walker_formationId[];
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004C15F0) --------------------------------------------------------
 signed int  fun_walkerProvideServiceCoverage(int walkerId)
 {
   __int16 v2; // [sp+4Ch] [bp-8h]@1
@@ -77522,20 +74766,7 @@ void  fun_createFishHerdFlotsamWalkers(__int16 riverEntryX, __int16 riverEntryY,
     }
   }
 }
-// 4025D1: using guessed type _DWORD  sub_4025D1(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 6AD9EC: using guessed type int random_7f_1;
-// 7F8806: using guessed type __int16 formation_46[];
-// 7FA366: using guessed type __int16 word_7FA366[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA390: using guessed type __int16 walker_formationId[];
-// 98EDA4: using guessed type __int16 scn_fish_x[8];
-// 98EDB4: using guessed type __int16 scn_fish_y[8];
-// 98EF28: using guessed type char scn_climate;
-// 98EF29: using guessed type char scn_flotsam;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (004C3060) --------------------------------------------------------
 void  fun_showHelpDialog(int helpId, int a2)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -77562,18 +74793,7 @@ void  fun_showHelpDialog(int helpId, int a2)
   window_id = 5;
   window_redrawRequest = 1;
 }
-// 607FD0: using guessed type int helpDialog_showVideo;
-// 659B50: using guessed type int message_usePopup;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6DEE34: using guessed type int help_videoLink[];
-// 7E29E8: using guessed type int dword_7E29E8;
-// 7E2BF4: using guessed type int currentHelpId;
-// 7E2C10: using guessed type int dword_7E2C10;
-// 7E2C14: using guessed type int dword_7E2C14;
-// 7E3138: using guessed type int helpDialog_windowId;
-// 7E314C: using guessed type int dword_7E314C;
 
-//----- (004C3170) --------------------------------------------------------
 void  fun_drawHelpDialog()
 {
   if ( helpDialog_showVideo )
@@ -77581,74 +74801,7 @@ void  fun_drawHelpDialog()
   else
     fun_drawHelpDialogNoVideo();
 }
-// 607FD0: using guessed type int helpDialog_showVideo;
 
-//----- (004C31A0) --------------------------------------------------------
-
-// 607F8C: using guessed type int dword_607F8C;
-// 607FD0: using guessed type int helpDialog_showVideo;
-// 654464: using guessed type int dword_654464[];
-// 65E6D4: using guessed type int screen_height;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6ADBE4: using guessed type int draw_clip_y;
-// 6ADD2C: using guessed type int draw_clip_x;
-// 6DEDF8: using guessed type __int16 help_type[];
-// 6DEDFA: using guessed type __int16 help_messageType[];
-// 6DEDFE: using guessed type __int16 help_x[];
-// 6DEE00: using guessed type __int16 help_y[];
-// 6DEE02: using guessed type __int16 help_width[];
-// 6DEE04: using guessed type __int16 help_height[];
-// 6DEE06: using guessed type __int16 help_picture1_id[];
-// 6DEE08: using guessed type __int16 help_picture1_x[];
-// 6DEE0A: using guessed type __int16 help_picture1_y[];
-// 6DEE0C: using guessed type __int16 help_picture2_id[];
-// 6DEE0E: using guessed type __int16 help_picture2_x[];
-// 6DEE10: using guessed type __int16 help_picture2_y[];
-// 6DEE12: using guessed type __int16 help_title_x[];
-// 6DEE14: using guessed type __int16 help_title_y[];
-// 6DEE16: using guessed type __int16 help_subtitle_x[];
-// 6DEE18: using guessed type __int16 help_subtitle_y[];
-// 6DEE1E: using guessed type __int16 help_unknown20[];
-// 6DEE20: using guessed type __int16 help_unknown21[];
-// 6DEE3C: using guessed type int help_title[];
-// 6DEE40: using guessed type int help_subtitle[];
-// 6E6B4C: using guessed type int draw_clip_xEnd;
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 6E6CB2: using guessed type __int16 graphic_resourceIcons;
-// 6E6CEE: using guessed type __int16 word_6E6CEE;
-// 6E6D2C: using guessed type __int16 graphic_bigpeople;
-// 6E6DA2: using guessed type __int16 word_6E6DA2;
-// 7E26F8: using guessed type int draw_clip_yEnd;
-// 7E2724: using guessed type int text_xoffset;
-// 7E2824: using guessed type int text_yoffset;
-// 7E29E8: using guessed type int dword_7E29E8;
-// 7E2BF4: using guessed type int currentHelpId;
-// 7E2C04: using guessed type int dword_7E2C04;
-// 7E2C08: using guessed type int dword_7E2C08;
-// 7E2C10: using guessed type int dword_7E2C10;
-// 7E3128: using guessed type int dword_7E3128;
-// 7E313C: using guessed type int dword_7E313C;
-
-//----- (004C4670) --------------------------------------------------------
-
-// 660C5C: using guessed type char window_redrawRequest;
-// 6DEDF8: using guessed type __int16 help_type[];
-// 6DEDFA: using guessed type __int16 help_messageType[];
-// 6DEE02: using guessed type __int16 help_width[];
-// 6DEE04: using guessed type __int16 help_height[];
-// 6DEE34: using guessed type int help_videoLink[];
-// 6DEE3C: using guessed type int help_title[];
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 6E6CB2: using guessed type __int16 graphic_resourceIcons;
-// 7E2724: using guessed type int text_xoffset;
-// 7E2824: using guessed type int text_yoffset;
-// 7E29E8: using guessed type int dword_7E29E8;
-// 7E2BF4: using guessed type int currentHelpId;
-// 7E2C08: using guessed type int dword_7E2C08;
-// 7E3128: using guessed type int dword_7E3128;
-// 7E313C: using guessed type int dword_7E313C;
-
-//----- (004C4CC0) --------------------------------------------------------
 void  sub_4C4CC0()
 {
   int v0; // [sp+4Ch] [bp-Ch]@8
@@ -77676,11 +74829,7 @@ void  sub_4C4CC0()
       helpDialog_text_y + v0 + 26);
   }
 }
-// 6E6BCE: using guessed type __int16 graphic_buttons;
-// 7E2D0C: using guessed type int dword_7E2D0C;
-// 7E314C: using guessed type int dword_7E314C;
 
-//----- (004C4DC0) --------------------------------------------------------
 void  fun_drawHelpDialogButtons()
 {
   imagebuttons_redraw = 1;
@@ -77821,19 +74970,7 @@ void  fun_drawHelpDialogButtons()
     }
   }
 }
-// 607FD0: using guessed type int helpDialog_showVideo;
-// 66071C: using guessed type char video_refreshRequested;
-// 660905: using guessed type char imagebuttons_redraw;
-// 6DEDF8: using guessed type __int16 help_type[];
-// 6DEDFA: using guessed type __int16 help_messageType[];
-// 6DEE02: using guessed type __int16 help_width[];
-// 6DEE04: using guessed type __int16 help_height[];
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 7E2BF4: using guessed type int currentHelpId;
-// 7E2C14: using guessed type int dword_7E2C14;
-// 7E2D08: using guessed type int message_msgAdvisorId;
 
-//----- (004C54C0) --------------------------------------------------------
 void  fun_handleHelpDialogClick()
 {
   int v0; // [sp+4Ch] [bp-4h]@81
@@ -78028,22 +75165,7 @@ LABEL_87:
     }
   }
 }
-// 401668: using guessed type int sub_401668(void);
-// 402F81: using guessed type int sub_402F81(void);
-// 607FD0: using guessed type int helpDialog_showVideo;
-// 66071C: using guessed type char video_refreshRequested;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6DEDF8: using guessed type __int16 help_type[];
-// 6DEDFA: using guessed type __int16 help_messageType[];
-// 6DEE02: using guessed type __int16 help_width[];
-// 6DEE04: using guessed type __int16 help_height[];
-// 7E2BF4: using guessed type int currentHelpId;
-// 7E2C10: using guessed type int dword_7E2C10;
-// 7E2C14: using guessed type int dword_7E2C14;
-// 7E2D08: using guessed type int message_msgAdvisorId;
-// 7E314C: using guessed type int dword_7E314C;
 
-//----- (004C5E40) --------------------------------------------------------
 void  sub_4C5E40()
 {
   imagebuttons_redraw = 1;
@@ -78054,9 +75176,7 @@ void  sub_4C5E40()
     sub_4C4CC0();
   }
 }
-// 660905: using guessed type char imagebuttons_redraw;
 
-//----- (004C5EE0) --------------------------------------------------------
 void  sub_4C5EE0()
 {
   fun_isImageButtonClick(dword_7E2C28 + 544, dword_7E2C2C + 152, &imagebuttons_unknown_5EF670, 1, 12);
@@ -78067,9 +75187,7 @@ void  sub_4C5EE0()
       sub_4C5FE0();
   }
 }
-// 401668: using guessed type int sub_401668(void);
 
-//----- (004C5FE0) --------------------------------------------------------
 signed int  sub_4C5FE0()
 {
   signed int result; // eax@2
@@ -78134,12 +75252,7 @@ signed int  sub_4C5FE0()
   }
   return result;
 }
-// 65E6BC: using guessed type char mouse_isLeftClick;
-// 660C5C: using guessed type char window_redrawRequest;
-// 7E2D0C: using guessed type int dword_7E2D0C;
-// 7E314C: using guessed type int dword_7E314C;
 
-//----- (004C6170) --------------------------------------------------------
 void  sub_4C6170()
 {
   if ( currentButton_parameter )
@@ -78159,10 +75272,7 @@ void  sub_4C6170()
   dword_7E314C = 0;
   window_redrawRequest = 2;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 7E314C: using guessed type int dword_7E314C;
 
-//----- (004C6200) --------------------------------------------------------
 void  sub_4C6200()
 {
   if ( dword_7E2C14 > 0 )
@@ -78176,13 +75286,7 @@ void  sub_4C6200()
     window_redrawRequest = 1;
   }
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 7E2BF4: using guessed type int currentHelpId;
-// 7E2C10: using guessed type int dword_7E2C10;
-// 7E2C14: using guessed type int dword_7E2C14;
-// 7E314C: using guessed type int dword_7E314C;
 
-//----- (004C6290) --------------------------------------------------------
 void  fun_message_close()
 {
   if ( helpDialog_showVideo )
@@ -78192,12 +75296,7 @@ void  fun_message_close()
   message_msgAdvisorId = 0;
   window_redrawRequest = 1;
 }
-// 607FD0: using guessed type int helpDialog_showVideo;
-// 660C5C: using guessed type char window_redrawRequest;
-// 7E2D08: using guessed type int message_msgAdvisorId;
-// 7E3138: using guessed type int helpDialog_windowId;
 
-//----- (004C62F0) --------------------------------------------------------
 int  sub_4C62F0()
 {
   int result; // eax@2
@@ -78221,13 +75320,7 @@ int  sub_4C62F0()
   }
   return result;
 }
-// 7E2C1C: using guessed type int dword_7E2C1C;
-// 7E2D40: using guessed type int dword_7E2D40[];
-// 7E2D44: using guessed type int dword_7E2D44[];
-// 7E2D48: using guessed type int dword_7E2D48[];
-// 7E2D4C: using guessed type int dword_7E2D4C[];
 
-//----- (004C63D0) --------------------------------------------------------
 void  sub_4C63D0(int a1, int a2, int a3, int a4)
 {
   if ( dword_7E2C1C < 50 )
@@ -78240,14 +75333,7 @@ void  sub_4C63D0(int a1, int a2, int a3, int a4)
     ++dword_7E2C1C;
   }
 }
-// 7E2BFC: using guessed type int dword_7E2BFC;
-// 7E2C1C: using guessed type int dword_7E2C1C;
-// 7E2D40: using guessed type int dword_7E2D40[];
-// 7E2D44: using guessed type int dword_7E2D44[];
-// 7E2D48: using guessed type int dword_7E2D48[];
-// 7E2D4C: using guessed type int dword_7E2D4C[];
 
-//----- (004C64A0) --------------------------------------------------------
 void  sub_4C64A0()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -78263,14 +75349,7 @@ void  sub_4C64A0()
   dword_7E2BFC = 0;
   dword_7E2C1C = 0;
 }
-// 7E2BFC: using guessed type int dword_7E2BFC;
-// 7E2C1C: using guessed type int dword_7E2C1C;
-// 7E2D40: using guessed type int dword_7E2D40[];
-// 7E2D44: using guessed type int dword_7E2D44[];
-// 7E2D48: using guessed type int dword_7E2D48[];
-// 7E2D4C: using guessed type int dword_7E2D4C[];
 
-//----- (004C6560) --------------------------------------------------------
 void  fun_drawScrollableText(char *text, int x, int y, int width, int a5)
 {
   __int64 v5; // qax@59
@@ -78438,17 +75517,7 @@ void  fun_drawScrollableText(char *text, int x, int y, int width, int a5)
     }
   }
 }
-// 6E6B20: using guessed type int textmultiline_longestLineLength;
-// 6E6CEE: using guessed type __int16 word_6E6CEE;
-// 788040: using guessed type int drawtext_wrap;
-// 7880CE: using guessed type char multiline_something_flag;
-// 7E2704: using guessed type int font_wordWidth;
-// 7E2724: using guessed type int text_xoffset;
-// 7E2824: using guessed type int text_yoffset;
-// 7E2C10: using guessed type int dword_7E2C10;
-// 7E3128: using guessed type int dword_7E3128;
 
-//----- (004C6B50) --------------------------------------------------------
 int  fun_getRichTextWordWidth(char *str)
 {
   unsigned __int8 c; // [sp+4Ch] [bp-10h]@3
@@ -78523,9 +75592,7 @@ LABEL_22:
   }
   return 0;
 }
-// 7E2704: using guessed type int font_wordWidth;
 
-//----- (004C6DE0) --------------------------------------------------------
 int  sub_4C6DE0(unsigned __int8 *a1, int a2, int a3, int a4)
 {
   int result; // eax@2
@@ -78576,11 +75643,7 @@ int  sub_4C6DE0(unsigned __int8 *a1, int a2, int a3, int a4)
   }
   return result;
 }
-// 40302B: using guessed type _DWORD  sub_40302B(_DWORD, _DWORD, _DWORD, _DWORD);
-// 7E2704: using guessed type int font_wordWidth;
-// 7E2C08: using guessed type int dword_7E2C08;
 
-//----- (004C6FA0) --------------------------------------------------------
 int  sub_4C6FA0(int a1, unsigned __int8 a2, int a3, int a4, int a5)
 {
   int result; // eax@2
@@ -78609,7 +75672,6 @@ int  sub_4C6FA0(int a1, unsigned __int8 a2, int a3, int a4, int a5)
   return result;
 }
 
-//----- (004C70C0) --------------------------------------------------------
 signed int  fun_getButtonTooltipText()
 {
   signed int result; // eax@2
@@ -79104,35 +76166,7 @@ LABEL_196:
   }
   return result;
 }
-// 4012C1: using guessed type int __thiscall fun_getButtonTooltipText_EmpireMap(_DWORD);
-// 607740: using guessed type int currentAdvisor;
-// 608008: using guessed type int time_current;
-// 6080A8: using guessed type int sidepanel_collapsed;
-// 64E35C: using guessed type int dword_64E35C;
-// 659B7C: using guessed type int currentMessage_id;
-// 65E754: using guessed type int setting_mouse_tooltips;
-// 660C5C: using guessed type char window_redrawRequest;
-// 7E29E4: using guessed type int dword_7E29E4;
-// 7E2C00: using guessed type int dword_7E2C00;
-// 7E2C10: using guessed type int dword_7E2C10;
-// 7E2C18: using guessed type int dword_7E2C18;
-// 7E2D10: using guessed type int dword_7E2D10;
-// 7E2D1C: using guessed type int dword_7E2D1C;
-// 7E3128: using guessed type int dword_7E3128;
-// 7E312C: using guessed type int dword_7E312C;
-// 7E3248: using guessed type int mouseover_last_update;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 9D77F0: using guessed type int mouseover_imagebutton_id[202];
-// 9D7B28: using guessed type int mouseover_button_id;
-// 9D7B2C: using guessed type int mouseover_button_id_main;
-// 9D7B50: using guessed type int topmenu_fundsPopDateHit;
-// 9D7B6C: using guessed type int menuClickedItem;
-// 9D7B84: using guessed type int minimap_clicked;
-// 9D7BA4: using guessed type int arrowbutton_id;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (004C7ED0) --------------------------------------------------------
 signed int  fun_getButtonTooltipText_TradePrices()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -79145,7 +76179,6 @@ signed int  fun_getButtonTooltipText_TradePrices()
   return 0;
 }
 
-//----- (004C7F50) --------------------------------------------------------
 int  fun_getButtonTooltipText_EmpireMap()
 {
   int result; // eax@2
@@ -79246,13 +76279,7 @@ int  fun_getButtonTooltipText_EmpireMap()
   }
   return result;
 }
-// 607F70: using guessed type int empire_selectedCity;
-// 607F74: using guessed type int trade_selectedCity;
-// 65E6D4: using guessed type int screen_height;
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 7E2724: using guessed type int text_xoffset;
 
-//----- (004C8350) --------------------------------------------------------
 signed int  fun_getOverlayTooltipText()
 {
   __int16 v1; // ax@34
@@ -79297,9 +76324,9 @@ signed int  fun_getOverlayTooltipText()
     v3 = grid_buildingIds[dword_8C79EC];
   }
   if ( (unsigned __int8)byte_5FD6B4[currentOverlay] == 1
-    && (signed int)(unsigned __int8)buildings[v3].houseSize <= 0 )
+    && (signed int)(unsigned __int8)buildings[v3].house_size <= 0 )
     return 0;
-  if ( (unsigned __int8)byte_5FD6B4[currentOverlay] == 2 && buildings[v3].houseSize )
+  if ( (unsigned __int8)byte_5FD6B4[currentOverlay] == 2 && buildings[v3].house_size )
     return 0;
   v2 = 0;
   fun_getGameTextString(GAMETEXT_OVERLAY_INFO, 0);
@@ -79898,33 +76925,7 @@ signed int  fun_getOverlayTooltipText()
   window_redrawRequest = 1;
   return 1;
 }
-// 60777C: using guessed type int model_houses_foodtypes[];
-// 6500A8: using guessed type int cityinfo_taxrate[];
-// 65E754: using guessed type int setting_mouse_tooltips;
-// 65EB21: using guessed type char mouse_isRightClick;
-// 660C5C: using guessed type char window_redrawRequest;
-// 7E2838: using guessed type int dword_7E2838[107];
-// 7E29E4: using guessed type int dword_7E29E4;
-// 7E2C00: using guessed type int dword_7E2C00;
-// 7E2C10: using guessed type int dword_7E2C10;
-// 7E2C18: using guessed type int dword_7E2C18;
-// 7E2D10: using guessed type int dword_7E2D10;
-// 7E2D1C: using guessed type int dword_7E2D1C;
-// 7E3128: using guessed type int dword_7E3128;
-// 7E312C: using guessed type int dword_7E312C;
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD52: using guessed type __int16 building_12_walkerServiceAccess[];
-// 94BD56: using guessed type __int16 building_16_house_population[];
-// 94BD7E: using guessed type __int16 building_3e_damageRisk[];
-// 94BD80: using guessed type __int16 building_40_fireRisk[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
-// 94BDA0: using guessed type __int16 building_60_house_school_library[];
-// 94BDA2: using guessed type __int16 building_62_house_academy_barber[];
-// 94BDB4: using guessed type int building_74_house_taxIncomeThisYear_senateForum_treasureStore[];
-// 9DA898: using guessed type int mode_editor;
 
-//----- (004C9710) --------------------------------------------------------
 signed int  sub_4C9710()
 {
   signed int result; // eax@2
@@ -79945,14 +76946,7 @@ signed int  sub_4C9710()
   }
   return result;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 7E29E4: using guessed type int dword_7E29E4;
-// 7E2C10: using guessed type int dword_7E2C10;
-// 7E2C18: using guessed type int dword_7E2C18;
-// 7E3128: using guessed type int dword_7E3128;
-// 7E312C: using guessed type int dword_7E312C;
 
-//----- (004C9790) --------------------------------------------------------
 signed int  unused_4C9790()
 {
   signed int result; // eax@8
@@ -79982,27 +76976,8 @@ signed int  unused_4C9790()
   }
   return result;
 }
-// 5FFF58: using guessed type int dword_5FFF58[2];
-// 608008: using guessed type int time_current;
-// 65EB21: using guessed type char mouse_isRightClick;
-// 660C5C: using guessed type char window_redrawRequest;
-// 7E2838: using guessed type int dword_7E2838[107];
-// 7E29E4: using guessed type int dword_7E29E4;
-// 7E2D10: using guessed type int dword_7E2D10;
-// 7E3128: using guessed type int dword_7E3128;
-// 7E312C: using guessed type int dword_7E312C;
-// 7E3248: using guessed type int mouseover_last_update;
 
-//----- (004C9860) --------------------------------------------------------
-void  fun_resetTooltipTimer()
-{
-  mouseover_last_update = time_current;
-  mouseover_info_id = 0;
-}
-// 608008: using guessed type int time_current;
-// 7E3248: using guessed type int mouseover_last_update;
 
-//----- (004C9890) --------------------------------------------------------
 void  fun_drawTooltip()
 {
   bool v0; // [sp+4Ch] [bp-8h]@8
@@ -80100,17 +77075,7 @@ void  fun_drawTooltip()
     }
   }
 }
-// 607740: using guessed type int currentAdvisor;
-// 660C50: using guessed type int button_y;
-// 660C54: using guessed type int button_x;
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 788036: using guessed type __int16 drawtext_color;
-// 7E2C08: using guessed type int dword_7E2C08;
-// 7E2C10: using guessed type int dword_7E2C10;
-// 7E2D1C: using guessed type int dword_7E2D1C;
-// 7E3128: using guessed type int dword_7E3128;
 
-//----- (004C9D00) --------------------------------------------------------
 void  unused_4C9D00()
 {
   if ( window_id == 7 )
@@ -80127,9 +77092,7 @@ void  unused_4C9D00()
     fun_memcpy8(&dword_7E3154, (int *)screen_buffer + 4, 4);
   }
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (004C9E30) --------------------------------------------------------
 void  unused_4C9E30()
 {
   if ( window_id == 7 )
@@ -80169,10 +77132,7 @@ void  unused_4C9E30()
     }
   }
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (004C9FE0) --------------------------------------------------------
 void  sub_4C9FE0()
 {
   bool v0; // [sp+4Ch] [bp-8h]@4
@@ -80208,13 +77168,7 @@ void  sub_4C9FE0()
   fun_fillRect(dword_7E3148 + 1, dword_7E3144 + 1, dword_7E3150 - 2, dword_7E3154 - 2, 65535);
   fun_drawScrollableText(byte_7E2A00, dword_7E3148 + 5, dword_7E3144 + 7, dword_7E3150 - 5, 0);
 }
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 788036: using guessed type __int16 drawtext_color;
-// 7E2C08: using guessed type int dword_7E2C08;
-// 7E2C10: using guessed type int dword_7E2C10;
-// 7E3128: using guessed type int dword_7E3128;
 
-//----- (004CA270) --------------------------------------------------------
 void  fun_drawSenateTooltip()
 {
   bool v0; // [sp+4Ch] [bp-8h]@2
@@ -80280,14 +77234,7 @@ void  fun_drawSenateTooltip()
     graphic_font + 938,
     0x4208u);
 }
-// 652B58: using guessed type int cityinfo_unemploymentPercentage[];
-// 654228: using guessed type int cityinfo_cultureRating[];
-// 65422C: using guessed type int cityinfo_prosperityRating[];
-// 654230: using guessed type int cityinfo_peaceRating[];
-// 654234: using guessed type int cityinfo_favorRating[];
-// 6E6BD0: using guessed type __int16 graphic_font;
 
-//----- (004CA6E0) --------------------------------------------------------
 int  fun_strnpos(const char *haystack, const char *needle, int haystackSize)
 {
   int len; // [sp+4Ch] [bp-8h]@1
@@ -80393,18 +77340,6 @@ void  unused_strCutAtFirstNonCharacter(char *a1)
   }
 }
 
-//----- (004CAAA0) --------------------------------------------------------
-void  fun_strMoveLeft(char *start, const char *end)
-{
-  while ( start < end )
-  {
-    *start = start[1];
-    ++start;
-  }
-  *start = 0;
-}
-
-//----- (004CAAF0) --------------------------------------------------------
 void  fun_strMoveRight(char *start, char *end)
 {
   end[1] = 0;
@@ -80478,250 +77413,6 @@ void  unused_strRemoveDoubleSpaces(char *str)
 }
 
 //----- (004CAD20) --------------------------------------------------------
-int  fun_getStringWidth(const char *str, int fontId)
-{
-  unsigned __int8 c; // [sp+4Ch] [bp-14h]@12
-  signed int letterSpacing; // [sp+50h] [bp-10h]@3
-  signed int spaceWidth; // [sp+54h] [bp-Ch]@3
-  int stringWidth; // [sp+58h] [bp-8h]@1
-  signed int maxlen; // [sp+5Ch] [bp-4h]@1
-
-  maxlen = 10000;
-  stringWidth = 0;
-  if ( fontId != graphic_font + F_LargePlain && fontId != graphic_font + F_LargeBlack )
-  {
-    if ( fontId == graphic_font + F_LargeBrown )
-    {
-      spaceWidth = 10;
-      letterSpacing = 1;
-    }
-    else
-    {
-      if ( fontId == graphic_font + F_SmallPlain )
-      {
-        spaceWidth = 4;
-        letterSpacing = 1;
-      }
-      else
-      {
-        if ( fontId == graphic_font )
-        {
-          spaceWidth = 6;
-          letterSpacing = 1;
-        }
-        else
-        {
-          spaceWidth = 6;
-          letterSpacing = 0;
-        }
-      }
-    }
-  }
-  else
-  {
-    spaceWidth = 10;
-    letterSpacing = 1;
-  }
-  while ( maxlen > 0 )
-  {
-    c = *str++;
-    if ( !c )
-      return stringWidth;
-    if ( c == ' ' )
-    {
-      stringWidth += spaceWidth;
-    }
-    else
-    {
-      graphic_currentGraphicId = (unsigned __int8)map_char_to_fontGraphic[c];
-      if ( graphic_currentGraphicId )
-        stringWidth += letterSpacing + c3_sg2[fontId + graphic_currentGraphicId - 1].width;
-    }
-    --maxlen;
-  }
-  return stringWidth;
-}
-// 6E6BD0: using guessed type __int16 graphic_font;
-
-//----- (004CAEE0) --------------------------------------------------------
-int  fun_strlen(const char *str)
-{
-  char c; // ST4C_1@3
-  int len; // [sp+50h] [bp-8h]@1
-  signed int max; // [sp+54h] [bp-4h]@1
-
-  max = 10000;
-  len = 0;
-  while ( max > 0 )
-  {
-    c = *str++;
-    if ( !c )
-      return len;
-    ++len;
-    --max;
-  }
-  return len;
-}
-
-//----- (004CAF60) --------------------------------------------------------
-int  fun_getCharWidth(unsigned __int8 c, int fontId)
-{
-  int result; // eax@2
-
-  if ( c )
-  {
-    if ( c == ' ' )
-    {
-      result = 4;
-    }
-    else
-    {
-      graphic_currentGraphicId = (unsigned __int8)map_char_to_fontGraphic[c];
-      if ( graphic_currentGraphicId )
-        result = c3_sg2[fontId + graphic_currentGraphicId - 1].width + 1;
-      else
-        result = 0;
-    }
-  }
-  else
-  {
-    result = 0;
-  }
-  return result;
-}
-
-//----- (004CB010) --------------------------------------------------------
-int  fun_strToInt(char *str)
-{
-  int result; // eax@11
-  char *ptr; // [sp+4Ch] [bp-14h]@1
-  char *v3; // [sp+4Ch] [bp-14h]@6
-  signed int negative; // [sp+50h] [bp-10h]@1
-  int v5; // [sp+58h] [bp-8h]@1
-  int numChars; // [sp+5Ch] [bp-4h]@1
-
-  ptr = str;
-  negative = 0;
-  v5 = 0;
-  numChars = 0;
-  if ( (unsigned __int8)*str == '-' )
-  {
-    negative = 1;
-    ptr = str + 1;
-  }
-  while ( (signed int)(unsigned __int8)*ptr >= '0' && (signed int)(unsigned __int8)*ptr <= '9' )
-  {
-    ++numChars;
-    ++ptr;
-  }
-  v3 = str;
-  if ( (unsigned __int8)*str == '-' )
-    v3 = str + 1;
-  while ( numChars )
-  {
-    --numChars;
-    v5 += atoi_multipliers[numChars] * ((unsigned __int8)*v3++ - '0');
-  }
-  if ( negative )
-    result = -v5;
-  else
-    result = v5;
-  return result;
-}
-
-//----- (004CB120) --------------------------------------------------------
-int  fun_strNumDigitChars(char *str)
-{
-  signed int check; // [sp+4Ch] [bp-8h]@1
-  int numChars; // [sp+50h] [bp-4h]@1
-
-  numChars = 0;
-  check = 0;
-  while ( 1 )
-  {
-    ++check;
-    if ( check >= 1000 )
-      break;
-    if ( (signed int)(unsigned __int8)*str >= '0' && (signed int)(unsigned __int8)*str <= '9'
-      || (unsigned __int8)*str == '-' )
-      break;
-    ++str;
-    ++numChars;
-  }
-  return numChars;
-}
-
-//----- (004CB1B0) --------------------------------------------------------
-void  unused_addToGameTextString(char *str, int group, int number, signed int len)
-{
-  unsigned __int8 i; // [sp+4Ch] [bp-10h]@9
-  char *target; // [sp+54h] [bp-8h]@1
-
-  target = (char *)&c3eng_data
-         + 256 * (unsigned __int8)byte_6ADEFE[4 * group]
-         + (unsigned __int8)byte_6ADEFF[4 * group]
-         + 28;
-  while ( number > 0 )
-  {
-    if ( !*target )
-    {
-      if ( (signed int)(unsigned __int8)*(target - 1) >= ' ' )
-        --number;
-    }
-    ++target;
-  }
-  while ( (signed int)(unsigned __int8)*target < ' ' )
-    ++target;
-  for ( i = 0; i < len; ++i )
-    target[i] = str[i];
-}
-
-//----- (004CB2E0) --------------------------------------------------------
-int  unused_copyGameTextString(char *dst, int group, int number, signed int maxlen)
-{
-  int result; // eax@10
-  unsigned __int8 i; // [sp+4Ch] [bp-8h]@9
-  char *text; // [sp+50h] [bp-4h]@1
-
-  text = (char *)&c3eng_data + c3eng_index[group].offset;
-  while ( number > 0 )
-  {
-    if ( !*text )
-    {
-      if ( (signed int)(unsigned __int8)*(text - 1) >= 32 )
-        --number;
-    }
-    ++text;
-  }
-  while ( (signed int)(unsigned __int8)*text < 32 )
-    ++text;
-  for ( i = 0; ; ++i )
-  {
-    result = i;
-    if ( i >= maxlen )
-      break;
-    dst[i] = text[i];
-  }
-  return result;
-}
-
-//----- (004CB480) --------------------------------------------------------
-void  fun_getGameTextString_forMessagebox(int group, int number)
-{
-  c3eng_textstring_forMessagebox = (char *)&c3eng_data + c3eng_index[group].offset;
-  while ( number > 0 )
-  {
-    if ( !*c3eng_textstring_forMessagebox )
-    {
-      if ( (signed int)(unsigned __int8)*(c3eng_textstring_forMessagebox - 1) >= ' '
-        || !*(c3eng_textstring_forMessagebox - 1) )
-        --number;
-    }
-    ++c3eng_textstring_forMessagebox;
-  }
-  while ( (signed int)(unsigned __int8)*c3eng_textstring_forMessagebox < ' ' )
-    ++c3eng_textstring_forMessagebox;
-}
 
 //----- (004CB540) --------------------------------------------------------
 void  fun_inputDetermineCursorPosition()
@@ -80957,9 +77648,7 @@ void  fun_inputInit(int id)
   for ( i = 0; i <= input_maxlength[inputtext_lastUsed] && input_text[inputtext_lastUsed][i]; ++i )
     ++input_length[inputtext_lastUsed];
 }
-// 6E6B00: using guessed type int inputtext_lastUsed;
 
-//----- (004CBDD0) --------------------------------------------------------
 void  sub_4CBDD0()
 {
   drawtext_input_cursorSeen = 0;
@@ -80968,27 +77657,7 @@ void  sub_4CBDD0()
   text_xoffset = 0;
   text_yoffset = 0;
 }
-// 6DED64: using guessed type int drawtext_input_position;
-// 6DED68: using guessed type int drawtext_input_cursorSeen;
-// 7E2724: using guessed type int text_xoffset;
-// 7E2824: using guessed type int text_yoffset;
 
-//----- (004CBE30) --------------------------------------------------------
-void  unused_inputRemoveSpaces()
-{
-  int i; // [sp+4Ch] [bp-4h]@1
-
-  for ( i = 0; i <= input_length[inputtext_lastUsed] && input_text[inputtext_lastUsed][i]; ++i )
-  {
-    if ( (unsigned __int8)input_text[inputtext_lastUsed][i] == ' ' )
-      fun_strMoveLeft(
-        &input_text[inputtext_lastUsed][i],
-        &input_text[inputtext_lastUsed][input_length[inputtext_lastUsed]]);
-  }
-}
-// 6E6B00: using guessed type int inputtext_lastUsed;
-
-//----- (004CBF00) --------------------------------------------------------
 void  fun_initInputTextbox(int inputId, char *text, int maxlength, int textboxwidth, char allowPunctuation, int font)
 {
   input_font[inputId] = font;
@@ -81001,26 +77670,7 @@ void  fun_initInputTextbox(int inputId, char *text, int maxlength, int textboxwi
   input_atEnd = 0;
   input_cursorOffset = 0;
 }
-// 6AD9C8: using guessed type int input_cursorOffset;
-// 6DEC3C: using guessed type int input_atEnd;
 
-//----- (004CC160) --------------------------------------------------------
-int  fun_getGameTextStringWidth(int group, int number, int fontId)
-{
-  gametext_result = (char *)&c3eng_data + c3eng_index[group].offset;
-  while ( number > 0 )
-  {
-    if ( !*gametext_result )
-    {
-      if ( (signed int)(unsigned __int8)*(gametext_result - 1) >= 32 || !*(gametext_result - 1) )
-        --number;
-    }
-    ++gametext_result;
-  }
-  while ( (signed int)(unsigned __int8)*gametext_result < 32 )
-    ++gametext_result;
-  return fun_getStringWidth(gametext_result, fontId);
-}
 
 //----- (004CC240) --------------------------------------------------------
 void  fun_drawTextCentered(const char *str, int x, int y, int boxWidth, int fontId, __int16 color)
@@ -81030,9 +77680,7 @@ void  fun_drawTextCentered(const char *str, int x, int y, int boxWidth, int font
     draw_centeredTextOffset = 0;
   fun_drawText(str, draw_centeredTextOffset + x, y, fontId, color);
 }
-// 6ADCDC: using guessed type int draw_centeredTextOffset;
 
-//----- (004CC2D0) --------------------------------------------------------
 void  fun_drawText(const char *str, int x, int y, int fontId, __int16 color)
 {
   signed int letterSpacing; // [sp+4Ch] [bp-24h]@2
@@ -81200,26 +77848,7 @@ void  fun_drawText(const char *str, int x, int y, int fontId, __int16 color)
   multiline_something_flag = 0;
   draw_setToZero = 0;
 }
-// 660C8C: using guessed type int font_currentLineHeight[65819];
-// 6AD9C8: using guessed type int input_cursorOffset;
-// 6AD9D0: using guessed type int dword_6AD9D0;
-// 6ADBCC: using guessed type int drawtext_useDoubleShadow;
-// 6DEC20: using guessed type int drawtext_forceColor;
-// 6DED64: using guessed type int drawtext_input_position;
-// 6DED68: using guessed type int drawtext_input_cursorSeen;
-// 6E6B00: using guessed type int inputtext_lastUsed;
-// 6E6B14: using guessed type char drawtext_alwaysZero;
-// 6E6B1C: using guessed type int draw_setToZero;
-// 6E6B28: using guessed type int drawtext_useSingleShadow;
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 78802C: using guessed type int drawtext_hashCharAndWrap;
-// 788036: using guessed type __int16 drawtext_color;
-// 788040: using guessed type int drawtext_wrap;
-// 7880CE: using guessed type char multiline_something_flag;
-// 7E2724: using guessed type int text_xoffset;
-// 7E2824: using guessed type int text_yoffset;
 
-//----- (004CC8A0) --------------------------------------------------------
 int  fun_drawCharacter(int fontId, unsigned __int8 printableChar, int x, int y)
 {
   int result; // eax@2
@@ -87247,12 +83876,12 @@ void  fun_handleMouseClick()
       {
         mouseover_button_id = fun_isCustomButtonClick(
                                 cityscreen_width_withControlpanel - 170,
-                                dword_9D7B44 + 32,
+                                buildmenu_X + 32,
                                 &buttons_overlayMenu,
                                 8);
         if ( !fun_handleCustomButtonClick(
                 cityscreen_width_withControlpanel - 170,
-                dword_9D7B44 + 32,
+                buildmenu_X + 32,
                 &buttons_overlayMenu,
                 8) )
         {
@@ -87261,12 +83890,12 @@ void  fun_handleMouseClick()
           {
             mouseover_button_id_main = fun_isCustomButtonClick(
                                          cityscreen_width_withControlpanel - 348,
-                                         dword_9D7B44 + 24 * dword_9D7B34 + 32,
+                                         buildmenu_X + 24 * dword_9D7B34 + 32,
                                          &buttons_overlaySubMenu,
                                          selectedOverlaySubMenuNumItems);
             !fun_handleCustomButtonClick(
                cityscreen_width_withControlpanel - 348,
-               dword_9D7B44 + 24 * dword_9D7B34 + 32,
+               buildmenu_X + 24 * dword_9D7B34 + 32,
                &buttons_overlaySubMenu,
                selectedOverlaySubMenuNumItems);
           }
@@ -90552,7 +87181,7 @@ void  fun_showWarningMoreFoodNeeded(int buildingId)
         {
           if ( !scn_romeSuppliesWheat )
           {
-            if ( getPercentage( city_inform[ciid].dword_654504, city_inform[ciid].dword_654500 ) <= 95 )
+            if ( getPercentage( city_inform[ciid].plebsFoodInCityLastYear, city_inform[ciid].dword_654500 ) <= 95 )
               fun_showWarning(18);
           }
         }
@@ -90860,7 +87489,7 @@ void  fun_calculateHealthRate()
       {
         if ( buildings[i].inUse == 1 )
         {
-          if ( buildings[i].houseSize )
+          if ( buildings[i].house_size )
           {
             if (buildings[i].house_population )
             {
@@ -90937,7 +87566,7 @@ void  fun_calculateHealthRate()
               {
                 if ( buildings[j].inUse == 1 )
                 {
-                  if ( buildings[j].houseSize )
+                  if ( buildings[j].house_size )
                   {
                     if ( buildings[j].house_population )
                     {
@@ -90956,7 +87585,7 @@ void  fun_calculateHealthRate()
               {
                 if ( buildings[k].inUse == 1 )
                 {
-                  if ( buildings[k].houseSize )
+                  if ( buildings[k].house_size )
                   {
                     if ( buildings[k].house_population )
                     {
@@ -90977,7 +87606,7 @@ void  fun_calculateHealthRate()
                 {
                   if ( buildings[l].inUse != 1 )
                     continue;
-                  if ( !buildings[l].houseSize )
+                  if ( !buildings[l].house_size )
                     continue;
                   if ( !buildings[l].house_population )
                     continue;
@@ -91248,7 +87877,7 @@ int  fun_calculateCityHappinessAndCrime()
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].houseSize > 0 )
+      if ( buildings[i].house_size > 0 )
       {
         if (buildings[i].house_population )
         {
@@ -91350,7 +87979,7 @@ int  fun_calculateCityHappinessAndCrime()
   {
     if ( buildings[j].inUse == 1 )
     {
-      if ( buildings[j].houseSize > 0 )
+      if ( buildings[j].house_size > 0 )
       {
         if ( buildings[j].house_population > 0 )
         {
@@ -91435,7 +88064,7 @@ void  fun_decreaseCrimeRisk(char amount)
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].houseSize )
+      if ( buildings[i].house_size )
       {
         buildings[i].house_crimeRisk += amount;
         if ( buildings[i].house_crimeRisk < 0 )
@@ -91455,7 +88084,7 @@ void  fun_setCrimeRiskForAllHouses(signed int targetCrimeRisk)
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].houseSize )
+      if ( buildings[i].house_size )
       {
         if ( buildings[i].house_crimeRisk > targetCrimeRisk )
           buildings[i].house_crimeRisk = targetCrimeRisk;
@@ -92388,7 +89017,7 @@ void  fun_calculateGodHappiness(int includeBlessingsAndCurses)
                 else
                 {
                   fun_postMessageToPlayer(41, 0, 0);
-                  fun_ceresWitherCrops(1);
+                  ceresWitherCrops(1);
                 }
               }
             }
@@ -92429,7 +89058,7 @@ void  fun_calculateGodHappiness(int includeBlessingsAndCurses)
               else
               {
                 fun_postMessageToPlayer(91, 0, 0);
-                fun_ceresWitherCrops(0);
+                ceresWitherCrops(0);
               }
             }
           }
@@ -92462,7 +89091,7 @@ void  fun_calculateGodHappiness(int includeBlessingsAndCurses)
             else                                // ceres
             {
               fun_postMessageToPlayer(96, 0, 0);
-              sub_451E30();
+              ceresBlessingCrops();
             }
           }
         }
@@ -92731,7 +89360,7 @@ void  fun_handleScenarioWinLoseEvent()
       winState = 1;
     if ( winState )
     {
-      toPlace_buildingType = 0;
+      toPlace_buildingType = B_none_building;
       byte_660585 = 0;
       if ( winState < 1 )
       {
@@ -93061,7 +89690,7 @@ signed int  sub_4E6EC0()
                                         dword_64E344 = building__07_y[128 * currentlySelectedBuilding];
                                         break;
                                       default:
-                                        if ( buildings[currentlySelectedBuilding].houseSize )
+                                        if ( buildings[currentlySelectedBuilding].house_size )
                                         {
                                           sub_4FE3E0(/*v13, currentlySelectedBuilding << 7*/);
                                           fun_determineHouseEvolveText(currentlySelectedBuilding);
@@ -103407,7 +100036,7 @@ void  sub_4FE3E0()
         {
           if ( v13 != currentlySelectedBuilding )
           {
-            if ( !buildings[v13].houseSize
+            if ( !buildings[v13].house_size
               || buildings[v13].type < buildings[currentlySelectedBuilding].type )
             {
               desirability = model_buildings_desirability[8 * buildings[v13].type];
@@ -107081,18 +103710,14 @@ void  fun_drawCitySidepanelOverlayButtonText(signed int forceRedraw, int xOffset
     }
   }
 }
-// 6080A8: using guessed type int sidepanel_collapsed;
-// 6086E4: using guessed type int sidebarOverlayTextId;
-// 6E6BD0: using guessed type __int16 graphic_font;
 
-//----- (00505F40) --------------------------------------------------------
 void  fun_drawCitySidepanelBuildingGraphic(int forceRedraw, int xOffset)
 {
   if ( forceRedraw || !sidepanel_collapsed )
   {
     if ( toPlace_buildingType )
     {
-      switch ( buildmenu_selectedSubMenu )
+      switch ( buildmenu.selectedSubMenu )
       {
         case 1:
           fun_drawGraphic(graphic_panelwindows, xOffset, 239);
@@ -107157,7 +103782,7 @@ void  fun_drawCitySidepanelBuildingGraphic(int forceRedraw, int xOffset)
 // 6E6C6E: using guessed type __int16 graphic_panelwindows;
 // 6E6DAA: using guessed type __int16 word_6E6DAA;
 // 98EF28: using guessed type char scn_climate;
-// 9D7B48: using guessed type int buildmenu_selectedSubMenu;
+// 9D7B48: using guessed type int buildmenu.selectedSubMenu;
 
 //----- (00506300) --------------------------------------------------------
 void  fun_drawCitySidepanelMinimap(int forceRedraw)
@@ -107694,9 +104319,9 @@ void  fun_editor_drawControlPanelSubmenuButtons()
   if ( mode_editor == 1 )
     v3 = cityscreen_width_withControlpanel;
   v2 = -1;
-  for ( i = 0; i < buildmenu_submenuNumItems; ++i )
+  for ( i = 0; i < buildmenu.submenuNumItems; ++i )
   {
-    v2 = fun_sidePanel_submenuGetNextIndex(buildmenu_selectedSubMenu - 1, v2);
+    v2 = fun_sidePanel_submenuGetNextIndex(buildmenu.selectedSubMenu - 1, v2);
     if ( mouseover_button_id == i + 1 )
       v5 = 1;
     else
@@ -107705,103 +104330,103 @@ void  fun_editor_drawControlPanelSubmenuButtons()
       v4 = -1343;
     else
       v4 = 16122;
-    switch ( buildmenu_selectedSubMenu )
+    switch ( buildmenu.selectedSubMenu )
     {
       case 14:
-        fun_drawSmallGreyButton(6, v3 - 170, dword_9D7B44 + 24 * i + 110, 10, 1, v5);
+        fun_drawSmallGreyButton(6, v3 - 170, buildmenu_X + 24 * i + 110, 10, 1, v5);
         fun_drawGameTextCentered(
           48,
-          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu_selectedSubMenu - 1)] + 4 * v2) - 1,
+          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu.selectedSubMenu - 1)] + 4 * v2) - 1,
           v3 - 170,
-          dword_9D7B44 + 24 * i + 113,
+          buildmenu_X + 24 * i + 113,
           160,
           graphic_font + 1072,
           v4);
         break;
       case 15:
-        fun_drawSmallGreyButton(6, v3 - 170, dword_9D7B44 + 24 * i + 110, 10, 1, v5);
+        fun_drawSmallGreyButton(6, v3 - 170, buildmenu_X + 24 * i + 110, 10, 1, v5);
         fun_drawGameTextCentered(
           48,
-          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu_selectedSubMenu - 1)] + 4 * v2) + 4,
+          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu.selectedSubMenu - 1)] + 4 * v2) + 4,
           v3 - 170,
-          dword_9D7B44 + 24 * i + 113,
+          buildmenu_X + 24 * i + 113,
           160,
           graphic_font + 1072,
           v4);
         break;
       case 17:
-        fun_drawSmallGreyButton(6, v3 - 170, dword_9D7B44 + 24 * i + 110, 10, 1, v5);
+        fun_drawSmallGreyButton(6, v3 - 170, buildmenu_X + 24 * i + 110, 10, 1, v5);
         fun_drawGameTextCentered(
           48,
-          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu_selectedSubMenu - 1)] + 4 * v2) + 9,
+          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu.selectedSubMenu - 1)] + 4 * v2) + 9,
           v3 - 170,
-          dword_9D7B44 + 24 * i + 113,
+          buildmenu_X + 24 * i + 113,
           160,
           graphic_font + 1072,
           v4);
         break;
       case 16:
-        fun_drawSmallGreyButton(6, v3 - 170, dword_9D7B44 + 24 * i + 110, 10, 1, v5);
+        fun_drawSmallGreyButton(6, v3 - 170, buildmenu_X + 24 * i + 110, 10, 1, v5);
         fun_drawGameTextCentered(
           48,
-          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu_selectedSubMenu - 1)] + 4 * v2) + 6,
+          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu.selectedSubMenu - 1)] + 4 * v2) + 6,
           v3 - 170,
-          dword_9D7B44 + 24 * i + 113,
+          buildmenu_X + 24 * i + 113,
           160,
           graphic_font + 1072,
           v4);
         break;
       case 18:
-        fun_drawSmallGreyButton(6, v3 - 170, dword_9D7B44 + 24 * i + 110, 10, 1, v5);
+        fun_drawSmallGreyButton(6, v3 - 170, buildmenu_X + 24 * i + 110, 10, 1, v5);
         fun_drawGameTextCentered(
           48,
-          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu_selectedSubMenu - 1)] + 4 * v2) + 17,
+          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu.selectedSubMenu - 1)] + 4 * v2) + 17,
           v3 - 170,
-          dword_9D7B44 + 24 * i + 113,
+          buildmenu_X + 24 * i + 113,
           160,
           graphic_font + 1072,
           v4);
         break;
       case 19:
-        fun_drawSmallGreyButton(6, v3 - 170, dword_9D7B44 + 24 * i + 110, 10, 1, v5);
+        fun_drawSmallGreyButton(6, v3 - 170, buildmenu_X + 24 * i + 110, 10, 1, v5);
         fun_drawGameTextCentered(
           48,
-          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu_selectedSubMenu - 1)] + 4 * v2) + 19,
+          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu.selectedSubMenu - 1)] + 4 * v2) + 19,
           v3 - 170,
-          dword_9D7B44 + 24 * i + 113,
+          buildmenu_X + 24 * i + 113,
           160,
           graphic_font + 1072,
           v4);
         break;
       case 26:
-        fun_drawSmallGreyButton(6, v3 - 170, dword_9D7B44 + 24 * i + 110, 10, 1, v5);
+        fun_drawSmallGreyButton(6, v3 - 170, buildmenu_X + 24 * i + 110, 10, 1, v5);
         fun_drawGameTextCentered(
           48,
-          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu_selectedSubMenu - 1)] + 4 * v2) + 22,
+          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu.selectedSubMenu - 1)] + 4 * v2) + 22,
           v3 - 170,
-          dword_9D7B44 + 24 * i + 113,
+          buildmenu_X + 24 * i + 113,
           160,
           graphic_font + 1072,
           v4);
         break;
       default:
-        fun_drawSmallGreyButton(6, v3 - 266, dword_9D7B44 + 24 * i + 110, 16, 1, v5);
+        fun_drawSmallGreyButton(6, v3 - 266, buildmenu_X + 24 * i + 110, 16, 1, v5);
         fun_drawGameTextCentered(
           28,
-          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu_selectedSubMenu - 1)] + 4 * v2),
+          *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu.selectedSubMenu - 1)] + 4 * v2),
           v3 - 266,
-          dword_9D7B44 + 24 * i + 113,
+          buildmenu_X + 24 * i + 113,
           176,
           graphic_font + 1072,
           v4);
-        v1 = *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu_selectedSubMenu - 1)] + 4 * v2);
+        v1 = *(int *)((char *)&buildingMenu_buildingId[30 * (buildmenu.selectedSubMenu - 1)] + 4 * v2);
         if ( v1 == 7 )
           v1 = 90;
         v0 = model_buildings_cost[8 * v1];
         if ( v1 == 57 )
           v0 = 0;
         if ( v0 )
-          fun_drawNumber(v0, 64, "Dn", v3 - 82, dword_9D7B44 + 24 * i + 114, graphic_font + 1072, 0);
+          fun_drawNumber(v0, 64, "Dn", v3 - 82, buildmenu_X + 24 * i + 114, graphic_font + 1072, 0);
         break;
     }
   }
@@ -107811,7 +104436,7 @@ void  fun_editor_drawControlPanelSubmenuButtons()
 // 6E6BD0: using guessed type __int16 graphic_font;
 // 9D7B28: using guessed type int mouseover_button_id;
 // 9D7B44: using guessed type int dword_9D7B44;
-// 9D7B48: using guessed type int buildmenu_selectedSubMenu;
+// 9D7B48: using guessed type int buildmenu.selectedSubMenu;
 // 9D7B54: using guessed type int buildmenu_submenuNumItems;
 // 9DA898: using guessed type int mode_editor;
 
@@ -107855,31 +104480,31 @@ void  fun_drawOverlayMenuButtons()
       v1 = 2;
     if ( selectedOverlaySubMenu > 0 )
       v1 = 2;
-    fun_drawSmallGreyButton(6, v0 - 170, dword_9D7B44 + 24 * i + 34, 10, 1, v1);
+    fun_drawSmallGreyButton(6, v0 - 170, buildmenu_X + 24 * i + 34, 10, 1, v1);
     fun_drawGameTextCentered(
       14,
       overlayMenuIDToOverlayID[i],
       v0 - 170,
-      dword_9D7B44 + 24 * i + 37,
+      buildmenu_X + 24 * i + 37,
       160,
       graphic_font + 1072,
       0);
   }
   if ( selectedOverlaySubMenu > 0 )
   {
-    fun_drawGraphic(graphic_bullet, v0 - 185, dword_9D7B44 + 24 * dword_9D7B34 + 40);
+    fun_drawGraphic(graphic_bullet, v0 - 185, buildmenu_X + 24 * dword_9D7B34 + 40);
     for ( j = 0; j < selectedOverlaySubMenuNumItems; ++j )
     {
       if ( mouseover_button_id_main == j + 1 )
         v2 = 1;
       else
         v2 = 2;
-      fun_drawSmallGreyButton(6, v0 - 348, dword_9D7B44 + 24 * (dword_9D7B34 + j) + 34, 10, 1, v2);
+      fun_drawSmallGreyButton(6, v0 - 348, buildmenu_X + 24 * (dword_9D7B34 + j) + 34, 10, 1, v2);
       fun_drawGameTextCentered(
         14,
         *(int *)((char *)&overlaySubMenuIDToOverlayID[30 * selectedOverlaySubMenu] + 4 * j),
         v0 - 348,
-        dword_9D7B44 + 24 * (dword_9D7B34 + j) + 37,
+        buildmenu_X + 24 * (dword_9D7B34 + j) + 37,
         160,
         graphic_font + 1072,
         0);
@@ -112585,7 +109210,7 @@ void  fun_drawChiefAdvisor()
       fun_drawGraphic(graphic_bullet, dialog_x + 40, dialog_y + 147);
       fun_drawGameText(61, 62, dialog_x + 60, dialog_y + 146, graphic_font + 268, 0);
       text_xoffset = 0;
-      v2 = getPercentage( city_inform[ciid].dword_654504, city_inform[ciid].dword_654500 );
+      v2 = getPercentage( city_inform[ciid].plebsFoodInCityLastYear, city_inform[ciid].dword_654500 );
       if ( scn_romeSuppliesWheat )
       {
         fun_drawGameText(61, 26, dialog_x + text_xoffset + 240, dialog_y + 146, graphic_font + 1072, 0);
@@ -115969,7 +112594,7 @@ void  fun_drawDebugInfoBuildings()
         27,
         16122);
       fun_drawNumber(building_1c_house_maxPopEver[64 * v3], 64, " = max pop", 100, v5 + 180, 27, 16122);
-      if ( buildings[v3].houseSize )
+      if ( buildings[v3].house_size )
       {
         text_xoffset = 0;
         fun_drawNumber(LOBYTE(building_5a_house_theater_amphi[64 * v3]), 64, "th", 8, v5 + 192, 27, 16122);
@@ -116054,7 +112679,7 @@ void  fun_drawDebugInfoBuildings()
           16122);
       }
       fun_drawNumber(dword_8C79EC, 64, " = over ptr", 8, v5 + 204, 27, -1);
-      if ( buildings[v3].houseSize )
+      if ( buildings[v3].house_size )
       {
         text_xoffset = 0;
         fun_drawNumber(
@@ -116339,12 +112964,7 @@ void  fun_drawGreyButton(int a1, int x, int y, int width, int mouseOver)
     }
   }
 }
-// 5FFF60: using guessed type int dword_5FFF60[];
-// 5FFF64: using guessed type int dword_5FFF64[];
-// 608720: using guessed type int button_something_0[];
-// 6E6BCE: using guessed type __int16 graphic_buttons;
 
-//----- (0052B820) --------------------------------------------------------
 void  unused_drawGildedCorners(int a1, int x, int y, signed int a4, int a5, int a6)
 {
   int v6; // ST5C_4@10
@@ -116367,10 +112987,7 @@ void  unused_drawGildedCorners(int a1, int x, int y, signed int a4, int a5, int 
     fun_drawGraphic(graphic_buttons + 52, v6 + v7 - 7, y + 17);
   }
 }
-// 608720: using guessed type int button_something_0[];
-// 6E6BCE: using guessed type __int16 graphic_buttons;
 
-//----- (0052B990) --------------------------------------------------------
 void  fun_drawDialogBackground(int xOffset, int yOffset, int widthBlocks, int heightBlocks)
 {
   signed int yAdd; // [sp+4Ch] [bp-14h]@28
@@ -116773,13 +113390,7 @@ void  fun_drawDebugInfoBox(int greyButtonId, int a2, int a3, int a4, int a5, int
     }
   }
 }
-// 402E3C: using guessed type _DWORD  sub_402E3C(_DWORD, _DWORD, _DWORD, __int16);
-// 5FFF60: using guessed type int dword_5FFF60[];
-// 5FFF64: using guessed type int dword_5FFF64[];
-// 608720: using guessed type int button_something_0[];
-// 6E6BCE: using guessed type __int16 graphic_buttons;
 
-//----- (0052C7A0) --------------------------------------------------------
 signed int  sub_52C7A0(int a1)
 {
   button_something_6 = 100;
@@ -116787,19 +113398,14 @@ signed int  sub_52C7A0(int a1)
     fun_sound_playChannel(1);
   return 1;
 }
-// 608720: using guessed type int button_something_0[];
-// 608738: using guessed type int button_something_6;
 
-//----- (0052C810) --------------------------------------------------------
 signed int  unused_52C810(int a1)
 {
   if ( button_something_0[a1] == 7 )
     fun_sound_playChannel(1);
   return 1;
 }
-// 608720: using guessed type int button_something_0[];
 
-//----- (0052C870) --------------------------------------------------------
 void  fun_drawSmallGreyButton(int a1, int x, int y, int width, int widthIsFixed, int mouseOver)
 {
   int max; // [sp+4Ch] [bp-8h]@2
@@ -116837,10 +113443,7 @@ void  fun_drawSmallGreyButton(int a1, int x, int y, int width, int widthIsFixed,
     fun_drawGraphic(graphic_currentGraphicId, graphic_xOffset, graphic_yOffset);
   }
 }
-// 608720: using guessed type int button_something_0[];
-// 6E6BCE: using guessed type __int16 graphic_buttons;
 
-//----- (0052C9D0) --------------------------------------------------------
 int  unused_52C9D0(int a1, int a2, int a3)
 {
   int result; // eax@2
@@ -116864,11 +113467,7 @@ int  unused_52C9D0(int a1, int a2, int a3)
   }
   return result;
 }
-// 608720: using guessed type int button_something_0[];
-// 6ADD2C: using guessed type int draw_clip_x;
-// 6E6B4C: using guessed type int draw_clip_xEnd;
 
-//----- (0052CA90) --------------------------------------------------------
 int  unused_52CA90(int a1, int a2, int a3, int a4, int a5)
 {
   int result; // eax@2
@@ -116898,14 +113497,7 @@ int  unused_52CA90(int a1, int a2, int a3, int a4, int a5)
   }
   return result;
 }
-// 608720: using guessed type int button_something_0[];
-// 65E6D4: using guessed type int screen_height;
-// 6ADBE4: using guessed type int draw_clip_y;
-// 6ADD2C: using guessed type int draw_clip_x;
-// 6E6B4C: using guessed type int draw_clip_xEnd;
-// 7E26F8: using guessed type int draw_clip_yEnd;
 
-//----- (0052CBE0) --------------------------------------------------------
 void  fun_resetClipRegionOptionsDialog()
 {
   draw_clip_x = 0;
@@ -116913,13 +113505,7 @@ void  fun_resetClipRegionOptionsDialog()
   draw_clip_y = 0;
   draw_clip_yEnd = screen_height;
 }
-// 65E6D4: using guessed type int screen_height;
-// 6ADBE4: using guessed type int draw_clip_y;
-// 6ADD2C: using guessed type int draw_clip_x;
-// 6E6B4C: using guessed type int draw_clip_xEnd;
-// 7E26F8: using guessed type int draw_clip_yEnd;
 
-//----- (0052CC30) --------------------------------------------------------
 int  unused_52CC30(int a1)
 {
   int result; // eax@6
@@ -117002,14 +113588,7 @@ void  fun_drawTextCursor(int a1, int a2, int a3)
     }
   }
 }
-// 608008: using guessed type int time_current;
-// 608108: using guessed type int input_cursorLastChange;
-// 60810C: using guessed type int input_showCursor[7];
-// 6AD9C8: using guessed type int input_cursorOffset;
-// 6AD9D0: using guessed type int dword_6AD9D0;
-// 7E1EF8: using guessed type char input_isInsert;
 
-//----- (0052CFC0) --------------------------------------------------------
 void  unused_52CFC0()
 {
   if ( setting_map_camera_x > 0 )
@@ -117021,13 +113600,7 @@ void  unused_52CFC0()
   if ( setting_map_height - setting_map_camera_x > 14 )
     fun_drawGraphic(4, (screen_width - 32) / 2, screen_height - 60);
 }
-// 65E6D4: using guessed type int screen_height;
-// 8C79E4: using guessed type int setting_map_camera_x;
-// 8C79E8: using guessed type int setting_map_camera_y;
-// 8C79F8: using guessed type int setting_map_width;
-// 8C79FC: using guessed type int setting_map_height;
 
-//----- (0052D0B0) --------------------------------------------------------
 void  unused_52D0B0(const char *str, int a2)
 {
   unused_fillGreenGraphicRectWithBorder(128, 320, 24, 3);
@@ -117039,12 +113612,7 @@ void  unused_52D0B0(const char *str, int a2)
   if ( a2 )
     fun_drawNumberCentered(a2, 64, " ", 128, 348, 384, 107, 0);
 }
-// 660578: using guessed type int dword_660578;
-// 66057C: using guessed type int dword_66057C;
-// 6608AC: using guessed type int dword_6608AC[13];
-// 6DEC20: using guessed type int drawtext_forceColor;
 
-//----- (0052D180) --------------------------------------------------------
 void  unused_52D180()
 {
   ;
@@ -117077,11 +113645,7 @@ signed int  fun_startVideo(const char *filename, int x, int y, int fullscreen, i
   }
   return result;
 }
-// 60812C: using guessed type int message_useVideo;
-// 608458: using guessed type int video_nextWindowId;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0052D230) --------------------------------------------------------
 signed int  fun_checkVideo(const char *videoFilename, int xOffset, int yOffset)
 {
   signed int result; // eax@2
@@ -117106,12 +113670,7 @@ signed int  fun_checkVideo(const char *videoFilename, int xOffset, int yOffset)
   }
   return result;
 }
-// 608128: using guessed type int smack_currentVideo;
-// 6084AC: using guessed type int smack_videoInHomeDir;
-// 60856C: using guessed type int smack_videoPlaying;
-// 9DD944: using guessed type int __stdcall SmackClose(_DWORD);
 
-//----- (0052D2D0) --------------------------------------------------------
 signed int  fun_playVideo(const char *filename, int x, int y, int fullscreen)
 {
   int v4; // ecx@6
@@ -117295,20 +113854,7 @@ LABEL_17:
   }*/
   return result;
 }
-// 40308F: using guessed type _DWORD  fun_translateDDrawSurfaceLockError(_DWORD);
-// 608000: using guessed type int ddraw_busy;
-// 608128: using guessed type int smack_currentVideo;
-// 60856C: using guessed type int smack_videoPlaying;
-// 608570: using guessed type int smack_video_x;
-// 608574: using guessed type int smack_video_y[22];
-// 6085CC: using guessed type int smack_color_flags;
-// 9DD92C: using guessed type int __stdcall SmackWait(_DWORD);
-// 9DD938: using guessed type int __stdcall SmackToBuffer(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 9DD944: using guessed type int __stdcall SmackClose(_DWORD);
-// 9DD948: using guessed type int __fastcall SmackNextFrame(_DWORD, _DWORD, _DWORD);
-// 9DD94C: using guessed type int __stdcall SmackDoFrame(_DWORD);
 
-//----- (0052D7D0) --------------------------------------------------------
 void  fun_smackCancelVideo()
 {
   SIZE_T v0; // eax@7
@@ -117329,12 +113875,7 @@ void  fun_smackCancelVideo()
     fun_smackCleanupAfterVideo();
   }
 }
-// 608128: using guessed type int smack_currentVideo;
-// 6084AC: using guessed type int smack_videoInHomeDir;
-// 60856C: using guessed type int smack_videoPlaying;
-// 9DD944: using guessed type int __stdcall SmackClose(_DWORD);
 
-//----- (0052D880) --------------------------------------------------------
 void  fun_smackStopVideo()
 {
   if ( smack_videoPlaying )
@@ -117349,12 +113890,7 @@ void  fun_smackStopVideo()
     fun_chdirHome();
   }
 }
-// 608128: using guessed type int smack_currentVideo;
-// 6084AC: using guessed type int smack_videoInHomeDir;
-// 60856C: using guessed type int smack_videoPlaying;
-// 9DD944: using guessed type int __stdcall SmackClose(_DWORD);
 
-//----- (0052D8F0) --------------------------------------------------------
 void  fun_smackCleanupAfterVideo()
 {
   smack_videoPlaying = 0;
@@ -117365,12 +113901,7 @@ void  fun_smackCleanupAfterVideo()
     window_redrawRequest = 1;
   message_useVideo = 0;
 }
-// 60812C: using guessed type int message_useVideo;
-// 608458: using guessed type int video_nextWindowId;
-// 60856C: using guessed type int smack_videoPlaying;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0052D950) --------------------------------------------------------
 signed int  unused_52D950()
 {
   signed int result; // eax@2
@@ -117381,9 +113912,7 @@ signed int  unused_52D950()
     result = 0;
   return result;
 }
-// 60856C: using guessed type int smack_videoPlaying;
 
-//----- (0052D980) --------------------------------------------------------
 void  unused_52D980()
 {
   ;
@@ -117395,15 +113924,12 @@ void  unused_52D9A0()
   ;
 }
 
-//----- (0052D9C0) --------------------------------------------------------
 signed int  unused_52D9C0()
 {
   fun_soundStopChannel(0);
   return fun_startVideo(&aIntro_smk[16 * dword_6084A0], 39, 73, 0, window_id);
 }
-// 6084A0: using guessed type int dword_6084A0;
 
-//----- (0052DA10) --------------------------------------------------------
 void  unused_52DA10(HWND hWnd)
 {
   HDC v1; // [sp+4Ch] [bp-44h]@1
@@ -117423,13 +113949,7 @@ void  unused_52DA10(HWND hWnd)
     }
   }
 }
-// 608000: using guessed type int ddraw_busy;
-// 608128: using guessed type int smack_currentVideo;
-// 6084A8: using guessed type int dword_6084A8;
-// 9DD930: using guessed type int __stdcall SmackSoundOnOff(_DWORD, _DWORD);
-// 9DD93C: using guessed type int __stdcall SmackGoto(_DWORD, _DWORD);
 
-//----- (0052DAE0) --------------------------------------------------------
 int  unused_52DAE0(int a1, int a2, int a3, int a4)
 {
   int result; // eax@2
@@ -117450,10 +113970,7 @@ int  unused_52DAE0(int a1, int a2, int a3, int a4)
     result = ddraw_surface->Blt(&v9,ddraw_backSurface,&v5,0x1000200,0);
   return result;
 }
-// 65E704: using guessed type int setting_fullscreen;
-// 660554: using guessed type int dword_660554;
 
-//----- (0052DBC0) --------------------------------------------------------
 void  fun_playWalkerSound(int walkerSoundId, int soundId)
 {
   char path[32]; // [sp+4Ch] [bp-24h]@7
@@ -118051,9 +114568,7 @@ void  fun_playWalkerInfoSound()
     fun_playWalkerSound(currentWalkerSoundId, currentMoodSoundId);
   }
 }
-// 64E388: using guessed type int walkerInfo_index;
 
-//----- (0052F340) --------------------------------------------------------
 void  fun_initScenario(char *mapFilename)
 {
   int v1; // [sp+4Ch] [bp-8h]@1
@@ -118176,12 +114691,11 @@ signed int  fun_file_mapExists(char *mapFilename)
   return v2;
 }
 
-//----- (0052F910) --------------------------------------------------------
 void  fun_initCustomScenario(const char *scnFilename)
 {
   winState = 0;
   byte_65E6A0 = 0;
-  toPlace_buildingType = 0;
+  toPlace_buildingType = B_none_building;
   fun_clearCityInfo();
   sub_4E1200();
   ciid = 1;
@@ -118353,9 +114867,7 @@ signed int  fun_cdDrive_FileExistsOnDriveWithLength(LPCSTR drive, const char *fi
   }
   return result;
 }
-// 5356D0: using guessed type _DWORD  unknown_libname_1(_DWORD, _DWORD);
 
-//----- (0052FF00) --------------------------------------------------------
 BOOL  sub_52FF00(char *Dest)
 {
   char Dst; // [sp+4Ch] [bp-110h]@1
@@ -118545,13 +115057,7 @@ signed int  fun_loadC3ModelTxt()
   }
   return result;
 }
-// 5F6CD4: using guessed type int model_buildings_cost[];
-// 607754: using guessed type int model_houses_des_devolve[];
 
-//----- (005307A0) --------------------------------------------------------
-
-
-//----- (00530A90) --------------------------------------------------------
 MMRESULT  mmio_530A90(HMMIO *a1, LPMMCKINFO pmmcki, const MMCKINFO *pmmckiParent)
 {
   MMRESULT v4; // [sp+4Ch] [bp-4h]@1
@@ -118726,7 +115232,6 @@ signed int  unused_compressFile(const char *inputFile, const char *outputFile)
   return result;
 }
 
-//----- (005311C0) --------------------------------------------------------
 signed int  unused_decompressFile(char *inputFile, const char *outputFile)
 {
   int v2; // eax@1
@@ -118770,7 +115275,6 @@ int  j_freeMemory(void *a1)
   return freeMemory(a1, 1);
 }
 
-//----- (00533730) --------------------------------------------------------
 int freeMemory(void *a1, signed int a2)
 {
   int result; // eax@1
@@ -118921,31 +115425,7 @@ int freeMemory(void *a1, signed int a2)
   }
   return result;
 }
-// 533D60: using guessed type _DWORD  CheckBytes(_DWORD, _DWORD, _DWORD);
-// 533DF0: using guessed type int _CrtCheckMemory(void);
-// 534230: using guessed type _DWORD  _CrtIsValidHeapPointer(_DWORD);
-// 606780: using guessed type int dword_606780;
-// 60678C: using guessed type char byte_60678C;
-// 60678D: using guessed type char byte_60678D;
-// 6067B8: using guessed type int ( *off_6067B8)(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 608140: using guessed type int dword_608140;
-// 608148: using guessed type int dword_608148;
-// 60814C: using guessed type int dword_60814C;
 
-//----- (00535BBF) --------------------------------------------------------
-/*int __usercall sub_535BBF<eax>(int a1<ebp>)
-{
-  *(_DWORD *)(a1 - 104) = ***(_DWORD ***)(a1 - 20);
-  return _XcptFilter(*(_DWORD *)(a1 - 104), *(struct _EXCEPTION_POINTERS **)(a1 - 20));
-}
-
-//----- (00535BDA) --------------------------------------------------------
-void __usercall sub_535BDA(int a1<ebp>)
-{
-  _exit(*(_DWORD *)(a1 - 104));
-}*/
-
-//----- (00538D90) --------------------------------------------------------
 bool  sub_538D90(int a1)
 {
   bool result; // eax@2
@@ -119037,19 +115517,6 @@ bool  sub_538D90(int a1)
     result = v2 < dword_606AC0;
   return result;
 }
-
-// 539090: using guessed type _DWORD  cvtdate(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD, _DWORD);
-// 606A14: using guessed type int dword_606A14;
-// 606AA8: using guessed type int dword_606AA8;
-// 606AAC: using guessed type int dword_606AAC;
-// 606AB0: using guessed type int dword_606AB0;
-// 606AB8: using guessed type int dword_606AB8;
-// 606ABC: using guessed type int dword_606ABC;
-// 606AC0: using guessed type int dword_606AC0;
-// 6081F0: using guessed type int dword_6081F0;
-
-// ALL OK, 1907 function(s) have been successfully decompiled
-
 
 void  sub_42E560(int x, int y, int gridOffset)
 {
