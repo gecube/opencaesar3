@@ -10,7 +10,7 @@ void __cdecl fun_decayService_culture()
   {
     if ( buildings[i].inUse == 1 )
     {
-      if ( buildings[i].houseSize )
+      if ( buildings[i].size )
       {
         if ( (signed int)_LOBYTE(building_5a_house_theater_amphi[64 * i]) <= 1 )
           _LOBYTE(building_5a_house_theater_amphi[64 * i]) = 0;

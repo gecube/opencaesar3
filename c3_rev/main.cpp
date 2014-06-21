@@ -5118,10 +5118,7 @@ void fun_confirmdialog_deleteFort()
     deleteFort_confirmed = -1;
   sub_4771D0(0, deleteConfirm_a2, deleteConfirm_a3, deleteConfirm_x, deleteConfirm_y);
 }
-// 6ADCD8: using guessed type char confirmdialog_okClicked;
-// 89AA90: using guessed type int deleteFort_confirmed;
 
-//----- (00405A60) --------------------------------------------------------
 void  fun_confirmdialog_deleteBridge()
 {
   if ( (unsigned __int8)confirmdialog_okClicked == 1 )
@@ -5130,10 +5127,7 @@ void  fun_confirmdialog_deleteBridge()
     deleteBridge_confirmed = -1;
   sub_4771D0(0, deleteConfirm_a2, deleteConfirm_a3, deleteConfirm_x, deleteConfirm_y);
 }
-// 6ADCD8: using guessed type char confirmdialog_okClicked;
-// 8DADC8: using guessed type int deleteBridge_confirmed;
 
-//----- (00405AD0) --------------------------------------------------------
 void  fun_confirmdialog_openTrade()
 {
   if ( (unsigned __int8)confirmdialog_okClicked == 1 )
@@ -5146,13 +5140,7 @@ void  fun_confirmdialog_openTrade()
     window_redrawRequest = 1;
   }
 }
-// 607F74: using guessed type int trade_selectedCity;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6ADCD8: using guessed type char confirmdialog_okClicked;
-// 98DE06: using guessed type __int16 trade_costToOpen[0xff];
-// 9D7B9C: using guessed type int confirmDialog_windowId;
 
-//----- (00405B70) --------------------------------------------------------
 void  fun_confirmdialog_requestDispatchTroops()
 {
   if ( (unsigned __int8)confirmdialog_okClicked == 1 )
@@ -5162,18 +5150,13 @@ void  fun_confirmdialog_requestDispatchTroops()
     confirmDialog_windowId = 20;
   }
 }
-// 6ADCD8: using guessed type char confirmdialog_okClicked;
-// 9D7B9C: using guessed type int confirmDialog_windowId;
 
-//----- (00405BB0) --------------------------------------------------------
 void  fun_confirmdialog_requestDispatchGoods()
 {
   if ( (unsigned __int8)confirmdialog_okClicked == 1 )
     fun_dispatchRequestedGoods(request_dispatchGoods_requestId);
 }
-// 6ADCD8: using guessed type char confirmdialog_okClicked;
 
-//----- (00405BF0) --------------------------------------------------------
 void  fun_menuFile_newGame()
 {
   toPlace_buildingType = 0;
@@ -5183,10 +5166,7 @@ void  fun_menuFile_newGame()
   window_id = W_MainMenu;
   window_redrawRequest = 1;
 }
-// 608074: using guessed type int previousOverlay;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00405C50) --------------------------------------------------------
 void  fun_menuFile_replayMap()
 {
   toPlace_buildingType = 0;
@@ -5202,10 +5182,7 @@ void  fun_menuFile_replayMap()
     sub_4117C0();
   }
 }
-// 65E764: using guessed type int setting_isCustomScenario;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00405CB0) --------------------------------------------------------
 void  fun_menuFile_loadGame()
 {
   toPlace_buildingType = 0;
@@ -5226,17 +5203,7 @@ void  fun_menuFile_loadGame()
   fun_inputEndPressed();
   window_redrawRequest = 1;
 }
-// 660BF8: using guessed type int findfiles_numFiles;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6ADBC8: using guessed type int fileDialogSave_from_window;
-// 6ADD0C: using guessed type char byte_6ADD0C;
-// 7E1EF9: using guessed type char byte_7E1EF9;
-// 7E27A0: using guessed type int input_accepted;
-// 9DA7B8: using guessed type int filelist_selectedIndex;
-// 9DA86C: using guessed type int scrollbar_file_isLarge;
-// 9DA8C0: using guessed type int filelist_numFiles;
 
-//----- (00405DA0) --------------------------------------------------------
 void  fun_menuFile_saveGame()
 {
   fun_findFiles("*.sav");
@@ -5256,17 +5223,7 @@ void  fun_menuFile_saveGame()
   fun_inputEndPressed();
   window_redrawRequest = 1;
 }
-// 660BF8: using guessed type int findfiles_numFiles;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6ADBC8: using guessed type int fileDialogSave_from_window;
-// 6ADD0C: using guessed type char byte_6ADD0C;
-// 7E1EF9: using guessed type char byte_7E1EF9;
-// 7E27A0: using guessed type int input_accepted;
-// 9DA7B8: using guessed type int filelist_selectedIndex;
-// 9DA86C: using guessed type int scrollbar_file_isLarge;
-// 9DA8C0: using guessed type int filelist_numFiles;
 
-//----- (00405E80) --------------------------------------------------------
 void  fun_menuFile_deleteGame()
 {
   fun_findFiles("*.sav");
@@ -5285,17 +5242,7 @@ void  fun_menuFile_deleteGame()
   fun_inputEndPressed();
   window_redrawRequest = 1;
 }
-// 660BF8: using guessed type int findfiles_numFiles;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6ADBC8: using guessed type int fileDialogSave_from_window;
-// 6ADD0C: using guessed type char byte_6ADD0C;
-// 7E1EF9: using guessed type char byte_7E1EF9;
-// 7E27A0: using guessed type int input_accepted;
-// 9DA7B8: using guessed type int filelist_selectedIndex;
-// 9DA86C: using guessed type int scrollbar_file_isLarge;
-// 9DA8C0: using guessed type int filelist_numFiles;
 
-//----- (00405F50) --------------------------------------------------------
 void  fun_dialogFileSavedGame_okCancel()
 {
   mouseover_button_id_main = 0;
@@ -5341,16 +5288,7 @@ void  fun_dialogFileSavedGame_okCancel()
     window_redrawRequest = 1;
   }
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 6ADBC8: using guessed type int fileDialogSave_from_window;
-// 6ADD0C: using guessed type char byte_6ADD0C;
-// 7E1EF9: using guessed type char byte_7E1EF9;
-// 9D77F0: using guessed type int mouseover_imagebutton_id[202];
-// 9D7B28: using guessed type int mouseover_button_id;
-// 9D7B2C: using guessed type int mouseover_button_id_main;
-// 9D7B90: using guessed type int dword_9D7B90;
 
-//----- (004060F0) --------------------------------------------------------
 void  fun_dialogFile_scrollUpDown()
 {
   if ( filelist_numFiles > 12 )
@@ -5373,10 +5311,7 @@ void  fun_dialogFile_scrollUpDown()
     byte_6ADD0C = 0;
   }
 }
-// 6ADD0C: using guessed type char byte_6ADD0C;
-// 9DA8C0: using guessed type int filelist_numFiles;
 
-//----- (00406180) --------------------------------------------------------
 signed int  fun_dialogFile_handleScrollbarClick()
 {
   signed int result; // eax@2
@@ -5436,11 +5371,7 @@ signed int  fun_dialogFile_handleScrollbarClick()
   }
   return result;
 }
-// 65E6BC: using guessed type char mouse_isLeftClick;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA8C0: using guessed type int filelist_numFiles;
 
-//----- (004062D0) --------------------------------------------------------
 void  fun_dialogFileSavedGame_select()
 {
   if ( currentButton_parameter < filelist_numFiles )
@@ -5463,36 +5394,26 @@ void  fun_dialogFileSavedGame_select()
     byte_6ADD0C = 0;
   }
 }
-// 6ADD0C: using guessed type char byte_6ADD0C;
-// 9DA7B8: using guessed type int filelist_selectedIndex;
-// 9DA8C0: using guessed type int filelist_numFiles;
 
-//----- (004063D0) --------------------------------------------------------
 void  fun_menuFile_exitGame()
 {
   PostMessageA(main_window, 0x100u, 0x1Bu, 0);
 }
 
-//----- (00406400) --------------------------------------------------------
 void  fun_menuOptions_display()
 {
   window_id = W_DisplayOptionsDialog;
   button_something_2 = 0;
   window_redrawRequest = 1;
 }
-// 608728: using guessed type int button_something_2;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406440) --------------------------------------------------------
 void  fun_dialogDisplayOptions_toggleFullScreen()
 {
   PostMessageA(main_window, 0x100u, 0x75u, 0);
   window_id = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406480) --------------------------------------------------------
 void  fun_dialogDisplayOptions_setResolution()
 {
   switch ( currentButton_parameter )
@@ -5510,7 +5431,6 @@ void  fun_dialogDisplayOptions_setResolution()
   window_id = 1;
 }
 
-//----- (00406520) --------------------------------------------------------
 void  fun_showResolutionConfirmDialog()
 {
   if ( setting_resolution > setting_maxKnownGoodResolution )
@@ -5523,42 +5443,28 @@ void  fun_showResolutionConfirmDialog()
     }
   }
 }
-// 65E710: using guessed type int setting_resolution;
-// 65E78C: using guessed type int setting_maxKnownGoodResolution;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA818: using guessed type int resolutionConfirm_startTime;
 
-//----- (00406580) --------------------------------------------------------
 void  fun_changeBackToLastResolution()
 {
   PostMessageA(main_window, 0x100u, 0x76u, 0);
   window_id = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (004065C0) --------------------------------------------------------
 void  fun_resolutionConfirm_ok()
 {
   setting_maxKnownGoodResolution = setting_resolution;
   window_id = 1;
   window_redrawRequest = 1;
 }
-// 65E710: using guessed type int setting_resolution;
-// 65E78C: using guessed type int setting_maxKnownGoodResolution;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406600) --------------------------------------------------------
 void  fun_menuOptions_difficulty()
 {
   window_id = W_DifficultyOptionsDialog;
   button_something_2 = 0;
   window_redrawRequest = 1;
 }
-// 608728: using guessed type int button_something_2;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406640) --------------------------------------------------------
 void  fun_dialogDifficultyOptions_difficultyUpDown()
 {
   if ( currentButton_parameter )
@@ -5571,10 +5477,7 @@ void  fun_dialogDifficultyOptions_difficultyUpDown()
     setting_difficulty = 4;
   window_redrawRequest = 1;
 }
-// 65E928: using guessed type int setting_difficulty;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (004066C0) --------------------------------------------------------
 void  fun_dialogDifficultyOptions_godsToggle()
 {
   if ( setting_godsOn )
@@ -5583,18 +5486,13 @@ void  fun_dialogDifficultyOptions_godsToggle()
     setting_godsOn = 1;
   window_redrawRequest = 1;
 }
-// 65E92C: using guessed type int setting_godsOn;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406710) --------------------------------------------------------
 void  fun_dialogDisplayOptions_cancel()
 {
   window_id = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406740) --------------------------------------------------------
 void  fun_menuOptions_sound()
 {
   soundOptions_musicOn_undoCopy = (unsigned __int8)setting_sound_music_on;
@@ -5609,30 +5507,13 @@ void  fun_menuOptions_sound()
   button_something_3 = 0;
   window_redrawRequest = 1;
 }
-// 60872C: using guessed type int button_something_3;
-// 65E70B: using guessed type char setting_sound_effects_on;
-// 65E70C: using guessed type char setting_sound_music_on;
-// 65E70D: using guessed type char setting_sound_speech_on;
-// 65E768: using guessed type char setting_sound_city_on;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA758: using guessed type int soundOptions_cityPct_undoCopy;
-// 9DA7D4: using guessed type int soundOptions_speechPct_undoCopy;
-// 9DA7E8: using guessed type int soundOptions_cityOn_undoCopy;
-// 9DA80C: using guessed type int soundOptions_speechOn_undoCopy;
-// 9DA868: using guessed type int soundOptions_effectsPct_undoCopy;
-// 9DA888: using guessed type int soundOptions_effectsOn_undoCopy;
-// 9DA8EC: using guessed type int soundOptions_musicOn_undoCopy;
-// 9DA8F8: using guessed type int soundOptions_musicPct_undoCopy;
 
-//----- (004067F0) --------------------------------------------------------
 void  fun_dialogSoundOptions_ok()
 {
   window_id = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406820) --------------------------------------------------------
 void  fun_dialogSoundOptions_cancel()
 {
   setting_sound_music_on = soundOptions_musicOn_undoCopy;
@@ -5659,21 +5540,7 @@ void  fun_dialogSoundOptions_cancel()
   window_id = 1;
   window_redrawRequest = 1;
 }
-// 65E70B: using guessed type char setting_sound_effects_on;
-// 65E70C: using guessed type char setting_sound_music_on;
-// 65E70D: using guessed type char setting_sound_speech_on;
-// 65E768: using guessed type char setting_sound_city_on;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA758: using guessed type int soundOptions_cityPct_undoCopy;
-// 9DA7D4: using guessed type int soundOptions_speechPct_undoCopy;
-// 9DA7E8: using guessed type int soundOptions_cityOn_undoCopy;
-// 9DA80C: using guessed type int soundOptions_speechOn_undoCopy;
-// 9DA868: using guessed type int soundOptions_effectsPct_undoCopy;
-// 9DA888: using guessed type int soundOptions_effectsOn_undoCopy;
-// 9DA8EC: using guessed type int soundOptions_musicOn_undoCopy;
-// 9DA8F8: using guessed type int soundOptions_musicPct_undoCopy;
 
-//----- (00406940) --------------------------------------------------------
 void  fun_dialogSoundOptions_toggle()
 {
   if ( currentButton_parameter == 1 )
@@ -5717,13 +5584,7 @@ void  fun_dialogSoundOptions_toggle()
   }
   window_redrawRequest = 1;
 }
-// 65E70B: using guessed type char setting_sound_effects_on;
-// 65E70C: using guessed type char setting_sound_music_on;
-// 65E70D: using guessed type char setting_sound_speech_on;
-// 65E768: using guessed type char setting_sound_city_on;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406A60) --------------------------------------------------------
 void  fun_dialogSoundOptions_musicUpDown()
 {
   if ( currentButton_parameter == 1 )
@@ -5737,9 +5598,7 @@ void  fun_dialogSoundOptions_musicUpDown()
   fun_adjustSoundVolumeForChannel(setting_sound_music_pct, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406B00) --------------------------------------------------------
 void  fun_dialogSoundOptions_speechUpDown()
 {
   if ( currentButton_parameter == 1 )
@@ -5753,9 +5612,7 @@ void  fun_dialogSoundOptions_speechUpDown()
   fun_adjustSoundVolumeForChannel(setting_sound_speech_pct, 1);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406BA0) --------------------------------------------------------
 void  fun_dialogSoundOptions_effectsUpDown()
 {
   if ( currentButton_parameter == 1 )
@@ -5769,9 +5626,7 @@ void  fun_dialogSoundOptions_effectsUpDown()
   fun_adjustSoundVolumeForEffectsChannels(setting_sound_effects_pct, 1, 30);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406C40) --------------------------------------------------------
 void  fun_dialogSoundOptions_cityUpDown()
 {
   if ( currentButton_parameter == 1 )
@@ -5785,9 +5640,7 @@ void  fun_dialogSoundOptions_cityUpDown()
   fun_adjustSoundVolumeForEffectsChannels(setting_sound_city_pct, 31, 150);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406CF0) --------------------------------------------------------
 void  fun_menuOptions_speed()
 {
   speedOptions_game_undoCopy = setting_speed_game;
@@ -5796,20 +5649,13 @@ void  fun_menuOptions_speed()
   button_something_4 = 0;
   window_redrawRequest = 1;
 }
-// 608730: using guessed type int button_something_4;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA8AC: using guessed type int speedOptions_game_undoCopy;
-// 9DA8F4: using guessed type int speedOptions_scroll_undoCopy;
 
-//----- (00406D40) --------------------------------------------------------
 void  fun_dialogSpeedOptions_ok()
 {
   window_id = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406D70) --------------------------------------------------------
 void  fun_dialogSpeedOptions_cancel()
 {
   setting_speed_game = speedOptions_game_undoCopy;
@@ -5817,11 +5663,7 @@ void  fun_dialogSpeedOptions_cancel()
   window_id = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA8AC: using guessed type int speedOptions_game_undoCopy;
-// 9DA8F4: using guessed type int speedOptions_scroll_undoCopy;
 
-//----- (00406DC0) --------------------------------------------------------
 void  fun_dialogSpeedOptions_gameUpDown()
 {
   if ( mode_editor != 1 )
@@ -5837,10 +5679,7 @@ void  fun_dialogSpeedOptions_gameUpDown()
     window_redrawRequest = 1;
   }
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (00406E60) --------------------------------------------------------
 void  fun_dialogSpeedOptions_scrollUpDown()
 {
   if ( currentButton_parameter == 1 )
@@ -5853,21 +5692,17 @@ void  fun_dialogSpeedOptions_scrollUpDown()
     setting_speed_scroll = 100;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00406EF0) --------------------------------------------------------
 void  fun_menuHelp_help()
 {
   fun_showHelpDialog(10, 0);
 }
 
-//----- (00406F20) --------------------------------------------------------
 void  fun_menuHelp_about()
 {
   fun_showHelpDialog(0, 0);
 }
 
-//----- (00406F50) --------------------------------------------------------
 void  fun_menuHelp_cycleMouseHelp()
 {
   if ( setting_mouse_tooltips == 2 )
@@ -5891,7 +5726,6 @@ void  fun_menuHelp_cycleMouseHelp()
   keepSubMenuOpen = 1;
 }
 
-//----- (00406FE0) --------------------------------------------------------
 void  fun_menuHelp_toggleWarnings()
 {
   if ( setting_warnings_on )
@@ -5906,10 +5740,7 @@ void  fun_menuHelp_toggleWarnings()
   }
   keepSubMenuOpen = 1;
 }
-// 65E769: using guessed type char setting_warnings_on;
-// 9D7B8C: using guessed type int keepSubMenuOpen;
 
-//----- (00407040) --------------------------------------------------------
 void  unused_menuSettings_toggleAutoClear()
 {
   if ( setting_autoclear_on )
@@ -5924,31 +5755,24 @@ void  unused_menuSettings_toggleAutoClear()
   }
   keepSubMenuOpen = 1;
 }
-// 65E76B: using guessed type char setting_autoclear_on;
-// 9D7B8C: using guessed type int keepSubMenuOpen;
 
-//----- (004070A0) --------------------------------------------------------
 void  unused_4070A0()
 {
   fun_writeToC3mapsBmp(setting_map_start);
   unused_40F450();
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (004070E0) --------------------------------------------------------
 void  unused_4070E0()
 {
   ;
 }
 
-//----- (00407100) --------------------------------------------------------
 void  unused_407100()
 {
   ;
 }
 
-//----- (00407120) --------------------------------------------------------
 void  fun_dialogCckSelection_scrollUpDown()
 {
   if ( filelist_numFiles > 15 )
@@ -5971,10 +5795,7 @@ void  fun_dialogCckSelection_scrollUpDown()
     window_redrawRequest = 2;
   }
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA8C0: using guessed type int filelist_numFiles;
 
-//----- (004071B0) --------------------------------------------------------
 signed int  fun_dialogCckSelection_scrollbarClick()
 {
   signed int result; // eax@2
@@ -6034,11 +5855,7 @@ signed int  fun_dialogCckSelection_scrollbarClick()
   }
   return result;
 }
-// 65E6BC: using guessed type char mouse_isLeftClick;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA8C0: using guessed type int filelist_numFiles;
 
-//----- (00407300) --------------------------------------------------------
 void  fun_dialogCckSelection_select()
 {
   if ( currentButton_parameter < filelist_numFiles )
@@ -6055,8 +5872,6 @@ void  fun_dialogCckSelection_select()
     window_redrawRequest = 1;
   }
 }
-
-//----- (00407400) --------------------------------------------------------
 void  fun_numericInput_number()
 {
   signed int maxLength; // [sp+4Ch] [bp-4h]@2
@@ -6074,12 +5889,7 @@ void  fun_numericInput_number()
     fun_playInterfaceButtonSound(4);
   }
 }
-// 401D66: using guessed type _DWORD  fun_playInterfaceButtonSound(_DWORD);
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA820: using guessed type int numericInput_numDigits;
-// 9DA874: using guessed type int numericInput_valueType;
 
-//----- (004074A0) --------------------------------------------------------
 void  fun_numericInput_ok()
 {
   signed int v0; // [sp+4Ch] [bp-4h]@3
@@ -6178,25 +5988,13 @@ void  fun_numericInput_ok()
   window_id = numericInput_fromWindow;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 8C79E4: using guessed type int setting_map_camera_x;
-// 8C79E8: using guessed type int setting_map_camera_y;
-// 9DA7F8: using guessed type int numericInput_extraParam;
-// 9DA82C: using guessed type int numericInput_fromWindow;
-// 9DA874: using guessed type int numericInput_valueType;
-// 9DA878: using guessed type int loadFromBmp_input;
-// 9DA8FC: using guessed type int editEmpire_copyDataValue;
 
-//----- (00407770) --------------------------------------------------------
 void  fun_numericInput_cancel()
 {
   window_id = numericInput_fromWindow;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA82C: using guessed type int numericInput_fromWindow;
 
-//----- (004077A0) --------------------------------------------------------
 void  fun_showNumericInputDialog(int x, int y, int valueType, char *valueByte, __int16 *valueShort, int *valueInt, int a7)
 {
   numericInput_x = x;
@@ -6211,14 +6009,7 @@ void  fun_showNumericInputDialog(int x, int y, int valueType, char *valueByte, _
   numericInput_numDigits = 0;
   window_id = W_NumericInputDialog;
 }
-// 9DA7D0: using guessed type int numericInput_y;
-// 9DA7D8: using guessed type int numericInput_x;
-// 9DA7F8: using guessed type int numericInput_extraParam;
-// 9DA820: using guessed type int numericInput_numDigits;
-// 9DA82C: using guessed type int numericInput_fromWindow;
-// 9DA874: using guessed type int numericInput_valueType;
 
-//----- (00407840) --------------------------------------------------------
 void  fun_selectList_select()
 {
   switch ( selectList_valueType )
@@ -6242,13 +6033,7 @@ void  fun_selectList_select()
   dword_660B90 = 20;
   window_redrawRequest = 1;
 }
-// 660B90: using guessed type int dword_660B90;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7C0: using guessed type int selectList_valueType;
-// 9DA894: using guessed type int selectList_fromWindow;
-// 9DA8E8: using guessed type int selectList_extraParameter;
 
-//----- (00407900) --------------------------------------------------------
 void  fun_showSelectListDialog(int x, int y, int numItems, int group, char *valueByte, __int16 *valueShort, int *valueInt, int extraParam, int a9)
 {
   selectList_x = x;
@@ -6264,15 +6049,7 @@ void  fun_showSelectListDialog(int x, int y, int numItems, int group, char *valu
   selectList_fromWindow = window_id;
   window_id = W_SelectListDialog;
 }
-// 660B90: using guessed type int dword_660B90;
-// 9DA7C0: using guessed type int selectList_valueType;
-// 9DA894: using guessed type int selectList_fromWindow;
-// 9DA8BC: using guessed type int selectList_numItems;
-// 9DA8E0: using guessed type int selectList_x;
-// 9DA8E4: using guessed type int selectList_y;
-// 9DA8E8: using guessed type int selectList_extraParameter;
 
-//----- (004079A0) --------------------------------------------------------
 void  fun_sidePanel_build()
 {
   window_id = 6;
@@ -6292,15 +6069,7 @@ void  fun_sidePanel_build()
   }
   window_redrawRequest = 1;
 }
-// 5F5348: using guessed type int buildmenu_xOffsets[0xff];
-// 607F80: using guessed type int debug_houseEvolution;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9D7B40: using guessed type int dword_9D7B40;
-// 9D7B44: using guessed type int dword_9D7B44;
-// 9D7B48: using guessed type int buildmenu_selectedSubMenu;
-// 9D7B54: using guessed type int buildmenu_submenuNumItems;
 
-//----- (00407A70) --------------------------------------------------------
 int  fun_sidePanel_submenuClick()
 {
   int submenu_yOffset; // [sp+4Ch] [bp-10h]@5
@@ -6340,7 +6109,6 @@ int  fun_sidePanel_submenuClick()
   return submenuParam + 1;
 }
 
-//----- (00407C20) --------------------------------------------------------
 int  fun_sidePanel_submenuGetNextIndex(int submenuId, int start)
 {
   int i; // [sp+4Ch] [bp-4h]@1
@@ -6355,7 +6123,6 @@ int  fun_sidePanel_submenuGetNextIndex(int submenuId, int start)
   return 0;
 }
 
-//----- (00407CA0) --------------------------------------------------------
 int  fun_countBuildingSubMenuItems()
 {
   int v1; // [sp+4Ch] [bp-8h]@1
@@ -6369,9 +6136,7 @@ int  fun_countBuildingSubMenuItems()
   }
   return v1;
 }
-// 9D7B48: using guessed type int buildmenu_selectedSubMenu;
 
-//----- (00407D30) --------------------------------------------------------
 void  fun_enableAllBuildingMenuItems()
 {
   signed int j; // [sp+4Ch] [bp-8h]@3
@@ -6384,7 +6149,6 @@ void  fun_enableAllBuildingMenuItems()
   }
 }
 
-//----- (00407DA0) --------------------------------------------------------
 void fun_enableBuildingMenuItems()
 {
   BuildingType buildingId; // [sp+4Ch] [bp-Ch]@5
@@ -6404,6 +6168,7 @@ void fun_enableBuildingMenuItems()
       }
       if ( buildingId == B_ClearLand )
         buildingMenu_enabled[i][j] = 1;
+
       if ( buildingId == B_Road )
       {
         if ( scn_allow_road )
@@ -7228,63 +6993,7 @@ void fun_enableBuildingMenuItems()
     }
   }
 }
-// 65E760: using guessed type int setting_currentMissionId;
-// 949EE0: using guessed type int tutorial2_population250reached;
-// 949EF8: using guessed type int tutorial1_prefectureBuilt;
-// 94A314: using guessed type int tutorial2_population450reached;
-// 98A544: using guessed type int tutorial2_potteryMade;
-// 98BED4: using guessed type int tutorial1_senateEngineerBuilt;
-// 98BEEC: using guessed type int tutorial1_crime;
-// 98BEF4: using guessed type int tutorial2_granaryBuilt;
-// 98BEFC: using guessed type int tutorial1_fire;
-// 98EE42: using guessed type __int16 scn_allow_farms;
-// 98EE44: using guessed type __int16 scn_allow_rawMaterials;
-// 98EE46: using guessed type __int16 scn_allow_workshops;
-// 98EE48: using guessed type __int16 scn_allow_road;
-// 98EE4A: using guessed type __int16 scn_allow_wall;
-// 98EE4C: using guessed type __int16 scn_allow_aqueduct;
-// 98EE50: using guessed type __int16 scn_allow_amphitheater;
-// 98EE52: using guessed type __int16 scn_allow_theater;
-// 98EE54: using guessed type __int16 scn_allow_hippodrome;
-// 98EE56: using guessed type __int16 scn_allow_colosseum;
-// 98EE58: using guessed type __int16 scn_allow_gladiatorSchool;
-// 98EE5A: using guessed type __int16 scn_allow_lionHouse;
-// 98EE5C: using guessed type __int16 scn_allow_actorColony;
-// 98EE5E: using guessed type __int16 scn_allow_chariotMaker;
-// 98EE60: using guessed type __int16 scn_allow_gardens;
-// 98EE62: using guessed type __int16 scn_allow_plaza;
-// 98EE64: using guessed type __int16 scn_allow_statues;
-// 98EE66: using guessed type __int16 scn_allow_doctor;
-// 98EE68: using guessed type __int16 scn_allow_hospital;
-// 98EE6A: using guessed type __int16 scn_allow_bathhouse;
-// 98EE6C: using guessed type __int16 scn_allow_barber;
-// 98EE6E: using guessed type __int16 scn_allow_school;
-// 98EE70: using guessed type __int16 scn_allow_academy;
-// 98EE72: using guessed type __int16 scn_allow_library;
-// 98EE74: using guessed type __int16 scn_allow_prefecture;
-// 98EE76: using guessed type __int16 scn_allow_fort;
-// 98EE78: using guessed type __int16 scn_allow_gatehouse;
-// 98EE7A: using guessed type __int16 scn_allow_tower;
-// 98EE7C: using guessed type __int16 scn_allow_smallTemples;
-// 98EE7E: using guessed type __int16 scn_allow_largeTemples;
-// 98EE80: using guessed type __int16 scn_allow_market;
-// 98EE82: using guessed type __int16 scn_allow_granary;
-// 98EE84: using guessed type __int16 scn_allow_warehouse;
-// 98EE88: using guessed type __int16 scn_allow_dock;
-// 98EE8A: using guessed type __int16 scn_allow_wharves;
-// 98EE8C: using guessed type __int16 scn_allow_governorHome;
-// 98EE8E: using guessed type __int16 scn_allow_engineersPost;
-// 98EE90: using guessed type __int16 scn_allow_senate;
-// 98EE92: using guessed type __int16 scn_allow_forum;
-// 98EE94: using guessed type __int16 scn_allow_well;
-// 98EE96: using guessed type __int16 scn_allow_oracle;
-// 98EE98: using guessed type __int16 scn_allow_missionPost;
-// 98EE9A: using guessed type __int16 scn_allow_bridges;
-// 98EE9C: using guessed type __int16 scn_allow_barracks;
-// 98EE9E: using guessed type __int16 scn_allow_militaryAcademy;
-// 98EEA0: using guessed type __int16 scn_allow_distributionCenter;
 
-//----- (00409D70) --------------------------------------------------------
 int  fun_countOverlaySubmenuItems(int submenuId)
 {
   int amount; // [sp+4Ch] [bp-8h]@1
@@ -7296,7 +7005,6 @@ int  fun_countOverlaySubmenuItems(int submenuId)
   return amount;
 }
 
-//----- (00409DE0) --------------------------------------------------------
 void  fun_enableSidebarButtons()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -7313,9 +7021,7 @@ void  fun_enableSidebarButtons()
       imagebuttons_sidebar_buildCollapsed[i].state_enabled = 0;
   }
 }
-// 9D7B48: using guessed type int buildmenu_selectedSubMenu;
 
-//----- (00409EA0) --------------------------------------------------------
 void  fun_editorPanel_buttonClick()
 {
   dword_9DA908 = 0;
@@ -7552,26 +7258,7 @@ void  fun_editorPanel_buttonClick()
     }
   }
 }
-// 5F453C: using guessed type int dword_5F453C[];
-// 5F5348: using guessed type int buildmenu_xOffsets[];
-// 608008: using guessed type int time_current;
-// 660C5C: using guessed type char window_redrawRequest;
-// 8B460C: using guessed type int dword_8B460C;
-// 9363AC: using guessed type int dword_9363AC;
-// 9D7B40: using guessed type int dword_9D7B40;
-// 9D7B44: using guessed type int dword_9D7B44;
-// 9D7B48: using guessed type int buildmenu_selectedSubMenu;
-// 9D7B54: using guessed type int buildmenu_submenuNumItems;
-// 9DA7C4: using guessed type int dword_9DA7C4;
-// 9DA800: using guessed type int dword_9DA800;
-// 9DA810: using guessed type int dword_9DA810;
-// 9DA81C: using guessed type int toPlace_invasionPointId;
-// 9DA828: using guessed type int dword_9DA828;
-// 9DA8B4: using guessed type int dword_9DA8B4;
-// 9DA908: using guessed type int dword_9DA908;
-// 9DA910: using guessed type int dword_9DA910;
 
-//----- (0040A700) --------------------------------------------------------
 signed int  sub_40A700()
 {
   signed int res; // [sp+4Ch] [bp-4h]@1
@@ -7591,9 +7278,7 @@ signed int  sub_40A700()
   window_redrawRequest = 1;
   return res;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040A7B0) --------------------------------------------------------
 void  sub_40A7B0()
 {
   if ( dword_8C79EC )
@@ -7621,14 +7306,7 @@ void  sub_40A7B0()
     }
   }
 }
-// 401343: using guessed type _DWORD  sub_401343(_DWORD, _DWORD, _DWORD);
 
-// 65E708: using guessed type char setting_game_paused;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
-// 8EFAE8: using guessed type int dword_8EFAE8;
-// 9DA808: using guessed type int dword_9DA808;
-
-//----- (0040A930) --------------------------------------------------------
 void  sub_40A930()
 {
   if ( dword_9DA918 )
@@ -7666,10 +7344,7 @@ void  sub_40A930()
     }
   }
 }
-// 8C7A0C: using guessed type int dword_8C7A0C;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (0040AB00) --------------------------------------------------------
 void  sub_40AB00()
 {
   if ( mode_editor == 1 )
@@ -7708,12 +7383,7 @@ void  sub_40AB00()
       break;
   }
 }
-// 40114A: using guessed type int sub_40114A(void);
-// 401D66: using guessed type _DWORD  fun_playInterfaceButtonSound(_DWORD);
-// 8C7A0C: using guessed type int dword_8C7A0C;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (0040AC20) --------------------------------------------------------
 void  sub_40AC20()
 {
   setting_map_y = 0;
@@ -7725,24 +7395,18 @@ void  sub_40AC20()
     setting_map_y = (dword_8C79EC - setting_map_startGridOffset) / 162;
   }
 }
-// 4034BD: using guessed type int  sub_4034BD(_DWORD);
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0040ACB0) --------------------------------------------------------
 void  fun_sidePanel_undo()
 {
   fun_performUndo();
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040ACE0) --------------------------------------------------------
 void  fun_sidePanel_messages()
 {
   sub_4DE430();
 }
 
-//----- (0040AD00) --------------------------------------------------------
 void  fun_sidePanel_gotoProblem()
 {
   DWORD v0; // [sp+50h] [bp-4h]@3
@@ -7757,10 +7421,7 @@ void  fun_sidePanel_gotoProblem()
     window_redrawRequest = 1;
   }
 }
-// 65DE0C: using guessed type int dword_65DE0C;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040AD70) --------------------------------------------------------
 void  fun_menuResets_clearHerds()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -7772,7 +7433,6 @@ void  fun_menuResets_clearHerds()
     map_herd_y[j] = -1;
 }
 
-//----- (0040ADF0) --------------------------------------------------------
 void  fun_menuResets_clearFish()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -7784,7 +7444,6 @@ void  fun_menuResets_clearFish()
     map_fish_y[j] = -1;
 }
 
-//----- (0040AE70) --------------------------------------------------------
 void  fun_menuResets_clearInvasions()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -7796,7 +7455,6 @@ void  fun_menuResets_clearInvasions()
     map_invasionPoints_y[j] = -1;
 }
 
-//----- (0040AEF0) --------------------------------------------------------
 void  fun_minimap_hasBeenClicked()
 {
   minimap_clicked = 0;
@@ -8340,12 +7998,7 @@ void  fun_editor_editEmpire_nextPrevEmpireArrowButtons()
     window_redrawRequest = 1;
   }
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 990CE0: using guessed type int editEmpire_addObjectGraphicID;
-// 990D0C: using guessed type __int16 empire_graphicID[];
-// 990D0E: using guessed type __int16 empire_graphicID_exp[];
 
-//----- (0040C180) --------------------------------------------------------
 void  fun_editor_editEmpire_something(int a1, int a2)
 {
   int v2; // [sp+4Ch] [bp-Ch]@25
@@ -8422,26 +8075,7 @@ void  fun_editor_editEmpire_something(int a1, int a2)
     }
   }
 }
-// 5F96B8: using guessed type int empireMapBorderBottom;
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 65E6BC: using guessed type char mouse_isLeftClick;
-// 65E6C8: using guessed type char byte_65E6C8;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9900E0: using guessed type int empire_scroll_x;
-// 9900E4: using guessed type int empire_scroll_y;
-// 990CE0: using guessed type int editEmpire_addObjectGraphicID;
-// 990D04: using guessed type __int16 empire_xCoord[];
-// 990D06: using guessed type __int16 empire_yCoord[];
-// 990D08: using guessed type __int16 empire_width[];
-// 990D0A: using guessed type __int16 empire_height[];
-// 990D0C: using guessed type __int16 empire_graphicID[];
-// 990D0E: using guessed type __int16 empire_graphicID_exp[];
-// 990D14: using guessed type __int16 empire_xCoord_exp[];
-// 990D16: using guessed type __int16 empire_yCoord_exp[];
-// 993F00: using guessed type int empireScreen_selectedRouteId;
-// 993F04: using guessed type int dword_993F04;
 
-//----- (0040C550) --------------------------------------------------------
 int  fun_editor_editEmpire_something2()
 {
   int result; // eax@2
@@ -8532,19 +8166,7 @@ int  fun_editor_editEmpire_something2()
   }
   return result;
 }
-// 5F96B8: using guessed type int empireMapBorderBottom;
-// 6608A1: using guessed type char is_right_click;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9900E0: using guessed type int empire_scroll_x;
-// 9900E4: using guessed type int empire_scroll_y;
-// 990D04: using guessed type __int16 empire_xCoord[];
-// 990D06: using guessed type __int16 empire_yCoord[];
-// 990D08: using guessed type __int16 empire_width[];
-// 990D0A: using guessed type __int16 empire_height[];
-// 990D14: using guessed type __int16 empire_xCoord_exp[];
-// 990D16: using guessed type __int16 empire_yCoord_exp[];
 
-//----- (0040C7E0) --------------------------------------------------------
 signed int  fun_editor_editEmpire_something3()
 {
   signed int result; // eax@2
@@ -8635,19 +8257,7 @@ signed int  fun_editor_editEmpire_something3()
   }
   return result;
 }
-// 5F96B8: using guessed type int empireMapBorderBottom;
-// 660C5C: using guessed type char window_redrawRequest;
-// 98EF2C: using guessed type int scn_empireExpanded_flag;
-// 9900E0: using guessed type int empire_scroll_x;
-// 9900E4: using guessed type int empire_scroll_y;
-// 990D04: using guessed type __int16 empire_xCoord[];
-// 990D06: using guessed type __int16 empire_yCoord[];
-// 990D08: using guessed type __int16 empire_width[];
-// 990D0A: using guessed type __int16 empire_height[];
-// 990D14: using guessed type __int16 empire_xCoord_exp[];
-// 990D16: using guessed type __int16 empire_yCoord_exp[];
 
-//----- (0040CA70) --------------------------------------------------------
 void  fun_editor_editEmpire_moveEmpireCity(int direction, __int16 amount)
 {
   if ( window_id == 21 )
@@ -8705,14 +8315,7 @@ void  fun_editor_editEmpire_moveEmpireCity(int direction, __int16 amount)
     }
   }
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 990D04: using guessed type __int16 empire_xCoord[];
-// 990D06: using guessed type __int16 empire_yCoord[];
-// 990D14: using guessed type __int16 empire_xCoord_exp[];
-// 990D16: using guessed type __int16 empire_yCoord_exp[];
-// 993F08: using guessed type int editEmpire_selectedObjectButton;
 
-//----- (0040CC70) --------------------------------------------------------
 void  fun_editor_editEmpire_addObjectType()
 {
   dword_993F04 = currentButton_parameter;
@@ -8750,67 +8353,39 @@ void  fun_editor_editEmpire_addObjectType()
   }
   editEmpire_isSaved = 0;
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6E6D0C: using guessed type __int16 graphic_empireCity;
-// 6E6D12: using guessed type __int16 graphic_empireBattleIcon;
-// 6E6D14: using guessed type __int16 graphic_empireDistantBattleRomanArmy;
-// 6E6D16: using guessed type __int16 word_6E6D16;
-// 6E6D18: using guessed type __int16 graphic_empireBorderMarker;
-// 6E6D1A: using guessed type __int16 graphic_empireLandTradeRoute;
-// 6E6D1C: using guessed type __int16 graphic_empireSeaTradeRoute;
-// 6E6D70: using guessed type __int16 graphic_empireDistantBattleEnemyArmy;
-// 990CE0: using guessed type int editEmpire_addObjectGraphicID;
-// 993F04: using guessed type int dword_993F04;
 
-//----- (0040CDA0) --------------------------------------------------------
 void  fun_editor_demandChanges_select()
 {
   editDemandChanges_current = currentButton_parameter;
   window_id = W_EditorEditDemandChange;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7FC: using guessed type int editDemandChanges_current;
 
-//----- (0040CDE0) --------------------------------------------------------
 void  fun_editor_priceChanges_select()
 {
   editPriceChanges_current = currentButton_parameter;
   window_id = W_EditorEditPriceChange;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7E0: using guessed type int editPriceChanges_current;
 
-//----- (0040CE20) --------------------------------------------------------
 void  fun_editor_editDemandChange_year()
 {
   fun_showNumericInputDialog(200, 50, 2, 0, &map_demandChanges_year[editDemandChanges_current], 0, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7FC: using guessed type int editDemandChanges_current;
 
-//----- (0040CE70) --------------------------------------------------------
 void  fun_editor_editDemandChange_good()
 {
   fun_showSelectListDialog(50, 40, 16, 23, &map_demandChanges_good[editDemandChanges_current], 0, 0, 0, 1);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7FC: using guessed type int editDemandChanges_current;
 
-//----- (0040CEC0) --------------------------------------------------------
 void  fun_editor_editDemandChange_route()
 {
   fun_showNumericInputDialog(400, 50, 1, &map_demandChanges_route[editDemandChanges_current], 0, 0, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7FC: using guessed type int editDemandChanges_current;
 
-//----- (0040CF10) --------------------------------------------------------
 void  fun_editor_editDemandChange_riseFall()
 {
   if ( map_demandChanges_isRise[editDemandChanges_current] )
@@ -8819,10 +8394,7 @@ void  fun_editor_editDemandChange_riseFall()
     map_demandChanges_isRise[editDemandChanges_current] = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7FC: using guessed type int editDemandChanges_current;
 
-//----- (0040CF70) --------------------------------------------------------
 void  fun_editor_editDemandChange_unschedule()
 {
   map_demandChanges_year[editDemandChanges_current] = 0;
@@ -8833,37 +8405,26 @@ void  fun_editor_editDemandChange_unschedule()
   window_id = W_EditorDemandChanges;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7FC: using guessed type int editDemandChanges_current;
 
-//----- (0040CFE0) --------------------------------------------------------
 void  fun_editor_editDemandChange_ok()
 {
   fun_sortDemandChanges();
   window_id = W_EditorDemandChanges;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040D010) --------------------------------------------------------
 void  fun_editor_editPriceChange_year()
 {
   fun_showNumericInputDialog(200, 50, 2, 0, &map_priceChanges_year[editPriceChanges_current], 0, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7E0: using guessed type int editPriceChanges_current;
 
-//----- (0040D060) --------------------------------------------------------
 void  fun_editor_editPriceChange_good()
 {
   fun_showSelectListDialog(50, 40, 16, 23, &map_priceChanges_good[editPriceChanges_current], 0, 0, 0, 1);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7E0: using guessed type int editPriceChanges_current;
 
-//----- (0040D0B0) --------------------------------------------------------
 void  fun_editor_editPriceChange_riseFall()
 {
   if ( map_priceChanges_isRise[editPriceChanges_current] )
@@ -8872,19 +8433,13 @@ void  fun_editor_editPriceChange_riseFall()
     map_priceChanges_isRise[editPriceChanges_current] = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7E0: using guessed type int editPriceChanges_current;
 
-//----- (0040D110) --------------------------------------------------------
 void  fun_editor_editPriceChange_amount()
 {
   fun_showNumericInputDialog(500, 50, 1, &map_priceChanges_amount[editPriceChanges_current], 0, 0, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7E0: using guessed type int editPriceChanges_current;
 
-//----- (0040D160) --------------------------------------------------------
 void  fun_editor_editPriceChange_unschedule()
 {
   map_priceChanges_year[editPriceChanges_current] = 0;
@@ -8895,19 +8450,14 @@ void  fun_editor_editPriceChange_unschedule()
   window_id = W_EditorPriceChanges;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7E0: using guessed type int editPriceChanges_current;
 
-//----- (0040D1D0) --------------------------------------------------------
 void  fun_editor_editPriceChange_ok()
 {
   fun_sortPriceChanges();
   window_id = W_EditorPriceChanges;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040D200) --------------------------------------------------------
 void  fun_editor_setSupplyDemand_click()
 {
   int resource; // [sp+4Ch] [bp-4h]@1
@@ -8918,9 +8468,7 @@ void  fun_editor_setSupplyDemand_click()
   fun_setEmpireTradeAmountId(currentEmpireEntryId, currentButton_parameter, resource);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040D280) --------------------------------------------------------
 void  fun_editor_editEmpire_editRoute_tradeRouteId()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -8934,11 +8482,6 @@ void  fun_editor_editEmpire_editRoute_tradeRouteId()
     window_redrawRequest = 1;
   }
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 65E6D4: using guessed type int screen_height;
-// 660C5C: using guessed type char window_redrawRequest;
-
-//----- (0040D320) --------------------------------------------------------
 void  fun_editor_editEmpire_editCity_type()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -8953,11 +8496,7 @@ void  fun_editor_editEmpire_editCity_type()
     window_redrawRequest = 1;
   }
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 65E6D4: using guessed type int screen_height;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040D3D0) --------------------------------------------------------
 void  fun_editor_editEmpire_editCity_name()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -8971,11 +8510,7 @@ void  fun_editor_editEmpire_editCity_name()
     window_redrawRequest = 1;
   }
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 65E6D4: using guessed type int screen_height;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040D470) --------------------------------------------------------
 void  fun_editor_editEmpire_editCity_tradeRouteId()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -8989,20 +8524,14 @@ void  fun_editor_editEmpire_editCity_tradeRouteId()
     window_redrawRequest = 1;
   }
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 65E6D4: using guessed type int screen_height;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040D510) --------------------------------------------------------
 void  fun_editor_editEmpire_editCity_demand()
 {
   window_id = 36;
   sub_445880();
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040D540) --------------------------------------------------------
 void  fun_editor_editEmpire_editCity_costToOpen()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -9016,12 +8545,7 @@ void  fun_editor_editEmpire_editCity_costToOpen()
     window_redrawRequest = 1;
   }
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 65E6D4: using guessed type int screen_height;
-// 660C5C: using guessed type char window_redrawRequest;
-// 990D1C: using guessed type __int16 empire_tradeCostToOpen[];
 
-//----- (0040D5E0) --------------------------------------------------------
 void  fun_editor_editEmpire_editOwnCity_produces()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -9035,10 +8559,7 @@ void  fun_editor_editEmpire_editOwnCity_produces()
     fun_showSelectListDialog(400, 220, 11, 27, &empire_citySells[64 * v0] + editEmpire_resourceSlotId, 0, 0, 1, 1);
   }
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 9DA8F0: using guessed type int editEmpire_resourceSlotId;
 
-//----- (0040D680) --------------------------------------------------------
 void  fun_editor_editEmpire_editCity_sells()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -9052,10 +8573,7 @@ void  fun_editor_editEmpire_editCity_sells()
     fun_showSelectListDialog(400, 220, 16, 23, &empire_citySells[64 * v0] + editEmpire_resourceSlotId, 0, 0, 0, 1);
   }
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 9DA8F0: using guessed type int editEmpire_resourceSlotId;
 
-//----- (0040D720) --------------------------------------------------------
 void  fun_editor_editEmpire_editCity_buys()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -9069,10 +8587,7 @@ void  fun_editor_editEmpire_editCity_buys()
     fun_showSelectListDialog(400, 220, 16, 23, &empire_cityBuys[64 * v0] + editEmpire_resourceSlotId, 0, 0, 0, 1);
   }
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 9DA8F0: using guessed type int editEmpire_resourceSlotId;
 
-//----- (0040D7C0) --------------------------------------------------------
 void  fun_editor_editEmpire_editBattle_path()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -9086,11 +8601,7 @@ void  fun_editor_editEmpire_editBattle_path()
     window_redrawRequest = 1;
   }
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 65E6D4: using guessed type int screen_height;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040D860) --------------------------------------------------------
 void  fun_editor_editEmpire_editBattle_order()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -9104,36 +8615,25 @@ void  fun_editor_editEmpire_editBattle_order()
     window_redrawRequest = 1;
   }
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 65E6D4: using guessed type int screen_height;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040D900) --------------------------------------------------------
 void  fun_editor_startCond_startFunds()
 {
   fun_showNumericInputDialog(screen_640x480_x + 140, screen_640x480_y + 56, 4, 0, 0, &map_startFunds, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040D960) --------------------------------------------------------
 void  fun_editor_startCond_rescueLoan()
 {
   fun_showNumericInputDialog(screen_640x480_x + 140, screen_640x480_y + 56, 4, 0, 0, &map_rescueLoan, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040D9C0) --------------------------------------------------------
 void  fun_editor_main_enemy()
 {
   fun_showSelectListDialog(20, 40, 20, 37, 0, &map_enemy, 0, 0, 2);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 99079C: using guessed type __int16 map_enemy;
 
-//----- (0040DA10) --------------------------------------------------------
 void  fun_editor_main_terrain()
 {
   ++map_climate;
@@ -9142,35 +8642,25 @@ void  fun_editor_main_terrain()
   fun_loadClimateGraphics((unsigned __int8)map_climate);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 990CC8: using guessed type char map_climate;
 
-//----- (0040DA70) --------------------------------------------------------
 void  fun_editor_startCond_flotsam()
 {
   map_flotsam = (unsigned __int8)map_flotsam != 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 990CC9: using guessed type char map_flotsam;
 
-//----- (0040DAB0) --------------------------------------------------------
 void  fun_editor_startCond_romeSuppliesWheat()
 {
   map_romeSuppliesWheat = map_romeSuppliesWheat != 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DB00) --------------------------------------------------------
 void  fun_editor_main_allowedBuildings()
 {
   window_id = W_EditorAllowedBuildings;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DB30) --------------------------------------------------------
 void  fun_editor_allowedBuildings_toggle()
 {
   if ( map_allowedBuildings[currentButton_parameter] )
@@ -9179,17 +8669,13 @@ void  fun_editor_allowedBuildings_toggle()
     map_allowedBuildings[currentButton_parameter] = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DB90) --------------------------------------------------------
 void  fun_editor_main_winCriteria()
 {
   window_id = W_EditorWinCriteria;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DBC0) --------------------------------------------------------
 void  fun_editor_winCriteria_openPlayToggle()
 {
   if ( map_isOpenPlay )
@@ -9198,19 +8684,13 @@ void  fun_editor_winCriteria_openPlayToggle()
     map_isOpenPlay = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 990A14: using guessed type __int16 map_isOpenPlay;
 
-//----- (0040DC10) --------------------------------------------------------
 void  fun_editor_winCriteria_openPlayScenarioId()
 {
   fun_showNumericInputDialog(300, 200, 1, &map_openPlayScenId, 0, 0, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 990CD6: using guessed type char map_openPlayScenId;
 
-//----- (0040DC60) --------------------------------------------------------
 void  fun_editor_winCriteria_ratingToggle()
 {
   if ( map_win_culture_on[currentButton_parameter] )
@@ -9219,18 +8699,13 @@ void  fun_editor_winCriteria_ratingToggle()
     map_win_culture_on[currentButton_parameter] = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DCC0) --------------------------------------------------------
 void  fun_editor_winCriteria_ratingValue()
 {
   fun_showNumericInputDialog(300, 200, 4, 0, 0, &map_win_culture[currentButton_parameter], 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 990C44: using guessed type int map_win_culture[];
 
-//----- (0040DD10) --------------------------------------------------------
 void  fun_editor_winCriteria_timeLimitToggle()
 {
   if ( map_win_timeLimitYears_on )
@@ -9241,17 +8716,13 @@ void  fun_editor_winCriteria_timeLimitToggle()
     map_win_survivalYears_on = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DD70) --------------------------------------------------------
 void  fun_editor_winCriteria_timeLimitYears()
 {
   fun_showNumericInputDialog(300, 200, 4, 0, 0, &map_win_timeLimitYears, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DDC0) --------------------------------------------------------
 void  fun_editor_winCriteria_survivalTimeToggle()
 {
   if ( map_win_survivalYears_on )
@@ -9262,17 +8733,13 @@ void  fun_editor_winCriteria_survivalTimeToggle()
     map_win_timeLimitYears_on = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DE20) --------------------------------------------------------
 void  fun_editor_winCriteria_survivalTimeYears()
 {
   fun_showNumericInputDialog(300, 200, 4, 0, 0, &map_win_survivalYears, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DE70) --------------------------------------------------------
 void  fun_editor_winCriteria_populationToggle()
 {
   if ( map_win_population_flag )
@@ -9281,25 +8748,19 @@ void  fun_editor_winCriteria_populationToggle()
     map_win_population_flag = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DEC0) --------------------------------------------------------
 void  fun_editor_winCriteria_populationValue()
 {
   fun_showNumericInputDialog(300, 200, 4, 0, 0, &map_win_population, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DF10) --------------------------------------------------------
 void  fun_editor_main_specialEvents()
 {
   window_id = W_EditorSpecialEvents;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DF40) --------------------------------------------------------
 void  fun_editor_startCond_rank()
 {
   ++map_playerRank[0];
@@ -9307,34 +8768,25 @@ void  fun_editor_startCond_rank()
     map_playerRank[0] = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 990A16: using guessed type __int16 map_playerRank[];
 
-//----- (0040DF90) --------------------------------------------------------
 void  fun_editor_main_startCond()
 {
   window_id = W_EditorStartingConditions;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DFC0) --------------------------------------------------------
 void  fun_editor_main_demandChanges()
 {
   window_id = W_EditorDemandChanges;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040DFF0) --------------------------------------------------------
 void  fun_editor_main_priceChanges()
 {
   window_id = W_EditorPriceChanges;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E020) --------------------------------------------------------
 void  fun_editor_specialEvents_gladiatorRevoltToggle()
 {
   ++map_event_gladiatorRevolt_on;
@@ -9342,17 +8794,13 @@ void  fun_editor_specialEvents_gladiatorRevoltToggle()
     map_event_gladiatorRevolt_on = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E070) --------------------------------------------------------
 void  fun_editor_specialEvents_gladiatorRevoltYear()
 {
   fun_showNumericInputDialog(300, 100, 4, 0, 0, &map_event_gladiatorRevolt_year, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E0B0) --------------------------------------------------------
 void  fun_editor_specialEvents_emperorChangeToggle()
 {
   ++map_event_emperorChange_on;
@@ -9360,17 +8808,13 @@ void  fun_editor_specialEvents_emperorChangeToggle()
     map_event_emperorChange_on = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E100) --------------------------------------------------------
 void  fun_editor_specialEvents_emperorChangeYear()
 {
   fun_showNumericInputDialog(300, 100, 4, 0, 0, &map_event_emperorChange_year, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E140) --------------------------------------------------------
 void  fun_editor_specialEvents_seaTradeProblem()
 {
   ++map_event_seaTradeProblem;
@@ -9378,9 +8822,7 @@ void  fun_editor_specialEvents_seaTradeProblem()
     map_event_seaTradeProblem = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E190) --------------------------------------------------------
 void  fun_editor_specialEvents_landTradeProblem()
 {
   ++map_event_landTradeProblem;
@@ -9388,9 +8830,7 @@ void  fun_editor_specialEvents_landTradeProblem()
     map_event_landTradeProblem = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E1E0) --------------------------------------------------------
 void  fun_editor_specialEvents_raiseWages()
 {
   ++map_event_raiseWages;
@@ -9398,9 +8838,7 @@ void  fun_editor_specialEvents_raiseWages()
     map_event_raiseWages = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E230) --------------------------------------------------------
 void  fun_editor_specialEvents_lowerWages()
 {
   ++map_event_lowerWages;
@@ -9408,9 +8846,7 @@ void  fun_editor_specialEvents_lowerWages()
     map_event_lowerWages = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E280) --------------------------------------------------------
 void  fun_editor_specialEvents_contaminatedWater()
 {
   ++map_event_contaminatedWater;
@@ -9418,9 +8854,7 @@ void  fun_editor_specialEvents_contaminatedWater()
     map_event_contaminatedWater = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E2D0) --------------------------------------------------------
 void  fun_editor_specialEvents_ironMineCollapse()
 {
   ++map_event_ironMineCollapse;
@@ -9428,9 +8862,7 @@ void  fun_editor_specialEvents_ironMineCollapse()
     map_event_ironMineCollapse = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E320) --------------------------------------------------------
 void  fun_editor_specialEvents_clayPitFlooded()
 {
   ++map_event_clayPitFlooded;
@@ -9438,9 +8870,7 @@ void  fun_editor_specialEvents_clayPitFlooded()
     map_event_clayPitFlooded = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E370) --------------------------------------------------------
 void  fun_editor_specialEvents_earthquakeSeverity()
 {
   ++map_event_earthquake_severity;
@@ -9448,60 +8878,43 @@ void  fun_editor_specialEvents_earthquakeSeverity()
     map_event_earthquake_severity = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E3C0) --------------------------------------------------------
 void  fun_editor_specialEvents_earthquakeYear()
 {
   fun_showNumericInputDialog(300, 100, 4, 0, 0, &map_event_earthquake_year, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E400) --------------------------------------------------------
 void  fun_editor_startCond_milestone()
 {
   fun_showNumericInputDialog(300, 100, 4, 0, 0, &map_milestone25[currentButton_parameter], 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 990CB0: using guessed type int map_milestone25[];
 
-//----- (0040E450) --------------------------------------------------------
 void  fun_editor_startCond_startDate()
 {
   window_id = W_EditorEditStartDate;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E480) --------------------------------------------------------
 void  fun_editor_startDate_year()
 {
   fun_showNumericInputDialog(240, 180, 2, 0, &map_settings_startYear, 0, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 990620: using guessed type __int16 map_settings_startYear;
 
-//----- (0040E4D0) --------------------------------------------------------
 void  fun_editor_startDate_toggleEra()
 {
   map_settings_startYear = -map_settings_startYear;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 990620: using guessed type __int16 map_settings_startYear;
 
-//----- (0040E500) --------------------------------------------------------
 void  fun_editor_startDate_cancel()
 {
   window_id = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E530) --------------------------------------------------------
 void  fun_windowEditorSettings_imageUpDown()
 {
   if ( currentButton_parameter == 1 )
@@ -9514,73 +8927,50 @@ void  fun_windowEditorSettings_imageUpDown()
     map_image = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 990A12: using guessed type __int16 map_image;
 
-//----- (0040E5D0) --------------------------------------------------------
 void  fun_editor_main_requests()
 {
   window_id = W_EditorRequests;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E600) --------------------------------------------------------
 void  fun_editor_requests_select()
 {
   editRequests_current = currentButton_parameter;
   window_id = W_EditorEditRequest;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA814: using guessed type int editRequests_current;
 
-//----- (0040E640) --------------------------------------------------------
 void  fun_editor_editRequest_year()
 {
   fun_showNumericInputDialog(250, 50, 2, 0, &map_requests_year[editRequests_current], 0, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA814: using guessed type int editRequests_current;
 
-//----- (0040E690) --------------------------------------------------------
 void  fun_editor_editRequest_amount()
 {
   fun_showNumericInputDialog(250, 100, 2, 0, &map_requests_amount[editRequests_current], 0, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA814: using guessed type int editRequests_current;
 
-//----- (0040E6E0) --------------------------------------------------------
 void  fun_editor_editRequest_good()
 {
   fun_showSelectListDialog(200, 40, 16, 23, 0, &map_requests_good[editRequests_current], 0, 0, 2);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA814: using guessed type int editRequests_current;
 
-//----- (0040E730) --------------------------------------------------------
 void  fun_editor_editRequest_deadline()
 {
   fun_showNumericInputDialog(400, 100, 2, 0, &map_requests_deadline[editRequests_current], 0, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA814: using guessed type int editRequests_current;
 
-//----- (0040E780) --------------------------------------------------------
 void  fun_editor_editRequest_favor()
 {
   fun_showNumericInputDialog(300, 100, 1, &map_requests_favor[editRequests_current], 0, 0, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA814: using guessed type int editRequests_current;
 
-//----- (0040E7D0) --------------------------------------------------------
 void  fun_editor_editRequest_unschedule()
 {
   map_requests_year[editRequests_current] = 0;
@@ -9591,27 +8981,20 @@ void  fun_editor_editRequest_unschedule()
   window_id = W_EditorRequests;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA814: using guessed type int editRequests_current;
 
-//----- (0040E850) --------------------------------------------------------
 void  fun_editor_editRequest_ok()
 {
   fun_sortRequests();
   window_id = W_EditorRequests;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E880) --------------------------------------------------------
 void  fun_editor_main_invasions()
 {
   window_id = W_EditorInvasions;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040E8B0) --------------------------------------------------------
 void  fun_editor_invasions_select()
 {
   editInvasions_current = currentButton_parameter;
@@ -9623,37 +9006,25 @@ void  fun_editor_invasions_select()
   window_id = W_EditorEditInvasion;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7F0: using guessed type int editInvasions_current;
 
-//----- (0040E920) --------------------------------------------------------
 void  fun_editor_editInvasion_year()
 {
   fun_showNumericInputDialog(300, 100, 2, 0, &map_invasions_year[editInvasions_current], 0, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7F0: using guessed type int editInvasions_current;
 
-//----- (0040E970) --------------------------------------------------------
 void  fun_editor_editInvasion_amount()
 {
   fun_showNumericInputDialog(100, 100, 2, 0, &map_invasions_amount[editInvasions_current], 0, 0);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7F0: using guessed type int editInvasions_current;
 
-//----- (0040E9C0) --------------------------------------------------------
 void  fun_editor_editInvasion_type()
 {
   fun_showSelectListDialog(150, 50, 5, 34, 0, &map_invasions_type[editInvasions_current], 0, 0, 2);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7F0: using guessed type int editInvasions_current;
 
-//----- (0040EA10) --------------------------------------------------------
 void  fun_editor_editInvasion_from()
 {
   if ( map_invasions_type[editInvasions_current] != 4 )
@@ -9662,10 +9033,7 @@ void  fun_editor_editInvasion_from()
     window_redrawRequest = 1;
   }
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7F0: using guessed type int editInvasions_current;
 
-//----- (0040EA80) --------------------------------------------------------
 void  fun_editor_editInvasion_attack()
 {
   if ( map_invasions_type[editInvasions_current] != 4 )
@@ -9674,10 +9042,7 @@ void  fun_editor_editInvasion_attack()
     window_redrawRequest = 1;
   }
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7F0: using guessed type int editInvasions_current;
 
-//----- (0040EAF0) --------------------------------------------------------
 void  fun_editor_editInvasion_unschedule()
 {
   map_invasions_year[editInvasions_current] = 0;
@@ -9689,10 +9054,7 @@ void  fun_editor_editInvasion_unschedule()
   window_id = W_EditorInvasions;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7F0: using guessed type int editInvasions_current;
 
-//----- (0040EB80) --------------------------------------------------------
 void  fun_editor_editInvasion_ok()
 {
   if ( !map_invasions_type[editInvasions_current] )
@@ -9704,10 +9066,7 @@ void  fun_editor_editInvasion_ok()
   window_id = W_EditorInvasions;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7F0: using guessed type int editInvasions_current;
 
-//----- (0040EBF0) --------------------------------------------------------
 void  fun_windowEditEmpire_empireUpDown()
 {
   empireindex_xOffset[16 * scenario_map_empire] = empire_scroll_x;
@@ -9736,48 +9095,34 @@ void  fun_windowEditEmpire_empireUpDown()
   fun_checkEmpireMapScrollBoundaries();
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9900E0: using guessed type int empire_scroll_x;
-// 9900E4: using guessed type int empire_scroll_y;
-// 990100: using guessed type __int16 empireindex_xOffset[];
-// 990102: using guessed type __int16 empireindex_yOffset[];
-// 990608: using guessed type int scenario_map_empire;
 
-//----- (0040ED20) --------------------------------------------------------
 void  fun_windowEmpireMap_city_openTrade()
 {
   fun_showConfirmDialog(2, fun_confirmdialog_openTrade, 2);
 }
 
-//----- (0040ED50) --------------------------------------------------------
 void  fun_windowEmpireMap_help()
 {
   fun_showHelpDialog(32, 1);
 }
 
-//----- (0040ED80) --------------------------------------------------------
 void  fun_windowEmpireMap_exit()
 {
   fun_editor_saveToEmpireEntry();
 }
 
-//----- (0040EDA0) --------------------------------------------------------
 void  fun_dialogTradeOpened_ok()
 {
   window_id = W_EmpireMap;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040EDD0) --------------------------------------------------------
 void  fun_menuFile_newMap()
 {
   fun_showSelectListDialog(50, 50, 7, 33, 0, 0, &mapsize, 2, 4);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040EE20) --------------------------------------------------------
 void  fun_menuFile_loadMap()
 {
   fun_findFiles("*.map");
@@ -9791,16 +9136,7 @@ void  fun_menuFile_loadMap()
   button_something_7 = 0;
   window_redrawRequest = 1;
 }
-// 60873C: using guessed type int button_something_7;
-// 660BF8: using guessed type int findfiles_numFiles;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6ADD0C: using guessed type char byte_6ADD0C;
-// 7E1EF9: using guessed type char byte_7E1EF9;
-// 9DA7B8: using guessed type int filelist_selectedIndex;
-// 9DA86C: using guessed type int scrollbar_file_isLarge;
-// 9DA8C0: using guessed type int filelist_numFiles;
 
-//----- (0040EEB0) --------------------------------------------------------
 void  fun_menuFile_saveMap()
 {
   fun_findFiles("*.map");
@@ -9814,16 +9150,7 @@ void  fun_menuFile_saveMap()
   button_something_7 = 0;
   window_redrawRequest = 1;
 }
-// 60873C: using guessed type int button_something_7;
-// 660BF8: using guessed type int findfiles_numFiles;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6ADD0C: using guessed type char byte_6ADD0C;
-// 7E1EF9: using guessed type char byte_7E1EF9;
-// 9DA7B8: using guessed type int filelist_selectedIndex;
-// 9DA86C: using guessed type int scrollbar_file_isLarge;
-// 9DA8C0: using guessed type int filelist_numFiles;
 
-//----- (0040EF40) --------------------------------------------------------
 void  fun_dialogFileScenario_okCancel()
 {
   if ( currentButton_parameter )
@@ -9856,45 +9183,31 @@ void  fun_dialogFileScenario_okCancel()
     window_redrawRequest = 1;
   }
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 6ADD0C: using guessed type char byte_6ADD0C;
-// 7E1EF9: using guessed type char byte_7E1EF9;
 
-//----- (0040F050) --------------------------------------------------------
 void  fun_menuResets_loadFromBmp()
 {
   fun_showNumericInputDialog(200, 100, 4, 0, 0, &loadFromBmp_input, 1);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA878: using guessed type int loadFromBmp_input;
 
-//----- (0040F090) --------------------------------------------------------
 void  fun_menuResets_saveToBmp()
 {
   fun_writeToC3mapsBmp(setting_map_start);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040F0C0) --------------------------------------------------------
 void  fun_imageButtonUnknown_doNothingRedraw()
 {
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040F0E0) --------------------------------------------------------
 void  fun_imageButtonUnknown_setFlag()
 {
   imagebuttonunknown_flag = currentButton_parameter;
   toPlace_buildingType = 0;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA88C: using guessed type int imagebuttonunknown_flag;
 
-//----- (0040F120) --------------------------------------------------------
 signed int  sub_40F120()
 {
   sidepanel_slide_progress[0] = 0;
@@ -9903,9 +9216,7 @@ signed int  sub_40F120()
   sub_4DC600();
   return fun_sound_playChannel(2);
 }
-// 6080AC: using guessed type int sidepanel_slide_progress[21];
 
-//----- (0040F170) --------------------------------------------------------
 void  fun_sidePanel_overlay()
 {
   window_id = W_OverlaySelectionMenu;
@@ -9920,17 +9231,7 @@ void  fun_sidePanel_overlay()
   dword_9D7B38 = 12;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9D7B34: using guessed type int dword_9D7B34;
-// 9D7B38: using guessed type int dword_9D7B38;
-// 9D7B40: using guessed type int dword_9D7B40;
-// 9D7B44: using guessed type int dword_9D7B44;
-// 9D7B54: using guessed type int buildmenu_submenuNumItems;
-// 9D7B70: using guessed type int dword_9D7B70;
-// 9D7B7C: using guessed type int dword_9D7B7C;
-// 9D7BA0: using guessed type int selectedOverlaySubMenuNumItems;
 
-//----- (0040F210) --------------------------------------------------------
 void  fun_overlayMainMenu_click()
 {
   int overlay; // [sp+4Ch] [bp-4h]@1
@@ -9960,10 +9261,7 @@ void  fun_overlayMainMenu_click()
   window_id = 1;
   window_redrawRequest = 1;
 }
-// 608074: using guessed type int previousOverlay;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040F2B0) --------------------------------------------------------
 void  fun_overlaySubMenu_click()
 {
   int overlay; // [sp+4Ch] [bp-4h]@1
@@ -9980,10 +9278,7 @@ void  fun_overlaySubMenu_click()
   window_id = 1;
   window_redrawRequest = 1;
 }
-// 608074: using guessed type int previousOverlay;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040F330) --------------------------------------------------------
 int  sub_40F330()
 {
   int result; // eax@5
@@ -10010,14 +9305,7 @@ int  sub_40F330()
   }
   return result;
 }
-// 608008: using guessed type int time_current;
-// 9D7B28: using guessed type int mouseover_button_id;
-// 9D7B2C: using guessed type int mouseover_button_id_main;
-// 9D7B34: using guessed type int dword_9D7B34;
-// 9D7BA0: using guessed type int selectedOverlaySubMenuNumItems;
-// 9DA904: using guessed type int dword_9DA904;
 
-//----- (0040F3F0) --------------------------------------------------------
 void  sub_40F3F0()
 {
   if ( sidepanel_collapsed == 2 )
@@ -10034,22 +9322,17 @@ void  sub_40F3F0()
   sub_4DC600();
   window_redrawRequest = 1;
 }
-// 6080A8: using guessed type int sidepanel_collapsed;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040F450) --------------------------------------------------------
 void  unused_40F450()
 {
   ;
 }
 
-//----- (0040F470) --------------------------------------------------------
 void  fun_unused_writeToC4mapsBmp()
 {
   fun_writeToC3mapsBmp(setting_map_start);
 }
 
-//----- (0040F4A0) --------------------------------------------------------
 void  fun_sidePanel_rotate()
 {
   if ( currentButton_parameter )
@@ -10063,11 +9346,7 @@ void  fun_sidePanel_rotate()
   fun_showWarning(1);
   window_redrawRequest = 1;
 }
-// 65DEF8: using guessed type int mapOrientation;
-// 660C5C: using guessed type char window_redrawRequest;
-// 8A788C: using guessed type int dword_8A788C;
 
-//----- (0040F510) --------------------------------------------------------
 void  fun_sidePanel_north()
 {
   if ( setting_map_orientation )
@@ -10103,11 +9382,7 @@ void  fun_sidePanel_north()
     window_redrawRequest = 1;
   }
 }
-// 65DEF8: using guessed type int mapOrientation;
-// 660C5C: using guessed type char window_redrawRequest;
-// 8A788C: using guessed type int dword_8A788C;
 
-//----- (0040F600) --------------------------------------------------------
 void  fun_showEmpireMap()
 {
   if ( mode_editor == 1 )
@@ -10123,12 +9398,7 @@ void  fun_showEmpireMap()
   }
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 993F04: using guessed type int dword_993F04;
-// 993F08: using guessed type int editEmpire_selectedObjectButton;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (0040F660) --------------------------------------------------------
 void  fun_editor_saveToEmpireEntry()
 {
   if ( mode_editor == 1 )
@@ -10141,16 +9411,7 @@ void  fun_editor_saveToEmpireEntry()
   window_id = 1;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9900E0: using guessed type int empire_scroll_x;
-// 9900E4: using guessed type int empire_scroll_y;
-// 990100: using guessed type __int16 empireindex_xOffset[];
-// 990102: using guessed type __int16 empireindex_yOffset[];
-// 990608: using guessed type int scenario_map_empire;
-// 990624: using guessed type __int16 map_empire;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (0040F6E0) --------------------------------------------------------
 void  fun_gotoAdvisorFromButton()
 {
   if ( setting_isCustomScenario )
@@ -10232,10 +9493,7 @@ void  fun_laborAdvisor_wagesUpDown()
   fun_calculateTributeThisYear();
   window_redrawRequest = 1;
 }
-// 652B64: using guessed type int cityinfo_wages[];
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040F980) --------------------------------------------------------
 void  fun_financeAdvisor_taxesUpDown()
 {
   if ( currentButton_parameter == 1 )
@@ -10261,27 +9519,20 @@ void  fun_financeAdvisor_taxesUpDown()
   fun_calculateTributeThisYear();
   window_redrawRequest = 1;
 }
-// 6500A8: using guessed type int cityinfo_taxrate[];
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040FAA0) --------------------------------------------------------
 void  fun_tradeAdvisor_resource()
 {
   selectedGoodId = goodlist_indexToResourceId1[currentButton_parameter];
   window_id = W_ResourceSettingsDialog;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040FAE0) --------------------------------------------------------
 void  fun_tradeAdvisor_prices()
 {
   window_id = W_TradePricesDialog;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040FB10) --------------------------------------------------------
 void  fun_tradeAdvisor_empire()
 {
   fun_showEmpireMap();
@@ -10340,7 +9591,6 @@ void  fun_dialogResourceSettings_exportUpDown()
   }
 }
 
-//----- (0040FEC0) --------------------------------------------------------
 void  fun_dialogResourceSettings_stockpile()
 {
   if ( city_inform[ciid].resourceStockpile[ selectedGoodId ] )
@@ -10355,10 +9605,7 @@ void  fun_dialogResourceSettings_stockpile()
   }
   window_redrawRequest = 1;
 }
-// 65286A: using guessed type __int16 cityinfo_resourceTradeStatus[];
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0040FF90) --------------------------------------------------------
 void  fun_militaryAdvisor_gotoLegion()
 {
   int formationId; // eax@1
@@ -10369,11 +9616,7 @@ void  fun_militaryAdvisor_gotoLegion()
   window_id = 1;
   window_redrawRequest = 1;
 }
-// 401087: using guessed type _DWORD  fun_getFormationIdOfLegion(_DWORD);
-// 660C5C: using guessed type char window_redrawRequest;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (00410020) --------------------------------------------------------
 void  fun_militaryAdvisor_returnToFort()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -10385,10 +9628,7 @@ void  fun_militaryAdvisor_returnToFort()
     window_redrawRequest = 1;
   }
 }
-// 401087: using guessed type _DWORD  fun_getFormationIdOfLegion(_DWORD);
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00410080) --------------------------------------------------------
 void  fun_militaryAdvisor_empireService()
 {
   int v0; // [sp+4Ch] [bp-4h]@1
@@ -10401,10 +9641,7 @@ void  fun_militaryAdvisor_empireService()
   sub_4BC600();
   window_redrawRequest = 1;
 }
-// 401087: using guessed type _DWORD  fun_getFormationIdOfLegion(_DWORD);
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00410100) --------------------------------------------------------
 void  fun_laborAdvisor_priority()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -10425,11 +9662,7 @@ void  fun_laborAdvisor_priority()
   window_id = W_LaborPriorityDialog;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA7B4: using guessed type int laborPriority_maxPriorities;
-// 9DA8DC: using guessed type int laborPriority_selectedCategory;
 
-//----- (004101F0) --------------------------------------------------------
 void  fun_setLaborPriorityDialog_priority()
 {
   int v0; // [sp+4Ch] [bp-1Ch]@1
@@ -10605,11 +9838,7 @@ void  fun_populationAdvisor_graph()
   dword_5FFFD8 = -1;
   window_redrawRequest = 1;
 }
-// 5FFFD8: using guessed type int dword_5FFFD8;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9DA8D8: using guessed type int populationAdvisor_graphOrder;
 
-//----- (004107C0) --------------------------------------------------------
 void  fun_entertainmentAdvisor_festival()
 {
   if ( !city_inform[ciid].plannedFestival_size )
@@ -10618,26 +9847,19 @@ void  fun_entertainmentAdvisor_festival()
     window_redrawRequest = 1;
   }
 }
-// 65441C: using guessed type int cityinfo_plannedFestival_size[];
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00410810) --------------------------------------------------------
 void  fun_dialogHoldFestival_help()
 {
   fun_showHelpDialog(28, 1);
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00410840) --------------------------------------------------------
 void  fun_dialogHoldFestival_close()
 {
   window_id = 7;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00410870) --------------------------------------------------------
 void  fun_dialogHoldFestival_holdFestival()
 {
   if ( city_inform[ciid].treasury > -5000 )
@@ -10685,10 +9907,7 @@ void  fun_dialogHoldFestival_selectGod()
   city_inform[ciid].festivalGod = currentButton_parameter;
   window_redrawRequest = 1;
 }
-// 654414: using guessed type int cityinfo_festivalGod[];
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00410BF0) --------------------------------------------------------
 void  fun_dialogHoldFestival_selectSize()
 {
   if ( city_inform[ciid].treasury > -5000 )
@@ -10700,21 +9919,13 @@ void  fun_dialogHoldFestival_selectSize()
     }
   }
 }
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 654418: using guessed type int cityinfo_festivalSize[];
-// 654438: using guessed type int cityinfo_grandFestivalWineUnavailable[];
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00410C70) --------------------------------------------------------
 void  fun_ratingsAdvisor_select()
 {
   city_inform[ciid].ratingAdvisorSelectedRating = currentButton_parameter;
   window_redrawRequest = 1;
 }
-// 654358: using guessed type int cityinfo_ratingAdvisorSelectedRating[];
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00410CB0) --------------------------------------------------------
 void  fun_imperialAdvisor_donate()
 {
 window_id = W_DonateToCityDialog;
@@ -10728,9 +9939,7 @@ void  fun_imperialAdvisor_salary()
   window_id = W_SetSalaryDialog;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00410D60) --------------------------------------------------------
 void  fun_imperialAdvisor_gift()
 {
   window_id = W_SendGiftDialog;
@@ -10746,13 +9955,7 @@ void  fun_imperialAdvisor_gift()
   }
   window_redrawRequest = 1;
 }
-// 654370: using guessed type int cityinfo_personalSavings[];
-// 65447C: using guessed type int cityinfo_giftToCaesarSize[];
-// 65449C: using guessed type int cityinfo_generousGiftCost[];
-// 6544A0: using guessed type int cityinfo_lavishGiftCost[];
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00410E50) --------------------------------------------------------
 void fun_imperialAdvisor_request()
 {
   int v0; // [sp+4Ch] [bp-8h]@1
@@ -10850,11 +10053,7 @@ void  fun_donateToCityDialog_amount()
     city_inform[ciid].donateAmount = 0;
   window_redrawRequest = 1;
 }
-// 654370: using guessed type int cityinfo_personalSavings[];
-// 654384: using guessed type int cityinfo_donateAmount[];
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (004112D0) --------------------------------------------------------
 void  fun_donateToCityDialog_amountUpDown()
 {
   if ( currentButton_parameter == 1 )
@@ -10872,11 +10071,7 @@ void  fun_donateToCityDialog_amountUpDown()
     city_inform[ciid].donateAmount = 0;
   window_redrawRequest = 1;
 }
-// 654370: using guessed type int cityinfo_personalSavings[];
-// 654384: using guessed type int cityinfo_donateAmount[];
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00411400) --------------------------------------------------------
 void  fun_sendGiftDialog_gift()
 {
   if ( currentButton_parameter != 1 || city_inform[ciid].modestGiftCost <= city_inform[ciid].personalSavings )
@@ -10891,14 +10086,7 @@ void  fun_sendGiftDialog_gift()
     }
   }
 }
-// 654370: using guessed type int cityinfo_personalSavings[];
-// 65447C: using guessed type int cityinfo_giftToCaesarSize[];
-// 654498: using guessed type int cityinfo_modestGiftCost[];
-// 65449C: using guessed type int cityinfo_generousGiftCost[];
-// 6544A0: using guessed type int cityinfo_lavishGiftCost[];
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00411500) --------------------------------------------------------
 void  fun_sendGiftDialog_send()
 {
   if ( city_inform[ciid].modestGiftCost <= city_inform[ciid].personalSavings )
@@ -10908,19 +10096,13 @@ void  fun_sendGiftDialog_send()
     window_redrawRequest = 1;
   }
 }
-// 654370: using guessed type int cityinfo_personalSavings[];
-// 654498: using guessed type int cityinfo_modestGiftCost[];
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00411560) --------------------------------------------------------
 void  fun_sendGiftDialog_cancel()
 {
   window_id = W_Advisors;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00411590) --------------------------------------------------------
 void  fun_windowMainMenu_button()
 {
   savedgame_missionId = campaign_missionIds_peaceful[2 * setting_currentMissionId];
@@ -10971,24 +10153,7 @@ void  fun_windowMainMenu_button()
       break;
   }
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 605910: using guessed type int campaign_missionIds_peaceful[];
-// 65E750: using guessed type int savedgame_missionId;
-// 65E760: using guessed type int setting_currentMissionId;
-// 65E764: using guessed type int setting_isCustomScenario;
-// 660BF8: using guessed type int findfiles_numFiles;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6ADBC8: using guessed type int fileDialogSave_from_window;
-// 6ADD0C: using guessed type char byte_6ADD0C;
-// 7E1EF9: using guessed type char byte_7E1EF9;
-// 7E27A0: using guessed type int input_accepted;
-// 9DA7B8: using guessed type int filelist_selectedIndex;
-// 9DA86C: using guessed type int scrollbar_file_isLarge;
-// 9DA898: using guessed type int mode_editor;
-// 9DA8B8: using guessed type int dword_9DA8B8;
-// 9DA8C0: using guessed type int filelist_numFiles;
 
-//----- (004117C0) --------------------------------------------------------
 void  sub_4117C0()
 {
   signed int v0; // [sp+4Ch] [bp-4h]@1
@@ -11012,26 +10177,17 @@ void  sub_4117C0()
     currentHelpId = savedgame_missionId + 200;
   }
 }
-// 607744: using guessed type int selectMission_choice;
-// 65E750: using guessed type int savedgame_missionId;
-// 65E760: using guessed type int setting_currentMissionId;
-// 7E2BF4: using guessed type int currentHelpId;
-// 7E2C10: using guessed type int dword_7E2C10;
-// 9DA7B0: using guessed type int dword_9DA7B0;
 
-//----- (00411890) --------------------------------------------------------
 void  unused_411890()
 {
   ;
 }
 
-//----- (004118B0) --------------------------------------------------------
 void  unused_4118B0()
 {
   ;
 }
 
-//----- (004118D0) --------------------------------------------------------
 void  fun_newCampaignOrCck_start()
 {
   mouseover_button_id_main = 0;
@@ -11063,16 +10219,7 @@ void  fun_newCampaignOrCck_start()
   }
   window_redrawRequest = 1;
 }
-// 608074: using guessed type int previousOverlay;
-// 65463C: using guessed type int cityinfo_missionSavedGameWritten[];
-// 6606BC: using guessed type char byte_6606BC;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9D77F0: using guessed type int mouseover_imagebutton_id[202];
-// 9D7B28: using guessed type int mouseover_button_id;
-// 9D7B2C: using guessed type int mouseover_button_id_main;
-// 9D7B90: using guessed type int dword_9D7B90;
 
-//----- (004119E0) --------------------------------------------------------
 void  sub_4119E0()
 {
   if ( window_id == W_MissionBriefing )
@@ -11082,9 +10229,7 @@ void  sub_4119E0()
   }
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00411A30) --------------------------------------------------------
 void  fun_selectMission_type()
 {
   int v0; // [sp+4Ch] [bp-10h]@3
@@ -11114,17 +10259,7 @@ void  fun_selectMission_type()
     }
   }
 }
-// 5E6A84: using guessed type int dword_5E6A84[];
-// 5E6A88: using guessed type int dword_5E6A88[];
-// 5E6A8C: using guessed type int dword_5E6A8C[];
-// 605910: using guessed type int campaign_missionIds_peaceful[];
-// 607744: using guessed type int selectMission_choice;
-// 65E6C8: using guessed type char byte_65E6C8;
-// 65E750: using guessed type int savedgame_missionId;
-// 65E760: using guessed type int setting_currentMissionId;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00411BA0) --------------------------------------------------------
 int  sub_411BA0()
 {
   int result; // eax@10
@@ -11181,14 +10316,7 @@ int  sub_411BA0()
   }
   return result;
 }
-// 5E6A84: using guessed type int dword_5E6A84[];
-// 5E6A88: using guessed type int dword_5E6A88[];
-// 5E6A8C: using guessed type int dword_5E6A8C[];
-// 607744: using guessed type int selectMission_choice;
-// 65E760: using guessed type int setting_currentMissionId;
-// 6E6DAC: using guessed type __int16 graphic_selectMissionButton[46];
 
-//----- (00411E80) --------------------------------------------------------
 void  fun_advisors_bottomButton_click()
 {
   if ( currentButton_parameter )
@@ -11203,11 +10331,7 @@ void  fun_advisors_bottomButton_click()
     window_redrawRequest = 1;
   }
 }
-// 607740: using guessed type int currentAdvisor;
-// 65E74C: using guessed type int sidepanel_lastAdvisor;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00411EE0) --------------------------------------------------------
 void  fun_sidePanel_advisors()
 {
   if ( setting_isCustomScenario )
@@ -11231,15 +10355,7 @@ LABEL_10:
     fun_showWarning(14);
   }
 }
-// 607740: using guessed type int currentAdvisor;
-// 608758: using guessed type int advisor_ifSomething;
-// 65E74C: using guessed type int sidepanel_lastAdvisor;
-// 65E760: using guessed type int setting_currentMissionId;
-// 65E764: using guessed type int setting_isCustomScenario;
-// 660C5C: using guessed type char window_redrawRequest;
-// 949EE0: using guessed type int tutorial2_population250reached;
 
-//----- (00411F80) --------------------------------------------------------
 void  fun_toggleEmpireMap()
 {
   if ( mode_editor == 1 || setting_isCustomScenario )
@@ -11262,22 +10378,14 @@ LABEL_14:
     fun_showWarning(14);
   }
 }
-// 65E760: using guessed type int setting_currentMissionId;
-// 65E764: using guessed type int setting_isCustomScenario;
-// 949EE0: using guessed type int tutorial2_population250reached;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (00412020) --------------------------------------------------------
 void  fun_editor_editEmpire_general_save()
 {
   fun_writeCurrentEmpireToFileCustom();
   editEmpire_isSaved = 1;
   window_redrawRequest = 1;
 }
-// 5F96BC: using guessed type int editEmpire_isSaved;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (00412050) --------------------------------------------------------
 void  fun_sidePanel_missionBriefing()
 {
   if ( !setting_isCustomScenario )
@@ -11290,12 +10398,7 @@ void  fun_sidePanel_missionBriefing()
     window_redrawRequest = 1;
   }
 }
-// 65E764: using guessed type int setting_isCustomScenario;
-// 660C5C: using guessed type char window_redrawRequest;
-// 7E2C10: using guessed type int dword_7E2C10;
-// 7E2D0C: using guessed type int dword_7E2D0C;
 
-//----- (004120D0) --------------------------------------------------------
 signed int  sub_4120D0()
 {
   signed int result; // eax@2
@@ -11329,10 +10432,7 @@ signed int  sub_4120D0()
   }
   return result;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (00412180) --------------------------------------------------------
 void  sub_412180()
 {
   int v0; // [sp+50h] [bp-4h]@7
@@ -11364,12 +10464,7 @@ void  sub_412180()
     window_redrawRequest = 1;
   }
 }
-// 40160E: using guessed type _DWORD  sub_40160E(_DWORD);
-// 660C5C: using guessed type char window_redrawRequest;
-// 7F881C: using guessed type __int16 formation_cursedByMars[];
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (004122A0) --------------------------------------------------------
 void  sub_4122A0()
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -11381,7 +10476,6 @@ void  sub_4122A0()
     byte_9DA640[j] = 0;
 }
 
-//----- (00412320) --------------------------------------------------------
 void  sub_412320()
 {
   int v0; // [sp+4Ch] [bp-8h]@4
@@ -11589,13 +10683,7 @@ int  fun_getBuildingAnimationIndex(int a1, int a2)
   }
   return result;
 }
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8A: using guessed type __int16 building_4a_grow_value_house_foodstocks[];
 
-//----- (004129D0) --------------------------------------------------------
 int  unused_4129D0(int a1, int a2, int a3)
 {
   int v3; // edx@1
@@ -11659,9 +10747,7 @@ int  unused_4129D0(int a1, int a2, int a3)
   getpixel_result[0] = v3;
   return getpixel_result[0];
 }
-// 9DA5E8: using guessed type int getpixel_result[22];
 
-//----- (00412AB0) --------------------------------------------------------
 int  unused_412AB0(int a1, void *a2)
 {
   int v2; // edx@1
@@ -11705,9 +10791,7 @@ int  unused_412AB0(int a1, void *a2)
   }
   return getpixel_result[0];
 }
-// 9DA5E8: using guessed type int getpixel_result[22];
 
-//----- (00412B30) --------------------------------------------------------
 void  unused_memxordst(char *input1, char *input2, char *dst, int length)
 {
   char *d; // eax@1
@@ -11743,7 +10827,6 @@ void  unused_memxordst(char *input1, char *input2, char *dst, int length)
   }
 }
 
-//----- (00412B80) --------------------------------------------------------
 void  unused_memxor(char *dst, char *src, int length)
 {
   int len; // ecx@1
@@ -11774,7 +10857,6 @@ void  unused_memxor(char *dst, char *src, int length)
   }
 }
 
-//----- (00412BD0) --------------------------------------------------------
 void  fun_memcpy8(int *a1, int *a2, signed int length)
 {
   signed int i; // ecx@1
@@ -11799,7 +10881,6 @@ void  fun_memcpy8(int *a1, int *a2, signed int length)
   }
 }
 
-//----- (00412C30) --------------------------------------------------------
 void  fun_memcpy(void *src, void *dst, signed int length)
 {
   signed int i; // ecx@1
@@ -11838,7 +10919,6 @@ void  fun_memcpy(void *src, void *dst, signed int length)
   }
 }
 
-//----- (00412CF0) --------------------------------------------------------
 void  unused_memcpy64(void *src, void *dst, int length)
 {
   int len; // ecx@1
@@ -11873,7 +10953,6 @@ void  unused_memcpy64(void *src, void *dst, int length)
   while ( len > 0 );
 }
 
-//----- (00412DA0) --------------------------------------------------------
 int  fun_memset(void *buffer, signed int length, int fillChar)
 {
   int result; // eax@1
@@ -11913,7 +10992,6 @@ int  fun_memset(void *buffer, signed int length, int fillChar)
   return result;
 }
 
-//----- (00412E20) --------------------------------------------------------
 void  fun_memAndWithByte(char *buffer, signed int length, unsigned __int8 andByte)
 {
   int value; // eax@1
@@ -11953,7 +11031,6 @@ void  fun_memAndWithByte(char *buffer, signed int length, unsigned __int8 andByt
   }
 }
 
-//----- (00412EC0) --------------------------------------------------------
 void  fun_memAndWithShort(__int16 *buffer, signed int length, unsigned __int16 value)
 {
   int v3 = 0; // eax@1
@@ -12008,7 +11085,6 @@ void  fun_memAndWithShort(__int16 *buffer, signed int length, unsigned __int16 v
   }
 }
 
-//----- (00412F90) --------------------------------------------------------
 void  unused_412F90(int a1, int a2, int a3)
 {
   int v3; // edx@1
@@ -12036,7 +11112,6 @@ void  unused_412F90(int a1, int a2, int a3)
   while ( v3 > 0 );
 }
 
-//----- (00412FF0) --------------------------------------------------------
 void  sub_412FF0(const void *buffer, int a2, int a3)
 {
   int v3; // edx@1
@@ -12057,9 +11132,7 @@ void  sub_412FF0(const void *buffer, int a2, int a3)
   }
   while ( v3 > 0 );
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00413060) --------------------------------------------------------
 void  sub_413060(void *buffer, int a2, int a3)
 {
   int y; // edx@1
@@ -12080,16 +11153,12 @@ void  sub_413060(void *buffer, int a2, int a3)
   }
   while ( y > 0 );
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (004130D0) --------------------------------------------------------
 void  fun_setPixel(int x, int y, __int16 color)
 {
   *(__int16 *)((char *)&ddraw_buffer[x] + ddraw_scanline * y) = color;
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00413110) --------------------------------------------------------
 void  unused_setIsometricPixel(int x, int y, __int16 color)
 {
   char *pixel; // edi@1
@@ -12098,16 +11167,12 @@ void  unused_setIsometricPixel(int x, int y, __int16 color)
   *(_WORD *)pixel = color;
   *((_WORD *)pixel + 1) = color;
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00413160) --------------------------------------------------------
 void  fun_andPixel(int x, int y, __int16 color)
 {
   *(__int16 *)((char *)&ddraw_buffer[x] + ddraw_scanline * y) &= color;
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (004131A0) --------------------------------------------------------
 int  fun_getPixelMasked(int x, int y, int mask)
 {
   int v4; // eax@1
@@ -12117,17 +11182,12 @@ int  fun_getPixelMasked(int x, int y, int mask)
   getpixel_result[0] = mask & v4;
   return getpixel_result[0];
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 9DA5E8: using guessed type int getpixel_result[22];
 
-//----- (004131F0) --------------------------------------------------------
 void  fun_orPixel(int x, int y, __int16 value)
 {
   *(__int16 *)((char *)&ddraw_buffer[x] + ddraw_scanline * y) |= value;
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00413240) --------------------------------------------------------
 void  unused_413240(int xOffset, int yOffset, __int16 color)
 {
   __int16 *ptr; // edi@1
@@ -12140,16 +11200,12 @@ void  unused_413240(int xOffset, int yOffset, __int16 color)
   if ( !*ptr2 )
     *ptr2 = color;
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (004132A0) --------------------------------------------------------
 __int64  unused_4132A0(int a1, int a2)
 {
   return (unsigned int)ddraw_scanline * a2;
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (004132E0) --------------------------------------------------------
 void  unused_4132E0(int x, int y, __int16 a3)
 {
   char *ptr; // edi@1
@@ -12160,9 +11216,7 @@ void  unused_4132E0(int x, int y, __int16 a3)
   *((_WORD *)ptr + 2) = a3;
   *((_WORD *)ptr + 4) = a3;
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00413330) --------------------------------------------------------
 void  fun_drawSelectionAntsPixel(int xOffset, int yOffset)
 {
   if ( xOffset >= 0 )
@@ -12177,10 +11231,7 @@ void  fun_drawSelectionAntsPixel(int xOffset, int yOffset)
     }
   }
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6ADA48: using guessed type int selectAnts_color;
 
-//----- (004133B0) --------------------------------------------------------
 void  fun_setPixelTransparencyOutline(int x, int y)
 {
   __int16 *v2; // edi@9
@@ -12203,27 +11254,22 @@ void  fun_setPixelTransparencyOutline(int x, int y)
     }
   }
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00413440) --------------------------------------------------------
 void  unused_413440()
 {
   ;
 }
 
-//----- (00413460) --------------------------------------------------------
 void  unused_413460()
 {
   ;
 }
 
-//----- (00413480) --------------------------------------------------------
 void  unused_413480()
 {
   ;
 }
 
-//----- (004134A0) --------------------------------------------------------
 void  fun_drawColoredRectangle(int x, int y, int color)
 {
   int v3; // edx@1
@@ -12268,9 +11314,7 @@ void  fun_drawColoredRectangle(int x, int y, int color)
   }
   while ( !((unsigned __int8)(v3 < 0 ^ v9) | v3 == 0) );
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00413540) --------------------------------------------------------
 void  unused_413540(int a1)
 {
   char *v1; // edi@1
@@ -12329,12 +11373,7 @@ void  unused_413540(int a1)
     while ( !((unsigned __int8)(v3 < 0 ^ v7) | v3 == 0) );
   }
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6A10FC: using guessed type int dword_6A10FC;
-// 7E2720: using guessed type int drawGraphic_skipBytesInBufferForClipX;
-// 7E2730: using guessed type int dword_7E2730;
 
-//----- (004135F0) --------------------------------------------------------
 int  unused_4135F0(int a1)
 {
   int result; // eax@1
@@ -12371,13 +11410,7 @@ int  unused_4135F0(int a1)
   while ( !((unsigned __int8)(v2 < 0 ^ v8) | v2 == 0) );
   return result;
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6A10FC: using guessed type int dword_6A10FC;
-// 6ADC00: using guessed type int drawGraphic_copyBytesInBufferForClipX;
-// 6ADC08: using guessed type int drawGraphic_visiblePixelsClipX;
-// 7E2720: using guessed type int drawGraphic_skipBytesInBufferForClipX;
 
-//----- (00413670) --------------------------------------------------------
 int  unused_413670(int a1)
 {
   int result; // eax@1
@@ -12414,13 +11447,7 @@ int  unused_413670(int a1)
   while ( !((unsigned __int8)(v2 < 0 ^ v8) | v2 == 0) );
   return result;
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6A10FC: using guessed type int dword_6A10FC;
-// 6ADC00: using guessed type int drawGraphic_copyBytesInBufferForClipX;
-// 6ADC08: using guessed type int drawGraphic_visiblePixelsClipX;
-// 7E2720: using guessed type int drawGraphic_skipBytesInBufferForClipX;
 
-//----- (004136F0) --------------------------------------------------------
 void  fun_drawGraphicUncompressedFull(char *data)
 {
   void *v1; // edi@1
@@ -12461,26 +11488,17 @@ void  fun_drawGraphicUncompressedFull(char *data)
     while ( !((unsigned __int8)(v6 < 0 ^ v8) | v6 == 0) );
   }
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6ADC00: using guessed type int drawGraphic_copyBytesInBufferForClipX;
-// 6ADC08: using guessed type int drawGraphic_visiblePixelsClipX;
-// 7E2720: using guessed type int drawGraphic_skipBytesInBufferForClipX;
 
-//----- (00413790) --------------------------------------------------------
 void  fun_drawMinimapPixel(int pixelData)
 {
   *(_DWORD *)((char *)&ddraw_buffer[graphic_xOffset] + ddraw_scanline * graphic_yOffset) = *(_DWORD *)pixelData;
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (004137E0) --------------------------------------------------------
 void  fun_drawTwoPixels(int colors)
 {
   *(_DWORD *)((char *)&ddraw_buffer[graphic_xOffset] + ddraw_scanline * graphic_yOffset) = colors;
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00413820) --------------------------------------------------------
 void  fun_drawGraphicUncompressedClipY(char *data)
 {
   int v1; // edx@1
@@ -12547,10 +11565,7 @@ void  fun_drawGraphicUncompressedClipY(char *data)
   }
   while ( !((unsigned __int8)(v1 < 0 ^ v6) | v1 == 0) );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 7E2720: using guessed type int drawGraphic_skipBytesInBufferForClipX;
 
-//----- (00413910) --------------------------------------------------------
 void  fun_drawGraphicUncompressedClipLeft(char *data)
 {
   int v1; // edx@1
@@ -12583,12 +11598,7 @@ void  fun_drawGraphicUncompressedClipLeft(char *data)
   }
   while ( !((unsigned __int8)(v1 < 0 ^ v7) | v1 == 0) );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6ADC00: using guessed type int drawGraphic_copyBytesInBufferForClipX;
-// 6ADC08: using guessed type int drawGraphic_visiblePixelsClipX;
-// 7E2720: using guessed type int drawGraphic_skipBytesInBufferForClipX;
 
-//----- (00413990) --------------------------------------------------------
 void  fun_drawGraphicUncompressedClipRight(char *data)
 {
   int v1; // edx@1
@@ -12621,12 +11631,7 @@ void  fun_drawGraphicUncompressedClipRight(char *data)
   }
   while ( !((unsigned __int8)(v1 < 0 ^ v7) | v1 == 0) );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6ADC00: using guessed type int drawGraphic_copyBytesInBufferForClipX;
-// 6ADC08: using guessed type int drawGraphic_visiblePixelsClipX;
-// 7E2720: using guessed type int drawGraphic_skipBytesInBufferForClipX;
 
-//----- (00413A10) --------------------------------------------------------
 void  fun_drawGraphicUncompressedColorMaskFull(char *data, __int16 colorMask)
 {
   int v2; // edx@1
@@ -12693,10 +11698,7 @@ void  fun_drawGraphicUncompressedColorMaskFull(char *data, __int16 colorMask)
   }
   while ( !((unsigned __int8)(v2 < 0 ^ v7) | v2 == 0) );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 7E2720: using guessed type int drawGraphic_skipBytesInBufferForClipX;
 
-//----- (00413B10) --------------------------------------------------------
 void  fun_drawGraphicUncompressedColorMaskClipLeft(char *data, __int16 colorMask)
 {
   int v2; // edx@1
@@ -12727,12 +11729,7 @@ void  fun_drawGraphicUncompressedColorMaskClipLeft(char *data, __int16 colorMask
   }
   while ( !((unsigned __int8)(v2 < 0 ^ v7) | v2 == 0) );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6ADC00: using guessed type int drawGraphic_copyBytesInBufferForClipX;
-// 6ADC08: using guessed type int drawGraphic_visiblePixelsClipX;
-// 7E2720: using guessed type int drawGraphic_skipBytesInBufferForClipX;
 
-//----- (00413BA0) --------------------------------------------------------
 void  fun_drawGraphicUncompressedColorMaskClipRight(char *data, __int16 colorMask)
 {
   int v2; // edx@1
@@ -12763,12 +11760,7 @@ void  fun_drawGraphicUncompressedColorMaskClipRight(char *data, __int16 colorMas
   }
   while ( !((unsigned __int8)(v2 < 0 ^ v7) | v2 == 0) );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6ADC00: using guessed type int drawGraphic_copyBytesInBufferForClipX;
-// 6ADC08: using guessed type int drawGraphic_visiblePixelsClipX;
-// 7E2720: using guessed type int drawGraphic_skipBytesInBufferForClipX;
 
-//----- (00413C30) --------------------------------------------------------
 void  fun_drawGraphicCompressedFull(char *data)
 {
   int v1; // edx@1
@@ -12959,10 +11951,7 @@ void  fun_drawGraphicCompressedFull(char *data)
   }
   while ( !((unsigned __int8)(v1 < 0 ^ v7) | v1 == 0) );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 7E2720: using guessed type int drawGraphic_skipBytesInBufferForClipX;
 
-//----- (004140A0) --------------------------------------------------------
 void  fun_drawGraphicCompressedClipLeft(char *data)
 {
   int v1; // edx@1
@@ -13023,10 +12012,7 @@ void  fun_drawGraphicCompressedClipLeft(char *data)
   }
   while ( v9 > 1 );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6ADC00: using guessed type int drawGraphic_copyBytesInBufferForClipX;
 
-//----- (00414170) --------------------------------------------------------
 int  fun_drawGraphicCompressedClipRight(char *data)
 {
   int v1; // edx@1
@@ -13084,10 +12070,7 @@ int  fun_drawGraphicCompressedClipRight(char *data)
   while ( v8 > 1 );
   return result;
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6ADC08: using guessed type int drawGraphic_visiblePixelsClipX;
 
-//----- (00414230) --------------------------------------------------------
 void  fun_drawGraphicCompressedColorMaskFull(char *data, __int16 colorMask)
 {
   int v2; // eax@1
@@ -13285,10 +12268,7 @@ void  fun_drawGraphicCompressedColorMaskFull(char *data, __int16 colorMask)
   }
   while ( v10 > 1 );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 7E2720: using guessed type int drawGraphic_skipBytesInBufferForClipX;
 
-//----- (004145B0) --------------------------------------------------------
 void  fun_drawGraphicCompressedColorMaskClipLeft(char *a1, __int16 colorMask)
 {
   int v2; // edx@1
@@ -13348,10 +12328,7 @@ void  fun_drawGraphicCompressedColorMaskClipLeft(char *a1, __int16 colorMask)
   }
   while ( v10 > 1 );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6ADC00: using guessed type int drawGraphic_copyBytesInBufferForClipX;
 
-//----- (00414680) --------------------------------------------------------
 void  fun_drawGraphicCompressedColorMaskClipRight(char *data, __int16 colorMask)
 {
   int v2; // edx@1
@@ -13408,10 +12385,7 @@ void  fun_drawGraphicCompressedColorMaskClipRight(char *data, __int16 colorMask)
   }
   while ( v9 > 1 );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6ADC08: using guessed type int drawGraphic_visiblePixelsClipX;
 
-//----- (00414740) --------------------------------------------------------
 void  fun_drawGraphicLetterColoredFull(char *data)
 {
   int v1; // eax@1
@@ -13608,11 +12582,7 @@ void  fun_drawGraphicLetterColoredFull(char *data)
   }
   while ( !((unsigned __int8)(v2 < 0 ^ v9) | v2 == 0) );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 788036: using guessed type __int16 drawtext_color;
-// 7E2720: using guessed type int drawGraphic_skipBytesInBufferForClipX;
 
-//----- (00414AC0) --------------------------------------------------------
 void  fun_drawGraphicLetterColoredClipLeft(char *data)
 {
   int v1; // edx@1
@@ -13673,11 +12643,7 @@ void  fun_drawGraphicLetterColoredClipLeft(char *data)
   }
   while ( v9 > 1 );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6ADC00: using guessed type int drawGraphic_copyBytesInBufferForClipX;
-// 788036: using guessed type __int16 drawtext_color;
 
-//----- (00414B90) --------------------------------------------------------
 void  fun_drawGraphicLetterColoredClipRight(char *data)
 {
   int v1; // edx@1
@@ -13734,11 +12700,7 @@ void  fun_drawGraphicLetterColoredClipRight(char *data)
   }
   while ( v8 > 1 );
 }
-// 6606AC: using guessed type int ddraw_scanline;
-// 6ADC08: using guessed type int drawGraphic_visiblePixelsClipX;
-// 788036: using guessed type __int16 drawtext_color;
 
-//----- (00414C60) --------------------------------------------------------
 char * fun_drawGraphicGetOffsetClipTop(char *a1)
 {
   int v1; // edx@1
@@ -13772,9 +12734,7 @@ char * fun_drawGraphicGetOffsetClipTop(char *a1)
   }
   return v2;
 }
-// 6ADBE8: using guessed type int drawGraphic_invisibleHeightClipTop;
 
-//----- (00414CD0) --------------------------------------------------------
 void  fun_drawGraphicType2(char *data)
 {
   char *v1; // edi@1
@@ -13785,9 +12745,7 @@ void  fun_drawGraphicType2(char *data)
   *(_DWORD *)v1 = *(_DWORD *)data;
   *(_WORD *)&v1[v2] = *((_WORD *)data + 1);
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00414D30) --------------------------------------------------------
 void  fun_drawImage_16x16(int *img)
 {
   char *v1; // edi@1
@@ -13924,9 +12882,7 @@ void  fun_drawImage_16x16(int *img)
   *(_DWORD *)&v1[15 * v2 + 24] = img[126];
   *(_DWORD *)&v1[15 * v2 + 28] = img[127];
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00415360) --------------------------------------------------------
 void  fun_drawImage_24x24(int *img)
 {
   char *v1; // edi@1
@@ -14223,9 +13179,7 @@ void  fun_drawImage_24x24(int *img)
   *(_DWORD *)&v1[23 * v2 + 40] = img[286];
   *(_DWORD *)&v1[23 * v2 + 44] = img[287];
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00416160) --------------------------------------------------------
 void  fun_drawImage_32x32(int *img)
 {
   int *v1; // edi@1
@@ -14746,9 +13700,7 @@ void  fun_drawImage_32x32(int *img)
   *(int *)((char *)v1 + 31 * v2 + 56) = img[510];
   *(int *)((char *)v1 + 31 * v2 + 60) = img[511];
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00417A60) --------------------------------------------------------
 int  unused_417A60(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
 {
   int v7; // edx@1
@@ -14777,7 +13729,6 @@ int  unused_417A60(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
   return 2 * a6 * a7;
 }
 
-//----- (00417AE0) --------------------------------------------------------
 int  unused_417AE0(char *buffer, int a2, int width, int xMin, int yMin, int xMax, int yMax)
 {
   int yToGo; // edx@1
@@ -14855,7 +13806,6 @@ LABEL_3:
   return v14;
 }
 
-//----- (00417C30) --------------------------------------------------------
 signed int  unused_grabBuildingFootprintFromBuffer(char *buffer, char *dst, int scanline, int xOffset, int yOffset, int width, signed int height)
 {
   signed int result; // eax@3
@@ -15112,7 +14062,6 @@ signed int  unused_grabBuildingFootprintFromBuffer(char *buffer, char *dst, int 
   return result;
 }
 
-//----- (00418C00) --------------------------------------------------------
 int  unused_clearBuildingFootprint(int a1, int a2, int a3, int a4, int a5, int width, int height)
 {
   int result; // eax@2
@@ -15504,18 +14453,7 @@ LABEL_32:
   }
   return result;
 }
-// 40309E: using guessed type int fun_loadC3ModelTxt(void);
-// 65E6AC: using guessed type int app_active;
-// 65E6C0: using guessed type int app_paused;
-// 65E780: using guessed type int setting_ram;
-// 6606BC: using guessed type char byte_6606BC;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6DEDD0: using guessed type char wndproc_closeStatus;
-// 9DA88C: using guessed type int imagebuttonunknown_flag;
-// 9DA898: using guessed type int mode_editor;
-// 9DA8B8: using guessed type int dword_9DA8B8;
 
-//----- (00419E80) --------------------------------------------------------
 signed int  fun_wndprocRefresh()
 {
   signed int result; // eax@6
@@ -15542,9 +14480,7 @@ signed int  fun_wndprocRefresh()
   }
   return result;
 }
-// 6DEDD0: using guessed type char wndproc_closeStatus;
 
-//----- (00419F20) --------------------------------------------------------
 signed int  fun_loadGraphics()
 {
   signed int result; // eax@2
@@ -15632,13 +14568,7 @@ signed int  fun_loadGraphics()
   }
   return result;
 }
-// 5FD868: using guessed type int dword_5FD868;
-// 60774C: using guessed type int currentClimate;
-// 607FF4: using guessed type int graphics_format_id;
-// 65E6D4: using guessed type int screen_height;
-// 6E6B80: using guessed type int climate_dataSize[12];
 
-//----- (0041A280) --------------------------------------------------------
 signed int  fun_loadClimateGraphics(int climate)
 {
   signed int result; // eax@2
@@ -15672,10 +14602,7 @@ signed int  fun_loadClimateGraphics(int climate)
   }
   return result;
 }
-// 60774C: using guessed type int currentClimate;
-// 607FF4: using guessed type int graphics_format_id;
 
-//----- (0041A350) --------------------------------------------------------
 signed int  fun_loadEnemyGraphics(int enemyId)
 {
   signed int result; // eax@2
@@ -15704,9 +14631,7 @@ signed int  fun_loadEnemyGraphics(int enemyId)
   }
   return result;
 }
-// 990600: using guessed type int currentEnemyId;
 
-//----- (0041A460) --------------------------------------------------------
 void  fun_saveSettingsAndFreeMemory()
 {
   fun_writeBufferToFile("c3.inf", &setting_start_bpp, 0x230u);
@@ -15717,9 +14642,7 @@ void  fun_saveSettingsAndFreeMemory()
   if ( c3_555 )
     j_freeMemory(c3_555);
 }
-// 65E700: using guessed type int setting_start_bpp;
 
-//----- (0041A510) --------------------------------------------------------
 signed int  fun_loadSettings()
 {
   int screenWidth; // [sp+4Ch] [bp-4h]@3
@@ -15842,10 +14765,7 @@ signed int  fun_readCaesar3IniFile()
   }
   return result;
 }
-// 65E70A: using guessed type char setting_cddrive;
-// 65E780: using guessed type int setting_ram;
 
-//----- (0041A9A0) --------------------------------------------------------
 void  fun_reallocateScreenBuffer()
 {
   fun_setCityScreenWidths();
@@ -15858,10 +14778,7 @@ void  fun_reallocateScreenBuffer()
     fun_setCityViewport_withPanel();
   sub_4DC600();
 }
-// 6080A8: using guessed type int sidepanel_collapsed;
-// 65E6D4: using guessed type int screen_height;
 
-//----- (0041AA20) --------------------------------------------------------
 LRESULT __stdcall fun_wndproc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
   int screenHeight; // ST18_4@20
@@ -16313,37 +15230,7 @@ LRESULT __stdcall fun_wndproc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
   }
   return DefWindowProcA(hWnd, Msg, wParam, lParam);
 }
-// 5FD848: using guessed type int video_busySwitching;
-// 607F8C: using guessed type int dword_607F8C;
-// 608020: using guessed type int key_ctrl_down;
-// 608024: using guessed type int key_shift_down;
-// 60802C: using guessed type int arrowkey_right_pressed;
-// 608030: using guessed type int arrowkey_left_pressed;
-// 608034: using guessed type int arrowkey_down_pressed;
-// 608038: using guessed type int arrowkey_up_pressed;
-// 608074: using guessed type int previousOverlay;
-// 6500AC: using guessed type int cityinfo_treasury[];
-// 6543C8: using guessed type int dword_6543C8[];
-// 65E6A0: using guessed type char byte_65E6A0;
-// 65E6A4: using guessed type int system_screen_width;
-// 65E6AC: using guessed type int app_active;
-// 65E6C0: using guessed type int app_paused;
-// 65E6D4: using guessed type int screen_height;
-// 65E704: using guessed type int setting_fullscreen;
-// 65E708: using guessed type char setting_game_paused;
-// 6606B8: using guessed type int system_screen_height;
-// 66071C: using guessed type char video_refreshRequested;
-// 660728: using guessed type char byte_660728;
-// 660782: using guessed type __int16 mouseInfo_x;
-// 660784: using guessed type __int16 mouseInfo_y;
-// 660786: using guessed type char mouseInfo_type;
-// 66078D: using guessed type char mouseInfo_buttonIsDown;
-// 660798: using guessed type int dword_660798;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6DEDD0: using guessed type char wndproc_closeStatus;
-// 94BD4A: using guessed type __int16 building_0a_type[];
 
-//----- (0041BB90) --------------------------------------------------------
 void  fun_showOverlay(int overlay)
 {
   if ( window_id == 30 )
@@ -16371,11 +15258,7 @@ void  fun_showOverlay(int overlay)
     window_redrawRequest = 1;
   }
 }
-// 608074: using guessed type int previousOverlay;
-// 660C5C: using guessed type char window_redrawRequest;
-// 7E2D10: using guessed type int dword_7E2D10;
 
-//----- (0041BC50) --------------------------------------------------------
 void  fun_showAdvisor(int advisor)
 {
   if ( window_id == 30 )
@@ -16402,10 +15285,7 @@ void  fun_showAdvisor(int advisor)
     }
   }
 }
-// 607740: using guessed type int currentAdvisor;
-// 660C5C: using guessed type char window_redrawRequest;
 
-//----- (0041BCF0) --------------------------------------------------------
 void  fun_cycleThroughLegions()
 {
   signed int id; // [sp+50h] [bp-8h]@5
@@ -16442,11 +15322,7 @@ void  fun_cycleThroughLegions()
     }
   }
 }
-// 5E9C88: using guessed type int shortcut_legion_id;
-// 660C5C: using guessed type char window_redrawRequest;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0041BE60) --------------------------------------------------------
 void  fun_jumpToBookmark(signed int bookmark)
 {
   if ( window_id == 30 )
@@ -16471,13 +15347,7 @@ void  fun_jumpToBookmark(signed int bookmark)
     }
   }
 }
-// 65DF00: using guessed type int mapBookmarks_x[];
-// 660C5C: using guessed type char window_redrawRequest;
-// 8C79E4: using guessed type int setting_map_camera_x;
-// 8C79E8: using guessed type int setting_map_camera_y;
-// 8C7A00: using guessed type int setting_map_startGridOffset;
 
-//----- (0041BF40) --------------------------------------------------------
 void  fun_setBookmark(signed int bookmark)
 {
   if ( window_id == 30 )
@@ -16503,7 +15373,6 @@ void  fun_changeGameSpeed(int goSlower)
     fun_dialogSpeedOptions_gameUpDown();
   }
 }
-
 
 void  sub_41C000(int buildingId, int a2)
 {
@@ -16643,10 +15512,7 @@ void  sub_41C5D0()
     dword_9D82E4[32 * i] /= 2;
   }
 }
-// 9D82E4: using guessed type int dword_9D82E4[];
-// 9D82EC: using guessed type int dword_9D82EC[];
 
-//----- (0041C670) --------------------------------------------------------
 signed int  sub_41C670()
 {
   signed int result; // eax@4
@@ -16974,16 +15840,7 @@ signed int  sub_41C670()
   dword_9D8334[2016] = 30000;
   return result;
 }
-// 9D7BB0: using guessed type int dword_9D7BB0[452];
-// 9D82E0: using guessed type int dword_9D82E0[];
-// 9D82E8: using guessed type int dword_9D82E8[];
-// 9D8304: using guessed type int dword_9D8304[];
-// 9D8308: using guessed type int dword_9D8308[];
-// 9D8328: using guessed type int dword_9D8328;
-// 9D8330: using guessed type int dword_9D8330[];
-// 9D8334: using guessed type int dword_9D8334[];
 
-//----- (0041E1B0) --------------------------------------------------------
 void  fun_changeBackgroundMusic()
 {
   signed int track; // [sp+4Ch] [bp-4h]@6
@@ -17068,23 +15925,13 @@ void  fun_changeBackgroundMusic()
     }
   }
 }
-// 6500C4: using guessed type int cityinfo_population[];
-// 654554: using guessed type int cityinfo_imperialArmyComing[];
-// 654564: using guessed type int cityinfo_enemyDestroyedBuildings[];
-// 65E70C: using guessed type char setting_sound_music_on;
-// 9DA5E0: using guessed type int music_currentlyPlayingBackground;
-// 9DA5E4: using guessed type int music_nextBackgroundChangeCheck;
 
-//----- (0041E440) --------------------------------------------------------
 void  fun_resetBackgroundMusic()
 {
   music_currentlyPlayingBackground = 0;
   music_nextBackgroundChangeCheck = 0;
 }
-// 9DA5E0: using guessed type int music_currentlyPlayingBackground;
-// 9DA5E4: using guessed type int music_nextBackgroundChangeCheck;
 
-//----- (0041E470) --------------------------------------------------------
 void  fun_drawMenuBar(struct C3Menu *menu, signed int numItems)
 {
   int y; // [sp+54h] [bp-10h]@3
@@ -17119,13 +15966,7 @@ void  fun_drawMenuBar(struct C3Menu *menu, signed int numItems)
     ++menu;
   }
 }
-// 65E6E8: using guessed type char byte_65E6E8;
-// 6DEC20: using guessed type int drawtext_forceColor;
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 7E2724: using guessed type int text_xoffset;
-// 9D7B68: using guessed type int selectedMainMenuItemId;
 
-//----- (0041E610) --------------------------------------------------------
 void fun_drawOpenSubMenu()
 {
   signed int numItems; // [sp+4Ch] [bp-1Ch]@5
@@ -17174,12 +16015,7 @@ void fun_drawOpenSubMenu()
     }
   }
 }
-// 6DEC20: using guessed type int drawtext_forceColor;
-// 6E6BD0: using guessed type __int16 graphic_font;
-// 9D7B64: using guessed type int selectedSubMenuItemId;
-// 9D7B68: using guessed type int selectedMainMenuItemId;
 
-//----- (0041E820) --------------------------------------------------------
 void  fun_drawDialogConfirm()
 {
   fun_drawDialogBackground(confirmDialog_x, confirmDialog_y, 30, 10);
@@ -17210,9 +16046,7 @@ void  fun_drawDialogConfirm()
       graphic_font + F_NormalBlack,
       0);
 }
-// 6E6BD0: using guessed type __int16 graphic_font;
 
-//----- (0041E970) --------------------------------------------------------
 void  fun_drawDialogConfirmButtons()
 {
   if ( confirmDialog_numButtons )
@@ -17224,9 +16058,7 @@ void  fun_drawDialogConfirmButtons()
   else
     fun_drawGameTextCentered(13, 1, confirmDialog_x, confirmDialog_y + 128, 480, graphic_font + 134, 0);
 }
-// 6E6BD0: using guessed type __int16 graphic_font;
 
-//----- (0041EA00) --------------------------------------------------------
 void  fun_drawArrowButtonCollection(int xOffset, int yOffset, struct C3ArrowButton *buttons, int numButtons)
 {
   int i; // [sp+50h] [bp-4h]@1
@@ -17254,9 +16086,7 @@ void  fun_drawArrowButtonCollection(int xOffset, int yOffset, struct C3ArrowButt
     ++buttons;
   }
 }
-// 66071C: using guessed type char video_refreshRequested;
 
-//----- (0041EB50) --------------------------------------------------------
 int  unused_41EB50(int xOffset, int yOffset, int a3)
 {
   dword_9D7B74 = xOffset;
@@ -17265,9 +16095,7 @@ int  unused_41EB50(int xOffset, int yOffset, int a3)
   graphic_currentGraphicId = 0;
   return fun_drawGraphic(graphic_currentGraphicId, xOffset, yOffset);
 }
-// 9D7B88: using guessed type int dword_9D7B88;
 
-//----- (0041EBD0) --------------------------------------------------------
 int  unused_41EBD0(int a1, int a2)
 {
   int result; // eax@3
@@ -17298,7 +16126,6 @@ int  unused_41EBD0(int a1, int a2)
   return result;
 }
 
-//----- (0041EDC0) --------------------------------------------------------
 int  unused_41EDC0(int a1, int a2)
 {
   int result; // eax@8
@@ -17371,9 +16198,7 @@ signed int  unused_41EFA0(int a1, int a2)
   }
   return result;
 }
-// 65E6BC: using guessed type char mouse_isLeftClick;
 
-//----- (0041F0B0) --------------------------------------------------------
 signed int  unused_41F0B0(int a1)
 {
   signed int result; // eax@3
@@ -17398,10 +16223,7 @@ signed int  unused_41F0B0(int a1)
   }
   return result;
 }
-// 66071C: using guessed type char video_refreshRequested;
-// 66078D: using guessed type char mouseInfo_buttonIsDown;
 
-//----- (0041F1C0) --------------------------------------------------------
 signed int  unused_41F1C0(int a1)
 {
   signed int result; // eax@3
@@ -17426,10 +16248,7 @@ signed int  unused_41F1C0(int a1)
   }
   return result;
 }
-// 66071C: using guessed type char video_refreshRequested;
-// 66078D: using guessed type char mouseInfo_buttonIsDown;
 
-//----- (0041F2D0) --------------------------------------------------------
 void  fun_drawImageButtonCollection(int parentX, int parentY, struct C3ImageButton *buttons, int numButtons)
 {
   int index; // [sp+4Ch] [bp-4h]@4
@@ -17466,12 +16285,7 @@ void  fun_drawImageButtonCollection(int parentX, int parentY, struct C3ImageButt
     }
   }
 }
-// 66071C: using guessed type char video_refreshRequested;
-// 660905: using guessed type char imagebuttons_redraw;
-// 660C5C: using guessed type char window_redrawRequest;
-// 6E6BB0: using guessed type __int16 graphic_id_start[];
 
-//----- (0041F440) --------------------------------------------------------
 int  fun_handleImageButtonClick(int parentX, int parentY, struct C3ImageButton *buttons, int numButtons)
 {
   int v5; // edx@41
@@ -17573,19 +16387,13 @@ int  fun_handleImageButtonClick(int parentX, int parentY, struct C3ImageButton *
   }
   return v9 + 1;
 }
-// 65E6BC: using guessed type char mouse_isLeftClick;
-// 65E934: using guessed type char handleClick_isRightClick;
-// 660C50: using guessed type int button_y;
-// 660C54: using guessed type int button_x;
 
-//----- (0041F760) --------------------------------------------------------
 void  unused_41F760(int a1, int a2)
 {
   sub_41F7A0((struct C3ImageButton *)a1, a2);
   sub_41F820((struct C3ImageButton *)a1, a2);
 }
 
-//----- (0041F7A0) --------------------------------------------------------
 void  sub_41F7A0(struct C3ImageButton *buttons, int numButtons)
 {
   int index; // [sp+4Ch] [bp-4h]@1
@@ -17605,9 +16413,7 @@ void  sub_41F7A0(struct C3ImageButton *buttons, int numButtons)
     ++buttons;
   }
 }
-// 660905: using guessed type char imagebuttons_redraw;
 
-//----- (0041F820) --------------------------------------------------------
 void  sub_41F820(struct C3ImageButton *buttons, int numButtons)
 {
   int index; // [sp+4Ch] [bp-4h]@1
@@ -17631,9 +16437,7 @@ void  sub_41F820(struct C3ImageButton *buttons, int numButtons)
     ++buttons;
   }
 }
-// 660905: using guessed type char imagebuttons_redraw;
 
-//----- (0041F8D0) --------------------------------------------------------
 void  fun_isImageButtonClick(int parentX, int parentY, struct C3ImageButton *buttons, int numButtons, int start)
 {
   int index; // [sp+4Ch] [bp-Ch]@1
@@ -17659,11 +16463,7 @@ void  fun_isImageButtonClick(int parentX, int parentY, struct C3ImageButton *but
     ++buttons;
   }
 }
-// 660C50: using guessed type int button_y;
-// 660C54: using guessed type int button_x;
-// 9D77F0: using guessed type int mouseover_imagebutton_id[202];
 
-//----- (0041F9C0) --------------------------------------------------------
 int  fun_handleArrowButtonClick(int xOffset, int yOffset, struct C3ArrowButton *buttons, int numButtons)
 {
   int result; // eax@24
@@ -17791,12 +16591,7 @@ LABEL_45:
   }
   return result;
 }
-// 607750: using guessed type int arrowbutton_lastTime;
-// 65E6BC: using guessed type char mouse_isLeftClick;
-// 66078D: using guessed type char mouseInfo_buttonIsDown;
-// 6ADD18: using guessed type int dword_6ADD18;
 
-//----- (0041FDD0) --------------------------------------------------------
 int  fun_isArrowButtonClick(int xOffset, int yOffset, struct C3ArrowButton *buttons, int numButtons, int offset)
 {
   int result; // eax@7
@@ -17823,11 +16618,7 @@ int  fun_isArrowButtonClick(int xOffset, int yOffset, struct C3ArrowButton *butt
   }
   return result;
 }
-// 660C50: using guessed type int button_y;
-// 660C54: using guessed type int button_x;
-// 9D7BA4: using guessed type int arrowbutton_id;
 
-//----- (0041FEC0) --------------------------------------------------------
 signed int  sub_41FEC0(struct C3Menu *a1, int a2)
 {
   signed int result; // eax@8
@@ -17887,15 +16678,7 @@ signed int  sub_41FEC0(struct C3Menu *a1, int a2)
   }
   return result;
 }
-// 5FFF58: using guessed type int dword_5FFF58[2];
-// 65E6E8: using guessed type char byte_65E6E8;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9D7B64: using guessed type int selectedSubMenuItemId;
-// 9D7B68: using guessed type int selectedMainMenuItemId;
-// 9D7B8C: using guessed type int keepSubMenuOpen;
-// 9D7B94: using guessed type int dword_9D7B94;
 
-//----- (00420090) --------------------------------------------------------
 int  fun_handleMenubarClick(struct C3Menu *menu, int numItems)
 {
   int result; // eax@2
@@ -17923,14 +16706,7 @@ int  fun_handleMenubarClick(struct C3Menu *menu, int numItems)
   }
   return result;
 }
-// 5FFF58: using guessed type int dword_5FFF58[2];
-// 660C5C: using guessed type char window_redrawRequest;
-// 9D7B64: using guessed type int selectedSubMenuItemId;
-// 9D7B68: using guessed type int selectedMainMenuItemId;
-// 9D7B6C: using guessed type int menuClickedItem;
-// 9D7B94: using guessed type int dword_9D7B94;
 
-//----- (00420130) --------------------------------------------------------
 void  sub_420130()
 {
   byte_660BFC[0] = 2;
@@ -17942,14 +16718,7 @@ void  sub_420130()
   dword_5FFF58[0] = 1;
   window_redrawRequest = 1;
 }
-// 5FFF58: using guessed type int dword_5FFF58[2];
-// 65E6E8: using guessed type char byte_65E6E8;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9D7B64: using guessed type int selectedSubMenuItemId;
-// 9D7B68: using guessed type int selectedMainMenuItemId;
-// 9D7B94: using guessed type int dword_9D7B94;
 
-//----- (004201B0) --------------------------------------------------------
 void  fun_closeSubMenu()
 {
   selectedSubMenuItemId = 0;
@@ -17958,12 +16727,7 @@ void  fun_closeSubMenu()
   dword_5FFF58[0] = 1;
   window_redrawRequest = 1;
 }
-// 5FFF58: using guessed type int dword_5FFF58[2];
-// 660C5C: using guessed type char window_redrawRequest;
-// 9D7B64: using guessed type int selectedSubMenuItemId;
-// 9D7B68: using guessed type int selectedMainMenuItemId;
 
-//----- (00420200) --------------------------------------------------------
 signed int  fun_isMenubarClick(struct C3Menu *menu, signed int numItems)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -17980,7 +16744,6 @@ signed int  fun_isMenubarClick(struct C3Menu *menu, signed int numItems)
   return 0;
 }
 
-//----- (004202A0) --------------------------------------------------------
 signed int  fun_isSubMenuClick(struct C3MenuItem *item, signed int numItems, int xOffset, int yOffset)
 {
   signed int i; // [sp+50h] [bp-4h]@1
@@ -17997,7 +16760,6 @@ signed int  fun_isSubMenuClick(struct C3MenuItem *item, signed int numItems, int
   return 0;
 }
 
-//----- (00420350) --------------------------------------------------------
 int  fun_handleCustomButtonClick(int xOffset, int yOffset, struct C3CustomButton *buttons, int numButtons)
 {
   int v4; // ecx@12
@@ -18099,17 +16861,7 @@ LABEL_42:
   }
   return i + 1;
 }
-// 65E6BC: using guessed type char mouse_isLeftClick;
-// 65E6C8: using guessed type char byte_65E6C8;
-// 65E934: using guessed type char handleClick_isRightClick;
-// 65EB21: using guessed type char mouse_isRightClick;
-// 660584: using guessed type char byte_660584;
-// 66078D: using guessed type char mouseInfo_buttonIsDown;
-// 6608A1: using guessed type char is_right_click;
-// 6A1108: using guessed type int dword_6A1108;
-// 6ADBEC: using guessed type int dword_6ADBEC;
 
-//----- (004206F0) --------------------------------------------------------
 int  fun_isCustomButtonClick(int xOffset, int yOffset, struct C3CustomButton *buttons, int numButtons)
 {
   int i; // [sp+4Ch] [bp-4h]@1
@@ -18129,10 +16881,7 @@ int  fun_isCustomButtonClick(int xOffset, int yOffset, struct C3CustomButton *bu
   }
   return 0;
 }
-// 660C50: using guessed type int button_y;
-// 660C54: using guessed type int button_x;
 
-//----- (004207C0) --------------------------------------------------------
 void  fun_showConfirmDialog(int msgId, void (*okFunc)(void), int numButtons)
 {
   confirmDialog_windowId = window_id;
@@ -18145,11 +16894,7 @@ void  fun_showConfirmDialog(int msgId, void (*okFunc)(void), int numButtons)
   confirmDialog_numButtons = numButtons;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 6ADCD8: using guessed type char confirmdialog_okClicked;
-// 9D7B9C: using guessed type int confirmDialog_windowId;
 
-//----- (00420850) --------------------------------------------------------
 void  fun_handleConfirmDialogClick()
 {
   imagebuttons_redraw = 1;
@@ -18170,12 +16915,7 @@ void  fun_handleConfirmDialogClick()
     }
   }
 }
-// 65E934: using guessed type char handleClick_isRightClick;
-// 660905: using guessed type char imagebuttons_redraw;
-// 660C5C: using guessed type char window_redrawRequest;
-// 9D7B9C: using guessed type int confirmDialog_windowId;
 
-//----- (004208E0) --------------------------------------------------------
 void  fun_confirmdialog_ok()
 {
   confirmdialog_okClicked = 1;
@@ -18183,11 +16923,7 @@ void  fun_confirmdialog_ok()
   window_id = confirmDialog_windowId;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 6ADCD8: using guessed type char confirmdialog_okClicked;
-// 9D7B9C: using guessed type int confirmDialog_windowId;
 
-//----- (00420920) --------------------------------------------------------
 void  fun_confirmdialog_cancel()
 {
   confirmdialog_okClicked = 0;
@@ -18195,11 +16931,7 @@ void  fun_confirmdialog_cancel()
   window_id = confirmDialog_windowId;
   window_redrawRequest = 1;
 }
-// 660C5C: using guessed type char window_redrawRequest;
-// 6ADCD8: using guessed type char confirmdialog_okClicked;
-// 9D7B9C: using guessed type int confirmDialog_windowId;
 
-//----- (00420960) --------------------------------------------------------
 signed int  unused_420960()
 {
   signed int result; // eax@2
@@ -18222,9 +16954,7 @@ signed int  unused_420960()
   }
   return result;
 }
-// 65E6C8: using guessed type char byte_65E6C8;
 
-//----- (004209C0) --------------------------------------------------------
 signed int  unused_4209C0(int a1, int a2)
 {
   signed int result; // eax@2
@@ -18247,9 +16977,7 @@ signed int  unused_4209C0(int a1, int a2)
   }
   return result;
 }
-// 65E6C8: using guessed type char byte_65E6C8;
 
-//----- (00420A20) --------------------------------------------------------
 signed int  fun_enableDirectDraw()
 {
   int v0; // esi@1
@@ -18386,15 +17114,7 @@ signed int  fun_enableDirectDraw()
   fun_logDebugMessage("ERR:DD Enable error level:", 0, err);
   return 0;
 }
-// 65E6A4: using guessed type int system_screen_width;
-// 65E6D4: using guessed type int screen_height;
-// 65E700: using guessed type int setting_start_bpp;
-// 65E704: using guessed type int setting_fullscreen;
-// 6606B8: using guessed type int system_screen_height;
-// 660724: using guessed type int windowedMode_yOffset;
-// 66072C: using guessed type int windowedMode_xOffset;
 
-//----- (00420FC0) --------------------------------------------------------
 signed int  fun_disableDirectDraw(int release)
 {
   if ( ddraw_clipper )
@@ -18425,7 +17145,6 @@ signed int  fun_disableDirectDraw(int release)
   return 1;
 }
 
-//----- (004210C0) --------------------------------------------------------
 signed int  fun_directDrawClearFill()
 {
   int v1; // [sp+4Ch] [bp-68h]@7
@@ -18473,9 +17192,7 @@ signed int  fun_directDrawClearFill()
   }
   return 1;
 }
-// 65E704: using guessed type int setting_fullscreen;
 
-//----- (00421210) --------------------------------------------------------
 signed int  fun_directDrawCreateSurface()
 {
   int v1; // eax@6
@@ -18654,13 +17371,7 @@ signed int  fun_directDrawCreateSurface()
   }
   return 1;
 }
-// 40308F: using guessed type _DWORD  fun_translateDDrawSurfaceLockError(_DWORD);
-// 607FF4: using guessed type int graphics_format_id;
-// 608000: using guessed type int ddraw_busy;
-// 65E704: using guessed type int setting_fullscreen;
-// 6608E0: using guessed type int graphics_format_hex;
 
-//----- (004218B0) --------------------------------------------------------
 LPDIRECTDRAWSURFACE  fun_directDrawCreateExtraSurface(DWORD width, DWORD height, int a3)
 {
   DWORD v3; // ecx@2
@@ -18692,7 +17403,6 @@ LPDIRECTDRAWSURFACE  fun_directDrawCreateExtraSurface(DWORD width, DWORD height,
   return surface;
 }
 
-//----- (00421970) --------------------------------------------------------
 signed int  fun_translateDDrawSurfaceLockError(int a1)
 {
   signed int result; // eax@2
@@ -19003,7 +17713,6 @@ signed int  fun_translateDDrawSurfaceLockError(int a1)
   return result;
 }
 
-//----- (004222A0) --------------------------------------------------------
 void  fun_drawBuildingFootprint_xFull(int *data, int clipYcode)
 {
   int v2; // edx@3
@@ -19502,9 +18211,7 @@ void  fun_drawBuildingFootprint_xFull(int *data, int clipYcode)
     }
   }
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00423900) --------------------------------------------------------
 void  fun_drawBuildingFootprint_xFull_colored(int *data, int clipYcode)
 {
   int v2; // edx@1
@@ -19999,9 +18706,7 @@ void  fun_drawBuildingFootprint_xFull_colored(int *data, int clipYcode)
     *(_DWORD *)(&v5[v18 + 56] + v3) = v4 & data[449];
   }
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (004253B0) --------------------------------------------------------
 void  fun_drawBuildingFootprint_xClipRight(int *data, int clipYcode)
 {
   int v2; // edx@3
@@ -20289,9 +18994,7 @@ void  fun_drawBuildingFootprint_xClipRight(int *data, int clipYcode)
     }
   }
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00425E80) --------------------------------------------------------
 void  fun_drawBuildingFootprint_xClipRight_colored(int *data, int clipYcode)
 {
   int v2; // edx@1
@@ -20575,9 +19278,7 @@ void  fun_drawBuildingFootprint_xClipRight_colored(int *data, int clipYcode)
     *(_DWORD *)(&v5[v3] + v32) = v4 & data[448];
   }
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00426B50) --------------------------------------------------------
 void  fun_drawBuildingFootprint_xClipLeft(int *data, int clipYcode)
 {
   int v2; // edx@3
@@ -20831,7 +19532,9 @@ void  fun_drawBuildingFootprint_xClipLeft(int *data, int clipYcode)
       *(_DWORD *)&v4[v25 + 36] = data[388];
       *(_DWORD *)&v4[v25 + 40] = data[389];
       *(_DWORD *)&v4[v25 + 44] = data[390];
-      *(_DWORD *)&v4[v25 + 48] = data[391];
+      *(_DWORD *)&v4[v25 + 48] = data[391];// 6606AC: using guessed type int ddraw_scanline;
+
+      //----- (00426B50) --------------------------------------------------------
       *(_DWORD *)&v4[v25 + 52] = data[392];
       v26 = scanline + v25;
       *(_DWORD *)&v4[v26 + 32] = data[401];
@@ -20862,9 +19565,7 @@ void  fun_drawBuildingFootprint_xClipLeft(int *data, int clipYcode)
     }
   }
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00427630) --------------------------------------------------------
 void  fun_drawBuildingFootprint_xClipLeft_colored(int *data, int clipYcode)
 {
   int v2; // edx@1
@@ -21145,9 +19846,7 @@ void  fun_drawBuildingFootprint_xClipLeft_colored(int *data, int clipYcode)
     *(_DWORD *)(&v5[v31 + 52] + v3) = v4 & data[446];
   }
 }
-// 6606AC: using guessed type int ddraw_scanline;
 
-//----- (00428310) --------------------------------------------------------
 void  unused_grabBuildingFootprintTileFromBuffer(char *buffer, int *data, int scanline)
 {
   char *source; // esi@1
@@ -21605,7 +20304,7 @@ void  unused_grabBuildingFootprintTileFromBuffer(char *buffer, int *data, int sc
   data[449] = *(_DWORD *)&source[58 * scanline + 56];
 }
 
-//----- (00429A80) --------------------------------------------------------
+
 void  unused_clearBuildingFootprintTile(char *buffer, int scanline)
 {
   char *v2; // esi@1
@@ -23168,29 +21867,7 @@ void  fun_setIsometricViewport(int gridwidth, int gridheight, int xoffset, int y
   dword_9A050C = iso_grid_width / 2;
   dword_9A0510 = iso_grid_height;
 }
-// 9A049C: using guessed type int dword_9A049C;
-// 9A04B0: using guessed type int iso_tile_height;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04B8: using guessed type int dword_9A04B8;
-// 9A04C0: using guessed type int iso_viewport_width;
-// 9A04C4: using guessed type int cityviewport_yEnd;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04CC: using guessed type int iso_viewport_height;
-// 9A04D0: using guessed type int iso_yoffset;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A04E4: using guessed type int cityviewport_x;
-// 9A04F0: using guessed type int dword_9A04F0;
-// 9A0504: using guessed type int iso_xoffset;
-// 9A0508: using guessed type int iso_grid_height;
-// 9A050C: using guessed type int dword_9A050C;
-// 9A0510: using guessed type int dword_9A0510;
-// 9A0514: using guessed type int dword_9A0514;
-// 9A0518: using guessed type int iso_grid_width;
-// 9A0528: using guessed type int cityviewport_xEnd;
-// 9A0538: using guessed type int cityviewport_y;
-// 9D4B54: using guessed type int dword_9D4B54;
 
-//----- (0042DA10) --------------------------------------------------------
 void  sub_42DA10()
 {
   signed int j; // [sp+4Ch] [bp-8h]@3
@@ -23202,9 +21879,7 @@ void  sub_42DA10()
       *(int *)((char *)&dword_9A0560[165 * i] + 4 * j) = graphic_terrain_start + 268369920;
   }
 }
-// 6E6BB2: using guessed type __int16 graphic_terrain_start;
 
-//----- (0042DAA0) --------------------------------------------------------
 void  sub_42DAA0(int gridOffset)
 {
   signed int j; // [sp+4Ch] [bp-8h]@3
@@ -23227,7 +21902,6 @@ void  sub_42DAA0(int gridOffset)
   }
 }
 
-//----- (0042DB70) --------------------------------------------------------
 void  sub_42DB70(int a1)
 {
   int j; // [sp+4Ch] [bp-2Ch]@11
@@ -23303,15 +21977,7 @@ void  sub_42DB70(int a1)
     v6 += v5;
   }
 }
-// 6E6BB2: using guessed type __int16 graphic_terrain_start;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 995C50: using guessed type int dword_995C50[10771];
-// 9A04BC: using guessed type int dword_9A04BC;
-// 9A0530: using guessed type int dword_9A0530;
-// 9D4B44: using guessed type int dword_9D4B44;
-// 9D4DEC: using guessed type int dword_9D4DEC;
 
-//----- (0042DE10) --------------------------------------------------------
 int  sub_42DE10()
 {
   int result; // eax@2
@@ -23426,24 +22092,7 @@ int  sub_42DE10()
   }
   return result;
 }
-// 9A04A0: using guessed type int dword_9A04A0;
-// 9A04A4: using guessed type int dword_9A04A4;
-// 9A04AC: using guessed type int dword_9A04AC;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04C0: using guessed type int iso_viewport_width;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04CC: using guessed type int iso_viewport_height;
-// 9A04D0: using guessed type int iso_yoffset;
-// 9A04D4: using guessed type int dword_9A04D4;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A04E8: using guessed type int dword_9A04E8;
-// 9A04EC: using guessed type int dword_9A04EC;
-// 9A0504: using guessed type int iso_xoffset;
-// 9A050C: using guessed type int dword_9A050C;
-// 9A0510: using guessed type int dword_9A0510;
-// 9D4DE8: using guessed type int dword_9D4DE8;
 
-//----- (0042E190) --------------------------------------------------------
 void  fun_rotateMapCounterClockwise()
 {
   int v0; // [sp+4Ch] [bp-Ch]@1
@@ -23465,14 +22114,7 @@ void  fun_rotateMapCounterClockwise()
       ++setting_map_camera_x;
   }
 }
-// 4017CB: using guessed type _DWORD  sub_4017CB(_DWORD);
-// 65DEF8: using guessed type int mapOrientation;
-// 8C79E4: using guessed type int setting_map_camera_x;
-// 8C79E8: using guessed type int setting_map_camera_y;
-// 9A04C0: using guessed type int iso_viewport_width;
-// 9A04CC: using guessed type int iso_viewport_height;
 
-//----- (0042E2D0) --------------------------------------------------------
 void  fun_rotateMapClockwise()
 {
   int v0; // [sp+4Ch] [bp-Ch]@1
@@ -23494,44 +22136,27 @@ void  fun_rotateMapClockwise()
       setting_map_camera_y += 2;
   }
 }
-// 4017CB: using guessed type _DWORD  sub_4017CB(_DWORD);
-// 65DEF8: using guessed type int mapOrientation;
-// 8C79E4: using guessed type int setting_map_camera_x;
-// 8C79E8: using guessed type int setting_map_camera_y;
-// 9A04C0: using guessed type int iso_viewport_width;
-// 9A04CC: using guessed type int iso_viewport_height;
 
-//----- (0042E410) --------------------------------------------------------
 int  fun_getIsometricViewportWidth()
 {
   return iso_viewport_width;
 }
-// 9A04C0: using guessed type int iso_viewport_width;
 
-//----- (0042E430) --------------------------------------------------------
 int  fun_getIsometricViewportHeight()
 {
   return iso_viewport_height;
 }
-// 9A04CC: using guessed type int iso_viewport_height;
 
-//----- (0042E450) --------------------------------------------------------
 int  fun_getCityScreenWidth()
 {
   return iso_viewport_width * (iso_tile_width + 2);
 }
-// 9A04C0: using guessed type int iso_viewport_width;
-// 9A04C8: using guessed type int iso_tile_width;
 
-//----- (0042E480) --------------------------------------------------------
 int  unused_42E480()
 {
   return iso_tile_half_height * iso_viewport_height;
 }
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04CC: using guessed type int iso_viewport_height;
 
-//----- (0042E4B0) --------------------------------------------------------
 void  fun_gotoGridOffset(__int16 gridOffset)
 {
   sub_42DAA0(gridOffset);
@@ -23544,8 +22169,6 @@ void  fun_gotoGridOffset(__int16 gridOffset)
   sub_4DC600();
 }
 
-
-//----- (0042E6D0) --------------------------------------------------------
 void  sub_42E6D0(int x, int y, int gridOffset, int a4)
 {
   dword_9A050C = x;
@@ -23563,20 +22186,7 @@ void  sub_42E6D0(int x, int y, int gridOffset, int a4)
   draw_clip_y = 0;
   draw_clip_yEnd = screen_height;
 }
-// 65E6D4: using guessed type int screen_height;
-// 6ADBE4: using guessed type int draw_clip_y;
-// 6ADD2C: using guessed type int draw_clip_x;
-// 6E6B4C: using guessed type int draw_clip_xEnd;
-// 7E26F8: using guessed type int draw_clip_yEnd;
-// 9A04C4: using guessed type int cityviewport_yEnd;
-// 9A04E0: using guessed type int dword_9A04E0;
-// 9A04E4: using guessed type int cityviewport_x;
-// 9A050C: using guessed type int dword_9A050C;
-// 9A0510: using guessed type int dword_9A0510;
-// 9A0528: using guessed type int cityviewport_xEnd;
-// 9A0538: using guessed type int cityviewport_y;
 
-//----- (0042E7A0) --------------------------------------------------------
 void  sub_42E7A0()
 {
   int v0; // [sp+4Ch] [bp-2Ch]@1
@@ -23721,36 +22331,7 @@ void  sub_42E7A0()
     ++dword_9A0540[0];
   }
 }
-// 403193: using guessed type _DWORD  sub_403193(_DWORD, _DWORD);
-// 660B7C: using guessed type int dword_660B7C;
-// 6E6BBA: using guessed type __int16 graphic_terrain_water;
-// 6E6BD8: using guessed type __int16 graphic_overlaytiles;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 9A049C: using guessed type int dword_9A049C;
-// 9A04B0: using guessed type int iso_tile_height;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04B8: using guessed type int dword_9A04B8;
-// 9A04C0: using guessed type int iso_viewport_width;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04CC: using guessed type int iso_viewport_height;
-// 9A04D0: using guessed type int iso_yoffset;
-// 9A04D8: using guessed type int dword_9A04D8;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A04F0: using guessed type int dword_9A04F0;
-// 9A0504: using guessed type int iso_xoffset;
-// 9A050C: using guessed type int dword_9A050C;
-// 9A0510: using guessed type int dword_9A0510;
-// 9A0514: using guessed type int dword_9A0514;
-// 9A051C: using guessed type int dword_9A051C;
-// 9A0534: using guessed type int dword_9A0534;
-// 9A053C: using guessed type int dword_9A053C;
-// 9A0540: using guessed type int dword_9A0540[8];
-// 9D4B4C: using guessed type int dword_9D4B4C;
-// 9DA808: using guessed type int dword_9DA808;
 
-//----- (0042ED00) --------------------------------------------------------
 void  fun_drawOverlay()
 {
   int v0; // [sp+54h] [bp-1Ch]@27
@@ -23921,31 +22502,7 @@ void  fun_drawOverlay()
     ++dword_9A0540[0];
   }
 }
-// 6E6BC4: using guessed type __int16 graphic_terrain_grass1;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 9A049C: using guessed type int dword_9A049C;
-// 9A04B0: using guessed type int iso_tile_height;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04B8: using guessed type int dword_9A04B8;
-// 9A04C0: using guessed type int iso_viewport_width;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04CC: using guessed type int iso_viewport_height;
-// 9A04D0: using guessed type int iso_yoffset;
-// 9A04D8: using guessed type int dword_9A04D8;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A04F0: using guessed type int dword_9A04F0;
-// 9A0504: using guessed type int iso_xoffset;
-// 9A050C: using guessed type int dword_9A050C;
-// 9A0510: using guessed type int dword_9A0510;
-// 9A0514: using guessed type int dword_9A0514;
-// 9A051C: using guessed type int dword_9A051C;
-// 9A053C: using guessed type int dword_9A053C;
-// 9A0540: using guessed type int dword_9A0540[8];
-// 9D4B4C: using guessed type int dword_9D4B4C;
-// 9DA808: using guessed type int dword_9DA808;
 
-//----- (0042F2D0) --------------------------------------------------------
 void  fun_drawBuildingOnWaterOverlayPipes(int a1, int a2)
 {
   int v2; // ST68_4@3
@@ -24070,22 +22627,7 @@ void  fun_drawBuildingOnWaterOverlayPipes(int a1, int a2)
     }
   }
 }
-// 6E6BC4: using guessed type __int16 graphic_terrain_grass1;
-// 6E6BD8: using guessed type __int16 graphic_overlaytiles;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 9A049C: using guessed type int dword_9A049C;
-// 9A04B0: using guessed type int iso_tile_height;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04B8: using guessed type int dword_9A04B8;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A04F0: using guessed type int dword_9A04F0;
-// 9A0514: using guessed type int dword_9A0514;
-// 9D4B4C: using guessed type int dword_9D4B4C;
 
-//----- (0042F790) --------------------------------------------------------
 void  fun_drawBuildingOnWaterOverlay(int x, int y)
 {
   int buildingId; // [sp+4Ch] [bp-Ch]@1
@@ -24144,20 +22686,7 @@ void  fun_drawBuildingOnWaterOverlay(int x, int y)
     }
   }
 }
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 9A049C: using guessed type int dword_9A049C;
-// 9A04B0: using guessed type int iso_tile_height;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04B8: using guessed type int dword_9A04B8;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A04F0: using guessed type int dword_9A04F0;
-// 9A0514: using guessed type int dword_9A0514;
-// 9D4B4C: using guessed type int dword_9D4B4C;
 
-//----- (0042FA20) --------------------------------------------------------
 void  fun_drawBuildingOnNativeOverlayRed(int a1, int a2)
 {
   int v2; // ST5C_4@3
@@ -24243,22 +22772,7 @@ void  fun_drawBuildingOnNativeOverlayRed(int a1, int a2)
     }
   }
 }
-// 6E6BC4: using guessed type __int16 graphic_terrain_grass1;
-// 6E6BD8: using guessed type __int16 graphic_overlaytiles;
-// 6E6CBE: using guessed type __int16 word_6E6CBE;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 9A049C: using guessed type int dword_9A049C;
-// 9A04B0: using guessed type int iso_tile_height;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04B8: using guessed type int dword_9A04B8;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A04F0: using guessed type int dword_9A04F0;
-// 9A0514: using guessed type int dword_9A0514;
-// 9D4B4C: using guessed type int dword_9D4B4C;
 
-//----- (0042FDF0) --------------------------------------------------------
 void  fun_drawBuildingOnNativeOverlay(int a1, int a2)
 {
   int v2; // [sp+4Ch] [bp-Ch]@1
@@ -24771,27 +23285,7 @@ void  fun_drawBuildingWithOverlay(int buildingId, int xOffset, int yOffset, int 
     }
   }
 }
-// 5F5B88: using guessed type int dword_5F5B88[];
-// 5F5B8C: using guessed type int dword_5F5B8C[];
-// 5F5BA8: using guessed type int dword_5F5BA8[];
-// 5F5BAC: using guessed type int dword_5F5BAC[];
-// 5F5BF0: using guessed type int dword_5F5BF0[];
-// 5F5C70: using guessed type int dword_5F5C70[];
-// 5F94AC: using guessed type int dword_5F94AC[];
-// 5F94D0: using guessed type int dword_5F94D0[];
-// 5F9510: using guessed type int dword_5F9510[];
-// 6E6BD8: using guessed type __int16 graphic_overlaytiles;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 9A049C: using guessed type int dword_9A049C;
-// 9A04B0: using guessed type int iso_tile_height;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A0514: using guessed type int dword_9A0514;
-// 9D4B4C: using guessed type int dword_9D4B4C;
 
-//----- (00431680) --------------------------------------------------------
 void  fun_drawBuildingOnDesirabilityOverlay(int x, int y)
 {
   int v2; // [sp+4Ch] [bp-10h]@4
@@ -24911,20 +23405,7 @@ void  fun_drawBuildingOnDesirabilityOverlay(int x, int y)
     }
   }
 }
-// 6E6BC4: using guessed type __int16 graphic_terrain_grass1;
-// 6E6CBE: using guessed type __int16 word_6E6CBE;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 9A049C: using guessed type int dword_9A049C;
-// 9A04B0: using guessed type int iso_tile_height;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04B8: using guessed type int dword_9A04B8;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A04F0: using guessed type int dword_9A04F0;
-// 9A0514: using guessed type int dword_9A0514;
-// 9D4B4C: using guessed type int dword_9D4B4C;
 
-//----- (00431A70) --------------------------------------------------------
 void  fun_drawBuildingOnDesirabilityOverlayColored(int a1, int a2)
 {
   int v2; // [sp+4Ch] [bp-10h]@4
@@ -25039,19 +23520,7 @@ void  fun_drawBuildingOnDesirabilityOverlayColored(int a1, int a2)
     }
   }
 }
-// 6E6CBE: using guessed type __int16 word_6E6CBE;
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 9A049C: using guessed type int dword_9A049C;
-// 9A04B0: using guessed type int iso_tile_height;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04B8: using guessed type int dword_9A04B8;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A04F0: using guessed type int dword_9A04F0;
-// 9A0514: using guessed type int dword_9A0514;
-// 9D4B4C: using guessed type int dword_9D4B4C;
 
-//----- (00431E20) --------------------------------------------------------
 void  fun_drawBuildingOnFireOverlay(int buildingId, int a2, int a3)
 {
   int v3; // [sp+4Ch] [bp-8h]@9
@@ -26412,63 +24881,7 @@ void  fun_drawExtraBuildingImages(int a1)
     ++dword_9A0540[0];
   }
 }
-// 40123F: using guessed type _DWORD  sub_40123F(_DWORD);
-// 4027D4: using guessed type _DWORD  fun_getBuildingAnimationIndex(_DWORD, _DWORD);
-// 403233: using guessed type _DWORD  sub_403233(_DWORD);
-// 6500C4: using guessed type int cityinfo_population[];
-// 652B5C: using guessed type int cityinfo_unemploymentForSenateDrawing[];
-// 654228: using guessed type int cityinfo_cultureRating[];
-// 65422C: using guessed type int cityinfo_prosperityRating[];
-// 654230: using guessed type int cityinfo_peaceRating[];
-// 654234: using guessed type int cityinfo_favorRating[];
-// 654594: using guessed type int cityinfo_tradeCenterId[];
-// 654624: using guessed type int dword_654624[];
-// 6E6C28: using guessed type __int16 word_6E6C28;
-// 6E6C2C: using guessed type __int16 word_6E6C2C;
-// 6E6C34: using guessed type __int16 word_6E6C34;
-// 6E6C4C: using guessed type __int16 word_6E6C4C;
-// 6E6C54: using guessed type __int16 word_6E6C54;
-// 6E6C76: using guessed type __int16 graphic_granary;
-// 6E6C9C: using guessed type __int16 graphic_homeless;
-// 6E6D00: using guessed type __int16 word_6E6D00;
-// 6E6D02: using guessed type __int16 word_6E6D02;
-// 6E6D06: using guessed type __int16 word_6E6D06;
-// 6E6D2E: using guessed type __int16 word_6E6D2E;
-// 6E6D30: using guessed type __int16 word_6E6D30;
-// 6E6D32: using guessed type __int16 word_6E6D32;
-// 6E6D5A: using guessed type __int16 word_6E6D5A;
-// 6E6D5C: using guessed type __int16 word_6E6D5C;
-// 6E6D76: using guessed type __int16 word_6E6D76;
-// 6E6D8C: using guessed type __int16 word_6E6D8C;
-// 6E6DA0: using guessed type __int16 word_6E6DA0;
-// 7FA348: using guessed type __int16 walker_nextIdOnSameTile[];
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD48: using guessed type __int16 building_08_gridOffset[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD4C: using guessed type __int16 building_0c_level_resourceId[];
-// 94BD74: using guessed type __int16 building_34_industry_unitsStored[];
-// 94BD78: using guessed type __int16 building_38_num_workers[];
-// 94BD8C: using guessed type __int16 building_4c_granary_capacity[];
-// 9A049C: using guessed type int dword_9A049C;
-// 9A04B0: using guessed type int iso_tile_height;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04B8: using guessed type int dword_9A04B8;
-// 9A04C0: using guessed type int iso_viewport_width;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04CC: using guessed type int iso_viewport_height;
-// 9A04D0: using guessed type int iso_yoffset;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A04F0: using guessed type int dword_9A04F0;
-// 9A0504: using guessed type int iso_xoffset;
-// 9A050C: using guessed type int dword_9A050C;
-// 9A0510: using guessed type int dword_9A0510;
-// 9A0514: using guessed type int dword_9A0514;
-// 9A053C: using guessed type int dword_9A053C;
-// 9A0540: using guessed type int dword_9A0540[8];
-// 9D4B4C: using guessed type int dword_9D4B4C;
 
-//----- (00436130) --------------------------------------------------------
 void  fun_drawBridge(int x, int y)
 {
   __int16 terrain; // ax@1
@@ -27139,23 +25552,7 @@ void  fun_drawWalker(int walkerId, int a2, int a3, int a4)
     }
   }
 }
-// 607F88: using guessed type int debug_showPeople;
-// 65DF24: using guessed type int dword_65DF24;
-// 6E6CAE: using guessed type __int16 word_6E6CAE;
-// 7FA344: using guessed type __int16 word_7FA344[];
-// 7FA346: using guessed type __int16 word_7FA346[];
-// 7FA37A: using guessed type __int16 walker_tilePosition_y[];
-// 7FA37C: using guessed type __int16 walker_tilePosition_x[];
-// 7FA38A: using guessed type __int16 walker_buildingId[];
-// 7FA38E: using guessed type __int16 word_7FA38E[];
-// 7FA390: using guessed type __int16 walker_formationId[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9D4B48: using guessed type int dword_9D4B48;
-// 9D4B50: using guessed type int dword_9D4B50;
 
-//----- (00437E20) --------------------------------------------------------
 void  sub_437E20(int a1)
 {
   int v1; // [sp+50h] [bp-28h]@46
@@ -27305,29 +25702,7 @@ void  sub_437E20(int a1)
     ++dword_9A0540[0];
   }
 }
-// 7FA348: using guessed type __int16 walker_nextIdOnSameTile[];
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94A2FC: using guessed type int dword_94A2FC;
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 9A049C: using guessed type int dword_9A049C;
-// 9A04B0: using guessed type int iso_tile_height;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04C0: using guessed type int iso_viewport_width;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04CC: using guessed type int iso_viewport_height;
-// 9A04D0: using guessed type int iso_yoffset;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A04F0: using guessed type int dword_9A04F0;
-// 9A0504: using guessed type int iso_xoffset;
-// 9A050C: using guessed type int dword_9A050C;
-// 9A0510: using guessed type int dword_9A0510;
-// 9A053C: using guessed type int dword_9A053C;
-// 9A0540: using guessed type int dword_9A0540[8];
-// 9D4B4C: using guessed type int dword_9D4B4C;
-// 9DA645: using guessed type char byte_9DA645;
 
-//----- (004384F0) --------------------------------------------------------
 void  sub_4384F0()
 {
   __int16 v0; // ax@159
@@ -27696,32 +26071,7 @@ void  sub_4384F0()
     ++dword_9A0540[0];
   }
 }
-// 4027D4: using guessed type _DWORD  fun_getBuildingAnimationIndex(_DWORD, _DWORD);
-// 6E6C76: using guessed type __int16 graphic_granary;
-// 7FA348: using guessed type __int16 walker_nextIdOnSameTile[];
-// 8B4620: using guessed type __int16 grid_graphicIds[];
-// 8F61A0: using guessed type __int16 grid_buildingIds[];
-// 94BD4A: using guessed type __int16 building_0a_type[];
-// 94BD8C: using guessed type __int16 building_4c_granary_capacity[];
-// 9A049C: using guessed type int dword_9A049C;
-// 9A04B0: using guessed type int iso_tile_height;
-// 9A04B4: using guessed type int iso_tile_half_height;
-// 9A04B8: using guessed type int dword_9A04B8;
-// 9A04C0: using guessed type int iso_viewport_width;
-// 9A04C8: using guessed type int iso_tile_width;
-// 9A04CC: using guessed type int iso_viewport_height;
-// 9A04D0: using guessed type int iso_yoffset;
-// 9A04DC: using guessed type int iso_tile_half_width;
-// 9A04F0: using guessed type int dword_9A04F0;
-// 9A0504: using guessed type int iso_xoffset;
-// 9A050C: using guessed type int dword_9A050C;
-// 9A0510: using guessed type int dword_9A0510;
-// 9A0514: using guessed type int dword_9A0514;
-// 9A053C: using guessed type int dword_9A053C;
-// 9A0540: using guessed type int dword_9A0540[8];
-// 9D4B4C: using guessed type int dword_9D4B4C;
 
-//----- (00439520) --------------------------------------------------------
 void  fun_drawSelectedBuildingGhost()
 {
   if ( dword_8C79EC )
@@ -27803,11 +26153,7 @@ void  fun_drawSelectedBuildingGhost()
     }
   }
 }
-// 660C4C: using guessed type int shouldScrollMap;
-// 9DA7C8: using guessed type int dword_9DA7C8;
-// 9DA898: using guessed type int mode_editor;
 
-//----- (004397A0) --------------------------------------------------------
 void  fun_drawBuildingGhostDefault()
 {
   __int16 v0; // dx@82
@@ -92893,6 +91239,7 @@ int  fun_calculateCityHappinessAndCrime()
     v4 = 0;
     city_inform[ciid].byte_6545AB = 1;
   }
+
   v13 = 0;
   v10 = 0;
   v14 = 0;
@@ -92913,7 +91260,7 @@ int  fun_calculateCityHappinessAndCrime()
             ++v10;
             v12 = 0;
             v9 = 0;
-            if( model_houses[buildings[i].level_resourceId].foodtypes )
+            if( model_houses[buildings[i].level_resourceId].foodtypes > 0 )
             {
               ++v13;
               if ( (signed int)HIBYTE(buildings[i].word_94BDAC) < 2 )
@@ -93003,9 +91350,9 @@ int  fun_calculateCityHappinessAndCrime()
   {
     if ( buildings[j].inUse == 1 )
     {
-      if ( buildings[j].houseSize )
+      if ( buildings[j].houseSize > 0 )
       {
-        if ( buildings[j].house_population )
+        if ( buildings[j].house_population > 0 )
         {
           ++numberHouse;
           crimeRiskSum += buildings[j].house_crimeRisk;
@@ -93013,6 +91360,7 @@ int  fun_calculateCityHappinessAndCrime()
       }
     }
   }
+
   if ( numberHouse )
     city_inform[ciid].hapinessCity = crimeRiskSum / numberHouse;
   else
@@ -93048,6 +91396,7 @@ int  fun_calculateCityHappinessAndCrime()
       }
     }
   }
+
   v6 = 0;
   if ( v12 < 0 )
   {
@@ -93098,7 +91447,6 @@ void  fun_decreaseCrimeRisk(char amount)
   }
 }
 
-//----- (004E3050) --------------------------------------------------------
 void  fun_setCrimeRiskForAllHouses(signed int targetCrimeRisk)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
