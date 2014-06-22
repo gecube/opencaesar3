@@ -8,9 +8,9 @@ void __cdecl fun_decayService_culture()
 
   for ( i = 1; i < 2000; ++i )
   {
-    if ( building_00_inUse[128 * i] == 1 )
+    if ( buildings[i].inUse == 1 )
     {
-      if ( building_05_houseSize[128 * i] )
+      if ( buildings[i].house_size )
       {
         if ( (signed int)_LOBYTE(building_5a_house_theater_amphi[64 * i]) <= 1 )
           _LOBYTE(building_5a_house_theater_amphi[64 * i]) = 0;
@@ -123,23 +123,25 @@ void fun_determineHouseEvolveText(int buildingId)
   signed int v19; // [sp+98h] [bp-4h]@1
   int v20; // [sp+98h] [bp-4h]@80
 
-  v19 = building_0c_level_resourceId[64 * buildingId];
+  v19 = buildings[buildingId].level_resourceId;
   desirability = building_7a_desirability[128 * buildingId];
-  if ( desirability > model_houses_des_devolve[20 * v19] )
-    desirabilityMet = desirability >= model_houses_des_evolve[20 * v19];
+
+  if ( desirability > model_houses[v19].des_devolve[0] )
+    desirabilityMet = desirability >= model_houses[v19].des_evolve;
   else
     desirabilityMet = -1;
-  reqWater = model_houses_water[20 * v19];
-  reqEntertainment = model_houses_entertainment[20 * v19];
-  reqEducation = model_houses_education[20 * v19];
-  reqReligion = model_houses_religion[20 * v19];
-  reqHealth = model_houses_health[20 * v19];
-  reqFoodTypes = model_houses_foodtypes[20 * v19];
-  reqWine = model_houses_wine[20 * v19];
+
+  reqWater = model_houses[v19].water;
+  reqEntertainment = model_houses[v19].entertainment;
+  reqEducation = model_houses[v19].education;
+  reqReligion = model_houses[v19].religion;
+  reqHealth = model_houses[v19].health;
+  reqFoodTypes = model_houses[v19].foodtypes;
+  reqWine = model_houses[v19].wine;
   numFoods = 0;
   for ( i = 0; i < 4; ++i )
   {
-    if ( *(short*)((char *)&building_4a_grow_value_house_foodstocks[64 * buildingId] + 2 * i) )
+    if ( buildings[buildingId].grow_value_house_foodstocks[i] )
       ++numFoods;
   }
   if ( desirabilityMet == -1 )
@@ -206,12 +208,12 @@ void fun_determineHouseEvolveText(int buildingId)
         }
       }
     }
-    if ( model_houses_bathhouse[20 * v19] > (unsigned char)building_65_house_bathhouse_dock_numships_entert_days[128 * buildingId] )
+    if ( model_houses[v19].bathhouse > (unsigned char)building_65_house_bathhouse_dock_numships_entert_days[128 * buildingId] )
     {
       _HIBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = 18;
       return;
     }
-    if ( model_houses_pottery[20 * v19] > building_58_house_pottery[64 * buildingId] )
+    if ( model_houses[v19].pottery > building_58_house_pottery[64 * buildingId] )
     {
       _HIBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = 19;
       return;
@@ -234,19 +236,19 @@ void fun_determineHouseEvolveText(int buildingId)
         return;
       }
     }
-    if ( model_houses_barber[20 * v19] > _HIBYTE(building_62_house_academy_barber[64 * buildingId]) )
+    if ( model_houses[v19].barber > _HIBYTE(building_62_house_academy_barber[64 * buildingId]) )
     {
       _HIBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = 23;
       return;
     }
     if ( reqHealth <= building_70_house_health[128 * buildingId] )
     {
-      if ( model_houses_oil[20 * v19] > building_54_house_oil[64 * buildingId] )
+      if ( model_houses[v19].oil > building_54_house_oil[64 * buildingId] )
       {
         _HIBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = 27;
         return;
       }
-      if ( model_houses_furniture[20 * v19] > building_56_house_furniture[64 * buildingId] )
+      if ( model_houses[v19].furniture > building_56_house_furniture[64 * buildingId] )
       {
         _HIBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = 28;
         return;
@@ -267,13 +269,13 @@ void fun_determineHouseEvolveText(int buildingId)
         return;
       }
       v20 = v19 + 1;
-      v17 = model_houses_water[20 * v20];
-      v15 = model_houses_entertainment[20 * v20];
-      v13 = model_houses_education[20 * v20];
-      v11 = model_houses_religion[20 * v20];
-      v9 = model_houses_health[20 * v20];
-      v7 = model_houses_foodtypes[20 * v20];
-      v5 = model_houses_wine[20 * v20];
+      v17 = model_houses[v20].water;
+      v15 = model_houses[v20].entertainment;
+      v13 = model_houses[v20].education;
+      v11 = model_houses[v20].religion;
+      v9 = model_houses[v20].health;
+      v7 = model_houses[v20].foodtypes;
+      v5 = model_houses[v20].wine;
       if ( desirabilityMet )
       {
         if ( v17 == 1
@@ -337,12 +339,12 @@ void fun_determineHouseEvolveText(int buildingId)
               }
             }
           }
-          if ( model_houses_bathhouse[20 * v20] > (unsigned char)building_65_house_bathhouse_dock_numships_entert_days[128 * buildingId] )
+          if ( model_houses[v20].bathhouse > (unsigned char)building_65_house_bathhouse_dock_numships_entert_days[128 * buildingId] )
           {
             _HIBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = 48;
             return;
           }
-          if ( model_houses_pottery[20 * v20] > building_58_house_pottery[64 * buildingId] )
+          if ( model_houses[v20].pottery > building_58_house_pottery[64 * buildingId] )
           {
             _HIBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = 49;
             return;
@@ -362,20 +364,20 @@ void fun_determineHouseEvolveText(int buildingId)
           if ( v11 != 3 )
           {
 LABEL_154:
-            if ( model_houses_barber[20 * v20] <= _HIBYTE(building_62_house_academy_barber[64 * buildingId]) )
+            if ( model_houses[v20].barber <= _HIBYTE(building_62_house_academy_barber[64 * buildingId]) )
             {
               if ( v9 <= building_70_house_health[128 * buildingId] )
               {
-                if ( model_houses_oil[20 * v20] <= building_54_house_oil[64 * buildingId] )
+                if ( model_houses[v20].oil <= building_54_house_oil[64 * buildingId] )
                 {
-                  if ( model_houses_furniture[20 * v20] <= building_56_house_furniture[64 * buildingId] )
+                  if ( model_houses[v20].furniture <= building_56_house_furniture[64 * buildingId] )
                   {
                     if ( v5 <= building_52_house_wine[64 * buildingId] )
                     {
                       if ( v5 <= 1 || city_inform[ciid].numWineTypesAvailable[0] >= 2 )
                       {
                         _HIBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = 61;
-                        if ( _LOBYTE(building_6c_word_94BDAC[64 * buildingId]) == 1 )
+                        if ( _LOBYTE(buildings[buildingId].word_94BDAC[0]) == 1 )
                         {
                           _HIBYTE(building_72_wharf_hasBoat_house_evolveStatusDesir[64 * buildingId]) = 64;
                         }

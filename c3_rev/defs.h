@@ -30,9 +30,6 @@ int numStrings ;
 int unknown    ;
 };
 
-
-typedef int BuildingType;
-
 enum EmpireCityType
 {
 City_DistantRoman  = 0,
@@ -52,10 +49,11 @@ enum EnemyType
 };
 
 
-enum BuildingTypeT
+enum BuildingType
 {
-  B_Menu_Farms     = 2,
-  B_Menu_RawMaterials  = 3,
+ B_none_building  = 0,
+ B_Menu_Farms     = 2,
+ B_Menu_RawMaterials  = 3,
  B_Menu_Workshops  = 4,
  B_Road           = 5,
  B_Wall           = 6,
@@ -166,7 +164,13 @@ enum BuildingTypeT
  B_OilWorkshop    = 111,
  B_WeaponsWorkshop  = 112,
  B_FurnitureWorkshop  = 113,
- B_PotteryWorkshop  = 114
+ B_PotteryWorkshop  = 114,
+ B_invasion_type = 126,
+};
+
+enum MessageType
+{
+  messageBildingLimitReach=65
 };
 
 struct C3CustomButton
@@ -708,6 +712,8 @@ short field_12;
 short field_14;
 short field_16;
 };
+
+static const int actionWalkerDie =-107;
 
 
 struct C3Warning
