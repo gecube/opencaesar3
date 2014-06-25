@@ -1165,6 +1165,30 @@ struct Empire
 {
   char inUse;
   char type;
+  char currentAnimationIndex;
+  __int16 xCoord;
+  __int16 yCoord;
+  __int16 width;
+  __int16 height;
+  __int16 graphicID;
+  __int16 graphicID_exp;
+  char distBattleTravelMonths;
+  __int16 xCoord_exp;
+  __int16 yCoord_exp;
+  char cityType;
+  char cityNameId;
+  char tradeRouteId;
+  char tradeRouteOpen;
+  __int16 tradeCostToOpen[10];
+  char citySells[16];
+  char ownerCityIndex;
+  char f990D29[10];
+  char cityBuys[16];
+  char invasionPathId;
+  char invasionYears;
+  __int16 trade40;
+  __int16 trade25;
+  __int16 trade15;
 };
 
 struct Formation

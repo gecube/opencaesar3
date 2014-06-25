@@ -2143,30 +2143,7 @@ static int dword_990CDC; // weak
 static int editEmpire_addObjectGraphicID; // weak
 
 
-static char empire_currentAnimationIndex[0xff]; // weak
-static __int16 empire_xCoord[0xff]; // weak
-static __int16 empire_yCoord[0xff]; // weak
-static __int16 empire_width[0xff]; // weak
-static __int16 empire_height[0xff]; // weak
-static __int16 empire_graphicID[0xff]; // weak
-static __int16 empire_graphicID_exp[0xff]; // weak
-static char empire_distBattleTravelMonths[0xff]; // weak
-static __int16 empire_xCoord_exp[0xff]; // weak
-static __int16 empire_yCoord_exp[0xff]; // weak
-static char empire_cityType[0xff]; // weak
-static char empire_cityNameId[0xff]; // weak
-static char empire_tradeRouteId[0xff]; // weak
-static char empire_tradeRouteOpen[0xff]; // weak
-static __int16 empire_tradeCostToOpen[0xff]; // weak
-static char empire_citySells[0xff]; // idb
-static char empire_ownerCityIndex[0xff]; // weak
-static char empire_990D29[0xff]; // weak
-static char empire_cityBuys[0xff]; // idb
-static char empire_invasionPathId[0xff]; // weak
-static char empire_invasionYears[0xff]; // weak
-static __int16 empire_trade40[0xff]; // weak
-static __int16 empire_trade25[0xff]; // weak
-static __int16 empire_trade15[0xff]; // idb
+
 static int empireScreen_selectedRouteId; // weak
 static int dword_993F04; // weak
 static int editEmpire_selectedObjectButton; // weak
@@ -2577,7 +2554,7 @@ void  fun_drawEditEmpireObjectButtons();
 signed int  fun_getResourceGraphicIdOffset(int resourceId, int type); // idb
 void  fun_drawDialogResourceSettings();
 
-signed int  fun_empireCitySellsGood(int empireId, int goodId); // idb
+signed int  canEmpireCitySellsGood(int empireId, int goodId); // idb
 int  fun_writeToFilenameAppend(const char *filename, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite); // idb
 
 void  fun_showBuildingInfoTempleMars();
@@ -2652,7 +2629,7 @@ int  fun_strNumDigitChars(char *str); // idb
 void  fun_editor_startCond_startFunds();
 void  fun_strRemoveDoubleSpaces(char *str);
 void  fun_addPeopleToCityAndCensus(int ciid, int numPeople); // idb
-signed int  fun_isSeaTradeRoute(int tradeRouteId); // idb
+signed int  isSeaTradeRoute(int tradeRouteId); // idb
 int  fun_adjustWithPercentage(int value, int percentage); // idb
 void  fun_buildingInfo_granary_specialOrders();
 void  fun_drawBuildingOnProblemsOverlay(int a1, int a2, int a3);
@@ -2787,7 +2764,7 @@ void  fun_calculateHealthRate();
 void  fun_resumeApp();
 void  fun_dialogResourceSettings_help();
 int  fun_adjustWithPromille(int value, int promille); // idb
-signed int  fun_empireCityBuysGood(int empireId, int goodId); // idb
+signed int  canEmpireCityBuysGood(int empireId, int goodId); // idb
 void  fun_drawBuildingFootprint_26px_xFull();
 void  fun_menuOptions_speed();
 int  fun_walkerProvideLibraryAccess(int x, int y); // idb
@@ -3678,8 +3655,8 @@ void  fun_editor_empire_fixBuySell(int a1);
 void  fun_editor_empire_fixOwnCity();
 void  fun_empireObjectsCorrectOwnerCity(int cityId);
 void  fun_empireObjectsCorrectTradeStatus();
-signed int  fun_empireCitySellsGood(int empireId, int goodId);
-signed int  fun_empireCityBuysGood(int empireId, int goodId); // idb
+signed int  canEmpireCitySellsGood(int empireId, int goodId);
+signed int  canEmpireCityBuysGood(int empireId, int goodId); // idb
 bool  fun_canExportGoodToCity(int ciid, int cityId, int resourceId);
 bool  fun_canImportGoodFromCity(int ciid, int cityId, signed int resourceId);
 signed int  fun_tradeCanBuyGoodNow(int goodId); // idb
@@ -3696,7 +3673,7 @@ void  fun_initializeTradeRoutes();
 void  fun_determineDistantBattleCity();
 void  fun_resetTradeAmounts();
 signed int  fun_getTradeCityFromEmpireObject(int empireObjectId); // idb
-signed int  fun_isSeaTradeRoute(int tradeRouteId); // idb
+signed int  isSeaTradeRoute(int tradeRouteId); // idb
 signed int  fun_isTradeRouteOpen(int tradeRouteId); // idb
 signed int  fun_getTradeRouteCityIndex(int tradeRouteId); // idb
 void  fun_handleExpandEmpireEvent();
@@ -7788,9 +7765,9 @@ void  fun_editor_editEmpire_general_click()
           if ( empire[currentEmpireEntryId].inUse )
           {
             if ( map_empireExpanded )
-              editEmpire_addObjectGraphicID = empire_graphicID_exp[32 * currentEmpireEntryId];
+              editEmpire_addObjectGraphicID = empire[currentEmpireEntryId].graphicID_exp;
             else
-              editEmpire_addObjectGraphicID = empire_graphicID[32 * currentEmpireEntryId];
+              editEmpire_addObjectGraphicID = empire[currentEmpireEntryId].graphicID;
           }
         }
         window_redrawRequest = 1;
@@ -7825,9 +7802,9 @@ void  fun_editor_editEmpire_toggleExpanded()
   if ( empire[currentEmpireEntryId].inUse )
   {
     if ( map_empireExpanded )
-      editEmpire_addObjectGraphicID = empire_graphicID_exp[32 * currentEmpireEntryId];
+      editEmpire_addObjectGraphicID = empire[currentEmpireEntryId].graphicID_exp;
     else
-      editEmpire_addObjectGraphicID = empire_graphicID[32 * currentEmpireEntryId];
+      editEmpire_addObjectGraphicID = empire[currentEmpireEntryId].graphicID;
   }
   window_redrawRequest = 1;
 }
@@ -7911,9 +7888,9 @@ void  fun_editor_editEmpire_graphicArrowButtons()
     if ( empire[currentEmpireEntryId].inUse )
     {
       if ( map_empireExpanded )
-        empire_graphicID_exp[32 * currentEmpireEntryId] = editEmpire_addObjectGraphicID;
+        empire[currentEmpireEntryId].graphicID_exp = editEmpire_addObjectGraphicID;
       else
-        empire_graphicID[32 * currentEmpireEntryId] = editEmpire_addObjectGraphicID;
+        empire[currentEmpireEntryId].graphicID = editEmpire_addObjectGraphicID;
     }
   }
   window_redrawRequest = 1;
@@ -7939,9 +7916,9 @@ void  fun_editor_editEmpire_nextPrevEmpireArrowButtons()
     if ( empire[currentEmpireEntryId].inUse )
     {
       if ( map_empireExpanded )
-        editEmpire_addObjectGraphicID = empire_graphicID_exp[32 * currentEmpireEntryId];
+        editEmpire_addObjectGraphicID = empire[currentEmpireEntryId].graphicID_exp;
       else
-        editEmpire_addObjectGraphicID = empire_graphicID[32 * currentEmpireEntryId];
+        editEmpire_addObjectGraphicID = empire[currentEmpireEntryId].graphicID;
     }
     window_redrawRequest = 1;
   }
@@ -7965,12 +7942,12 @@ void  fun_editor_editEmpire_something(int a1, int a2)
           {
             if ( !empire[a1].inUse )
             {
-              empire_graphicID[32 * a1] = editEmpire_addObjectGraphicID;
+              empire[a1].graphicID = editEmpire_addObjectGraphicID;
               if ( map_empireExpanded )
-                empire_graphicID_exp[32 * a1] = editEmpire_addObjectGraphicID;
+                empire[a1].graphicID_exp = editEmpire_addObjectGraphicID;
               empire[a1].type = dword_993F04;
               if ( empire[a1].type == 4 || empire[a1].type == 5 )
-                empire_tradeRouteId[64 * a1] = empireScreen_selectedRouteId;
+                empire[a1].tradeRouteId = empireScreen_selectedRouteId;
             }
             currentEmpireEntryId = a1;
             empire[a1].inUse = 1;
@@ -7978,43 +7955,46 @@ void  fun_editor_editEmpire_something(int a1, int a2)
               empire[a1].inUse = 2;
             if ( (unsigned __int8)empire[a1].type == 6 )
               fun_calculateDistantBattleRomanTravelTime(0);
+
             if ( (unsigned __int8)empire[a1].type == 7 )
               fun_calculateDistantBattleEnemyTravelTime(0);
+
             if ( map_empireExpanded )
-              v2 = empire_graphicID_exp[32 * a1];
+              v2 = empire[a1].graphicID_exp;
             else
-              v2 = empire_graphicID[32 * a1];
+              v2 = empire[a1].graphicID;
+
             width = c3_sg2[v2].width;
             height = c3_sg2[v2].height;
             if ( map_empireExpanded )
             {
-              empire_xCoord_exp[32 * a1] = mouseclick_x
+              empire[a1].xCoord_exp = mouseclick_x
                                          + (_WORD)empire_scroll_x
                                          - (_WORD)empireMapBorderLeftRight
                                          - c3_sg2[v2].width / 2;
-              empire_yCoord_exp[32 * a1] = mouseclick_y
+              empire[a1].yCoord_exp = mouseclick_y
                                          + (_WORD)empire_scroll_y
                                          - (_WORD)empireMapBorderTop
                                          - height / 2;
               if ( !a2 )
               {
-                empire_xCoord[32 * a1] = mouseclick_x
+                empire[a1].xCoord = mouseclick_x
                                        + (_WORD)empire_scroll_x
                                        - (_WORD)empireMapBorderLeftRight
                                        - width / 2;
-                empire_yCoord[32 * a1] = mouseclick_y + (_WORD)empire_scroll_y - (_WORD)empireMapBorderTop - height / 2;
+                empire[a1].yCoord = mouseclick_y + (_WORD)empire_scroll_y - (_WORD)empireMapBorderTop - height / 2;
               }
             }
             else
             {
-              empire_xCoord[32 * a1] = mouseclick_x
+              empire[a1].xCoord = mouseclick_x
                                      + (_WORD)empire_scroll_x
                                      - (_WORD)empireMapBorderLeftRight
                                      - c3_sg2[v2].width / 2;
-              empire_yCoord[32 * a1] = mouseclick_y + (_WORD)empire_scroll_y - (_WORD)empireMapBorderTop - height / 2;
+              empire[a1].yCoord = mouseclick_y + (_WORD)empire_scroll_y - (_WORD)empireMapBorderTop - height / 2;
             }
-            empire_width[32 * a1] = width;
-            empire_height[32 * a1] = height;
+            empire[a1].width = width;
+            empire[a1].height = height;
             editEmpire_isSaved = 0;
             window_redrawRequest = 1;
           }
@@ -8054,27 +8034,27 @@ int  fun_editor_editEmpire_something2()
             {
               if ( map_empireExpanded )
               {
-                v6 = empire_xCoord_exp[32 * i];
-                v5 = empire_yCoord_exp[32 * i];
+                v6 = empire[i].xCoord_exp;
+                v5 = empire[i].yCoord_exp;
               }
               else
               {
-                v6 = empire_xCoord[32 * i];
-                v5 = empire_yCoord[32 * i];
+                v6 = empire[i].xCoord;
+                v5 = empire[i].yCoord;
               }
               if ( v6 - 8 <= v8 )
               {
-                if ( v6 + empire_width[32 * i] + 8 > v8 )
+                if ( v6 + empire[i].width + 8 > v8 )
                 {
                   if ( v5 - 8 <= v7 )
                   {
-                    if ( v5 + empire_height[32 * i] + 8 > v7 )
+                    if ( v5 + empire[i].height + 8 > v7 )
                     {
                       v3 = fun_getDistanceMaximum(
                              v8,
                              v7,
-                             empire_width[32 * i] / 2 + v6,
-                             empire_height[32 * i] / 2 + v5);
+                             empire[i].width / 2 + v6,
+                             empire[i].height / 2 + v5);
                       if ( v3 < v2 )
                       {
                         v2 = v3;
@@ -8145,27 +8125,27 @@ signed int  fun_editor_editEmpire_something3()
             {
               if ( scn_empireExpanded_flag )
               {
-                v6 = empire_xCoord_exp[32 * i];
-                v5 = empire_yCoord_exp[32 * i];
+                v6 = empire[i].xCoord_exp;
+                v5 = empire[i].yCoord_exp;
               }
               else
               {
-                v6 = empire_xCoord[32 * i];
-                v5 = empire_yCoord[32 * i];
+                v6 = empire[i].xCoord;
+                v5 = empire[i].yCoord;
               }
               if ( v6 - 8 <= v8 )
               {
-                if ( v6 + empire_width[32 * i] + 8 > v8 )
+                if ( v6 + empire[i].width + 8 > v8 )
                 {
                   if ( v5 - 8 <= v7 )
                   {
-                    if ( v5 + empire_height[32 * i] + 8 > v7 )
+                    if ( v5 + empire[i].height + 8 > v7 )
                     {
                       v3 = fun_getDistanceMaximum(
                              v8,
                              v7,
-                             empire_width[32 * i] / 2 + v6,
-                             empire_height[32 * i] / 2 + v5);
+                             empire[i].width / 2 + v6,
+                             empire[i].height / 2 + v5);
                       if ( v3 < v2 )
                       {
                         v2 = v3;
@@ -8221,19 +8201,19 @@ void  fun_editor_editEmpire_moveEmpireCity(int direction, __int16 amount)
             switch ( direction )
             {
               case Direction_East:
-                empire_xCoord_exp[32 * currentEmpireEntryId] += amount;
+                empire[currentEmpireEntryId].xCoord_exp += amount;
                 break;
               case Direction_South:
-                empire_yCoord_exp[32 * currentEmpireEntryId] += amount;
+                empire[currentEmpireEntryId].yCoord_exp += amount;
                 break;
               case Direction_West:
-                empire_xCoord_exp[32 * currentEmpireEntryId] -= amount;
+                empire[currentEmpireEntryId].xCoord_exp -= amount;
                 break;
             }
           }
           else
           {
-            empire_yCoord_exp[32 * currentEmpireEntryId] -= amount;
+            empire[currentEmpireEntryId].yCoord_exp -= amount;
           }
         }
         else
@@ -8243,19 +8223,19 @@ void  fun_editor_editEmpire_moveEmpireCity(int direction, __int16 amount)
             switch ( direction )
             {
               case Direction_East:
-                empire_xCoord[32 * currentEmpireEntryId] += amount;
+                empire[currentEmpireEntryId].xCoord += amount;
                 break;
               case Direction_South:
-                empire_yCoord[32 * currentEmpireEntryId] += amount;
+                empire[currentEmpireEntryId].yCoord += amount;
                 break;
               case Direction_West:
-                empire_xCoord[32 * currentEmpireEntryId] -= amount;
+                empire[currentEmpireEntryId].xCoord -= amount;
                 break;
             }
           }
           else
           {
-            empire_yCoord[32 * currentEmpireEntryId] -= amount;
+            empire[currentEmpireEntryId].yCoord -= amount;
           }
         }
         editEmpire_isSaved = 0;
@@ -8424,9 +8404,9 @@ void  fun_editor_editEmpire_editRoute_tradeRouteId()
   v0 = currentEmpireEntryId;
   if ( empire[currentEmpireEntryId].inUse )
   {
-    empire_990D29[64 * currentEmpireEntryId] = 10;
+    empire[currentEmpireEntryId].f990D29[0] = 10;
     editEmpire_isSaved = 0;
-    fun_showNumericInputDialog(453, screen_height - 314, 1, &empire_tradeRouteId[64 * v0], 0, 0, 0);
+    fun_showNumericInputDialog(453, screen_height - 314, 1, &empire[v0].tradeRouteId, 0, 0, 0);
     window_redrawRequest = 1;
   }
 }
@@ -8438,9 +8418,9 @@ void  fun_editor_editEmpire_editCity_type()
   if ( empire[currentEmpireEntryId].inUse )
   {
     fun_empireCityClearBuysSells(currentEmpireEntryId);
-    empire_990D29[64 * v0] = 10;
+    empire[v0].f990D29[0] = 10;
     editEmpire_isSaved = 0;
-    fun_showSelectListDialog(443, screen_height - 314, 7, 39, &empire_cityType[64 * v0], 0, 0, 0, 1);
+    fun_showSelectListDialog(443, screen_height - 314, 7, 39, &empire[v0].cityType, 0, 0, 0, 1);
     window_redrawRequest = 1;
   }
 }
@@ -8452,9 +8432,9 @@ void  fun_editor_editEmpire_editCity_name()
   v0 = currentEmpireEntryId;
   if ( empire[currentEmpireEntryId].inUse )
   {
-    empire_990D29[64 * currentEmpireEntryId] = 10;
+    empire[currentEmpireEntryId].f990D29[0] = 10;
     editEmpire_isSaved = 0;
-    fun_showSelectListDialog(373, screen_height - 534, 40, 21, &empire_cityNameId[64 * v0], 0, 0, 0, 1);
+    fun_showSelectListDialog(373, screen_height - 534, 40, 21, &empire[v0].cityNameId, 0, 0, 0, 1);
     window_redrawRequest = 1;
   }
 }
@@ -8466,9 +8446,9 @@ void  fun_editor_editEmpire_editCity_tradeRouteId()
   v0 = currentEmpireEntryId;
   if ( empire[currentEmpireEntryId].inUse )
   {
-    empire_990D29[64 * currentEmpireEntryId] = 10;
+    empire[currentEmpireEntryId].f990D29[0] = 10;
     editEmpire_isSaved = 0;
-    fun_showNumericInputDialog(453, screen_height - 314, 1, &empire_tradeRouteId[64 * v0], 0, 0, 0);
+    fun_showNumericInputDialog(453, screen_height - 314, 1, &empire[v0].tradeRouteId, 0, 0, 0);
     window_redrawRequest = 1;
   }
 }
@@ -8487,9 +8467,9 @@ void  fun_editor_editEmpire_editCity_costToOpen()
   v0 = currentEmpireEntryId;
   if ( empire[currentEmpireEntryId].inUse )
   {
-    empire_990D29[64 * currentEmpireEntryId] = 10;
+    empire[currentEmpireEntryId].f990D29[0] = 10;
     editEmpire_isSaved = 0;
-    fun_showNumericInputDialog(653, screen_height - 314, 2, 0, &empire_tradeCostToOpen[32 * v0], 0, 0);
+    fun_showNumericInputDialog(653, screen_height - 314, 2, 0, &empire[v0].tradeCostToOpen[0], 0, 0);
     window_redrawRequest = 1;
   }
 }
@@ -8502,9 +8482,9 @@ void  fun_editor_editEmpire_editOwnCity_produces()
   if ( empire[currentEmpireEntryId].inUse )
   {
     editEmpire_resourceSlotId = currentButton_parameter;
-    empire_990D29[64 * currentEmpireEntryId] = 10;
+    empire[currentEmpireEntryId].f990D29[0] = 10;
     editEmpire_isSaved = 0;
-    fun_showSelectListDialog(400, 220, 11, 27, &empire_citySells[64 * v0] + editEmpire_resourceSlotId, 0, 0, 1, 1);
+    fun_showSelectListDialog(400, 220, 11, 27, &empire[v0].citySells[editEmpire_resourceSlotId], 0, 0, 1, 1);
   }
 }
 
@@ -8516,9 +8496,9 @@ void  fun_editor_editEmpire_editCity_sells()
   if ( empire[currentEmpireEntryId].inUse )
   {
     editEmpire_resourceSlotId = currentButton_parameter;
-    empire_990D29[64 * currentEmpireEntryId] = 10;
+    empire[currentEmpireEntryId].f990D29[0] = 10;
     editEmpire_isSaved = 0;
-    fun_showSelectListDialog(400, 220, 16, 23, &empire_citySells[64 * v0] + editEmpire_resourceSlotId, 0, 0, 0, 1);
+    fun_showSelectListDialog(400, 220, 16, 23, &empire[v0].citySells[editEmpire_resourceSlotId], 0, 0, 0, 1);
   }
 }
 
@@ -8530,9 +8510,9 @@ void  fun_editor_editEmpire_editCity_buys()
   if ( empire[currentEmpireEntryId].inUse )
   {
     editEmpire_resourceSlotId = currentButton_parameter;
-    empire_990D29[64 * currentEmpireEntryId] = 10;
+    empire[currentEmpireEntryId].f990D29[0] = 10;
     editEmpire_isSaved = 0;
-    fun_showSelectListDialog(400, 220, 16, 23, &empire_cityBuys[64 * v0] + editEmpire_resourceSlotId, 0, 0, 0, 1);
+    fun_showSelectListDialog(400, 220, 16, 23, &empire[v0].cityBuys[editEmpire_resourceSlotId], 0, 0, 0, 1);
   }
 }
 
@@ -8543,9 +8523,9 @@ void  fun_editor_editEmpire_editBattle_path()
   v0 = currentEmpireEntryId;
   if ( empire[currentEmpireEntryId].inUse )
   {
-    empire_990D29[64 * currentEmpireEntryId] = 10;
+    empire[currentEmpireEntryId].f990D29[0] = 10;
     editEmpire_isSaved = 0;
-    fun_showNumericInputDialog(453, screen_height - 314, 1, &empire_invasionPathId[64 * v0], 0, 0, 0);
+    fun_showNumericInputDialog(453, screen_height - 314, 1, &empire[v0].invasionPathId, 0, 0, 0);
     window_redrawRequest = 1;
   }
 }
@@ -8557,9 +8537,9 @@ void  fun_editor_editEmpire_editBattle_order()
   v0 = currentEmpireEntryId;
   if ( empire[currentEmpireEntryId].inUse )
   {
-    empire_990D29[64 * currentEmpireEntryId] = 10;
+    empire[currentEmpireEntryId].f990D29[0] = 10;
     editEmpire_isSaved = 0;
-    fun_showNumericInputDialog(453, screen_height - 314, 1, &empire_invasionYears[64 * v0], 0, 0, 0);
+    fun_showNumericInputDialog(453, screen_height - 314, 1, &empire[v0].invasionYears, 0, 0, 0);
     window_redrawRequest = 1;
   }
 }
@@ -29544,63 +29524,63 @@ int  unused_4425B0()
       switch ( empire[i].type )
       {
         case 3:
-          empire_graphicID[32 * i] = graphic_empireBattleIcon;
+          empire[i].graphicID = graphic_empireBattleIcon;
           break;
         case 4:
-          empire_graphicID[32 * i] = empire_graphicID[32 * i] - 17 + graphic_empireLandTradeRoute;
+          empire[i].graphicID = empire[i].graphicID - 17 + graphic_empireLandTradeRoute;
           break;
         case 5:
-          empire_graphicID[32 * i] = empire_graphicID[32 * i] - 25 + graphic_empireSeaTradeRoute;
+          empire[i].graphicID = empire[i].graphicID - 25 + graphic_empireSeaTradeRoute;
           break;
         case 6:
-          empire_graphicID[32 * i] = graphic_empireDistantBattleRomanArmy;
+          empire[i].graphicID = graphic_empireDistantBattleRomanArmy;
           break;
         case 7:
-          empire_graphicID[32 * i] = graphic_empireDistantBattleEnemyArmy;
+          empire[i].graphicID = graphic_empireDistantBattleEnemyArmy;
           break;
         case 1:
-          if ( empire_cityType[64 * i] )
+          if ( empire[i].cityType )
           {
-            switch ( empire_cityType[64 * i] )
+            switch ( empire[i].cityType )
             {
               case 1:
-                empire_graphicID[32 * i] = graphic_empireCity;
+                empire[i].graphicID = graphic_empireCity;
                 break;
               case 2:
-                empire_graphicID[32 * i] = graphic_empireCityTrade;
+                empire[i].graphicID = graphic_empireCityTrade;
                 break;
               case 3:
-                empire_graphicID[32 * i] = graphic_empireCityDistant;
-                empire_graphicID_exp[32 * i] = graphic_empireCityTrade;
+                empire[i].graphicID = graphic_empireCityDistant;
+                empire[i].graphicID_exp = graphic_empireCityTrade;
                 break;
               case 4:
-                empire_graphicID[32 * i] = word_6E6D6E;
+                empire[i].graphicID = word_6E6D6E;
                 break;
               case 5:
-                empire_graphicID[32 * i] = graphic_empireCityDistant;
+                empire[i].graphicID = graphic_empireCityDistant;
                 break;
               case 6:
-                empire_graphicID[32 * i] = word_6E6D6E;
-                empire_graphicID_exp[32 * i] = graphic_empireCityDistant;
+                empire[i].graphicID = word_6E6D6E;
+                empire[i].graphicID_exp = graphic_empireCityDistant;
                 break;
             }
           }
           else
           {
-            empire_graphicID[32 * i] = graphic_empireCityDistant;
+            empire[i].graphicID = graphic_empireCityDistant;
           }
           break;
         default:
-          if ( empire_currentAnimationIndex[64 * i] )
-            empire_graphicID[32 * i] = graphic_empireBorderMarker;
+          if ( empire[i].currentAnimationIndex )
+            empire[i].graphicID = graphic_empireBorderMarker;
           else
-            empire_graphicID[32 * i] = word_6E6D16;
+            empire[i].graphicID = word_6E6D16;
           break;
       }
-      empire_graphicID_exp[32 * i] = empire_graphicID[32 * i];
-      v1 = empire_graphicID[32 * i];
-      empire_width[32 * i] = c3_sg2[v1].width;
-      empire_height[32 * i] = c3_sg2[v1].height;
+      empire[i].graphicID_exp = empire[i].graphicID;
+      v1 = empire[i].graphicID;
+      empire[i].width = c3_sg2[v1].width;
+      empire[i].height = c3_sg2[v1].height;
     }
     result = i + 1;
   }
@@ -29619,9 +29599,9 @@ void  fun_initEmpire()
   {
     if ( empire[i].inUse
       && (unsigned __int8)empire[i].type == Emp_City
-      && (unsigned __int8)empire_cityType[64 * i] == City_Ours )
+      && (unsigned __int8)empire[i].cityType == City_Ours )
     {
-      v1 = empire_graphicID[32 * i];
+      v1 = empire[i].graphicID;
       break;
     }
   }
@@ -29634,11 +29614,11 @@ void  fun_initEmpire()
       {
         if ( empire[j].inUse )
         {
-          if ( empire_graphicID[32 * j] )
+          if (empire[j].graphicID )
           {
-            empire_graphicID[32 * j] += v0;
-            if ( empire_graphicID_exp[32 * j] )
-              empire_graphicID_exp[32 * j] += v0;
+            empire[j].graphicID += v0;
+            if ( empire[j].graphicID_exp )
+              empire[j].graphicID_exp += v0;
           }
         }
       }
@@ -29657,37 +29637,37 @@ void  fun_editor_empire_determineGraphicSize()
     {
       if ( (unsigned __int8)empire[i].type == 1 )
       {
-        if ( empire_cityType[64 * i] )
+        if ( empire[i].cityType )
         {
-          switch ( empire_cityType[64 * i] )
+          switch ( empire[i].cityType )
           {
             case 1:
-              empire_graphicID[32 * i] = graphic_empireCity;
+              empire[i].graphicID = graphic_empireCity;
               break;
             case 2:
-              empire_graphicID[32 * i] = graphic_empireCityTrade;
+              empire[i].graphicID = graphic_empireCityTrade;
               break;
             case 3:
-              empire_graphicID[32 * i] = graphic_empireCityDistant;
+              empire[i].graphicID = graphic_empireCityDistant;
               break;
             case 4:
-              empire_graphicID[32 * i] = word_6E6D6E;
+              empire[i].graphicID = word_6E6D6E;
               break;
             case 5:
-              empire_graphicID[32 * i] = graphic_empireCityDistant;
+              empire[i].graphicID = graphic_empireCityDistant;
               break;
             case 6:
-              empire_graphicID[32 * i] = word_6E6D6E;
+              empire[i].graphicID = word_6E6D6E;
               break;
           }
         }
         else
         {
-          empire_graphicID[32 * i] = graphic_empireCityDistant;
+          empire[i].graphicID = graphic_empireCityDistant;
         }
-        v0 = empire_graphicID[32 * i];
-        empire_width[32 * i] = c3_sg2[v0].width;
-        empire_height[32 * i] = c3_sg2[v0].height;
+        v0 = empire[i].graphicID;
+        empire[i].width = c3_sg2[v0].width;
+        empire[i].height = c3_sg2[v0].height;
       }
     }
   }
@@ -29911,9 +29891,10 @@ void  fun_empireCityClearBuysSells(int empireItemId)
   signed int j; // [sp+4Ch] [bp-4h]@4
 
   for ( i = 0; i < 10; ++i )
-    *(&empire_citySells[64 * empireItemId] + i) = 0;
+    empire[empireItemId].citySells[i] = 0;
+
   for ( j = 0; j < 8; ++j )
-    *(&empire_cityBuys[64 * empireItemId] + j) = 0;
+    empire[empireItemId].cityBuys[j] = 0;
 }
 
 void  fun_editor_empire_fixBuySell(int a1)
@@ -29929,20 +29910,20 @@ void  fun_editor_empire_fixBuySell(int a1)
   {
     for ( j = 9; j > 0; --j )
     {
-      if ( *(&empire_citySells[64 * a1] + j) )
+      if ( empire[a1].citySells[j] )
       {
-        if ( *((_BYTE *)&empire_tradeCostToOpen[32 * a1] + j + 1) == (unsigned __int8)*(&empire_citySells[64 * a1] + j) )
+        if ( empire[a1].tradeCostToOpen[j + 1] == empire[a1].citySells[j] )
         {
-          *(&empire_citySells[64 * a1] + j) = 0;
+          empire[a1].citySells[j] = 0;
         }
         else
         {
-          if ( !*((_BYTE *)&empire_tradeCostToOpen[32 * a1] + j + 1)
-            || *((_BYTE *)&empire_tradeCostToOpen[32 * a1] + j + 1) > (signed int)(unsigned __int8)*(&empire_citySells[64 * a1] + j) )
+          if ( !empire[a1].tradeCostToOpen[j + 1]
+            || empire[a1].tradeCostToOpen[j + 1] > empire[a1].citySells[j] )
           {
-            v1 = *((_BYTE *)&empire_tradeCostToOpen[32 * a1] + j + 1);
-            *((_BYTE *)&empire_tradeCostToOpen[32 * a1] + j + 1) = *(&empire_citySells[64 * a1] + j);
-            *(&empire_citySells[64 * a1] + j) = v1;
+            v1 = empire[a1].tradeCostToOpen[j + 1];
+            empire[a1].tradeCostToOpen[j + 1] = empire[a1].citySells[j];
+            empire[a1].citySells[j] = v1;
           }
         }
       }
@@ -29952,21 +29933,19 @@ void  fun_editor_empire_fixBuySell(int a1)
   {
     for ( l = 9; l > 0; --l )
     {
-      if ( *(&empire_cityBuys[64 * a1] + l) )
+      if ( empire[a1].cityBuys[l] )
       {
-        if ( (unsigned __int8)*(&empire_990D29[64 * a1] + l) == (unsigned __int8)*(&empire_cityBuys[64 * a1] + l) )
+        if ( empire[a1].f990D29[l] == empire[a1].cityBuys[l] )
         {
-          *(&empire_cityBuys[64 * a1] + l) = 0;
+          empire[a1].cityBuys[l] = 0;
         }
         else
         {
-          if ( !*(&empire_990D29[64 * a1] + l)
-            || (unsigned __int8)*(&empire_990D29[64 * a1] + l) > (signed int)(unsigned __int8)*(&empire_cityBuys[64 * a1]
-                                                                                              + l) )
+          if ( !empire[a1].f990D29[l] || empire[a1].f990D29[l] > empire[a1].cityBuys[l] )
           {
-            v2 = *(&empire_990D29[64 * a1] + l);
-            *(&empire_990D29[64 * a1] + l) = *(&empire_cityBuys[64 * a1] + l);
-            *(&empire_cityBuys[64 * a1] + l) = v2;
+            v2 = empire[a1].f990D29[l];
+            empire[a1].f990D29[l] = empire[a1].cityBuys[l];
+            empire[a1].cityBuys[l] = v2;
           }
         }
       }
@@ -29985,11 +29964,12 @@ void  fun_editor_empire_fixOwnCity()
   {
     if ( empire[i].inUse )
     {
-      if ( (signed int)(unsigned __int8)empire_990D29[64 * i] > 0 )
-        --empire_990D29[64 * i];
-      if ( (unsigned __int8)empire[i].type == Emp_City )
+      if ( empire[i].f990D29[0] > 0 )
+        --empire[i].f990D29[0];
+
+      if ( empire[i].type == Emp_City )
       {
-        if ( (unsigned __int8)empire_cityType[64 * i] == City_Ours )
+        if ( empire[i].cityType == City_Ours )
           ++numOwnCities;
       }
     }
@@ -30003,11 +29983,11 @@ void  fun_editor_empire_fixOwnCity()
       {
         if (empire[j].type == Emp_City )
         {
-          if ( (unsigned __int8)empire_cityType[64 * j] == City_Ours )
+          if ( empire[i].cityType == City_Ours )
           {
-            if ( !empire_990D29[64 * j] )
+            if ( !empire[i].f990D29 )
             {
-              empire_cityType[64 * j] = City_DistantRoman;
+              empire[j].cityType = City_DistantRoman;
               fun_empireCityClearBuysSells(j);
             }
           }
@@ -30024,11 +30004,11 @@ void  fun_empireObjectsCorrectOwnerCity(int cityId)
   for ( i = 0; i < 200; ++i )
   {
     if ( empire[i].inUse
-      && (unsigned __int8)empire[i].type == 1
-      && (unsigned __int8)empire_tradeRouteId[64 * i] == (unsigned __int8)empire_tradeRouteId[64 * cityId] )
+      && empire[i].type == 1
+      && empire[i].tradeRouteId == empire[cityId].tradeRouteId )
     {
-      empire_ownerCityIndex[64 * cityId] = i;
-      empire_cityNameId[64 * cityId] = empire_cityNameId[64 * i];
+      empire[cityId].ownerCityIndex = i;
+      empire[cityId].cityNameId = empire[i].cityNameId;
       return;
     }
   }
@@ -30042,32 +30022,33 @@ void  fun_empireObjectsCorrectTradeStatus()
   {
     if ( empire[i].inUse )
     {                                           // trade route dots
-      if ( (unsigned __int8)empire[i].type == Emp_LandTradeRoute
-        || (unsigned __int8)empire[i].type == Emp_SeaTradeRoute )
-        empire_tradeRouteOpen[64 * i] = empire_tradeRouteOpen[64 * (unsigned __int8)empire_ownerCityIndex[64 * i]];
+      if ( empire[i].type == Emp_LandTradeRoute
+        || empire[i].type == Emp_SeaTradeRoute )
+        empire[i].tradeRouteOpen = empire[empire[i].ownerCityIndex].tradeRouteOpen;
     }
   }
 }
 
-signed int  fun_empireCitySellsGood(int empireId, int goodId)
+signed int  canEmpireCitySellsGood(int empireId, int goodId)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
 
-  for ( i = 0; i < 10; ++i )
+  for( i = 0; i < 10; ++i )
   {
-    if ( (unsigned __int8)*(&empire_citySells[64 * empireId] + i) == goodId )
+    if( empire[empireId].citySells[i] == goodId )
       return 1;
   }
+
   return 0;
 }
 
-signed int  fun_empireCityBuysGood(int empireId, int goodId)
+signed int  canEmpireCityBuysGood(int empireId, int goodId)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
 
   for ( i = 0; i < 8; ++i )
   {
-    if ( (unsigned __int8)*(&empire_cityBuys[64 * empireId] + i) == goodId )
+    if ( empire[empireId].cityBuys[i] == goodId )
       return 1;
   }
   return 0;
@@ -30408,17 +30389,17 @@ void  fun_fillExpandedEmpireFields()
   {
     if ( empire[i].inUse )
     {
-      if ( !empire_xCoord_exp[32 * i] && !empire_yCoord_exp[32 * i] || !empire_graphicID_exp[32 * i] )
+      if ( !empire[i].xCoord_exp && !empire[i].yCoord_exp || !empire[i].graphicID_exp )
       {
-        empire_xCoord_exp[32 * i] = empire_xCoord[32 * i];
-        empire_yCoord_exp[32 * i] = empire_yCoord[32 * i];
-        empire_graphicID_exp[32 * i] = empire_graphicID[32 * i];
+        empire[i].xCoord_exp = empire[i].xCoord;
+        empire[i].yCoord_exp = empire[i].yCoord;
+        empire[i].graphicID_exp = empire[i].graphicID;
       }
     }
     else
     {
-      empire_yCoord_exp[32 * i] = 0;
-      empire_xCoord_exp[32 * i] = 0;
+      empire[i].yCoord_exp = 0;
+      empire[i].xCoord_exp = 0;
     }
   }
 }
@@ -30439,16 +30420,16 @@ void  fun_initializeTradeRoutes()
       if ( (unsigned __int8)empire[i].type == 1 )
       {
         trade_inUse[66 * tradeIndex] = 1;
-        trade_cityType[66 * tradeIndex] = empire_cityType[64 * i];
-        trade_cityNameId[66 * tradeIndex] = empire_cityNameId[64 * i];
-        if ( (signed int)(unsigned __int8)empire_tradeRouteId[64 * i] < 0 )
-          empire_tradeRouteId[64 * i] = 0;
-        if ( (signed int)(unsigned __int8)empire_tradeRouteId[64 * i] >= 20 )
-          empire_tradeRouteId[64 * i] = 19;
-        trade_routeId[66 * tradeIndex] = empire_tradeRouteId[64 * i];
-        trade_isOpen[66 * tradeIndex] = empire_tradeRouteOpen[64 * i];
-        trade_costToOpen[33 * tradeIndex] = empire_tradeCostToOpen[32 * i];
-        trade_isSeaTrade[66 * tradeIndex] = fun_isSeaTradeRoute((unsigned __int8)trade_routeId[66 * tradeIndex]);
+        trade_cityType[66 * tradeIndex] = empire[i].cityType;
+        trade_cityNameId[66 * tradeIndex] = empire[i].cityNameId;
+        if ( empire[i].tradeRouteId < 0 )
+          empire[i].tradeRouteId = 0;
+        if ( empire[i].tradeRouteId >= 20 )
+          empire[i].tradeRouteId = 19;
+        trade_routeId[66 * tradeIndex] = empire[i].tradeRouteId;
+        trade_isOpen[66 * tradeIndex] = empire[i].tradeRouteOpen;
+        trade_costToOpen[33 * tradeIndex] = empire[i].tradeCostToOpen[0];
+        trade_isSeaTrade[66 * tradeIndex] = isSeaTradeRoute((unsigned __int8)trade_routeId[66 * tradeIndex]);
         for ( resource = 1; resource <= 15; ++resource )
         {
           *(&trade_sellsFlag[66 * tradeIndex] + resource) = 0;
@@ -30461,9 +30442,9 @@ void  fun_initializeTradeRoutes()
               {
                 if ( (unsigned __int8)trade_cityType[66 * tradeIndex] != City_FutureRoman )
                 {
-                  if ( fun_empireCitySellsGood(i, resource) )
+                  if ( canEmpireCitySellsGood(i, resource) )
                     *(&trade_sellsFlag[66 * tradeIndex] + resource) = 1;
-                  if ( fun_empireCityBuysGood(i, resource) )
+                  if ( canEmpireCityBuysGood(i, resource) )
                     *(&trade_buysFlag[66 * tradeIndex] + resource) = 1;
                   amountId = fun_getEmpireTradeAmountId(i, resource);
                   switch ( amountId )
@@ -30544,17 +30525,17 @@ signed int  fun_getTradeCityFromEmpireObject(int empireObjectId)
   return 0;
 }
 
-signed int  fun_isSeaTradeRoute(int tradeRouteId)
+signed int  isSeaTradeRoute(int tradeRouteId)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
 
   for ( i = 0; i < 200; ++i )
   {
-    if ( empire[i].inUse && (unsigned __int8)empire_tradeRouteId[64 * i] == tradeRouteId )
+    if ( empire[i].inUse && empire[i].tradeRouteId == tradeRouteId )
     {
-      if ( (unsigned __int8)empire[i].type == Emp_SeaTradeRoute )
+      if ( empire[i].type == Emp_SeaTradeRoute )
         return 1;
-      if ( (unsigned __int8)empire[i].type == Emp_LandTradeRoute )
+      if ( empire[i].type == Emp_LandTradeRoute )
         return 0;
     }
   }
@@ -30580,7 +30561,6 @@ signed int  fun_isTradeRouteOpen(int tradeRouteId)
   return result;
 }
 
-//----- (004453A0) --------------------------------------------------------
 signed int  fun_getTradeRouteCityIndex(int tradeRouteId)
 {
   signed int i; // [sp+4Ch] [bp-4h]@1
@@ -30625,15 +30605,15 @@ void  fun_handleExpandEmpireEvent()
           trade_cityType[66 * i] = City_DistantRoman;
         }
         v0 = trade_empireObjectId[33 * i];
-        empire_cityType[64 * v0] = trade_cityType[66 * i];
+        empire[v0].cityType = trade_cityType[66 * i];
         if ( trade_cityType[66 * i] )
         {
-          if ( (unsigned __int8)trade_cityType[66 * i] == City_Trade )
-            empire_graphicID_exp[32 * v0] = graphic_empireCityTrade;
+          if ( trade_cityType[66 * i] == City_Trade )
+            empire[v0].graphicID_exp = graphic_empireCityTrade;
         }
         else
         {
-          empire_graphicID_exp[32 * v0] = graphic_empireCityDistant;
+          empire[v0].graphicID_exp = graphic_empireCityDistant;
         }
       }
     }
@@ -30647,24 +30627,24 @@ signed int  fun_getEmpireTradeAmountId(int empireEntryId, __int16 goodId)
 
   if ( empire[empireEntryId].type == 1 )
   {
-    if ( (signed int)(unsigned __int8)empire_cityType[64 * empireEntryId] > 1 )
+    if ( empire[empireEntryId].cityType > 1 )
     {
-      if ( (signed int)(unsigned __int8)empire_cityType[64 * empireEntryId] < 6 )
+      if ( empire[empireEntryId].cityType < 6 )
       {
         goodId2 = 1 << goodId;
-        if ( (signed __int16)(1 << goodId) & empire_trade40[32 * empireEntryId] )
+        if ( (signed __int16)(1 << goodId) & empire[empireEntryId].trade40 )
         {
           result = 3;
         }
         else
         {
-          if ( goodId2 & empire_trade25[32 * empireEntryId] )
+          if ( goodId2 & empire[empireEntryId].trade25 )
           {
             result = 2;
           }
           else
           {
-            if ( goodId2 & empire_trade15[32 * empireEntryId] )
+            if ( goodId2 & empire[empireEntryId].trade15 )
               result = 1;
             else
               result = 0;
@@ -30694,26 +30674,26 @@ void  fun_setEmpireTradeAmountId(int empireEntryId, __int16 goodId, int amountId
 
   if ( (unsigned __int8)empire[empireEntryId].type == 1 )
   {
-    if ( (signed int)(unsigned __int8)empire_cityType[64 * empireEntryId] > 1 )
+    if ( empire[empireEntryId].cityType > 1 )
     {
-      if ( (signed int)(unsigned __int8)empire_cityType[64 * empireEntryId] < 6 )
+      if ( empire[empireEntryId].cityType < 6 )
       {
         goodMask = 1 << goodId;
-        empire_trade40[32 * empireEntryId] &= ~(1 << goodId);// clear flags
-        empire_trade25[32 * empireEntryId] &= ~(1 << goodId);
-        empire_trade15[32 * empireEntryId] &= ~(1 << goodId);
+        empire[empireEntryId].trade40 &= ~(1 << goodId);// clear flags
+        empire[empireEntryId].trade25 &= ~(1 << goodId);
+        empire[empireEntryId].trade15 &= ~(1 << goodId);
         if ( amountId > 0 )
         {
           switch ( amountId )
           {
             case 1:
-              empire_trade15[32 * empireEntryId] |= goodMask;
+              empire[empireEntryId].trade15 |= goodMask;
               break;
             case 2:
-              empire_trade25[32 * empireEntryId] |= goodMask;
+              empire[empireEntryId].trade25 |= goodMask;
               break;
             case 3:
-              empire_trade40[32 * empireEntryId] |= goodMask;
+              empire[empireEntryId].trade40 |= goodMask;
               break;
           }
         }
@@ -30743,9 +30723,9 @@ void  sub_445880()
         {
           for ( resource2 = 1; resource2 <= 15; ++resource2 )
           {
-            if ( !fun_empireCitySellsGood(i, resource2) )
+            if ( !canEmpireCitySellsGood(i, resource2) )
             {
-              if ( !fun_empireCityBuysGood(i, resource2) )
+              if ( !canEmpireCityBuysGood(i, resource2) )
                 fun_setEmpireTradeAmountId(i, resource2, 0);
             }
           }
@@ -31857,12 +31837,12 @@ void  fun_calculateDistantBattleRomanTravelTime(int isGame)
         if ( isGame )
         {
           ++scn_distantBattle_romanTravelTime;
-          empire_distBattleTravelMonths[64 * i] = scn_distantBattle_romanTravelTime;
+          empire[i].distBattleTravelMonths = scn_distantBattle_romanTravelTime;
         }
         else
         {
           ++map_distantBattle_romanTravelTime;
-          empire_distBattleTravelMonths[64 * i] = map_distantBattle_romanTravelTime;
+          empire[i].distBattleTravelMonths = map_distantBattle_romanTravelTime;
         }
       }
     }
@@ -31886,12 +31866,12 @@ void  fun_calculateDistantBattleEnemyTravelTime(int isGame)
         if ( isGame )
         {
           ++scn_distantBattle_enemyTravelTime;
-          empire_distBattleTravelMonths[64 * i] = scn_distantBattle_enemyTravelTime;
+          empire[i].distBattleTravelMonths = scn_distantBattle_enemyTravelTime;
         }
         else
         {
           ++map_distantBattle_enemyTravelTime;
-          empire_distBattleTravelMonths[64 * i] = map_distantBattle_enemyTravelTime;
+          empire[i].distBattleTravelMonths = map_distantBattle_enemyTravelTime;
         }
       }
     }
@@ -31907,7 +31887,7 @@ void  fun_setDistantBattleCity()
   {
     if ( empire[i].inUse
       && (unsigned __int8)empire[i].type == Emp_City
-      && (unsigned __int8)empire_cityType[64 * i] == City_VulnerableRoman )
+      && (unsigned __int8)empire[i].cityType == City_VulnerableRoman )
     {
       city_inform[ciid].distantBattleCity = i;
       return;
@@ -31946,8 +31926,8 @@ void  fun_setInvasionMonthsAndPaths()
       {
         if ( (unsigned __int8)empire[i].type == 3 )
         {
-          if ( (unsigned __int8)empire_invasionPathId[64 * i] > dword_990CDC )
-            dword_990CDC = (unsigned __int8)empire_invasionPathId[64 * i];
+          if ( empire[i].invasionPathId > dword_990CDC )
+            dword_990CDC = empire[i].invasionPathId;
         }
       }
     }
@@ -31971,11 +31951,11 @@ void  fun_setInvasionMonthsAndPaths()
                 if ( v4 )
                 {
                   byte_98EF40[32 * v0] = 1;
-                  byte_98EF42[32 * v0] = empire_invasionPathId[64 * v4];
-                  byte_98EF43[32 * v0] = empire_invasionYears[64 * v4];
-                  word_98EF44[16 * v0] = empire_xCoord[32 * v4];
-                  word_98EF46[16 * v0] = empire_yCoord[32 * v4];
-                  word_98EF48[16 * v0] = empire_graphicID[32 * v4];
+                  byte_98EF42[32 * v0] = empire[v4].invasionPathId;
+                  byte_98EF43[32 * v0] = empire[v4].invasionYears;
+                  word_98EF44[16 * v0] = empire[v4].xCoord;
+                  word_98EF46[16 * v0] = empire[v4].yCoord;
+                  word_98EF48[16 * v0] = empire[v4].graphicID;
                   byte_98EF54[32 * v0] = v2;
                   word_98EF4A[16 * v0] = v4;
                   word_98EF4C[16 * v0] = 0;
@@ -32004,9 +31984,9 @@ signed int  sub_449570(int a1)
   for ( i = 0; i < 200; ++i )
   {
     if ( empire[i].inUse
-      && (unsigned __int8)empire[i].type == 3
-      && (unsigned __int8)empire_invasionPathId[64 * i] == dword_990604
-      && (unsigned __int8)empire_invasionYears[64 * i] == a1 )
+      && empire[i].type == 3
+      && empire[i].invasionPathId == dword_990604
+      && empire[i].invasionYears == a1 )
       return i;
   }
   return 0;
@@ -32034,9 +32014,9 @@ void  fun_handleInvasionEvent()
             byte_98EF41[32 * i] = 1;
             word_98EF4E[16 * i] = gametime_year;
             word_98EF4C[16 * i] = gametime_month;
-            if ( (signed int)(unsigned __int8)byte_98EF43[32 * i] > 1 )
+            if ( byte_98EF43[32 * i] > 1 )
             {
-              if ( (signed int)(unsigned __int8)byte_98EF43[32 * i] > 2 )
+              if ( byte_98EF43[32 * i] > 2 )
                 fun_postMessageToPlayer(25, 0, 0);
               else
                 fun_postMessageToPlayer(26, 0, 0);
@@ -76175,7 +76155,7 @@ int  fun_getButtonTooltipText_EmpireMap()
             v1 = 0;
             while ( v5 <= 15 )
             {
-              if ( fun_empireCitySellsGood(v7, v5) )
+              if ( canEmpireCitySellsGood(v7, v5) )
               {
                 if ( fun_isMouseHit(v9 + 100 * v1 + 120, v8 + 21, 26, 26) )
                   return v5;
@@ -76187,7 +76167,7 @@ int  fun_getButtonTooltipText_EmpireMap()
             v2 = 0;
             while ( v6 <= 15 )
             {
-              if ( fun_empireCityBuysGood(v7, v6) )
+              if ( canEmpireCityBuysGood(v7, v6) )
               {
                 if ( fun_isMouseHit(v9 + 100 * v2 + 120, v8 + 51, 26, 26) )
                   return v6;
@@ -76202,7 +76182,7 @@ int  fun_getButtonTooltipText_EmpireMap()
             text_xoffset += fun_getGameTextStringWidth(47, 5, graphic_font + F_NormalBlack);
             for ( i = 1; i <= 15; ++i )
             {
-              if ( fun_empireCitySellsGood(v7, i) )
+              if ( canEmpireCitySellsGood(v7, i) )
               {
                 if ( fun_isMouseHit(v9 + text_xoffset + 60, v8 + 35, 26, 26) )
                   return i;
@@ -76212,7 +76192,7 @@ int  fun_getButtonTooltipText_EmpireMap()
             text_xoffset += fun_getGameTextStringWidth(47, 4, graphic_font + F_NormalBlack);
             for ( j = 1; j <= 15; ++j )
             {
-              if ( fun_empireCityBuysGood(v7, j) )
+              if ( canEmpireCityBuysGood(v7, j) )
               {
                 if ( fun_isMouseHit(v9 + text_xoffset + 110, v8 + 35, 26, 26) )
                   return j;
@@ -84375,7 +84355,7 @@ void  fun_handleMouseClick()
                 {
                   currentEmpireEntryId = v12 - 1;
                   editEmpire_selectedObjectButton = 2;
-                  editEmpire_addObjectGraphicID = empire_graphicID[32 * (v12 - 1)];
+                  editEmpire_addObjectGraphicID = empire[v12 - 1].graphicID;
                 }
               }
             }
@@ -84396,14 +84376,14 @@ void  fun_handleMouseClick()
                 case Emp_City:
                   if ( fun_handleCustomButtonClick(223, screen_height - 114, &buttons_editEmpireMap_editCity, 5) )
                     return;
-                  if ( (unsigned __int8)empire_cityType[64 * v13] == City_Ours )
+                  if ( empire[v13].cityType == City_Ours )
                   {
                     if ( fun_handleCustomButtonClick(223, screen_height - 114, &buttons_editEmpireMap_editOwnCity, 10) )
                       return;
                   }
                   else
                   {
-                    if ( (unsigned __int8)empire_cityType[64 * v13] == City_Trade )
+                    if ( empire[v13].cityType == City_Trade )
                     {
                       if ( fun_handleCustomButtonClick(
                              223,
@@ -84414,7 +84394,7 @@ void  fun_handleMouseClick()
                     }
                     else
                     {
-                      if ( (unsigned __int8)empire_cityType[64 * v13] == City_FutureTrade
+                      if ( empire[v13].cityType == City_FutureTrade
                         && fun_handleCustomButtonClick(
                              223,
                              screen_height - 114,
@@ -84423,9 +84403,9 @@ void  fun_handleMouseClick()
                         return;
                     }
                   }
-                  if ( (unsigned __int8)empire_cityType[64 * v13] == City_Ours
-                    || (unsigned __int8)empire_cityType[64 * v13] == City_Trade
-                    || (unsigned __int8)empire_cityType[64 * v13] == City_FutureTrade )
+                  if ( empire[v13].cityType == City_Ours
+                    || empire[v13].cityType == City_Trade
+                    || empire[v13].cityType == City_FutureTrade )
                     fun_editor_empire_fixBuySell(v13);
                   fun_editor_empire_fixOwnCity();
                   break;
@@ -84439,7 +84419,7 @@ void  fun_handleMouseClick()
                     return;
                   fun_empireObjectsCorrectOwnerCity(v13);
                   fun_empireObjectsCorrectTradeStatus();
-                  empireScreen_selectedRouteId = (unsigned __int8)empire_tradeRouteId[64 * v13];
+                  empireScreen_selectedRouteId = empire[v13].tradeRouteId;
                   break;
               }
               fun_editor_editEmpire_something(currentEmpireEntryId, 1);
@@ -84447,7 +84427,7 @@ void  fun_handleMouseClick()
               if ( v14 )
               {
                 currentEmpireEntryId = v14 - 1;
-                editEmpire_addObjectGraphicID = empire_graphicID[32 * (v14 - 1)];
+                editEmpire_addObjectGraphicID = empire[v14-1].graphicID;
               }
               return;
             }
@@ -109567,7 +109547,7 @@ void  fun_drawEmpireInfoPanelCity()
               fun_drawGameText(47, 10, v26 + 40, v24 + 30, graphic_font + 1072, 0);
               for ( i = 1; i <= 15; ++i )
               {
-                if ( fun_empireCitySellsGood(v22, i) )
+                if ( canEmpireCitySellsGood(v22, i) )
                 {
                   fun_drawInsetRect(v26 + 100 * v10 + 120, v24 + 21, 26, 26);
                   v6 = i + word_6E6D0A;
@@ -109608,7 +109588,7 @@ void  fun_drawEmpireInfoPanelCity()
               fun_drawGameText(47, 9, v26 + 40, v24 + 60, graphic_font + 1072, 0);
               for ( j = 1; j <= 15; ++j )
               {
-                if ( fun_empireCityBuysGood(v22, j) )
+                if ( canEmpireCityBuysGood(v22, j) )
                 {
                   fun_drawInsetRect(v26 + 100 * v11 + 120, v24 + 51, 26, 26);
                   v8 = j + word_6E6D0A;
@@ -109654,7 +109634,7 @@ void  fun_drawEmpireInfoPanelCity()
               v12 = 0;
               while ( v14 <= 15 )
               {
-                if ( fun_empireCitySellsGood(v22, v14) )
+                if ( canEmpireCitySellsGood(v22, v14) )
                 {
                   fun_drawInsetRect(v26 + text_xoffset + 60, v24 + 33, 26, 26);
                   v0 = v26 + text_xoffset + 61;
@@ -109683,7 +109663,7 @@ void  fun_drawEmpireInfoPanelCity()
               v13 = 0;
               while ( v15 <= 15 )
               {
-                if ( fun_empireCityBuysGood(v22, v15) )
+                if ( canEmpireCityBuysGood(v22, v15) )
                 {
                   fun_drawInsetRect(v26 + text_xoffset + 110, v24 + 33, 26, 26);
                   v3 = v26 + text_xoffset + 110;
@@ -109758,7 +109738,7 @@ void  fun_drawEmpireInfoPanelRomanArmy()
     if ( city_inform[ciid].byte_654585 > 0
       || city_inform[ciid].byte_654584 > 0 )
     {
-      if ( city_inform[ciid].byte_65458B == (unsigned __int8)empire_distBattleTravelMonths[64 * (empire_selectedCity - 1)] )
+      if ( city_inform[ciid].byte_65458B == empire[empire_selectedCity - 1].distBattleTravelMonths )
       {
         v1 = (screen_width - 240) / 2;
         v0 = screen_height - 88;
@@ -109782,7 +109762,7 @@ void  fun_drawEmpireInfoPanelEnemyArmy()
   {
     if ( city_inform[ciid].byte_654583 > 0 )
     {
-      if ( city_inform[ciid].byte_65458A == (unsigned __int8)empire_distBattleTravelMonths[64 * (empire_selectedCity - 1)] )
+      if ( city_inform[ciid].byte_65458A == empire[empire_selectedCity - 1].distBattleTravelMonths )
         fun_drawGameTextWrapped(47, 14, (screen_width - 240) / 2, screen_height - 88 + 20, 240, graphic_font + 134, 0);
     }
   }
@@ -109996,9 +109976,9 @@ void  fun_drawEditEmpireObjectPanel_Edit()
   if ( (unsigned __int8)empire[currentEmpireEntryId].type == 1 )
   {
     fun_drawOutsetRect(393, screen_height - 112, 180, 20);
-    if ( empire_cityType[64 * v17] )
+    if ( empire[v17].cityType )
     {
-      switch ( empire_cityType[64 * v17] )
+      switch ( empire[v17].cityType )
       {
         case 1:
           fun_drawGameTextCentered(39, 1, 393, screen_height - 108, 180, graphic_font, 0);
@@ -110027,7 +110007,7 @@ void  fun_drawEditEmpireObjectPanel_Edit()
     fun_drawOutsetRect(593, screen_height - 112, 180, 20);
     fun_drawGameTextCentered(
       21,
-      (unsigned __int8)empire_cityNameId[64 * v17],
+      empire[v17].cityNameId,
       593,
       screen_height - 108,
       180,
@@ -110036,7 +110016,7 @@ void  fun_drawEditEmpireObjectPanel_Edit()
     fun_drawGameText(44, 32, 393, screen_height - 83, graphic_font, 0);
     fun_drawOutsetRect(453, screen_height - 87, 50, 20);
     fun_drawNumberCentered(
-      (unsigned __int8)empire_tradeRouteId[64 * v17],
+      empire[v17].tradeRouteId,
       64,
       " ",
       453,
@@ -110048,14 +110028,14 @@ void  fun_drawEditEmpireObjectPanel_Edit()
     fun_drawGameTextCentered(44, 33, 523, screen_height - 83, 100, graphic_font, 0);
     fun_drawGameText(44, 34, 653, screen_height - 83, graphic_font, 0);
     fun_drawOutsetRect(703, screen_height - 87, 80, 20);
-    fun_drawNumberCentered(empire_tradeCostToOpen[32 * v17], 64, " ", 703, screen_height - 83, 60, graphic_font, 0);
-    if ( (unsigned __int8)empire_cityType[64 * v17] == 1 )
+    fun_drawNumberCentered(empire[v17].tradeCostToOpen[0], 64, " ", 703, screen_height - 83, 60, graphic_font, 0);
+    if ( empire[v17].cityType == 1 )
     {
       fun_drawGameText(44, 35, 393, screen_height - 55, graphic_font, 0);
       for ( i = 0; i < 10; ++i )
       {
         fun_drawInsetRect(30 * i + 473, screen_height - 62, 26, 26);
-        v2 = (unsigned __int8)*(&empire_citySells[64 * v17] + i);
+        v2 = empire[v17].citySells[i];
         v3 = screen_height - 61;
         v4 = v2 + word_6E6D0A;
         v5 = fun_getResourceGraphicIdOffset(v2, 3);
@@ -110064,13 +110044,13 @@ void  fun_drawEditEmpireObjectPanel_Edit()
     }
     else
     {
-      if ( (unsigned __int8)empire_cityType[64 * v17] == 2 || (unsigned __int8)empire_cityType[64 * v17] == 3 )
+      if ( empire[v17].cityType == 2 || empire[v17].cityType == 3 )
       {
         fun_drawGameText(44, 36, 393, screen_height - 55, graphic_font, 0);
         for ( j = 0; j < 8; ++j )
         {
           fun_drawInsetRect(30 * j + 523, screen_height - 62, 26, 26);
-          v6 = (unsigned __int8)*(&empire_citySells[64 * v17] + j);
+          v6 = empire[v17].citySells[j];
           v7 = screen_height - 61;
           v8 = v6 + word_6E6D0A;
           v9 = fun_getResourceGraphicIdOffset(v6, 3);
@@ -110080,7 +110060,7 @@ void  fun_drawEditEmpireObjectPanel_Edit()
         for ( k = 0; k < 8; ++k )
         {
           fun_drawInsetRect(30 * k + 523, screen_height - 34, 26, 26);
-          v10 = (unsigned __int8)*(&empire_cityBuys[64 * v17] + k);
+          v10 = empire[v17].cityBuys[k];
           v11 = screen_height - 33;
           v12 = v10 + word_6E6D0A;
           v13 = fun_getResourceGraphicIdOffset(v10, 3);
@@ -110091,13 +110071,13 @@ void  fun_drawEditEmpireObjectPanel_Edit()
   }
   else
   {
-    if ( (unsigned __int8)empire[currentEmpireEntryId].type == 3 )
+    if ( empire[currentEmpireEntryId].type == 3 )
     {
       fun_drawGameText(44, 69, 393, screen_height - 100, graphic_font + 536, 0);
       fun_drawGameText(44, 70, 423, screen_height - 64, graphic_font, 0);
       fun_drawOutsetRect(523, screen_height - 68, 50, 20);
       fun_drawNumberCentered(
-        (unsigned __int8)empire_invasionPathId[64 * v17],
+        empire[v17].invasionPathId,
         64,
         " ",
         523,
@@ -110108,7 +110088,7 @@ void  fun_drawEditEmpireObjectPanel_Edit()
       fun_drawGameText(44, 71, 423, screen_height - 34, graphic_font, 0);
       fun_drawOutsetRect(523, screen_height - 38, 50, 20);
       fun_drawNumberCentered(
-        (unsigned __int8)empire_invasionYears[64 * v17],
+        empire[v17].invasionYears,
         64,
         " ",
         523,
@@ -110131,7 +110111,7 @@ void  fun_drawEditEmpireObjectPanel_Edit()
           else
             fun_drawGameText(44, 31, 393, screen_height - 100, graphic_font + 536, 0);
           fun_drawNumber(
-            (unsigned __int8)empire_distBattleTravelMonths[64 * v17],
+            empire[v17].distBattleTravelMonths,
             64,
             " ",
             text_xoffset + 393,
@@ -110149,7 +110129,7 @@ void  fun_drawEditEmpireObjectPanel_Edit()
           fun_drawGameText(44, 29, 393, screen_height - 100, graphic_font + 536, 0);
         fun_drawOutsetRect(393, screen_height - 54, 50, 20);
         fun_drawNumberCentered(
-          (unsigned __int8)empire_tradeRouteId[64 * v17],
+          (unsigned __int8)empire[v17].tradeRouteId,
           64,
           " ",
           393,
@@ -110159,7 +110139,7 @@ void  fun_drawEditEmpireObjectPanel_Edit()
           0);
         fun_drawGameText(
           21,
-          (unsigned __int8)empire_cityNameId[64 * v17],
+          (unsigned __int8)empire[v17].cityNameId,
           493,
           screen_height - 50,
           graphic_font + 134,
@@ -110168,7 +110148,7 @@ void  fun_drawEditEmpireObjectPanel_Edit()
         fun_drawGameText(44, 33, 623, screen_height - 50, graphic_font, 0);
         fun_drawGameTextCentered(
           18,
-          (unsigned __int8)empire_tradeRouteOpen[64 * v17],
+          empire[v17].tradeRouteOpen,
           text_xoffset + 623,
           screen_height - 50,
           50,
@@ -110284,27 +110264,27 @@ void  fun_drawEmpire()
   {
     if ( window_id != 20
       || (unsigned __int8)empire[i].type != 4 && (unsigned __int8)empire[i].type != 5
-      || fun_isTradeRouteOpen((unsigned __int8)empire_tradeRouteId[64 * i]) )
+      || fun_isTradeRouteOpen((unsigned __int8)empire[j].tradeRouteId) )
     {
       if ( window_id == 21 && map_empireExpanded )
       {
-        v6 = empire_xCoord_exp[32 * i];
-        v4 = empire_yCoord_exp[32 * i];
-        v3 = empire_graphicID_exp[32 * i];
+        v6 = empire[i].xCoord_exp;
+        v4 = empire[i].yCoord_exp;
+        v3 = empire[i].graphicID_exp;
       }
       else
       {
         if ( window_id == 20 && scn_empireExpanded_flag )
         {
-          v6 = empire_xCoord_exp[32 * i];
-          v4 = empire_yCoord_exp[32 * i];
-          v3 = empire_graphicID_exp[32 * i];
+          v6 = empire[i].xCoord_exp;
+          v4 = empire[i].yCoord_exp;
+          v3 = empire[i].graphicID_exp;
         }
         else
         {
-          v6 = empire_xCoord[32 * i];
-          v4 = empire_yCoord[32 * i];
-          v3 = empire_graphicID[32 * i];
+          v6 = empire[i].xCoord;
+          v4 = empire[i].yCoord;
+          v3 = empire[i].graphicID;
         }
       }
       if ( (unsigned __int8)empire[i].type == Emp_City )
@@ -110320,7 +110300,7 @@ void  fun_drawEmpire()
         if ( window_id == W_EmpireMap )
           continue;
         fun_drawNumber(
-          (unsigned __int8)empire_invasionPathId[64 * i],
+          empire[i].invasionPathId,
           64,
           " ",
           v6 + empireMapBorderLeftRight - empire_scroll_x - 8,
@@ -110328,7 +110308,7 @@ void  fun_drawEmpire()
           graphic_font + 938,
           0);
         fun_drawNumber(
-          (unsigned __int8)empire_invasionPathId[64 * i],
+          empire[i].invasionPathId,
           64,
           " ",
           v6 + empireMapBorderLeftRight - empire_scroll_x - 9,
@@ -110336,7 +110316,7 @@ void  fun_drawEmpire()
           graphic_font + 938,
           -1);
         fun_drawNumber(
-          (unsigned __int8)empire_invasionYears[64 * i],
+          empire[i].invasionYears,
           64,
           " ",
           v6 + empireMapBorderLeftRight - empire_scroll_x + 16,
@@ -110344,7 +110324,7 @@ void  fun_drawEmpire()
           graphic_font + 938,
           0);
         fun_drawNumber(
-          (unsigned __int8)empire_invasionYears[64 * i],
+          empire[i].invasionYears,
           64,
           " ",
           v6 + empireMapBorderLeftRight - empire_scroll_x + 15,
@@ -110362,7 +110342,7 @@ void  fun_drawEmpire()
         else
           v2 = -2048;
         fun_drawNumber(
-          (unsigned __int8)empire_distBattleTravelMonths[64 * i],
+          (unsigned __int8)empire[i].distBattleTravelMonths,
           64,
           " ",
           v6 + empireMapBorderLeftRight - empire_scroll_x + 8,
@@ -110370,7 +110350,7 @@ void  fun_drawEmpire()
           graphic_font + 938,
           0);
         fun_drawNumber(
-          (unsigned __int8)empire_distBattleTravelMonths[64 * i],
+          (unsigned __int8)empire[i].distBattleTravelMonths,
           64,
           " ",
           v6 + empireMapBorderLeftRight - empire_scroll_x + 7,
@@ -110386,9 +110366,9 @@ LABEL_49:
         {
           v0 = c3_sg2[v3].sprite_top_offset;
           v1 = c3_sg2[v3].sprite_left_offset;
-          empire_currentAnimationIndex[64 * i] = sub_51F950(v3, (unsigned __int8)empire_currentAnimationIndex[64 * i]);
+          empire[i].currentAnimationIndex = sub_51F950(v3, (unsigned __int8)empire[i].currentAnimationIndex);
           fun_drawGraphic(
-            (unsigned __int8)empire_currentAnimationIndex[64 * i] + v3,
+            (unsigned __int8)empire[i].currentAnimationIndex + v3,
             v0 + v6 + empireMapBorderLeftRight - empire_scroll_x,
             v1 + v4 + empireMapBorderTop - empire_scroll_y);
         }
@@ -110397,14 +110377,14 @@ LABEL_49:
       if ( (unsigned __int8)empire[i].type == Emp_DistantBattleEnemyArmy )
       {
         if ( city_inform[ciid].byte_654583 > 0
-          && city_inform[ciid].byte_65458A == (unsigned __int8)empire_distBattleTravelMonths[64 * i] )
+          && city_inform[ciid].byte_65458A == (unsigned __int8)empire[i].distBattleTravelMonths )
           goto LABEL_49;
       }
       else
       {
         if ( (city_inform[ciid].byte_654585 > 0
            || city_inform[ciid].byte_654584 > 0)
-          && city_inform[ciid].byte_65458B == (unsigned __int8)empire_distBattleTravelMonths[64 * i] )
+          && city_inform[ciid].byte_65458B == (unsigned __int8)empire[i].distBattleTravelMonths )
           goto LABEL_49;
       }
     }
@@ -110413,20 +110393,20 @@ LABEL_49:
   {
     if ( map_empireExpanded )
     {
-      v7 = empire_xCoord_exp[32 * currentEmpireEntryId];
-      v5 = empire_yCoord_exp[32 * currentEmpireEntryId];
+      v7 = empire[currentEmpireEntryId].xCoord_exp;
+      v5 = empire[currentEmpireEntryId].yCoord_exp;
     }
     else
     {
-      v7 = empire_xCoord[32 * currentEmpireEntryId];
-      v5 = empire_yCoord[32 * currentEmpireEntryId];
+      v7 = empire[currentEmpireEntryId].xCoord;
+      v5 = empire[currentEmpireEntryId].yCoord;
     }
     if ( empire[currentEmpireEntryId].inUse )
       fun_drawSelectionAnts(
         v7 + empireMapBorderLeftRight - empire_scroll_x - 4,
         v5 + empireMapBorderTop - empire_scroll_y - 4,
-        c3_sg2[empire_graphicID[32 * currentEmpireEntryId]].width + 8,
-        c3_sg2[empire_graphicID[32 * currentEmpireEntryId]].height + 8);
+        c3_sg2[empire[currentEmpireEntryId].graphicID].width + 8,
+        c3_sg2[empire[currentEmpireEntryId].graphicID].height + 8);
   }
   for ( j = 0; j < 101 && window_id == W_EmpireMap; ++j )
   {
