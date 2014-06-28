@@ -1086,7 +1086,7 @@ struct Walker
 
   int destination_x;
 
-  int type;
+  WalkerType type;
   int word_7FA344;
   char byte_7FA34C;
   char byte_7FA358;
@@ -1165,7 +1165,92 @@ struct Empire
 {
   char inUse;
   char type;
+  char currentAnimationIndex;
+  __int16 xCoord;
+  __int16 yCoord;
+  __int16 width;
+  __int16 height;
+  __int16 graphicID;
+  __int16 graphicID_exp;
+  char distBattleTravelMonths;
+  __int16 xCoord_exp;
+  __int16 yCoord_exp;
+  char cityType;
+  char cityNameId;
+  char tradeRouteId;
+  char tradeRouteOpen;
+  __int16 tradeCostToOpen[10];
+  char citySells[16];
+  char ownerCityIndex;
+  char f990D29[10];
+  char cityBuys[16];
+  char invasionPathId;
+  char invasionYears;
+  __int16 trade40;
+  __int16 trade25;
+  __int16 trade15;
 };
+
+struct Formation
+{
+char inUse;
+char formation_01;
+char fortId;
+char f03_flag;
+WalkerType walkerType;
+__int16 buildingId;
+__int16 walkerIds[20];
+char numWalkers;
+char maxWalkers;
+__int16 layout;
+__int16 morale;
+char fortX;
+char fortY;
+char standardX;
+char standardY;
+char x;
+char y;
+char f34;
+char f35;
+__int16 f36;
+__int16 bannerId;
+char isFort;
+__int16 attackType;
+__int16 formation_3e;
+__int16 hasMilitaryTraining;
+__int16 formation_42;
+__int16 formation_44;
+__int16 formation_46;
+__int16 formation_48;
+__int16 formation_4a;
+__int16 formation_4c;
+__int16 formation_4e;
+__int16 formation_50;
+__int16 formation_52;
+__int16 formation_54;
+__int16 formation_56;
+__int16 formation_58;
+__int16 formation_5a;
+__int16 cursedByMars;
+char formation_5e;
+char fortEmpireServiceFlag;
+char formation_60;
+char formation_61;
+char enemyType;
+char formation_63;
+char formation_64;
+char formation_65;
+char formation_66;
+char orientation;
+char formation_68;
+char formation_69;
+char invasionId;
+char formation_6b;
+char formation_6c;
+__int16 invasionInternalId;
+};
+
+static Formation formations[50];
 
 static Empire empire[100];
 
