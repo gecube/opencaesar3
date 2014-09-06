@@ -1,6 +1,8 @@
 **main branch of development here**
 https://bitbucket.org/dalerank/caesaria
 
+Please support our project here: https://www.indiegogo.com/projects/caesaria-divide-et-empera/x/8519755
+Great thanks!
 
 
 
