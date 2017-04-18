@@ -16,7 +16,7 @@ Building openCaesar3
 -------------------
 See INSTALL_LINUX.md or INSTALL_WINDOWS.md depending on which operating system you are running.
 
-####External dependencies
+#### External dependencies
 openCaesar3 is build using following excellent libraries:
   * SDL - http://www.libsdl.org/
     * SDL_image - http://www.libsdl.org/projects/SDL_image/
